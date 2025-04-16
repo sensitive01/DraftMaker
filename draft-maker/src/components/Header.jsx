@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import draftMakerLogo from "../assets/images/logo.png"
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,7 +14,7 @@ const Header = () => {
       <div className="container">
         <nav className="navbar navbar-expand-lg">
           <Link className="navbar-brand" to="/">
-            <img src="/src/assets/images/logo.png" alt="Draft Maker" />
+            <img src={draftMakerLogo} alt="Draft Maker" />
           </Link>
           <button 
             className="navbar-toggler" 

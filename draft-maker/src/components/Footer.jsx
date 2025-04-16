@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import animaeIng from "../assets/images/anim_line_2.png"
+import contactImg from "../assets/images/contact.png"
+import logoImg from "../assets/images/logo.png" 
 
 
 const Footer = () => {
@@ -26,7 +28,7 @@ const Footer = () => {
               <div className="abt_side">
                 <div className="logo">
                   {" "}
-                  <img src="/src/assets/images/logo - light.png" alt="image" />
+                  <img src={logoImg} alt="image" />
                 </div>
                 <hr />
                 <p align="justify">
@@ -120,7 +122,7 @@ const Footer = () => {
                 <ul>
                   <li>
                     <span className="icon">
-                      <img src="/src/assets/images/new/contact_01.png" alt="image" />
+                      <img src={contactImg} alt="image" />
                     </span>
                     <div className="text">
                       <p>
@@ -130,7 +132,7 @@ const Footer = () => {
                   </li>
                   <li>
                     <span className="icon">
-                      <img src="/src/assets/images/new/contact_02.png" alt="image" />
+                      <img src={contactImg} alt="image" />
                     </span>
                     <div className="text">
                       <p>
@@ -140,7 +142,7 @@ const Footer = () => {
                   </li>
                   <li>
                     <span className="icon">
-                      <img src="/src/assets/images/new/contact_03.png" alt="image" />
+                      <img src={contactImg} alt="image" />
                     </span>
                     <div className="text">
                       <p>

@@ -6,7 +6,7 @@ import DocumentForm from "./components/DocumentForm";
 import DocumentPreview from "./components/DocumentPreview";
 import NeedSupport from "./components/NeedSupport";
 import Preloader from "./components/Preloader";
-import draftLogo from "./images/anim_line.png";
+import animLogo from "./images/anim_line.png";
 import RentalAgreementForm from "./components/documents/rentalAggrement/RentalAgreementForm";
 
 function App() {
@@ -32,7 +32,7 @@ function App() {
             <div className="anim_line dark_bg">
               {[...Array(9)].map((_, index) => (
                 <span key={index}>
-                  <img src="/src/assets/images/anim_line.png" alt="anim_line" />
+                  <img src={animLogo} alt="anim_line" />
                 </span>
               ))}
             </div>
@@ -51,7 +51,7 @@ function App() {
             <div className="anim_line dark_bg">
               {[...Array(9)].map((_, index) => (
                 <span key={index}>
-                  <img src={draftLogo} alt="anim_line" />
+                  <img src={animLogo} alt="anim_line" />
                 </span>
               ))}
             </div>
