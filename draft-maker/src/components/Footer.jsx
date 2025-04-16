@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import animaeIng from "../assets/images/anim_line_2.png"
+
 
 const Footer = () => {
   return (
@@ -9,7 +11,7 @@ const Footer = () => {
           <div className="anim_line dark_bg">
             {[...Array(9)].map((_, index) => (
               <span key={index}>
-                <img src="/src/assets/images/anim_line_2.png" alt="anim_line" />
+                <img src={animaeIng} alt="anim_line" />
               </span>
             ))}
           </div>

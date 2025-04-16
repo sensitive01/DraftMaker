@@ -1,3 +1,5 @@
+import authorImage1 from "../assets/images/new/authore_01.png"
+
 const DocumentPreview = () => {
     // You can use state from a parent component or context to get the actual document data
     
@@ -24,7 +26,7 @@ const DocumentPreview = () => {
               <div className="authore_block" data-aos="fade-up" data-aos-duration="1000">
                 <div className="authore">
                   <div className="img">
-                    <img src="/src/assets/images/new/authore_01.png" alt="author" />
+                    <img src={authorImage1} alt="author" />
                   </div>
                   <div className="text">
                     <h4>Stephan Joe</h4>
