@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import animaeIng from "../assets/images/anim_line_2.png"
-import contactImg from "../assets/images/contact.png"
+import contactImg from "../assets/images/new/contact_01.png"
 import logoImg from "../assets/images/logo.png" 
 
 
