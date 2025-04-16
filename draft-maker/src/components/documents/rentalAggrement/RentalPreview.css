@@ -1,0 +1,219 @@
+/* A4 Paper styling */
+.rental-agreement-container {
+  min-height: 297mm;
+  margin: 0 auto;
+  background-color: white;
+  padding: 20mm;
+  font-family: "Times New Roman", serif;
+  font-size: 12pt;
+  line-height: 1.5;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Page styling */
+.page {
+  position: relative;
+  min-height: 257mm;
+}
+
+/* Page breaks */
+.page-break {
+  page-break-after: always;
+  margin-bottom: 30px;
+}
+
+/* Corner markers */
+.corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+}
+
+.corner-top-left {
+  top: 0;
+  left: 0;
+  border-top: 1px solid #777;
+  border-left: 1px solid #777;
+}
+
+.corner-top-right {
+  top: 0;
+  right: 0;
+  border-top: 1px solid #777;
+  border-right: 1px solid #777;
+}
+
+.corner-bottom-left {
+  bottom: 0;
+  left: 0;
+  border-bottom: 1px solid #777;
+  border-left: 1px solid #777;
+}
+
+.corner-bottom-right {
+  bottom: 0;
+  right: 0;
+  border-bottom: 1px solid #777;
+  border-right: 1px solid #777;
+}
+
+/* Title styling */
+.agreement-title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 16pt;
+  margin-bottom: 24px;
+  text-decoration: underline;
+}
+
+/* Highlight for form fields */
+.highlight {
+  background-color: #ffff00;
+  padding: 0 2px;
+}
+
+/* Paragraph spacing */
+.paragraph {
+  margin-bottom: 15px;
+}
+
+/* Clause list styling */
+.clause-list {
+  list-style-type: decimal;
+  padding-left: 25px;
+  margin-bottom: 20px;
+}
+
+.clause-list li {
+  margin-bottom: 12px;
+}
+
+.clause-title {
+  font-weight: bold;
+}
+
+/* Schedule section */
+.schedule {
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.schedule-title {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+/* Witness and signature section */
+.signatures {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.signature-block {
+  margin-top: 40px;
+}
+
+.signature-title {
+  font-weight: bold;
+}
+
+/* Annexure table */
+.annexure {
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+.annexure-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.fixtures-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fixtures-table th,
+.fixtures-table td {
+  border: 1px solid #000;
+  padding: 8px;
+}
+
+.fixtures-table th {
+  background-color: #f3f3f3;
+  text-align: center;
+}
+
+.serial-column {
+  width: 10%;
+  text-align: center;
+}
+
+.item-column {
+  width: 60%;
+}
+
+.quantity-column {
+  width: 30%;
+  text-align: center;
+}
+
+.fixtures-table td {
+  height: 30px;
+}
+
+/* Page number */
+.page-number {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  font-size: 10pt;
+  color: #777;
+}
+
+/* Print button */
+.print-button {
+  display: block;
+  width: 150px;
+  margin: 20px auto;
+  padding: 10px 15px;
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+}
+
+.print-button:hover {
+  background-color: #0055aa;
+}
+
+@media print {
+  .print-button {
+    display: none;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .rental-agreement-container {
+    width: 210mm;
+    height: 297mm;
+    padding: 20mm;
+    box-shadow: none;
+    margin: 0;
+  }
+
+  .page-break {
+    page-break-after: always;
+  }
+}

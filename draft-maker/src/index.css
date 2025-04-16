@@ -1,0 +1,13 @@
+/* Import fonts if needed */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+
+/* Import external CSS libraries - this is an approach if you don't use npm to install these */
+@import '/src/css/icofont.min.css';
+@import '/src/css/animate.min.css';
+@import '/src/css/owl.carousel.min.css';
+@import '/src/css/bootstrap.min.css';
+@import '/src/css/aos.css';
+@import '/src/css/style.css';
+@import '/src/css/responsive.css';
+
+/* Add any additional global styles here */

@@ -1,0 +1,213 @@
+/* Main container */
+.rental-agreement-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* Layout */
+.rental-agreement-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* For medium screens and up - side by side layout */
+@media (min-width: 768px) {
+  .rental-agreement-layout {
+    flex-direction: row;
+  }
+}
+
+/* Wrappers */
+.rental-form-wrapper,
+.rental-preview-wrapper {
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+  .rental-form-wrapper,
+  .rental-preview-wrapper {
+    width: 50%;
+  }
+}
+
+/* Form styles */
+.rental-form {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+}
+
+.rental-form-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.rental-form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rental-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rental-form-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #444;
+}
+
+.rental-form-field {
+  margin-bottom: 12px;
+}
+
+.rental-form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.rental-form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.rental-form-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.rental-form-field-group {
+  display: flex;
+  gap: 12px;
+}
+
+.rental-form-field-third {
+  flex: 1;
+}
+
+.rental-form-fixture {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.rental-form-fixture-item {
+  flex-grow: 1;
+}
+
+.rental-form-fixture-quantity {
+  width: 80px;
+}
+
+.rental-form-add-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.rental-form-add-button:hover {
+  background-color: #3d8b40;
+}
+
+.rental-form-remove-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.rental-form-remove-button:hover {
+  background-color: #d32f2f;
+}
+
+/* Preview styles */
+.rental-preview {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+  padding: 24px;
+}
+
+.rental-preview-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.rental-preview-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.rental-preview-header {
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+
+.rental-preview-bold {
+  font-weight: 700;
+}
+
+.rental-preview-center {
+  text-align: center;
+}
+
+.rental-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.rental-preview-table-header {
+  background-color: #f5f5f5;
+}
+
+.rental-preview-table-cell {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+/* Make sure we handle overflow in both components */
+.rental-form-content,
+.rental-preview-content {
+  overflow-y: auto;
+}
