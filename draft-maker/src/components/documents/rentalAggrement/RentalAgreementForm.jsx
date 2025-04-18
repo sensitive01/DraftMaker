@@ -1,7 +1,6 @@
 import { useState } from "react";
 import RentalForm from "./RentalForm";
 import RentalPreview from "./RentalPreview";
-import "./RentalAgreement.css";
 
 export default function RentalAgreementForm() {
   const [formData, setFormData] = useState({
@@ -73,9 +72,9 @@ export default function RentalAgreementForm() {
   };
 
   return (
-    <div className="rental-agreement-container">
-      <div className="rental-agreement-layout">
-        <div className="rental-form-wrapper">
+    <div className="container mx-auto p-4">
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="w-full md:w-1/2">
           <RentalForm
             formData={formData}
             handleChange={handleChange}
@@ -84,7 +83,7 @@ export default function RentalAgreementForm() {
             removeFixture={removeFixture}
           />
         </div>
-        <div className="rental-preview-wrapper">
+        <div className="w-full md:w-1/2 bg-white shadow-lg rounded-lg p-6">
           <RentalPreview formData={formData} />
         </div>
       </div>

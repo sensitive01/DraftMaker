@@ -8,6 +8,8 @@ import NeedSupport from "./components/NeedSupport";
 import Preloader from "./components/Preloader";
 import animLogo from "./images/anim_line.png";
 import RentalAgreementForm from "./components/documents/rentalAggrement/RentalAgreementForm";
+import CommercialAggrement from "./components/documents/commercialAggrement/CommercialAggrement";
+import DocumentServices from "./components/DocumentServices";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -39,6 +41,11 @@ function App() {
           </div>
 
           <Header />
+
+          {/* Added spacing div with Tailwind classes */}
+          <div className="w-full py-8 md:py-12"></div>
+
+          <DocumentServices />
 
           {/* Bread Crumb */}
           <div
@@ -86,10 +93,18 @@ function App() {
             }
           />
           <Route
-            path="/service-list-1"
+            path="/rental-aggrement"
             element={
               <>
                 <RentalAgreementForm />
+              </>
+            }
+          />
+          <Route
+            path="/service-list-2"
+            element={
+              <>
+                <CommercialAggrement />
               </>
             }
           />

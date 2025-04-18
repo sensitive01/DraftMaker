@@ -41,8 +41,8 @@ const Header = () => {
                 <span className="drp_btn"><i className="icofont-rounded-down"></i></span>
                 <div className="sub_menu">
                   <ul>
-                    <li><Link to="/service-list-1">Commercial</Link></li>
-                    <li><Link to="/service-list-2">Residential</Link></li>
+                    <li><Link to="/rental-aggrement">Residential</Link></li>
+                    <li><Link to="/commercial-aggrement">Commercial</Link></li>
                   </ul>
                 </div>
               </li>
