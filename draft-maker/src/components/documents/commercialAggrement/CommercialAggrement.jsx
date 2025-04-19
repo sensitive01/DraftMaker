@@ -3,6 +3,7 @@ import CommercialPreview from "./CommercialPreview";
 import CommercialForm from "./CommercialForm";
 
 const CommercialAggrement = () => {
+
   const [formData, setFormData] = useState({
     agreementDate: "",
     lessorName: "",

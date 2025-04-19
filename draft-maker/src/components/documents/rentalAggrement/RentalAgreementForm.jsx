@@ -1,8 +1,11 @@
 import { useState } from "react";
 import RentalForm from "./RentalForm";
 import RentalPreview from "./RentalPreview";
+import { useParams } from "react-router-dom";
 
 export default function RentalAgreementForm() {
+  const {type} = useParams()
+  console.log("Type",type)
   const [formData, setFormData] = useState({
     agreementDate: "",
     lessorName: "",

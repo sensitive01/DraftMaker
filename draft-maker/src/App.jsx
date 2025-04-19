@@ -21,8 +21,8 @@ function MainLayout({ children }) {
     <>
       <div className="top_home_wraper white_option">
         <div className="content-wrapper">
-          <Header />
-
+      <Header />
+          <div className="container mx-auto text-center ">
           <div
             className="bread_crumb"
             data-aos="fade-in"
@@ -37,7 +37,6 @@ function MainLayout({ children }) {
               ))}
             </div>
           </div>
-          <div className="container mx-auto text-center ">
             <DraftHeading />
           </div>
         </div>
@@ -84,11 +83,11 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={<Navigate to="/documents/residential-lease" replace />}
+            element={<Navigate to="/documents/:type" replace />}
           />
 
           <Route
-            path="/documents/residential-lease"
+            path="/documents/:type"
             element={
               <MainLayout>
                 <RentalAgreementForm />
@@ -97,7 +96,7 @@ function App() {
           />
 
           <Route
-            path="/documents/commercial-lease"
+            path="/documents/:type"
             element={
               <MainLayout>
                 <CommercialAggrement />
