@@ -22,25 +22,14 @@ function MainLayout({ children }) {
   return (
     <>
       <div className="top_home_wraper white_option">
-        {/* Animated line background */}
-        <div className="container">
-          <div className="anim_line dark_bg">
-            {[...Array(9)].map((_, index) => (
-              <span key={index}>
-                <img src={animLogo} alt="anim_line" />
-              </span>
-            ))}
-          </div>
-        </div>
-        <Header />
-
         <div className="content-wrapper">
+          <Header />
+
           <div
             className="bread_crumb"
             data-aos="fade-in"
             data-aos-duration="2000"
             data-aos-delay="100"
-            style={{ paddingBottom: "0" }}
           >
             <div className="anim_line dark_bg">
               {[...Array(9)].map((_, index) => (
@@ -50,15 +39,12 @@ function MainLayout({ children }) {
               ))}
             </div>
           </div>
+          <div className="container mx-auto text-center ">
+            <DraftHeading />
+          </div>
         </div>
-        <div className="container mx-auto text-center">
-          <DraftHeading />
-        </div>
-
-        
       </div>
 
-      {/* Document Services placed outside of bread_crumb but before content */}
       <div className="container">
         <div
           className="document-services-wrapper"

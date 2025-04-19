@@ -78,7 +78,7 @@ const CommercialAggrement = () => {
             />
           </div>
           <div className="w-full md:w-1/2 bg-white shadow-lg rounded-lg p-6">
-            <CommercialPreview data={formData} />
+            <CommercialPreview formData={formData} />
           </div>
         </div>
       </div>
