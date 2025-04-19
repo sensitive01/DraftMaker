@@ -7,8 +7,7 @@ import {
 } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import DocumentForm from "./components/DocumentForm";
-import DocumentPreview from "./components/DocumentPreview";
+
 import NeedSupport from "./components/NeedSupport";
 import Preloader from "./components/Preloader";
 import animLogo from "./images/anim_line.png";
@@ -17,7 +16,6 @@ import CommercialAggrement from "./components/documents/commercialAggrement/Comm
 import DocumentServices from "./components/DocumentServices";
 import DraftHeading from "./DraftHeading";
 
-// MainLayout component to hold all the permanent UI elements
 function MainLayout({ children }) {
   return (
     <>
@@ -59,7 +57,6 @@ function MainLayout({ children }) {
         </div>
       </div>
 
-      {/* This is where the route-specific content will render */}
       {children}
 
       <NeedSupport />
@@ -72,7 +69,6 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate preloader
     const timer = setTimeout(() => {
       setLoading(false);
     }, 2000);
@@ -86,13 +82,11 @@ function App() {
         {loading && <Preloader />}
 
         <Routes>
-          {/* Redirect root to residential lease by default */}
           <Route
             path="/"
             element={<Navigate to="/documents/residential-lease" replace />}
           />
 
-          {/* Route for residential lease */}
           <Route
             path="/documents/residential-lease"
             element={
@@ -102,7 +96,6 @@ function App() {
             }
           />
 
-          {/* Route for commercial lease */}
           <Route
             path="/documents/commercial-lease"
             element={
@@ -113,10 +106,8 @@ function App() {
           />
         </Routes>
 
-        {/* Go to top button */}
         <GoTop />
 
-        {/* Video modal */}
         <VideoModal />
       </div>
     </Router>
