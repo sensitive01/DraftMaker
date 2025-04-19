@@ -10,19 +10,19 @@ export default function DocumentServices() {
       id: 1,
       title: "Commercial Rental / Lease Agreement",
       type: "agreement",
-      path: "/documents/commercial-lease",
+      path: "/documents/commercial/commercial-lease",
     },
     {
       id: 2,
       title: "Residential Rental / Lease Agreement",
       type: "agreement",
-      path: "/documents/residential-lease",
+      path: "/documents/rental/residential-lease",
     },
     {
       id: 3,
-      title: "AFFIDAVITS",
+      title: "Address Affadavit",
       type: "affidavit",
-      path: "/documents/affidavit-1",
+      path: "/documents/address/addressaffadavit",
     },
     {
       id: 4,

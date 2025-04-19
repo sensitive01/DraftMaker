@@ -368,10 +368,11 @@ const RentalForm = ({
             <h2 className="text-lg font-medium text-gray-800 mb-3 pb-2 border-b">
               Property Details
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
+              {/* First Row - Agreement Field */}
               <div>
                 <label className="block text-sm text-gray-700 mb-1">
-                  Property Address
+                  Agreement
                 </label>
                 <textarea
                   name="propertyAddress"
@@ -382,6 +383,7 @@ const RentalForm = ({
                 ></textarea>
               </div>
 
+              {/* Second Row - Configuration */}
               <div>
                 <label className="block text-sm text-gray-700 mb-1">
                   Configuration
@@ -510,15 +512,6 @@ const RentalForm = ({
               </label>
             </div>
           </div>
-
-          {/* <div className="flex justify-center mt-6">
-            <button
-              type="submit"
-              className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none flex items-center font-medium"
-            >
-              Generate Agreement <span className="ml-2">→</span>
-            </button>
-          </div> */}
         </div>
       </form>
     </div>

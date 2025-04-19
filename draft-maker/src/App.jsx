@@ -15,10 +15,11 @@ import RentalAgreementForm from "./components/documents/rentalAggrement/RentalAg
 import CommercialAggrement from "./components/documents/commercialAggrement/CommercialAggrement";
 import DocumentServices from "./components/DocumentServices";
 import DraftHeading from "./DraftHeading";
+import AddressAffadavit from "./components/documents/addressProofAffadavit/AddressAffadavit";
 
 function MainLayout({ children }) {
   return (
-       <div className="page_wrapper">
+    <div className="page_wrapper">
       <div className="top_home_wraper white_option">
         <div className="content-wrapper">
           <div className="container">
@@ -69,7 +70,7 @@ function MainLayout({ children }) {
 
       <NeedSupport />
       <Footer />
-      </div>
+    </div>
   );
 }
 
@@ -92,11 +93,11 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={<Navigate to="/documents/:type" replace />}
+            element={<Navigate to="/documents/rental/:type" replace />}
           />
 
           <Route
-            path="/documents/:type"
+            path="/documents/rental/:type"
             element={
               <MainLayout>
                 <RentalAgreementForm />
@@ -105,10 +106,19 @@ function App() {
           />
 
           <Route
-            path="/documents/:type"
+            path="/documents/commercial/:type"
             element={
               <MainLayout>
                 <CommercialAggrement />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/documents/address/:type"
+            element={
+              <MainLayout>
+                <AddressAffadavit />
               </MainLayout>
             }
           />

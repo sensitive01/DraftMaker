@@ -1,90 +1,95 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import RentalForm from "./CommercialForm";
 import CommercialPreview from "./CommercialPreview";
-import CommercialForm from "./CommercialForm";
+import { useParams } from "react-router-dom";
 
-const CommercialAggrement = () => {
-
+export default function CommercialAggrement() {
+  const {type} = useParams()
+  console.log("Type",type)
   const [formData, setFormData] = useState({
     agreementDate: "",
     lessorName: "",
-    lessorAddress1: "",
-    lessorAddress2: "",
+    lessorAddressLine1: "",
+    lessorAddressLine2: "",
     lessorCity: "",
     lessorState: "",
-    lessorPin: "",
-
+    lessorPinCode: "",
     lesseeName: "",
     lesseeAadhaar: "",
-    lesseeAddress1: "",
-    lesseeAddress2: "",
-    lesseeCity: "",
-    lesseeState: "",
-    lesseePin: "",
-
-    premisesAddress: "",
-    premisesSqFt: "",
-
+    lesseePermanentAddressLine1: "",
+    lesseePermanentAddressLine2: "",
+    lesseePermanentCity: "",
+    lesseePermanentState: "",
+    lesseePermanentPinCode: "",
     rentAmount: "",
-    rentInWords: "",
-    maintenanceIncluded: false,
-
-    securityDeposit: "",
-    securityInWords: "",
-    paidAmount: "",
-    paymentMode: "cash",
-
-    tenancyStartDate: "",
-    rentIncrease: "",
-
+    rentAmountWords: "",
+    rentDueDate: "5", // Default is 5th of every month
+    depositAmount: "",
+    depositAmountWords: "",
+    paymentMode: "", // Cash/Online
+    agreementStartDate: "",
+    agreementEndDate: "", // Optional: can calculate or allow user input
+    rentIncreasePercentage: "",
     noticePeriod: "",
-    defaultPeriod: "",
-    paintingCharge: "",
-
-    witness1: "",
-    witness2: "",
-
-    fixtureItems: [{ item: "", quantity: "" }],
+    terminationPeriod: "", // Termination if rent not paid for X months
+    paintingCharges: "",
+    usePurpose: "RESIDENTIAL PURPOSE",
+    bhkConfig: "",
+    bedroomCount: "",
+    hallCount: "",
+    kitchenCount: "",
+    toiletCount: "",
+    fixtures: [{ item: "", quantity: "" }],
   });
 
-  const handleChange = (e, index, key) => {
-    if (key === "fixtureItems") {
-      const newItems = [...formData.fixtureItems];
-      newItems[index][e.target.name] = e.target.value;
-      setFormData({ ...formData, fixtureItems: newItems });
-    } else {
-      const { name, value, type, checked } = e.target;
-      setFormData({
-        ...formData,
-        [name]: type === "checkbox" ? checked : value,
-      });
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleFixtureChange = (index, field, value) => {
+    const updatedFixtures = [...formData.fixtures];
+    updatedFixtures[index] = { ...updatedFixtures[index], [field]: value };
+    setFormData((prev) => ({
+      ...prev,
+      fixtures: updatedFixtures,
+    }));
   };
 
   const addFixture = () => {
-    setFormData({
-      ...formData,
-      fixtureItems: [...formData.fixtureItems, { item: "", quantity: "" }],
-    });
+    setFormData((prev) => ({
+      ...prev,
+      fixtures: [...prev.fixtures, { item: "", quantity: "" }],
+    }));
+  };
+
+  const removeFixture = (index) => {
+    const updatedFixtures = formData.fixtures.filter((_, i) => i !== index);
+    setFormData((prev) => ({
+      ...prev,
+      fixtures: updatedFixtures,
+    }));
   };
 
   return (
-    <>
-      <div className="container mx-auto p-4">
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="w-full md:w-1/2">
-            <CommercialForm
-              formData={formData}
-              addFixture={addFixture}
-              handleChange={handleChange}
-            />
-          </div>
-          <div className="w-full md:w-1/2 bg-white shadow-lg rounded-lg p-6">
-            <CommercialPreview formData={formData} />
-          </div>
+    <div className="container-fluid mx-auto p-4">
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="w-full md:w-1/2">
+          <RentalForm
+            formData={formData}
+            handleChange={handleChange}
+            handleFixtureChange={handleFixtureChange}
+            addFixture={addFixture}
+            removeFixture={removeFixture}
+          />
+        </div>
+        <div className="w-full md:w-1/2 bg-white shadow-lg rounded-lg">
+          <CommercialPreview formData={formData} />
         </div>
       </div>
-    </>
+    </div>
   );
-};
-
-export default CommercialAggrement;
+}

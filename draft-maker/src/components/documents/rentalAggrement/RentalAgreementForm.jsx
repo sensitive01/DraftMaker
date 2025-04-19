@@ -75,7 +75,7 @@ export default function RentalAgreementForm() {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container-fluid mx-auto p-4">
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-full md:w-1/2">
           <RentalForm
@@ -86,7 +86,7 @@ export default function RentalAgreementForm() {
             removeFixture={removeFixture}
           />
         </div>
-        <div className="w-full md:w-1/2 bg-white shadow-lg rounded-lg p-6">
+        <div className="w-full md:w-1/2 bg-white shadow-lg rounded-lg">
           <RentalPreview formData={formData} />
         </div>
       </div>
