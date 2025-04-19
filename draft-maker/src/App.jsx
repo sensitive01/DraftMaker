@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import DocumentForm from "./components/DocumentForm";
@@ -10,6 +15,72 @@ import animLogo from "./images/anim_line.png";
 import RentalAgreementForm from "./components/documents/rentalAggrement/RentalAgreementForm";
 import CommercialAggrement from "./components/documents/commercialAggrement/CommercialAggrement";
 import DocumentServices from "./components/DocumentServices";
+import DraftHeading from "./DraftHeading";
+
+// MainLayout component to hold all the permanent UI elements
+function MainLayout({ children }) {
+  return (
+    <>
+      <div className="top_home_wraper white_option">
+        {/* Animated line background */}
+        <div className="container">
+          <div className="anim_line dark_bg">
+            {[...Array(9)].map((_, index) => (
+              <span key={index}>
+                <img src={animLogo} alt="anim_line" />
+              </span>
+            ))}
+          </div>
+        </div>
+        <Header />
+
+        <div className="content-wrapper">
+          <div
+            className="bread_crumb"
+            data-aos="fade-in"
+            data-aos-duration="2000"
+            data-aos-delay="100"
+            style={{ paddingBottom: "0" }}
+          >
+            <div className="anim_line dark_bg">
+              {[...Array(9)].map((_, index) => (
+                <span key={index}>
+                  <img src={animLogo} alt="anim_line" />
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="container mx-auto text-center">
+          <DraftHeading />
+        </div>
+
+        
+      </div>
+
+      {/* Document Services placed outside of bread_crumb but before content */}
+      <div className="container">
+        <div
+          className="document-services-wrapper"
+          style={{
+            marginTop: "-100px",
+            marginBottom: "50px",
+            position: "relative",
+            zIndex: "10",
+          }}
+        >
+          <DocumentServices />
+        </div>
+      </div>
+
+      {/* This is where the route-specific content will render */}
+      {children}
+
+      <NeedSupport />
+      <Footer />
+    </>
+  );
+}
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -28,100 +99,33 @@ function App() {
       <div className="page_wrapper">
         {loading && <Preloader />}
 
-        <div className="top_home_wraper white_option">
-          {/* Animated line background */}
-          <div className="container">
-            <div className="anim_line dark_bg">
-              {[...Array(9)].map((_, index) => (
-                <span key={index}>
-                  <img src={animLogo} alt="anim_line" />
-                </span>
-              ))}
-            </div>
-          </div>
-          <Header />
-
-          {/* Bread Crumb */}
-          <div
-            className="bread_crumb"
-            data-aos="fade-in"
-            data-aos-duration="2000"
-            data-aos-delay="100"
-            style={{ paddingBottom: "150px" }}
-          >
-            <div className="anim_line dark_bg">
-              {[...Array(9)].map((_, index) => (
-                <span key={index}>
-                  <img src={animLogo} alt="anim_line" />
-                </span>
-              ))}
-            </div>
-            <div className="container">
-              <div className="bred_text">
-                <h1>Draft Document</h1>
-                <ul>
-                  <li>
-                    <a href="/">Document</a>
-                  </li>
-                  <li>
-                    <span>»</span>
-                  </li>
-                  <li>
-                    <a href="/rental-lease">Rental / Lease Agreement</a>
-                  </li>
-                </ul>
-
-                {/* Add spacing here to create separation */}
-                <div style={{ marginTop: "50px" }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Document Services placed outside of bread_crumb but before Routes */}
-        <div className="container">
-          <div
-            className="document-services-wrapper"
-            style={{
-              marginTop: "-100px",
-              marginBottom: "50px",
-              position: "relative",
-              zIndex: "10",
-            }}
-          >
-            <DocumentServices />
-          </div>
-        </div>
-
         <Routes>
+          {/* Redirect root to residential lease by default */}
           <Route
             path="/"
-            element={
-              <>
-                <RentalAgreementForm />
-              </>
-            }
+            element={<Navigate to="/documents/residential-lease" replace />}
           />
+
+          {/* Route for residential lease */}
           <Route
             path="/documents/residential-lease"
             element={
-              <>
+              <MainLayout>
                 <RentalAgreementForm />
-              </>
+              </MainLayout>
             }
           />
+
+          {/* Route for commercial lease */}
           <Route
             path="/documents/commercial-lease"
             element={
-              <>
+              <MainLayout>
                 <CommercialAggrement />
-              </>
+              </MainLayout>
             }
           />
         </Routes>
-
-        <NeedSupport />
-        <Footer />
 
         {/* Go to top button */}
         <GoTop />
