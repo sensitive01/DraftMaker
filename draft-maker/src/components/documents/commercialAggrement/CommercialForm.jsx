@@ -1,90 +1,502 @@
+import React from "react";
 
-const TenancyForm = ({formData,handleChange,addFixture}) => {
+const CommercialForm = ({
+  formData,
+  handleChange,
+  addFixture,
+  removeFixture,
+}) => {
   return (
-    <div className="flex flex-col md:flex-row gap-4 p-4">
-      <form className="w-full md:w-1/2 space-y-4 overflow-y-auto h-screen p-4 border">
-        <h2 className="text-xl font-bold">Tenancy Agreement Form</h2>
+    <div className="max-w-5xl mx-auto p-6 bg-white">
+      <h1 className="text-2xl font-semibold text-center mb-8">
+        Realtime Document Drafting Online - Tenancy Agreement
+      </h1>
+      <p className="text-center text-gray-600 mb-8">
+        Fill the below details to see your realtime document.
+      </p>
 
-        <div className="grid grid-cols-2 gap-2">
-          <input name="agreementDate" onChange={handleChange} placeholder="Agreement Date" className="input" />
-          <input name="lessorName" onChange={handleChange} placeholder="Lessor Name" className="input" />
-          <input name="lessorAddress1" onChange={handleChange} placeholder="Lessor Address Line 1" className="input" />
-          <input name="lessorAddress2" onChange={handleChange} placeholder="Lessor Address Line 2" className="input" />
-          <input name="lessorCity" onChange={handleChange} placeholder="Lessor City" className="input" />
-          <input name="lessorState" onChange={handleChange} placeholder="Lessor State" className="input" />
-          <input name="lessorPin" onChange={handleChange} placeholder="Lessor Pincode" className="input" />
+      <form className="space-y-8">
+        {/* Lessor Details */}
+        <div className="p-6 bg-gray-50 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Lessor (Owner) Details
+          </h2>
+          <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-700 mb-2">
+                  Agreement Date
+                </label>
+                <input
+                  type="date"
+                  name="agreementDate"
+                  value={formData.agreementDate || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">Lessor Name</label>
+                <input
+                  type="text"
+                  name="lessorName"
+                  value={formData.lessorName || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-2">Address Line 1</label>
+              <input
+                type="text"
+                name="lessorAddressLine1"
+                value={formData.lessorAddressLine1 || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-2">Address Line 2</label>
+              <input
+                type="text"
+                name="lessorAddressLine2"
+                value={formData.lessorAddressLine2 || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-gray-700 mb-2">City</label>
+                <input
+                  type="text"
+                  name="lessorCity"
+                  value={formData.lessorCity || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">State</label>
+                <input
+                  type="text"
+                  name="lessorState"
+                  value={formData.lessorState || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">Pin Code</label>
+                <input
+                  type="text"
+                  name="lessorPinCode"
+                  value={formData.lessorPinCode || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
-        <hr />
+        {/* Lessee Details */}
+        <div className="p-6 bg-gray-50 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Lessee (Tenant) Details
+          </h2>
+          <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-700 mb-2">Lessee Name</label>
+                <input
+                  type="text"
+                  name="lesseeName"
+                  value={formData.lesseeName || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">
+                  Aadhaar Number
+                </label>
+                <input
+                  type="text"
+                  name="lesseeAadhaar"
+                  value={formData.lesseeAadhaar || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
 
-        <div className="grid grid-cols-2 gap-2">
-          <input name="lesseeName" onChange={handleChange} placeholder="Lessee Name" className="input" />
-          <input name="lesseeAadhaar" onChange={handleChange} placeholder="Aadhaar Number" className="input" />
-          <input name="lesseeAddress1" onChange={handleChange} placeholder="Lessee Address Line 1" className="input" />
-          <input name="lesseeAddress2" onChange={handleChange} placeholder="Lessee Address Line 2" className="input" />
-          <input name="lesseeCity" onChange={handleChange} placeholder="Lessee City" className="input" />
-          <input name="lesseeState" onChange={handleChange} placeholder="Lessee State" className="input" />
-          <input name="lesseePin" onChange={handleChange} placeholder="Lessee Pincode" className="input" />
+            <div>
+              <label className="block text-gray-700 mb-2">Address Line 1</label>
+              <input
+                type="text"
+                name="lesseePermanentAddressLine1"
+                value={formData.lesseePermanentAddressLine1 || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-2">Address Line 2</label>
+              <input
+                type="text"
+                name="lesseePermanentAddressLine2"
+                value={formData.lesseePermanentAddressLine2 || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-gray-700 mb-2">City</label>
+                <input
+                  type="text"
+                  name="lesseePermanentCity"
+                  value={formData.lesseePermanentCity || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">State</label>
+                <input
+                  type="text"
+                  name="lesseePermanentState"
+                  value={formData.lesseePermanentState || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">Pin Code</label>
+                <input
+                  type="text"
+                  name="lesseePermanentPinCode"
+                  value={formData.lesseePermanentPinCode || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
-        <hr />
+        {/* Premises Details */}
+        <div className="p-6 bg-gray-50 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Premises Details
+          </h2>
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <label className="block text-gray-700 mb-2">Address Line 1</label>
+              <input
+                type="text"
+                name="propertyAddressLine1"
+                value={formData.propertyAddressLine1 || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 mb-2">Address Line 2</label>
+              <input
+                type="text"
+                name="propertyAddressLine2"
+                value={formData.propertyAddressLine2 || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-gray-700 mb-2">City</label>
+                <input
+                  type="text"
+                  name="propertyCity"
+                  value={formData.propertyCity || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">State</label>
+                <input
+                  type="text"
+                  name="propertyState"
+                  value={formData.propertyState || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">Pin Code</label>
+                <input
+                  type="text"
+                  name="propertyPinCode"
+                  value={formData.propertyPinCode || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-gray-700 mb-2">
+                  BHK Configuration
+                </label>
+                <input
+                  type="text"
+                  name="bhkConfig"
+                  value={formData.bhkConfig || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">
+                  Bedroom Count
+                </label>
+                <input
+                  type="number"
+                  name="bedroomCount"
+                  value={formData.bedroomCount || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">Hall Count</label>
+                <input
+                  type="number"
+                  name="hallCount"
+                  value={formData.hallCount || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">
+                  Kitchen Count
+                </label>
+                <input
+                  type="number"
+                  name="kitchenCount"
+                  value={formData.kitchenCount || ""}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-gray-700 mb-2">Toilet Count</label>
+              <input
+                type="number"
+                name="toiletCount"
+                value={formData.toiletCount || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        </div>
 
-        <input name="premisesAddress" onChange={handleChange} placeholder="Premises Address" className="input" />
-        <input name="premisesSqFt" onChange={handleChange} placeholder="Size (Sq. Ft.)" className="input" />
+        {/* Rent Details */}
+        <div className="p-6 bg-gray-50 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Rent Details
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-gray-700 mb-2">Rent Amount</label>
+              <input
+                type="text"
+                name="rentAmount"
+                value={formData.rentAmount || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 mb-2">Rent in Words</label>
+              <input
+                type="text"
+                name="rentAmountWords"
+                value={formData.rentAmountWords || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        </div>
 
-        <hr />
-        <input name="rentAmount" onChange={handleChange} placeholder="Rent Amount" className="input" />
-        <input name="rentInWords" onChange={handleChange} placeholder="Rent in Words" className="input" />
-        <label>
-          <input type="checkbox" name="maintenanceIncluded" onChange={handleChange} />
-          Maintenance Included
-        </label>
+        {/* Security Deposit */}
+        <div className="p-6 bg-gray-50 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Security Deposit
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-gray-700 mb-2">
+                Security Deposit
+              </label>
+              <input
+                type="text"
+                name="depositAmount"
+                value={formData.depositAmount || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 mb-2">
+                Deposit in Words
+              </label>
+              <input
+                type="text"
+                name="depositAmountWords"
+                value={formData.depositAmountWords || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        </div>
 
-        <hr />
-        <input name="securityDeposit" onChange={handleChange} placeholder="Security Deposit" className="input" />
-        <input name="securityInWords" onChange={handleChange} placeholder="Deposit in Words" className="input" />
-        <input name="paidAmount" onChange={handleChange} placeholder="Paid Amount" className="input" />
-        <select name="paymentMode" onChange={handleChange} className="input">
-          <option value="cash">Cash</option>
-          <option value="online">Online</option>
-        </select>
-
-        <hr />
-        <input name="tenancyStartDate" onChange={handleChange} placeholder="Tenancy Start Date" className="input" />
-        <input name="rentIncrease" onChange={handleChange} placeholder="Rent Increase (%)" className="input" />
-        <input name="noticePeriod" onChange={handleChange} placeholder="Notice Period (months)" className="input" />
-        <input name="defaultPeriod" onChange={handleChange} placeholder="Default Period (months)" className="input" />
-        <input name="paintingCharge" onChange={handleChange} placeholder="Painting Charges" className="input" />
-
-        <hr />
-        <h3 className="font-semibold">Fixtures</h3>
-        {formData.fixtureItems.map((item, idx) => (
-          <div key={idx} className="grid grid-cols-2 gap-2">
+        {/* Tenancy Terms */}
+        <div className="p-6 bg-gray-50 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Tenancy Terms
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-gray-700 mb-2">
+                Tenancy Start Date
+              </label>
+              <input
+                type="date"
+                name="agreementStartDate"
+                value={formData.agreementStartDate || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 mb-2">
+                Rent Increase (%)
+              </label>
+              <input
+                type="text"
+                name="rentIncreasePercentage"
+                value={formData.rentIncreasePercentage || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+            <div>
+              <label className="block text-gray-700 mb-2">
+                Notice Period (months)
+              </label>
+              <input
+                type="text"
+                name="noticePeriod"
+                value={formData.noticePeriod || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 mb-2">
+                Default Period (months)
+              </label>
+              <input
+                type="text"
+                name="defaultPeriod"
+                value={formData.defaultPeriod || ""}
+                onChange={handleChange}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+          <div className="mt-4">
+            <label className="block text-gray-700 mb-2">Painting Charges</label>
             <input
-              name="item"
-              value={item.item}
-              onChange={(e) => handleChange(e, idx, "fixtureItems")}
-              placeholder="Item"
-              className="input"
-            />
-            <input
-              name="quantity"
-              value={item.quantity}
-              onChange={(e) => handleChange(e, idx, "fixtureItems")}
-              placeholder="Quantity"
-              className="input"
+              type="text"
+              name="paintingCharges"
+              value={formData.paintingCharges || ""}
+              onChange={handleChange}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-        ))}
-        <button type="button" onClick={addFixture} className="btn">+ Add Fixture</button>
+        </div>
 
-        <input name="witness1" onChange={handleChange} placeholder="Witness 1" className="input" />
-        <input name="witness2" onChange={handleChange} placeholder="Witness 2" className="input" />
+        {/* Fixtures */}
+        <div className="p-6 bg-gray-50 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Fixtures and Fittings
+          </h2>
+          {formData.fixtures &&
+            formData.fixtures.map((item, index) => (
+              <div key={index} className="flex items-center space-x-4 mb-3">
+                <input
+                  type="text"
+                  name="item"
+                  value={item.item || ""}
+                  onChange={(e) => handleChange(e, index, "fixtures")}
+                  placeholder="Item name"
+                  className="flex-grow p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                  type="text"
+                  name="quantity"
+                  value={item.quantity || ""}
+                  onChange={(e) => handleChange(e, index, "fixtures")}
+                  placeholder="Qty"
+                  className="w-24 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeFixture(index)}
+                  className="p-4 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 focus:outline-none"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+
+          <button
+            type="button"
+            onClick={addFixture}
+            className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none"
+          >
+            Add Item
+          </button>
+        </div>
+
+        {/* Submit Button */}
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            className="px-8 py-4 bg-blue-700 text-white rounded-lg hover:bg-blue-800 focus:outline-none flex items-center font-medium"
+          >
+            Preview Agreement <span className="ml-2">→</span>
+          </button>
+        </div>
       </form>
-
-     
     </div>
   );
 };
 
-export default TenancyForm;
+export default CommercialForm;

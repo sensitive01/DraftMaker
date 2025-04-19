@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import CommercialPreview from "./CommercialPreview"
-import CommercialForm from "./CommercialForm"
+import CommercialPreview from "./CommercialPreview";
+import CommercialForm from "./CommercialForm";
 
 const CommercialAggrement = () => {
   const [formData, setFormData] = useState({
@@ -66,10 +66,24 @@ const CommercialAggrement = () => {
     });
   };
 
-  return <>
-  <CommercialForm formData={formData} addFixture={addFixture} handleChange={handleChange}  />
-  <CommercialPreview data={formData} />
-  </>;
+  return (
+    <>
+      <div className="container mx-auto p-4">
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="w-full md:w-1/2">
+            <CommercialForm
+              formData={formData}
+              addFixture={addFixture}
+              handleChange={handleChange}
+            />
+          </div>
+          <div className="w-full md:w-1/2 bg-white shadow-lg rounded-lg p-6">
+            <CommercialPreview data={formData} />
+          </div>
+        </div>
+      </div>
+    </>
+  );
 };
 
 export default CommercialAggrement;

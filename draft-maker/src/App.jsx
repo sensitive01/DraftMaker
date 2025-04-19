@@ -39,13 +39,7 @@ function App() {
               ))}
             </div>
           </div>
-
           <Header />
-
-          {/* Added spacing div with Tailwind classes */}
-          <div className="w-full py-8 md:py-12"></div>
-
-          <DocumentServices />
 
           {/* Bread Crumb */}
           <div
@@ -76,13 +70,17 @@ function App() {
                     <a href="/rental-lease">Rental / Lease Agreement</a>
                   </li>
                 </ul>
+                {/* Added spacing div with Tailwind classes */}
+                <div className="w-full py-8 md:py-12"></div>
+
+                <DocumentServices />
               </div>
             </div>
           </div>
         </div>
 
         <Routes>
-          <Route
+          {/* <Route
             path="/"
             element={
               <>
@@ -91,9 +89,9 @@ function App() {
                 <NeedSupport />
               </>
             }
-          />
+          /> */}
           <Route
-            path="/rental-aggrement"
+            path="/documents/residential-lease"
             element={
               <>
                 <RentalAgreementForm />
@@ -101,7 +99,7 @@ function App() {
             }
           />
           <Route
-            path="/service-list-2"
+            path="/documents/commercial-lease"
             element={
               <>
                 <CommercialAggrement />
@@ -109,6 +107,7 @@ function App() {
             }
           />
         </Routes>
+        <NeedSupport />
 
         <Footer />
 
