@@ -18,7 +18,7 @@ import DraftHeading from "./DraftHeading";
 
 function MainLayout({ children }) {
   return (
-    <>
+       <div className="page_wrapper">
       <div className="top_home_wraper white_option">
         <div className="content-wrapper">
           <div className="container">
@@ -69,7 +69,7 @@ function MainLayout({ children }) {
 
       <NeedSupport />
       <Footer />
-    </>
+      </div>
   );
 }
 
