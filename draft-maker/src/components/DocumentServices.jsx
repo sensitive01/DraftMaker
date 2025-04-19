@@ -49,8 +49,8 @@ export default function DocumentServices() {
   };
 
   return (
-    <div className="w-full dark_bg p-8 font-sans">
-      <div className="max-w-5xl mx-auto text-center">
+    <div className="max-w-5xl mx-auto text-center">
+        <div className="w-full  p-8 font-sans">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {documentTypes.map((doc) => (
             <div

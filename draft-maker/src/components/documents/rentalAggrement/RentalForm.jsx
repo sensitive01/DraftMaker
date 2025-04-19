@@ -17,34 +17,6 @@ const RentalForm = ({
       </p>
 
       <form className="space-y-8">
-        {/* Document Selection Header Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div>
-            <select
-              name="documentType"
-              value={formData.documentType || ""}
-              onChange={handleChange}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Choose Document Type</option>
-              <option value="rental">Rental Agreement</option>
-              <option value="lease">Lease Agreement</option>
-              <option value="commercial">Commercial Rental</option>
-            </select>
-          </div>
-
-          <div>
-            <input
-              type="text"
-              name="partyName"
-              value={formData.partyName || ""}
-              onChange={handleChange}
-              placeholder="1st Party Name"
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-
         {/* Agreement Details */}
         <div className="p-6 bg-gray-50 rounded-lg">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">

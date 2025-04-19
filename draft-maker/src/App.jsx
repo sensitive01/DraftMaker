@@ -70,26 +70,38 @@ function App() {
                     <a href="/rental-lease">Rental / Lease Agreement</a>
                   </li>
                 </ul>
-                {/* Added spacing div with Tailwind classes */}
-                <div className="w-full py-8 md:py-12"></div>
 
-                <DocumentServices />
+                {/* Add spacing here to create separation */}
+                <div style={{ marginTop: "50px" }}></div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Document Services placed outside of bread_crumb but before Routes */}
+        <div className="container">
+          <div
+            className="document-services-wrapper"
+            style={{
+              marginTop: "-100px",
+              marginBottom: "50px",
+              position: "relative",
+              zIndex: "10",
+            }}
+          >
+            <DocumentServices />
+          </div>
+        </div>
+
         <Routes>
-          {/* <Route
+          <Route
             path="/"
             element={
               <>
-                <DocumentForm />
-                <DocumentPreview />
-                <NeedSupport />
+                <RentalAgreementForm />
               </>
             }
-          /> */}
+          />
           <Route
             path="/documents/residential-lease"
             element={
@@ -107,8 +119,8 @@ function App() {
             }
           />
         </Routes>
-        <NeedSupport />
 
+        <NeedSupport />
         <Footer />
 
         {/* Go to top button */}
