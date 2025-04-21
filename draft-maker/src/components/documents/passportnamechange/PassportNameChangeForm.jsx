@@ -1,10 +1,10 @@
 import React from "react";
 
-const AddressAffidavitForm = ({ formData, handleChange }) => {
+const PassportNameChangeForm = ({ formData, handleChange }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">
-        Affidavit Form
+        Passport Name Change Affidavit Form
       </h2>
 
       <div className="mb-6">
@@ -39,6 +39,7 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
               <option value="S/O">Son of (S/O)</option>
               <option value="D/O">Daughter of (D/O)</option>
               <option value="W/O">Wife of (W/O)</option>
+              <option value="H/O">Husband of (H/O)</option>
             </select>
           </div>
           <div>
@@ -64,7 +65,9 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
                 ? "Father's Name"
                 : formData.gender === "D/O"
                 ? "Father's Name"
-                : "Husband's Name"}
+                : formData.gender === "W/O"
+                ? "Husband's Name"
+                : "Wife's Name"}
             </label>
             <input
               type="text"
@@ -72,11 +75,7 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
               value={formData.relatedPersonName || ""}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-              placeholder={
-                formData.gender === "W/O"
-                  ? "Husband's full name"
-                  : "Father's full name"
-              }
+              placeholder="Related person's full name"
             />
           </div>
         )}
@@ -228,9 +227,9 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
 
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-3 text-gray-700">
-          Other Details
+          Identification Details
         </h3>
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Aadhaar Number
@@ -246,69 +245,114 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Residing Since
+              Passport Number
             </label>
             <input
               type="text"
-              name="currentResidenceAddress"
-              value={formData.currentResidenceAddress}
+              name="passportNo"
+              value={formData.passportNo}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-              placeholder="Date since when residing at present address (DD/MM/YYYY)"
+              placeholder="Passport Number"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Company Name
-            </label>
-            <input
-              type="text"
-              name="companyName"
-              value={formData.companyName}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-              placeholder="Name of the company this affidavit is for"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Purpose of Affidavit
-            </label>
-            <input
-              type="text"
-              name="purposeOfAffidavit"
-              value={formData.purposeOfAffidavit}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-              placeholder="e.g. Address Proof"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-3 text-gray-700">
+          Name Change Details
+        </h3>
+        <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date
-              </label>
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Place
+                Current Given Name (as per Aadhaar)
               </label>
               <input
                 type="text"
-                name="place"
-                value={formData.place}
+                name="currentGivenName"
+                value={formData.currentGivenName}
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                placeholder="Place of signing"
+                placeholder="Current Given Name"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Current Surname (as per Aadhaar)
+              </label>
+              <input
+                type="text"
+                name="currentSurname"
+                value={formData.currentSurname}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                placeholder="Current Surname"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                New Given Name
+              </label>
+              <input
+                type="text"
+                name="newGivenName"
+                value={formData.newGivenName}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                placeholder="New Given Name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                New Surname
+              </label>
+              <input
+                type="text"
+                name="newSurname"
+                value={formData.newSurname}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                placeholder="New Surname"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-3 text-gray-700">
+          Additional Details
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Date
+            </label>
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Place
+            </label>
+            <input
+              type="text"
+              name="place"
+              value={formData.place}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+              placeholder="Place of signing"
+            />
           </div>
         </div>
       </div>
@@ -316,4 +360,4 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
   );
 };
 
-export default AddressAffidavitForm;
+export default PassportNameChangeForm;

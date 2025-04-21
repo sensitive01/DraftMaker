@@ -16,6 +16,9 @@ import CommercialAggrement from "./components/documents/commercialAggrement/Comm
 import DocumentServices from "./components/DocumentServices";
 import DraftHeading from "./DraftHeading";
 import AddressAffadavit from "./components/documents/addressProofAffadavit/AddressAffadavit";
+import PassportNameChange from "./components/documents/passportnamechange/PassportNameChange";
+import AnnexureFContainer from "./components/documents/passportannaxure/PasswordAnnaxure";
+import GapPeriod from "./components/documents/gapPeriod/GapPeriod";
 
 function MainLayout({ children }) {
   return (
@@ -119,6 +122,31 @@ function App() {
             element={
               <MainLayout>
                 <AddressAffadavit />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/documents/passport-name/:type"
+            element={
+              <MainLayout>
+                <PassportNameChange />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/documents/passport-annaxure/:type"
+            element={
+              <MainLayout>
+                <AnnexureFContainer />
+              </MainLayout>
+            }
+          />
+                 <Route
+            path="/documents/gap-period/:type"
+            element={
+              <MainLayout>
+                <GapPeriod />
               </MainLayout>
             }
           />

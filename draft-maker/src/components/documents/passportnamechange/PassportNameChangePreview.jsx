@@ -1,6 +1,6 @@
 import React from "react";
 
-const AffidavitPreview = ({ formData }) => {
+const PassportNameChangePreview = ({ formData }) => {
   // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return "xx/xx/xxxx";
@@ -40,6 +40,7 @@ const AffidavitPreview = ({ formData }) => {
       "S/O": "S/o",
       "D/O": "D/o",
       "W/O": "W/o",
+      "H/O": "H/o",
     };
 
     const relationshipPrefix =
@@ -69,47 +70,50 @@ const AffidavitPreview = ({ formData }) => {
           <p className="mb-2">
             Present Address: <strong>{formatPresentAddress()}</strong>
           </p>
-          <p className="mb-4">
+          <p className="mb-2">
             My Aadhaar No:{" "}
-            <strong>{formData.aadhaarNo || "536709665679"}</strong>.
+            <strong>{formData.aadhaarNo || "0000 0000 0000"}</strong>
           </p>
-          <p className="mb-4 font-medium">
-            Do hereby solemnly affirm and declare as under:
+          <p className="mb-4">
+            My Passport No: <strong>{formData.passportNo || "0000"}</strong>
           </p>
         </div>
 
         <div className="mb-6">
           <ol className="list-decimal pl-6 space-y-4">
             <li className="text-justify">
-              I hereby declare that I am presently residing at above address
-              since{" "}
-              {formData.currentResidenceAddress
-                ? formData.currentResidenceAddress
-                : "XX/XX/XXXX"}
-              .
+              That as per My Aadhaar card my given name is{" "}
+              <strong>{formData.currentGivenName || "NAME"}</strong> and in my
+              Expired Passport, my given name is{" "}
+              <strong>{formData.currentGivenName || "NAME"}</strong>, surname is{" "}
+              <strong>{formData.currentSurname || "NAME"}</strong>.
             </li>
             <li className="text-justify">
-              I further declare that I am swearing this affidavit to produce
-              before the concerned{" "}
-              <strong>{formData.companyName || "COMPANY NAME"}</strong>.
+              That I wanted to change my given name as{" "}
+              <strong>{formData.newGivenName || "NAME"}</strong> and surname as{" "}
+              <strong>{formData.newSurname || "NAME"}</strong> from given name{" "}
+              <strong>{formData.currentGivenName || "NAME"}</strong> and surname{" "}
+              <strong>{formData.currentSurname || "NAME"}</strong>, for getting
+              reissue of PASSPORT.
             </li>
             <li className="text-justify">
-              That this affidavit is being made to serve as proof of my Address
-              for the purpose of{" "}
-              <strong>{formData.purposeOfAffidavit || "XXXX"}</strong>.
+              That I also required this affidavit for Publishing News Paper
+              Advertisement for The Name Change.
             </li>
           </ol>
 
           <p className="mt-6 text-justify">
-            I do hereby verify and declare that what is stated above are true
-            and correct to the best of my knowledge, information and belief.
+            I hereby state that whatever is stated herein above is true to the
+            best of my knowledge.
           </p>
         </div>
 
-        {/* Space for legal stamp */}
+        {/* Space for photo and signature */}
         <div className="flex justify-between mt-12">
-          <div className="border-2 border-dashed border-gray-300 w-32 h-32 flex items-center justify-center text-gray-400 text-sm text-center p-2">
-            Space for Legal Stamp
+          <div className="flex flex-col items-center">
+            <div className="border-2 border-dashed border-gray-300 w-32 h-40 flex items-center justify-center text-gray-400 text-sm text-center p-2">
+              (Photo)
+            </div>
           </div>
 
           <div className="text-right">
@@ -132,4 +136,4 @@ const AffidavitPreview = ({ formData }) => {
   );
 };
 
-export default AffidavitPreview;
+export default PassportNameChangePreview;

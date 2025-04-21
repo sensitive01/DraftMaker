@@ -21,26 +21,26 @@ export default function DocumentServices() {
     {
       id: 3,
       title: "Address Affadavit",
-      type: "affidavit",
+      type: "Address-Affadavit",
       path: "/documents/address/addressaffadavit",
     },
     {
       id: 4,
-      title: "AFFIDAVITS",
-      type: "affidavit",
-      path: "/documents/affidavit-2",
+      title: "Passport Name Change",
+      type: "Passport Name change",
+      path: "/documents/passport-name/passport-name-change",
     },
     {
       id: 5,
-      title: "AFFIDAVITS",
+      title: "Passport Annaxure",
       type: "affidavit",
-      path: "/documents/affidavit-3",
+      path: "/documents/passport-annaxure/passport-annaxure",
     },
     {
       id: 6,
-      title: "AFFIDAVITS",
+      title: "Gap Period ",
       type: "affidavit",
-      path: "/documents/affidavit-4",
+      path: "/documents/gap-period/gap-period",
     },
   ];
 
