@@ -368,10 +368,11 @@ const CommercialForm = ({
             <h2 className="text-lg font-medium text-gray-800 mb-3 pb-2 border-b">
               Property Details
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
+              {/* First Row - Agreement Field */}
               <div>
                 <label className="block text-sm text-gray-700 mb-1">
-                  Property Address
+                  Agreement
                 </label>
                 <textarea
                   name="propertyAddress"
@@ -382,6 +383,7 @@ const CommercialForm = ({
                 ></textarea>
               </div>
 
+              {/* Second Row - Configuration */}
               <div>
                 <label className="block text-sm text-gray-700 mb-1">
                   Configuration
