@@ -1,136 +1,105 @@
-/* document-services.css */
+/* Additional CSS for 3D Carousel effect */
+.carousel-container {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
 
-/* Card styles */
-.document-card {
-  background-color: #ffffff;
-  padding: 16px;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.carousel-items {
+  transform-style: preserve-3d;
   position: relative;
-
-  /* Explicit transition properties */
-  transition-property: transform, box-shadow, background-color;
-  transition-duration: 0.3s;
-  transition-timing-function: ease;
-  cursor: pointer;
 }
 
-/* Explicit hover state */
-.document-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-  background-color: #fee2e2; /* Light red color */
+/* Add transition classes for animations */
+.left-enter {
+  opacity: 0;
+  transform: translateX(-100%) scale(0.6);
+  z-index: 0;
 }
 
-/* Icon container */
-.card-icon {
-  width: 64px;
-  height: 64px;
-  background-color: #ef4444; /* Red 500 */
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-
-  /* Explicit transition for icon */
-  transition-property: background-color;
-  transition-duration: 0.3s;
-  transition-timing-function: ease;
+.left-enter-active {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  transition: all 500ms ease;
+  z-index: 3;
 }
 
-/* Icon hover effect */
-.document-card:hover .card-icon {
-  background-color: #dc2626; /* Slightly darker red on hover */
+.left-exit {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  z-index: 3;
 }
 
-/* Inner icon style */
-.icon-inner {
-  width: 24px;
-  height: 24px;
-  background-color: white;
-  border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.left-exit-active {
+  opacity: 0;
+  transform: translateX(100%) scale(0.6);
+  transition: all 500ms ease;
+  z-index: 0;
 }
 
-/* Title style */
-.card-title {
-  color: #4b5563; /* Gray 600 */
-  text-align: center;
-  font-size: 14px;
+.right-enter {
+  opacity: 0;
+  transform: translateX(100%) scale(0.6);
+  z-index: 0;
 }
 
-/* Affidavit indicator */
-.affidavit-indicator {
-  width: 100%;
-  height: 4px;
-  background-color: #b91c1c; /* Red 700 */
-  margin-top: 8px;
-  border-radius: 2px;
+.right-enter-active {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  transition: all 500ms ease;
+  z-index: 3;
 }
 
-/* Container for the entire component */
-.services-container {
-  width: 100%;
-  background-color: white;
-  padding: 32px;
-  font-family: ui-sans-serif, system-ui, sans-serif;
+.right-exit {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  z-index: 3;
 }
 
-/* Content wrapper */
-.services-content {
-  max-width: 1024px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
+.right-exit-active {
+  opacity: 0;
+  transform: translateX(-100%) scale(0.6);
+  transition: all 500ms ease;
+  z-index: 0;
 }
 
-/* Main heading */
-.services-heading {
-  font-size: 36px;
-  font-weight: 700;
-  color: #dc2626; /* Red 600 */
-  margin-bottom: 8px;
-}
-
-/* Subheading */
-.services-subheading {
-  font-size: 30px;
-  font-weight: 700;
-  color: #dc2626; /* Red 600 */
-  margin-bottom: 24px;
-}
-
-/* Description paragraph */
-.services-description {
-  color: #6b7280; /* Gray 500 */
-  margin-bottom: 48px;
-  max-width: 768px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Card grid layout */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-}
-
-/* Media queries for responsive design */
-@media (min-width: 768px) {
-  .card-grid {
-    grid-template-columns: repeat(3, 1fr);
+/* Arrow slide animation */
+@keyframes slideLeft {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: translateX(0);
   }
 }
 
-@media (min-width: 1024px) {
-  .card-grid {
-    grid-template-columns: repeat(6, 1fr);
+@keyframes slideRight {
+  0% {
+    transform: translateX(0);
   }
+  50% {
+    transform: translateX(5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.arrow-left.arrow-slide {
+  animation: slideLeft 0.3s ease-in-out;
+}
+
+.arrow-right.arrow-slide {
+  animation: slideRight 0.3s ease-in-out;
+}
+
+/* Hide scrollbar */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }

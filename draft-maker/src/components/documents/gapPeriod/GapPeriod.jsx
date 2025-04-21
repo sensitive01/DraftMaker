@@ -53,9 +53,7 @@ export default function GapPeriod() {
 
   return (
     <div className="container-fluid mx-auto py-8">
-      <h1 className="text-3xl font-bold text-center mb-6">
-        Gap Period Affidavit
-      </h1>
+
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Left column: Form */}
@@ -78,14 +76,7 @@ export default function GapPeriod() {
         </div>
       </div>
 
-      <div className="mt-8 text-center print:hidden">
-        <button
-          onClick={() => window.print()}
-          className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 font-medium"
-        >
-          Print Affidavit
-        </button>
-      </div>
+      
     </div>
   );
 }

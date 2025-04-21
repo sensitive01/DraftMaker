@@ -19,6 +19,7 @@ import AddressAffadavit from "./components/documents/addressProofAffadavit/Addre
 import PassportNameChange from "./components/documents/passportnamechange/PassportNameChange";
 import AnnexureFContainer from "./components/documents/passportannaxure/PasswordAnnaxure";
 import GapPeriod from "./components/documents/gapPeriod/GapPeriod";
+import HufAggrement from "./components/documents/huf/HufAggrement";
 
 function MainLayout({ children }) {
   return (
@@ -142,11 +143,19 @@ function App() {
               </MainLayout>
             }
           />
-                 <Route
+          <Route
             path="/documents/gap-period/:type"
             element={
               <MainLayout>
                 <GapPeriod />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/documents/huf/:type"
+            element={
+              <MainLayout>
+                <HufAggrement />
               </MainLayout>
             }
           />
