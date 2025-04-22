@@ -20,6 +20,14 @@ import PassportNameChange from "./components/documents/passportnamechange/Passpo
 import AnnexureFContainer from "./components/documents/passportannaxure/PasswordAnnaxure";
 import GapPeriod from "./components/documents/gapPeriod/GapPeriod";
 import HufAggrement from "./components/documents/huf/HufAggrement";
+import VehicleInsuranceClaming from "./components/documents/vehicleinsuranceclaming/VehicleInsuranceClaming";
+import JointKhataTransfer from "./components/documents/jointKhataTransfer/JointKhataTransfer";
+import MatriculationPage from "./components/documents/metriculation/MatriculationPage";
+import GstForm from "./components/documents/gst/GstForm";
+import GstPage from "./components/documents/gst/GstPage";
+import BirthCertificatePage from "./components/documents/birtCertificate/BirthCertificatePage";
+import BirthCertificateParentNameCorrectionPage from "./components/documents/birtCeritificateParentName/BirthCertificateParentNameCorrectionPage";
+import DocumentLostPage from "./components/documents/documentLost/DocumentLostPage";
 
 function MainLayout({ children }) {
   return (
@@ -156,6 +164,63 @@ function App() {
             element={
               <MainLayout>
                 <HufAggrement />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/documents/vehicle-insurance/:type"
+            element={
+              <MainLayout>
+                <VehicleInsuranceClaming />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/documents/khata-transfer/:type"
+            element={
+              <MainLayout>
+                <JointKhataTransfer />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/documents/metriculation/:type"
+            element={
+              <MainLayout>
+                <MatriculationPage />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/documents/gst/:type"
+            element={
+              <MainLayout>
+                <GstPage />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/documents/birth-certificate/:type"
+            element={
+              <MainLayout>
+                <BirthCertificatePage />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/documents/birth-certificate-parent/:type"
+            element={
+              <MainLayout>
+                <BirthCertificateParentNameCorrectionPage />
+              </MainLayout>
+            }
+          />
+                 <Route
+            path="/documents/document-lost/:type"
+            element={
+              <MainLayout>
+                <DocumentLostPage />
               </MainLayout>
             }
           />
