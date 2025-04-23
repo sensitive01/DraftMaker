@@ -28,6 +28,10 @@ import GstPage from "./components/documents/gst/GstPage";
 import BirthCertificatePage from "./components/documents/birtCertificate/BirthCertificatePage";
 import BirthCertificateParentNameCorrectionPage from "./components/documents/birtCeritificateParentName/BirthCertificateParentNameCorrectionPage";
 import DocumentLostPage from "./components/documents/documentLost/DocumentLostPage";
+import GasAffidavitForm from "./components/documents/gasaffadavit/GasAffadavitPage";
+import DobCorrectionPage from "./components/documents/dobCorrection/DobCorrectionPage";
+import NameCorrectionChange from "./components/documents/namechangecorrection/NameCorrectionChange";
+import DualNameChange from "./components/documents/dualNameChange/DualNameChange";
 
 function MainLayout({ children }) {
   return (
@@ -216,11 +220,43 @@ function App() {
               </MainLayout>
             }
           />
-                 <Route
+          <Route
             path="/documents/document-lost/:type"
             element={
               <MainLayout>
                 <DocumentLostPage />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/documents/gas/:type"
+            element={
+              <MainLayout>
+                <GasAffidavitForm />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/documents/dob/:type"
+            element={
+              <MainLayout>
+                <DobCorrectionPage />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/documents/name/:type"
+            element={
+              <MainLayout>
+                <NameCorrectionChange />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/documents/dual-name/:type"
+            element={
+              <MainLayout>
+                <DualNameChange />
               </MainLayout>
             }
           />

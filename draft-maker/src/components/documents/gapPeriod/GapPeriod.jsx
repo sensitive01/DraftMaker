@@ -53,8 +53,6 @@ export default function GapPeriod() {
 
   return (
     <div className="container-fluid mx-auto py-8">
-
-
       <div className="grid md:grid-cols-2 gap-8">
         {/* Left column: Form */}
         <div className="print:hidden">
@@ -75,8 +73,6 @@ export default function GapPeriod() {
           />
         </div>
       </div>
-
-      
     </div>
   );
 }
