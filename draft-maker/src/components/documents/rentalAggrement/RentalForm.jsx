@@ -8,50 +8,25 @@ const RentalForm = ({
   removeFixture,
 }) => {
   return (
-    <div className="max-w-5xl mx-auto p-3 sm:p-6 bg-white">
+    <div className="max-w-5xl mx-auto p-3 sm:p-6 bg-white rounded-lg shadow-sm">
       <h1 className="text-xl sm:text-2xl font-semibold text-center mb-4">
         Realtime Document Drafting - Rental Agreement
       </h1>
-      <p className="text-sm text-center text-gray-600 mb-4">
+      <p className="text-sm text-center text-gray-600 mb-6">
         Fill the details below to generate your document in realtime.
       </p>
 
-      <form className="space-y-4">
+      <form className="space-y-6">
         {/* Multi-tab Navigation */}
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="flex flex-wrap gap-2 justify-center mb-4">
-            {[
-              "Agreement",
-              "Lessor",
-              "Lessee",
-              "Rent",
-              "Property",
-              "Fixtures",
-            ].map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                className="px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none"
-                onClick={() => {
-                  // Navigation logic would go here in a real implementation
-                  document
-                    .getElementById(tab.toLowerCase())
-                    .scrollIntoView({ behavior: "smooth" });
-                }}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
+        <div className="bg-gray-50 rounded-lg p-6">
           {/* Agreement Details */}
-          <div id="agreement" className="mb-6">
-            <h2 className="text-lg font-medium text-gray-800 mb-3 pb-2 border-b">
+          <div id="agreement" className="mb-8">
+            <h2 className="text-lg font-medium text-gray-800 mb-4 pb-2 border-b">
               Agreement Details
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-red-600 mb-2">
                   Agreement Date
                 </label>
                 <input
@@ -63,7 +38,7 @@ const RentalForm = ({
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-red-600 mb-2">
                   Start Date
                 </label>
                 <input
@@ -78,14 +53,14 @@ const RentalForm = ({
           </div>
 
           {/* Lessor Details */}
-          <div id="lessor" className="mb-6">
-            <h2 className="text-lg font-medium text-gray-800 mb-3 pb-2 border-b">
+          <div id="lessor" className="mb-8">
+            <h2 className="text-lg font-medium text-gray-800 mb-4 pb-2 border-b">
               Lessor (Owner) Details
             </h2>
-            <div className="grid grid-cols-1 gap-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-red-600 mb-2">
                     Lessor Name
                   </label>
                   <input
@@ -96,9 +71,9 @@ const RentalForm = ({
                     className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-red-600 mb-2">
                       City
                     </label>
                     <input
@@ -110,7 +85,7 @@ const RentalForm = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-red-600 mb-2">
                       State
                     </label>
                     <input
@@ -124,9 +99,9 @@ const RentalForm = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div className="sm:col-span-2">
-                  <label className="block text-sm text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-red-600 mb-2">
                     Address Line 1
                   </label>
                   <input
@@ -138,7 +113,7 @@ const RentalForm = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-red-600 mb-2">
                     Pin Code
                   </label>
                   <input
@@ -152,7 +127,7 @@ const RentalForm = ({
               </div>
 
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-red-600 mb-2">
                   Address Line 2
                 </label>
                 <input
@@ -167,14 +142,14 @@ const RentalForm = ({
           </div>
 
           {/* Lessee Details */}
-          <div id="lessee" className="mb-6">
-            <h2 className="text-lg font-medium text-gray-800 mb-3 pb-2 border-b">
+          <div id="lessee" className="mb-8">
+            <h2 className="text-lg font-medium text-gray-800 mb-4 pb-2 border-b">
               Lessee (Tenant) Details
             </h2>
-            <div className="grid grid-cols-1 gap-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-red-600 mb-2">
                     Lessee Name
                   </label>
                   <input
@@ -186,7 +161,7 @@ const RentalForm = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-red-600 mb-2">
                     Aadhaar Number
                   </label>
                   <input
@@ -199,9 +174,9 @@ const RentalForm = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div className="sm:col-span-2">
-                  <label className="block text-sm text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-red-600 mb-2">
                     Permanent Address Line 1
                   </label>
                   <input
@@ -213,7 +188,7 @@ const RentalForm = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-red-600 mb-2">
                     Pin Code
                   </label>
                   <input
@@ -226,9 +201,9 @@ const RentalForm = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-red-600 mb-2">
                     City
                   </label>
                   <input
@@ -240,7 +215,7 @@ const RentalForm = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-red-600 mb-2">
                     State
                   </label>
                   <input
@@ -252,7 +227,7 @@ const RentalForm = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-red-600 mb-2">
                     Line 2 (Optional)
                   </label>
                   <input
@@ -268,13 +243,13 @@ const RentalForm = ({
           </div>
 
           {/* Rent & Deposit Details */}
-          <div id="rent" className="mb-6">
-            <h2 className="text-lg font-medium text-gray-800 mb-3 pb-2 border-b">
+          <div id="rent" className="mb-8">
+            <h2 className="text-lg font-medium text-gray-800 mb-4 pb-2 border-b">
               Rent & Deposit
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-red-600 mb-2">
                   Rent Amount (₹)
                 </label>
                 <input
@@ -286,7 +261,7 @@ const RentalForm = ({
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-red-600 mb-2">
                   In Words
                 </label>
                 <input
@@ -298,7 +273,7 @@ const RentalForm = ({
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-red-600 mb-2">
                   Deposit (₹)
                 </label>
                 <input
@@ -310,7 +285,7 @@ const RentalForm = ({
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-red-600 mb-2">
                   In Words
                 </label>
                 <input
@@ -323,9 +298,9 @@ const RentalForm = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-red-600 mb-2">
                   Rent Increase (%)
                 </label>
                 <input
@@ -337,7 +312,7 @@ const RentalForm = ({
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-red-600 mb-2">
                   Notice Period (months)
                 </label>
                 <input
@@ -349,7 +324,7 @@ const RentalForm = ({
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-red-600 mb-2">
                   Painting Charges (₹)
                 </label>
                 <input
@@ -364,14 +339,14 @@ const RentalForm = ({
           </div>
 
           {/* Property Details */}
-          <div id="property" className="mb-6">
-            <h2 className="text-lg font-medium text-gray-800 mb-3 pb-2 border-b">
+          <div id="property" className="mb-8">
+            <h2 className="text-lg font-medium text-gray-800 mb-4 pb-2 border-b">
               Property Details
             </h2>
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-6">
               {/* First Row - Agreement Field */}
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-red-600 mb-2">
                   Agreement
                 </label>
                 <textarea
@@ -385,12 +360,12 @@ const RentalForm = ({
 
               {/* Second Row - Configuration */}
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-red-600 mb-2">
                   Configuration
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">
+                    <label className="block text-xs font-medium text-red-600 mb-2">
                       Configuration
                     </label>
                     <input
@@ -403,7 +378,7 @@ const RentalForm = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">
+                    <label className="block text-xs font-medium text-red-600 mb-2">
                       Bedrooms
                     </label>
                     <input
@@ -415,7 +390,7 @@ const RentalForm = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">
+                    <label className="block text-xs font-medium text-red-600 mb-2">
                       Halls
                     </label>
                     <input
@@ -427,7 +402,7 @@ const RentalForm = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">
+                    <label className="block text-xs font-medium text-red-600 mb-2">
                       Toilets
                     </label>
                     <input
@@ -444,14 +419,14 @@ const RentalForm = ({
           </div>
 
           {/* Fixtures */}
-          <div id="fixtures" className="mb-6">
-            <h2 className="text-lg font-medium text-gray-800 mb-3 pb-2 border-b">
+          <div id="fixtures" className="mb-8">
+            <h2 className="text-lg font-medium text-gray-800 mb-4 pb-2 border-b">
               Fixtures and Fittings
             </h2>
-            <div className="space-y-2">
+            <div className="space-y-4">
               {formData.fixtures &&
                 formData.fixtures.map((fixture, index) => (
-                  <div key={index} className="flex items-center space-x-2">
+                  <div key={index} className="flex items-center space-x-4">
                     <input
                       type="text"
                       value={fixture.item}
@@ -483,7 +458,7 @@ const RentalForm = ({
               <button
                 type="button"
                 onClick={addFixture}
-                className="px-4 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-900 focus:outline-none"
+                className="px-4 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 focus:outline-none transition-colors duration-200"
               >
                 Add Item
               </button>
@@ -491,7 +466,7 @@ const RentalForm = ({
           </div>
 
           {/* Terms and Conditions */}
-          <div className="mt-6">
+          <div className="mt-8">
             <div className="flex items-center mb-2">
               <input
                 type="checkbox"
@@ -507,7 +482,7 @@ const RentalForm = ({
                 }
                 className="h-4 w-4 text-blue-600"
               />
-              <label className="ml-2 text-sm text-gray-700">
+              <label className="ml-2 text-sm text-red-600 font-medium">
                 I agree to the terms and conditions of this rental agreement
               </label>
             </div>

@@ -66,7 +66,6 @@ const AddressAffidavit = () => {
 
   return (
     <div className="container-fluid mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-center">Address Affidavit Generator</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>

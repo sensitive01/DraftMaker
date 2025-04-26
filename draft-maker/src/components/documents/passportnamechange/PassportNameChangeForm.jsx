@@ -2,18 +2,18 @@ import React from "react";
 
 const PassportNameChangeForm = ({ formData, handleChange }) => {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">
+    <div className="bg-white p-8 rounded-lg shadow-md max-w-4xl mx-auto">
+      <h2 className="text-2xl font-bold mb-8 text-gray-800 border-b pb-3">
         Passport Name Change Affidavit Form
       </h2>
 
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold mb-4 text-gray-700">
           Personal Details
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-red-600 mb-2">
               Full Name
             </label>
             <input
@@ -21,19 +21,19 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               placeholder="Mr/Mrs/Ms Full Name"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-red-600 mb-2">
               Relationship
             </label>
             <select
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
             >
               <option value="">Select Relationship</option>
               <option value="S/O">Son of (S/O)</option>
@@ -43,7 +43,7 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-red-600 mb-2">
               Age
             </label>
             <input
@@ -51,7 +51,7 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
               name="age"
               value={formData.age}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               placeholder="Age in years"
             />
           </div>
@@ -59,8 +59,8 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
 
         {/* Field for parent/spouse name */}
         {formData.gender && (
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="mt-5">
+            <label className="block text-sm font-medium text-red-600 mb-2">
               {formData.gender === "S/O"
                 ? "Father's Name"
                 : formData.gender === "D/O"
@@ -74,20 +74,20 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
               name="relatedPersonName"
               value={formData.relatedPersonName || ""}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               placeholder="Related person's full name"
             />
           </div>
         )}
       </div>
 
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold mb-4 text-gray-700">
           Permanent Address
         </h3>
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-red-600 mb-2">
               Address Line 1
             </label>
             <input
@@ -95,12 +95,12 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
               name="permanentAddress.line1"
               value={formData.permanentAddress.line1}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               placeholder="House/Flat No., Building Name"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-red-600 mb-2">
               Address Line 2
             </label>
             <input
@@ -108,13 +108,13 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
               name="permanentAddress.line2"
               value={formData.permanentAddress.line2}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               placeholder="Street, Area"
             />
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-red-600 mb-2">
                 City
               </label>
               <input
@@ -122,11 +122,11 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
                 name="permanentAddress.city"
                 value={formData.permanentAddress.city}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-red-600 mb-2">
                 State
               </label>
               <input
@@ -134,11 +134,11 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
                 name="permanentAddress.state"
                 value={formData.permanentAddress.state}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-red-600 mb-2">
                 PIN Code
               </label>
               <input
@@ -146,20 +146,20 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
                 name="permanentAddress.pinCode"
                 value={formData.permanentAddress.pinCode}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold mb-4 text-gray-700">
           Present Address
         </h3>
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-red-600 mb-2">
               Address Line 1
             </label>
             <input
@@ -167,12 +167,12 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
               name="presentAddress.line1"
               value={formData.presentAddress.line1}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               placeholder="House/Flat No., Building Name"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-red-600 mb-2">
               Address Line 2
             </label>
             <input
@@ -180,13 +180,13 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
               name="presentAddress.line2"
               value={formData.presentAddress.line2}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               placeholder="Street, Area"
             />
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-red-600 mb-2">
                 City
               </label>
               <input
@@ -194,11 +194,11 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
                 name="presentAddress.city"
                 value={formData.presentAddress.city}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-red-600 mb-2">
                 State
               </label>
               <input
@@ -206,11 +206,11 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
                 name="presentAddress.state"
                 value={formData.presentAddress.state}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-red-600 mb-2">
                 PIN Code
               </label>
               <input
@@ -218,20 +218,20 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
                 name="presentAddress.pinCode"
                 value={formData.presentAddress.pinCode}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold mb-4 text-gray-700">
           Identification Details
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-red-600 mb-2">
               Aadhaar Number
             </label>
             <input
@@ -239,12 +239,12 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
               name="aadhaarNo"
               value={formData.aadhaarNo}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               placeholder="12-digit Aadhaar Number"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-red-600 mb-2">
               Passport Number
             </label>
             <input
@@ -252,21 +252,21 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
               name="passportNo"
               value={formData.passportNo}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               placeholder="Passport Number"
             />
           </div>
         </div>
       </div>
 
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold mb-4 text-gray-700">
           Name Change Details
         </h3>
-        <div className="grid grid-cols-1 gap-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-red-600 mb-2">
                 Current Given Name (as per Aadhaar)
               </label>
               <input
@@ -274,12 +274,12 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
                 name="currentGivenName"
                 value={formData.currentGivenName}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                 placeholder="Current Given Name"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-red-600 mb-2">
                 Current Surname (as per Aadhaar)
               </label>
               <input
@@ -287,15 +287,15 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
                 name="currentSurname"
                 value={formData.currentSurname}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                 placeholder="Current Surname"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-red-600 mb-2">
                 New Given Name
               </label>
               <input
@@ -303,12 +303,12 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
                 name="newGivenName"
                 value={formData.newGivenName}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                 placeholder="New Given Name"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-red-600 mb-2">
                 New Surname
               </label>
               <input
@@ -316,7 +316,7 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
                 name="newSurname"
                 value={formData.newSurname}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                 placeholder="New Surname"
               />
             </div>
@@ -325,12 +325,12 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
       </div>
 
       <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">
+        <h3 className="text-lg font-semibold mb-4 text-gray-700">
           Additional Details
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-red-600 mb-2">
               Date
             </label>
             <input
@@ -338,11 +338,11 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
               name="date"
               value={formData.date}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-red-600 mb-2">
               Place
             </label>
             <input
@@ -350,7 +350,7 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
               name="place"
               value={formData.place}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
               placeholder="Place of signing"
             />
           </div>

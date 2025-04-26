@@ -9,25 +9,25 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
 
   return (
     <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden my-8">
-      <div className="bg-gray-800 text-white p-6">
+      <div className="bg-gray-800 text-white p-8">
         <h1 className="text-2xl font-bold text-center">
           Vehicle Insurance Claim Form
         </h1>
-        <p className="text-center text-gray-300 mt-2">
+        <p className="text-center text-gray-300 mt-3">
           Please complete all required fields to process your claim
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-6 space-y-8">
+      <form onSubmit={handleSubmit} className="p-8 space-y-10">
         {/* Personal Information Section */}
-        <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-6 text-red-600 border-b pb-3">
+        <div className="bg-gray-50 p-8 rounded-lg shadow-sm border border-gray-200">
+          <h2 className="text-xl font-semibold mb-8 text-red-600 border-b-2 pb-3">
             Personal Information
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Title <span className="text-red-500">*</span>
               </label>
               <select
@@ -46,7 +46,7 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Full Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -60,7 +60,7 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Relation <span className="text-red-500">*</span>
               </label>
               <select
@@ -79,7 +79,7 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Age <span className="text-red-500">*</span>
               </label>
               <input
@@ -93,8 +93,8 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
           </div>
 
-          <div className="mt-6">
-            <label className="block text-sm font-medium mb-2 text-gray-700">
+          <div className="mt-8">
+            <label className="block text-sm font-medium mb-2 text-red-600">
               Address <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -106,8 +106,8 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             ></textarea>
           </div>
 
-          <div className="mt-6">
-            <label className="block text-sm font-medium mb-2 text-gray-700">
+          <div className="mt-8">
+            <label className="block text-sm font-medium mb-2 text-red-600">
               Aadhaar Number <span className="text-red-500">*</span>
             </label>
             <input
@@ -124,14 +124,14 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
         </div>
 
         {/* Vehicle Details Section */}
-        <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-6 text-red-600 border-b pb-3">
+        <div className="bg-gray-50 p-8 rounded-lg shadow-sm border border-gray-200">
+          <h2 className="text-xl font-semibold mb-8 text-red-600 border-b-2 pb-3">
             Vehicle Details
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Vehicle Number <span className="text-red-500">*</span>
               </label>
               <input
@@ -145,7 +145,7 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Vehicle Model <span className="text-red-500">*</span>
               </label>
               <input
@@ -159,7 +159,7 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Engine Number <span className="text-red-500">*</span>
               </label>
               <input
@@ -173,7 +173,7 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Chassis Number <span className="text-red-500">*</span>
               </label>
               <input
@@ -189,14 +189,14 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
         </div>
 
         {/* Insurance Details Section */}
-        <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-6 text-red-600 border-b pb-3">
+        <div className="bg-gray-50 p-8 rounded-lg shadow-sm border border-gray-200">
+          <h2 className="text-xl font-semibold mb-8 text-red-600 border-b-2 pb-3">
             Insurance Details
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Insurance Company <span className="text-red-500">*</span>
               </label>
               <input
@@ -210,7 +210,7 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Policy Number <span className="text-red-500">*</span>
               </label>
               <input
@@ -224,7 +224,7 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Policy Start Date <span className="text-red-500">*</span>
               </label>
               <input
@@ -238,7 +238,7 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Policy End Date <span className="text-red-500">*</span>
               </label>
               <input
@@ -254,14 +254,14 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
         </div>
 
         {/* Accident Details Section */}
-        <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-6 text-red-600 border-b pb-3">
+        <div className="bg-gray-50 p-8 rounded-lg shadow-sm border border-gray-200">
+          <h2 className="text-xl font-semibold mb-8 text-red-600 border-b-2 pb-3">
             Accident Details
           </h2>
 
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Driver Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -275,14 +275,14 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Accident Details <span className="text-red-500">*</span>
               </label>
               <textarea
                 name="accidentDetails"
                 value={formData.accidentDetails}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-md h-32 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-gray-300 rounded-md h-36 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Please provide detailed information about the accident including date, time, location, and circumstances"
                 required
               ></textarea>
@@ -291,14 +291,14 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
         </div>
 
         {/* Verification Details Section */}
-        <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-6 text-red-600 border-b pb-3">
+        <div className="bg-gray-50 p-8 rounded-lg shadow-sm border border-gray-200">
+          <h2 className="text-xl font-semibold mb-8 text-red-600 border-b-2 pb-3">
             Verification Details
           </h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Place <span className="text-red-500">*</span>
               </label>
               <input
@@ -312,7 +312,7 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Day <span className="text-red-500">*</span>
               </label>
               <input
@@ -328,7 +328,7 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Month <span className="text-red-500">*</span>
               </label>
               <select
@@ -355,7 +355,7 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block text-sm font-medium mb-2 text-red-600">
                 Year <span className="text-red-500">*</span>
               </label>
               <input
@@ -372,10 +372,18 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
           </div>
         </div>
 
-       
+        {/* Form Submit Button */}
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            className="px-8 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300"
+          >
+            Submit Claim
+          </button>
+        </div>
       </form>
 
-      <div className="bg-gray-100 p-4 text-center text-gray-600 text-sm">
+      <div className="bg-gray-100 p-6 text-center text-gray-600 text-sm">
         Please ensure all information provided is accurate and complete.
       </div>
     </div>
