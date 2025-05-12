@@ -23,7 +23,6 @@ import HufAggrement from "./components/documents/huf/HufAggrement";
 import VehicleInsuranceClaming from "./components/documents/vehicleinsuranceclaming/VehicleInsuranceClaming";
 import JointKhataTransfer from "./components/documents/jointKhataTransfer/JointKhataTransfer";
 import MatriculationPage from "./components/documents/metriculation/MatriculationPage";
-import GstForm from "./components/documents/gst/GstForm";
 import GstPage from "./components/documents/gst/GstPage";
 import BirthCertificatePage from "./components/documents/birtCertificate/BirthCertificatePage";
 import BirthCertificateParentNameCorrectionPage from "./components/documents/birtCeritificateParentName/BirthCertificateParentNameCorrectionPage";
@@ -32,6 +31,11 @@ import GasAffidavitForm from "./components/documents/gasaffadavit/GasAffadavitPa
 import DobCorrectionPage from "./components/documents/dobCorrection/DobCorrectionPage";
 import NameCorrectionChange from "./components/documents/namechangecorrection/NameCorrectionChange";
 import DualNameChange from "./components/documents/dualNameChange/DualNameChange";
+import AdminLoginPage from "./components/admin/loginPage/AdminLoginPage";
+import ForgotPassword from "./components/admin/forgotpassword/ForgotPassword";
+import Layout from "./components/admin/dashboard/layout.jsx/Layout";
+import Statistics from "./components/admin/dashboard/statistics/Statistics";
+import AdminSignUpPage from "./components/admin/signup/AdminSignUpPage";
 
 function MainLayout({ children }) {
   return (
@@ -92,20 +96,60 @@ function MainLayout({ children }) {
 
 function App() {
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
+
+      // Check for authentication token
+      const admin = localStorage.getItem("adminData");
+      console.log(admin);
+      if (admin) {
+        setIsAuthenticated(true);
+      }
     }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Protected Route Component for Admin Routes
+  const ProtectedAdminRoute = ({ children }) => {
+    return <Layout>{children}</Layout>;
+  };
 
   return (
     <Router>
       <div className="page_wrapper">
         {loading && <Preloader />}
 
+        {/* Authentication and Admin Routes */}
+        <Routes>
+          <Route path="/admin/signup" element={<AdminSignUpPage />} />
+
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin/forgot-password" element={<ForgotPassword />} />
+
+          {/* Protected Admin Dashboard Routes */}
+          {/* <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedAdminRoute>
+                <Dashboard />
+              </ProtectedAdminRoute>
+            }
+          /> */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedAdminRoute>
+                <Statistics />
+              </ProtectedAdminRoute>
+            }
+          />
+        </Routes>
+
+        {/* Existing Document Routes */}
         <Routes>
           <Route
             path="/"
@@ -263,7 +307,6 @@ function App() {
         </Routes>
 
         <GoTop />
-
         <VideoModal />
       </div>
     </Router>

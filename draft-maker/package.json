@@ -12,6 +12,7 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "aos": "^2.3.4",
+    "axios": "^1.9.0",
     "bootstrap": "^5.3.5",
     "docx": "^8.2.2",
     "draft-maker": "file:",
