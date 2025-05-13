@@ -286,7 +286,7 @@ const Layout = ({ children }) => {
                   <ul>
                     <li>
                       <Link
-                        to="/profile"
+                        to="/admin/reset-password"
                         className=" px-4 py-3 hover:bg-red-50 flex items-center text-red-800 hover:text-red-900"
                       >
                         <LockKeyhole size={16} className="mr-3" />

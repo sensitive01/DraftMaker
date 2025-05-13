@@ -56,3 +56,14 @@ export const deleteDocumentPrice = async (docId) => {
     return err;
   }
 };
+
+export const changePassword = async (formData) => {
+  try {
+    const response = await axiosInstance.post(
+      `/admin/change-password`,{formData}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};

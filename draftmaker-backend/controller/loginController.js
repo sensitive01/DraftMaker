@@ -47,4 +47,53 @@ const adminLoginController = async (req, res) => {
   }
 };
 
-module.exports = { adminLoginController };
+const adminChangePassword = async (req, res) => {
+  try {
+    console.log("Welcome to setting the password", req.body);
+    const { formData } = req.body;
+    const { currentPassword, newPassword, confirmPassword } = formData;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res
+        .status(400)
+        .json({ message: "New password and confirm password do not match" });
+    }
+
+    if (currentPassword === newPassword) {
+      return res
+        .status(400)
+        .json({ message: "Old and new password cannot be the same" });
+    }
+
+
+
+
+    const user = await User.findOne();
+
+    if (!user) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedNewPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (err) {
+    console.error("Error in setting the password", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { adminLoginController, adminChangePassword };
