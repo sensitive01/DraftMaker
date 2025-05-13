@@ -36,6 +36,7 @@ import ForgotPassword from "./components/admin/forgotpassword/ForgotPassword";
 import Layout from "./components/admin/dashboard/layout.jsx/Layout";
 import Statistics from "./components/admin/dashboard/statistics/Statistics";
 import AdminSignUpPage from "./components/admin/signup/AdminSignUpPage";
+import DocumentPriceTable from "./components/admin/dashboard/statistics/DocumentsPriceTable";
 
 function MainLayout({ children }) {
   return (
@@ -130,20 +131,19 @@ function App() {
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin/forgot-password" element={<ForgotPassword />} />
 
-          {/* Protected Admin Dashboard Routes */}
-          {/* <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedAdminRoute>
-                <Dashboard />
-              </ProtectedAdminRoute>
-            }
-          /> */}
           <Route
             path="/admin/dashboard"
             element={
               <ProtectedAdminRoute>
                 <Statistics />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/documents-price-table"
+            element={
+              <ProtectedAdminRoute>
+                <DocumentPriceTable />
               </ProtectedAdminRoute>
             }
           />

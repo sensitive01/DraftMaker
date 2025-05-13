@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 5000;
 
 const adminSignUp = require("./routes/adminSignUpRoute");
 const adminLogin = require("./routes/adminAuthRoute");
+const documentPrice = require("./routes/documentPriceRoute")
 
 // ✅ Allowed frontend origins
 const allowedOrigins = [
@@ -38,6 +39,8 @@ dbConnect();
 // Routes
 app.use("/", adminSignUp);
 app.use("/admin", adminLogin);
+app.use("/document-price", documentPrice);
+
 
 // ✅ CORS error handler
 app.use((err, req, res, next) => {

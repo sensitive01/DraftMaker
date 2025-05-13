@@ -63,9 +63,9 @@ const Layout = ({ children }) => {
       },
       {
         icon: BookOpen,
-        label: "Menu",
-        path: "/menu",
-        isActive: location.pathname === "/menu",
+        label: "Document Price",
+        path: "/admin/documents-price-table",
+        isActive: location.pathname === "/admin/documents-price-table",
       },
     ];
 
@@ -139,8 +139,8 @@ const Layout = ({ children }) => {
           </div>
         </div>
 
-        <nav className="flex-1 p-4 bg-white">
-          <ul className="space-y-2">{renderNavItems(navItems)}</ul>
+        <nav className="flex-1 p-2 bg-white">
+          <ul className="space-y-1">{renderNavItems(navItems)}</ul>
         </nav>
 
         <div className="p-4 border-t border-red-100 bg-red-50">
