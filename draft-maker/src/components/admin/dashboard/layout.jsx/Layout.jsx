@@ -10,6 +10,7 @@ import {
   LogOut,
   Settings,
   HelpCircle,
+  LockKeyhole,
 } from "lucide-react";
 
 const Layout = ({ children }) => {
@@ -288,8 +289,8 @@ const Layout = ({ children }) => {
                         to="/profile"
                         className=" px-4 py-3 hover:bg-red-50 flex items-center text-red-800 hover:text-red-900"
                       >
-                        <User size={16} className="mr-3" />
-                        Profile
+                        <LockKeyhole size={16} className="mr-3" />
+                        Reset Password
                       </Link>
                     </li>
                     <li>

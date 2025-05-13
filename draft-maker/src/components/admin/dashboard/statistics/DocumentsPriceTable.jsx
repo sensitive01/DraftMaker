@@ -1,3 +1,4 @@
+// Add this CSS animation at the top of the file
 import React, { useEffect, useState } from "react";
 import { Plus, Edit, X, Check, AlertCircle } from "lucide-react";
 import {
@@ -7,12 +8,34 @@ import {
   updateDocumentPrice,
 } from "../../../../api/service/axiosService";
 
+// CSS for animations - add this to your global styles or use a style tag
+const notificationAnimationStyle = `
+@keyframes slideIn {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-100%); opacity: 0; }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.animate-slide-out {
+  animation: slideOut 0.3s ease-in forwards;
+}
+`;
+
 const DocumentPriceTable = () => {
   const [documentPrices, setDocumentPrices] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentEditId, setCurrentEditId] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [isNotificationExiting, setIsNotificationExiting] = useState(false);
   const [newItem, setNewItem] = useState({
     documentType: "",
     draftCharge: "",
@@ -51,10 +74,27 @@ const DocumentPriceTable = () => {
 
   // Show notification
   const showNotification = (message, type = "success") => {
-    setNotification({ message, type });
+    // Clear any existing notification first
+    setNotification(null);
+
+    // Set the new notification after a brief delay
+    setTimeout(() => {
+      setNotification({ message, type });
+    }, 100);
+
+    // Auto dismiss after 5 seconds
+    setTimeout(() => {
+      dismissNotification();
+    }, 5000);
+  };
+
+  // Dismiss notification with animation
+  const dismissNotification = () => {
+    setIsNotificationExiting(true);
     setTimeout(() => {
       setNotification(null);
-    }, 5000);
+      setIsNotificationExiting(false);
+    }, 300); // Match this timing with your CSS animation duration
   };
 
   const openAddModal = () => {
@@ -202,29 +242,66 @@ const DocumentPriceTable = () => {
 
   return (
     <div className="space-y-6 p-6 bg-white rounded-lg">
-      {/* Notification */}
+      {/* Enhanced Notification */}
       {notification && (
-        <div
-          className={`p-4 rounded-lg flex items-center justify-between ${
-            notification.type === "success"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
-        >
-          <div className="flex items-center">
-            {notification.type === "success" ? (
-              <Check size={20} className="mr-2" />
-            ) : (
-              <AlertCircle size={20} className="mr-2" />
-            )}
-            <p>{notification.message}</p>
-          </div>
-          <button
-            onClick={() => setNotification(null)}
-            className="text-gray-500 hover:text-gray-700"
+        <div className="fixed top-5 right-5 left-5 md:left-auto md:w-96 z-50">
+          <div
+            className={`shadow-lg rounded-lg border-l-4 ${
+              isNotificationExiting ? "animate-slide-out" : "animate-slide-in"
+            } ${
+              notification.type === "success"
+                ? "bg-white border-green-500"
+                : "bg-white border-red-500"
+            }`}
           >
-            <X size={16} />
-          </button>
+            <div className="flex p-4">
+              <div
+                className={`flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full ${
+                  notification.type === "success"
+                    ? "bg-green-100 text-green-600"
+                    : "bg-red-100 text-red-600"
+                }`}
+              >
+                {notification.type === "success" ? (
+                  <Check size={20} />
+                ) : (
+                  <AlertCircle size={20} />
+                )}
+              </div>
+              <div className="ml-3 flex-1">
+                <h3
+                  className={`text-sm leading-5 font-medium ${
+                    notification.type === "success"
+                      ? "text-green-800"
+                      : "text-red-800"
+                  }`}
+                >
+                  {notification.type === "success" ? "Success" : "Error"}
+                </h3>
+                <p
+                  className={`mt-1 text-sm leading-5 ${
+                    notification.type === "success"
+                      ? "text-green-700"
+                      : "text-red-700"
+                  }`}
+                >
+                  {notification.message}
+                </p>
+              </div>
+              <div className="ml-4 flex-shrink-0 flex">
+                <button
+                  onClick={dismissNotification}
+                  className={`inline-flex text-gray-400 hover:${
+                    notification.type === "success"
+                      ? "text-green-600"
+                      : "text-red-600"
+                  } focus:outline-none`}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -442,25 +519,6 @@ const DocumentPriceTable = () => {
                     />
                   </div>
                 </div>
-
-                {/* Status - Added status selection in modal */}
-                {isEditMode && (
-                  <div>
-                    <label className="block text-sm font-medium text-red-600 mb-1">
-                      Status
-                    </label>
-                    <select
-                      value={newItem.status.toString()}
-                      onChange={(e) =>
-                        handleInputChange("status", e.target.value)
-                      }
-                      className="w-full p-2 border border-red-200 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    >
-                      <option value="true">Enabled</option>
-                      <option value="false">Disabled</option>
-                    </select>
-                  </div>
-                )}
               </div>
 
               {/* Buttons */}
