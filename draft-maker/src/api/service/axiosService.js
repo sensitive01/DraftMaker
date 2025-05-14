@@ -94,7 +94,8 @@ export const getDocumentName = async () => {
 export const createDualNameChangeBooking = async (data) => {
   try {
     const response = await axiosInstance.post(
-      `/documents/create-dual-name-booking`,{data}
+      `/documents/create-dual-name-booking`,
+      { data }
     );
     return response;
   } catch (err) {
@@ -105,31 +106,29 @@ export const createDualNameChangeBooking = async (data) => {
 export const createDualNameChangePaymentData = async (data) => {
   try {
     const response = await axiosInstance.put(
-      `/documents/update-dual-name-payment-data`,{data}
+      `/documents/update-dual-name-payment-data`,
+      { data }
     );
     return response;
   } catch (err) {
     return err;
   }
 };
-
 
 export const getAllBookingData = async () => {
   try {
-    const response = await axiosInstance.get(
-      `/documents/get-all-booking-data`,
-    );
+    const response = await axiosInstance.get(`/documents/get-all-booking-data`);
     return response;
   } catch (err) {
     return err;
   }
 };
-
 
 export const sendNameCorrectionData = async (document) => {
   try {
     const response = await axiosInstance.post(
-      `/documents/save-name-correction-data`,{document}
+      `/documents/save-name-correction-data`,
+      { document }
     );
     return response;
   } catch (err) {
@@ -140,7 +139,154 @@ export const sendNameCorrectionData = async (document) => {
 export const createNameChangePaymentData = async (data) => {
   try {
     const response = await axiosInstance.put(
-      `/documents/update-name-correction-payment-data`,{data}
+      `/documents/update-name-correction-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const sendDobCorrectionData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-name-correction-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createDobCorrectionPaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-name-correction-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const sendGasCorrectionData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-gas-correction-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createGassAffadavitPaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-gas-correction-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const sendDocumentLostData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-document-lost-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createDocumentLostPaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-document-lost-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const dobParentNameCorrectionData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-dob-parent-name-correction`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createDobParentNameCorrectionPaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-dob-parent-name-correction`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const birthCerticateNameCorrectionData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-birth-certificate-name-correction`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const birthCerticateNameCorrectionPaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-birth-certificate-name-correction`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const sendGstCorrectionData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-gst-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const gstPaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-gst-payment-data`,
+      { data }
     );
     return response;
   } catch (err) {

@@ -8,7 +8,7 @@ const GasAffadavitPreview = ({formData}) => {
     </h1>
 
     <p className="mb-4">
-      I, {formData.fullName} {formData.relation}, Aged: {formData.age} Years,
+      I, {formData.fullName} {formData.relation},{formData.fatherName} Aged: {formData.age} Years,
     </p>
 
     <p className="mb-4">Permanent Address {formData.permanentAddress}</p>

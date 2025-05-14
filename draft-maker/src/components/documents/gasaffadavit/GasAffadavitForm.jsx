@@ -44,6 +44,18 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
                 <option value="H/o">Husband of</option>
               </select>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-red-600 mb-1">
+                Relation's Name
+              </label>
+              <input
+                type="text"
+                name="fatherName"
+                value={formData.fatherName || ""}
+                onChange={handleChange}
+                className="block w-full border border-gray-300 rounded-md shadow-sm p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-red-600 mb-1">
@@ -319,28 +331,28 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
         </div>
 
         {/* Verification Section */}
-        <div className="bg-white p-5 rounded-md shadow-sm">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">
+        <div className="border-b pb-4">
+          <h2 className="text-lg font-medium text-gray-900 mb-4">
             Verification Details
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-red-600 mb-1">
-                Place of Verification
+                Place of Verification <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 name="place"
                 value={formData.place}
                 onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2.5 focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
                 required
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-red-600 mb-1">
-                Day
+                Day <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -349,20 +361,20 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
                 max="31"
                 value={formData.day}
                 onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2.5 focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
                 required
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-red-600 mb-1">
-                Month
+                Month <span className="text-red-500">*</span>
               </label>
               <select
                 name="month"
                 value={formData.month}
                 onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2.5 focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
                 required
               >
                 <option value="">Select Month</option>
@@ -383,27 +395,18 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
 
             <div>
               <label className="block text-sm font-medium text-red-600 mb-1">
-                Year
+                Year <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
                 name="year"
                 value={formData.year}
                 onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2.5 focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
                 required
               />
             </div>
           </div>
-        </div>
-
-        <div className="flex justify-center mt-8">
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-8 py-3 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium text-lg"
-          >
-            Preview Affidavit
-          </button>
         </div>
       </form>
     </div>

@@ -43,6 +43,7 @@ export default function DualNameChange() {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  
   const previewRef = useRef(null);
 
   const handleChange = (e) => {
