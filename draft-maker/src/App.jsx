@@ -38,6 +38,7 @@ import Statistics from "./components/admin/dashboard/statistics/Statistics";
 import AdminSignUpPage from "./components/admin/signup/AdminSignUpPage";
 import DocumentPriceTable from "./components/admin/dashboard/statistics/DocumentsPriceTable";
 import ResetPasswordComponent from "./components/admin/dashboard/statistics/ResetPasswordComponent";
+import NewBookingTables from "./components/admin/dashboard/statistics/NewBookingTables";
 
 function MainLayout({ children }) {
   return (
@@ -106,7 +107,6 @@ function App() {
 
       // Check for authentication token
       const admin = localStorage.getItem("adminData");
-      console.log(admin);
       if (admin) {
         setIsAuthenticated(true);
       }
@@ -145,6 +145,14 @@ function App() {
             element={
               <ProtectedAdminRoute>
                 <DocumentPriceTable />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/documents-new-booking-table"
+            element={
+              <ProtectedAdminRoute>
+                <NewBookingTables />
               </ProtectedAdminRoute>
             }
           />

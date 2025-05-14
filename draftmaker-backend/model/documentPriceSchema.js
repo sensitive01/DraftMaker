@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const documentPriceSchema = new mongoose.Schema(
   {
+    formId: {
+      type: String,
+      
+    },
     documentType: {
       type: String,
       required: true,
@@ -22,7 +26,41 @@ const documentPriceSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
-    isVisible:{type:Boolean,default:true}
+    hasDraftNotaryCharge: {
+      type: Boolean,
+      default: false,
+    },
+    draftNotaryCharge: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    hasPdfNotaryCharge: {
+      type: Boolean,
+      default: false,
+    },
+    pdfNotaryCharge: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    hasHomeDropNotaryCharge: {
+      type: Boolean,
+      default: false,
+    },
+    homeDropNotaryCharge: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    status: {
+      type: Boolean,
+      default: true,
+    },
+    isVisible: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,

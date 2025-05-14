@@ -1,20 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Download } from "lucide-react";
-import html2pdf from "html2pdf.js";
-import { saveAs } from "file-saver";
-import {
-  Document,
-  Packer,
-  Paragraph,
-  TextRun,
-  HeadingLevel,
-  AlignmentType,
-  BorderStyle,
-} from "docx";
+import React, { useRef } from "react";
 
 const DualNameChangePreview = ({ formData }) => {
-  const [downloadFormat, setDownloadFormat] = useState("pdf");
-  const [isDownloading, setIsDownloading] = useState(false);
   const pdfTemplateRef = useRef(null);
 
   // Function to check if a field is filled
@@ -22,125 +8,8 @@ const DualNameChangePreview = ({ formData }) => {
     return value && value.trim() !== "";
   };
 
-  // Function to trigger PDF download
-  const handleDownloadPDF = async () => {
-    setIsDownloading(true);
-
-    try {
-      // Clone the template to preserve the two-page layout
-      const content = document.getElementById("pdf-template").cloneNode(true);
-
-      // Configure pdf options
-      const options = {
-        margin: 10,
-        filename: "Dual-name-correction.pdf",
-        image: { type: "pdf", quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      };
-
-      // Generate PDF
-      await html2pdf().from(content).set(options).save();
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
-  // Function to trigger Word download
-  const handleDownloadWord = async () => {
-    setIsDownloading(true);
-
-    try {
-      // Create Word document
-      const doc = new Document({
-        sections: [
-          {
-            properties: {},
-            children: [
-              new Paragraph({
-                text: "AFFIDAVIT",
-                heading: HeadingLevel.HEADING_1,
-                alignment: AlignmentType.CENTER,
-                bold: true,
-              }),
-              new Paragraph({
-                children: [
-                  new TextRun("I, "),
-                  new TextRun({
-                    text:
-                      formData?.fullName ||
-                      "Mr/Mrs/Ms ...........................",
-                    highlight: "yellow",
-                  }),
-                  new TextRun(" "),
-                  new TextRun({
-                    text: formData?.relation || "D/o, S/o, H/o, W/o",
-                    highlight: "yellow",
-                  }),
-                  new TextRun(" "),
-                  new TextRun({
-                    text: formData?.relationName || "...................",
-                    highlight: "yellow",
-                  }),
-                  new TextRun(", Aged: "),
-                  new TextRun({
-                    text: formData?.age || "......",
-                    highlight: "yellow",
-                  }),
-                  new TextRun(" Years,"),
-                ],
-              }),
-              // Add the rest of your document content here
-              // ...
-            ],
-          },
-        ],
-      });
-
-      // Generate and save document
-      const buffer = await Packer.toBuffer(doc);
-      saveAs(new Blob([buffer]), "affidavit.docx");
-    } catch (error) {
-      console.error("Error generating Word document:", error);
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
-  const handleDownload = () => {
-    if (downloadFormat === "pdf") {
-      handleDownloadPDF();
-    } else {
-      handleDownloadWord();
-    }
-  };
-
   return (
     <div className="flex flex-col items-center">
-      {/* Download controls */}
-      <div className="w-full max-w-3xl mb-4 flex justify-end items-center gap-4">
-        <select
-          className="border border-gray-300 rounded px-3 py-1"
-          value={downloadFormat}
-          onChange={(e) => setDownloadFormat(e.target.value)}
-          disabled={isDownloading}
-        >
-          <option value="pdf">PDF Format</option>
-          <option value="word">Word Format</option>
-        </select>
-
-        <button
-          onClick={handleDownload}
-          disabled={isDownloading}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
-        >
-          <Download size={16} />
-          {isDownloading ? "Processing..." : "Download"}
-        </button>
-      </div>
-
       {/* Single page preview with continuous content */}
       <div className="bg-white border border-gray-300 shadow font-serif w-full max-w-3xl">
         <div className="relative p-8">
@@ -161,6 +30,7 @@ const DualNameChangePreview = ({ formData }) => {
                   isFilled(formData?.fullName) ? "" : "bg-yellow-200 px-1"
                 }
               >
+                {formData?.namePrefix}{" "}
                 {formData?.fullName || "Mr/Mrs/Ms ..........................."}
               </span>{" "}
               <span
@@ -293,9 +163,8 @@ const DualNameChangePreview = ({ formData }) => {
                 <span style={{ display: "inline-block", width: "1.5em" }}>
                   {4}.
                 </span>{" "}
-                That I further declare that both the names mentioned{" "}
-                here in above belongs to one
-                and the same person i.e. "myself".
+                That I further declare that both the names mentioned here in
+                above belongs to one and the same person i.e. "myself".
               </li>
 
               <li style={{ display: "block", counterIncrement: "item" }}>

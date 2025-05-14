@@ -11,6 +11,7 @@ import {
   Settings,
   HelpCircle,
   LockKeyhole,
+  Files,
 } from "lucide-react";
 
 const Layout = ({ children }) => {
@@ -67,6 +68,12 @@ const Layout = ({ children }) => {
         label: "Document Price",
         path: "/admin/documents-price-table",
         isActive: location.pathname === "/admin/documents-price-table",
+      },
+      {
+        icon: Files,
+        label: "New Bookings",
+        path: "/admin/documents-new-booking-table",
+        isActive: location.pathname === "/admin/documents-new-booking-table",
       },
     ];
 

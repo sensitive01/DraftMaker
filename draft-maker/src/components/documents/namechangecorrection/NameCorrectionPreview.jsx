@@ -1,60 +1,107 @@
-import React from 'react'
+import React from "react";
 
-const NameCorrectionPreview = ({formData}) => {
+const NameCorrectionPreview = ({ formData }) => {
   return (
-    <div className="bg-white p-6 border border-gray-300 rounded shadow">
-    <h1 className="text-xl font-bold text-center underline mb-6">AFFIDAVIT</h1>
-    
-    <p className="mb-4">
-      I, {formData.fullName} {formData.relation} {formData.relationName}, Aged: {formData.age} Years,
-    </p>
-    
-    <p className="mb-4">
-      Permanent Address {formData.permanentAddress}
-    </p>
-    
-    <p className="mb-4">
-      My Aadhaar No: {formData.aadhaarNo}
-    </p>
-    
-    <p className="mb-4">Do hereby solemnly affirm and declare as under:</p>
-    
-    <ol className="list-decimal pl-6 space-y-4">
-      <li>
-        That I am the citizen of India.
-      </li>
-      
-      <li>
-        That my name has been recorded as {formData.oldName} (old name)
-      </li>
-      
-      <li>
-        That now I have changed my name permanently as {formData.newName} (new name) in place of my previous name i.e. {formData.oldName} (old name).
-      </li>
-      
-      <li>
-        That in future I will be known by my new name i.e. {formData.newName} for all the purpose.
-      </li>
-      
-      <li>
-        That I further declare that both the names mentioned hereinabove belongs to one and the same person i.e. "myself".
-      </li>
-      
-      <li>
-        That my statement is true and correct.
-      </li>
-    </ol>
-    
-    <p className="mt-6">
-      Verified at <strong>{formData.place}</strong> on this {formData.day} day of {formData.month}, {formData.year} that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.
-    </p>
-    
-    <div className="mt-10 text-right">
-      <p>(Signature of the Deponent)</p>
-      <p className="mt-1">{formData.fullName}</p>
-    </div>
-  </div>
-  )
-}
+    <div className="max-w-3xl mx-auto bg-white p-8 border border-gray-300 rounded-md shadow-md font-serif">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-bold border-b-2 border-black pb-2 inline-block">
+          AFFIDAVIT
+        </h1>
+        <p className="text-xs mt-1 text-gray-600">(For Change of Name)</p>
+      </div>
 
-export default NameCorrectionPreview
+      {/* Introduction */}
+      <div className="mb-6 leading-relaxed">
+        <p className="mb-3">
+          I, <span className="font-semibold">{formData.fullName}</span>,{" "}
+          {formData.relation} of{" "}
+          <span className="font-semibold">{formData.relationName}</span>, aged{" "}
+          <span className="font-semibold">{formData.age}</span> years,
+        </p>
+
+        <p className="mb-3">
+          Permanent Resident of:{" "}
+          <span className="font-semibold">{formData.permanentAddress}</span>
+        </p>
+
+        <p className="mb-5">
+          Aadhaar No:{" "}
+          <span className="font-semibold">{formData.aadhaarNo}</span>
+        </p>
+
+        <p className="font-semibold mb-5">
+          Do hereby solemnly affirm and declare as under:
+        </p>
+      </div>
+
+      {/* Declaration Points */}
+      <div className="mb-8">
+        <ol className="list-decimal pl-8 space-y-4">
+          <li>That I am a citizen of India.</li>
+
+          <li>
+            That my name has been recorded as{" "}
+            <span className="font-semibold ">{formData.oldName}</span>{" "}
+            (old name) in my official documents.
+          </li>
+
+          <li>
+            That now I have changed my name permanently to{" "}
+            <span className="font-semibold ">{formData.newName}</span>{" "}
+            (new name) in place of my previous name i.e.,{" "}
+            <span className="">{formData.oldName}</span> (old name).
+          </li>
+
+          <li>
+            That in future I will be known by my new name i.e.,{" "}
+            <span className="font-semibold ">{formData.newName}</span>{" "}
+            for all purposes.
+          </li>
+
+          <li>
+            That I further declare that both the names mentioned hereinabove
+            belong to one and the same person i.e., "myself".
+          </li>
+
+          <li>
+            That my statement is true and correct to the best of my knowledge
+            and belief.
+          </li>
+        </ol>
+      </div>
+
+      {/* Verification */}
+      <div className="mb-12 mt-8">
+        <p className="leading-relaxed">
+          Verified at <span className="font-semibold">{formData.place}</span> on
+          this <span className="font-semibold">{formData.day}</span> day of{" "}
+          <span className="font-semibold">{formData.month}</span>,{" "}
+          <span className="font-semibold">{formData.year}</span> that the
+          contents of the above said affidavit are true and correct to the best
+          of my knowledge and belief.
+        </p>
+      </div>
+
+      {/* Signature */}
+      <div className="flex justify-between items-end mt-16">
+        <div>
+          <p className="font-bold"></p>
+          <div className="mt-8 border-black pt-1 w-40"></div>
+          <div className="mt-8  border-black pt-1 w-40"></div>
+        </div>
+
+        <div className="text-center">
+          <div className="h-16"></div>
+          <div className="border-t border-black pt-1">
+            <p className="font-semibold">Deponent</p>
+          </div>
+        </div>
+      </div>
+
+     
+    </div>
+  );
+};
+
+export default NameCorrectionPreview;

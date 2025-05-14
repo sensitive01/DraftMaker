@@ -59,8 +59,88 @@ export const deleteDocumentPrice = async (docId) => {
 
 export const changePassword = async (formData) => {
   try {
+    const response = await axiosInstance.post(`/admin/change-password`, {
+      formData,
+    });
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const sendDualNameCorrectionData = async (formData) => {
+  try {
     const response = await axiosInstance.post(
-      `/admin/change-password`,{formData}
+      `/documents/save-dual-name-correction-data`,
+      { formData }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getDocumentName = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/documents/get-documents-name-data`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createDualNameChangeBooking = async (data) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/create-dual-name-booking`,{data}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createDualNameChangePaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-dual-name-payment-data`,{data}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const getAllBookingData = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/documents/get-all-booking-data`,
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const sendNameCorrectionData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-name-correction-data`,{document}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createNameChangePaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-name-correction-payment-data`,{data}
     );
     return response;
   } catch (err) {

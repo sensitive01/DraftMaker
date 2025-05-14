@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Facebook, Lock, Mail, User } from "lucide-react";
+import { Facebook, Lock, Mail, User, Loader } from "lucide-react";
 import { verifyLogin } from "../../../api/service/axiosService";
 import { useNavigate } from "react-router-dom";
 
@@ -9,9 +9,13 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState(""); // 'success' or 'error'
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setMessage("");
+
     try {
       console.log("Login attempt:", { username, password });
       const response = await verifyLogin(username, password);
@@ -30,6 +34,9 @@ export default function AdminLoginPage() {
           navigate("/admin/dashboard");
           window.location.reload(); // Force reload to trigger authentication check
         }, 1500);
+      } else {
+        setMessage(response?.response?.data?.message);
+        setMessageType("error");
       }
     } catch (err) {
       console.log("Error in verify admin", err);
@@ -39,6 +46,8 @@ export default function AdminLoginPage() {
         err.response?.data?.message || "Login failed. Please try again."
       );
       setMessageType("error");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -100,17 +109,53 @@ export default function AdminLoginPage() {
         </div>
 
         <div className="bg-white bg-opacity-95 backdrop-filter backdrop-blur-md rounded-xl shadow-2xl overflow-hidden transition-all duration-300">
-          {message && (
-            <div
-              className={`p-4 text-center ${
-                messageType === "success"
-                  ? "bg-green-200 text-green-800"
-                  : "bg-red-100 text-red-800"
-              }`}
-            >
-              {message}
-            </div>
-          )}
+          {/* Status message box - now fixed height so it doesn't jump */}
+          <div className="h-16 flex items-center justify-center">
+            {message && (
+              <div
+                className={`w-full p-4 text-center flex items-center justify-center space-x-2 transition-all duration-300 ${
+                  messageType === "success"
+                    ? "bg-green-100 text-green-800 border-l-4 border-green-500"
+                    : messageType === "error"
+                    ? "bg-red-100 text-red-800 border-l-4 border-red-500"
+                    : "bg-transparent"
+                }`}
+              >
+                {messageType === "success" && (
+                  <div className="flex items-center">
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    {message}
+                  </div>
+                )}
+                {messageType === "error" && (
+                  <div className="flex items-center">
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    {message}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           <div className="px-6 py-8">
             <h2 className="text-center text-2xl font-bold text-gray-800 mb-6">
@@ -142,6 +187,7 @@ export default function AdminLoginPage() {
                       setUsername(e.target.value);
                       setMessage("");
                     }}
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -170,6 +216,7 @@ export default function AdminLoginPage() {
                       setPassword(e.target.value);
                       setMessage("");
                     }}
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -189,9 +236,17 @@ export default function AdminLoginPage() {
                 <button
                   type="button"
                   onClick={handleLogin}
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300"
+                  disabled={isLoading}
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300 disabled:opacity-70"
                 >
-                  Sign in
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <Loader className="h-5 w-5 mr-2 animate-spin" />
+                      Signing in...
+                    </div>
+                  ) : (
+                    "Sign in"
+                  )}
                 </button>
               </div>
             </div>

@@ -12,7 +12,18 @@ const getAllDocumentPrices = async (req, res) => {
 const createDocumentPrice = async (req, res) => {
   try {
     console.log("Welcome to createDocumentPrice", req.body);
-    const { documentType, draftCharge, pdfCharge, homeDropCharge } = req.body.documents;
+    const {
+      documentType,
+      draftCharge,
+      pdfCharge,
+      homeDropCharge,
+      hasDraftNotaryCharge,
+      draftNotaryCharge,
+      hasPdfNotaryCharge,
+      pdfNotaryCharge,
+      hasHomeDropNotaryCharge,
+      homeDropNotaryCharge,
+    } = req.body.documents;
 
     if (!documentType || draftCharge == null || pdfCharge == null || homeDropCharge == null) {
       return res.status(400).json({ message: "All fields are required." });
@@ -29,6 +40,12 @@ const createDocumentPrice = async (req, res) => {
       draftCharge,
       pdfCharge,
       homeDropCharge,
+      hasDraftNotaryCharge,
+      draftNotaryCharge,
+      hasPdfNotaryCharge,
+      pdfNotaryCharge,
+      hasHomeDropNotaryCharge,
+      homeDropNotaryCharge,
     });
 
     await newPrice.save();
@@ -37,6 +54,7 @@ const createDocumentPrice = async (req, res) => {
     res.status(500).json({ message: "Failed to create document price", error });
   }
 };
+
 
 
 const updateDocumentPrice = async (req, res) => {
@@ -71,28 +89,21 @@ const updateDocumentPrice = async (req, res) => {
 
 const deleteDocumentPrice = async (req, res) => {
   try {
-    console.log("Welcome to toggle the document visibility");
+    console.log("Welcome to delete the document price");
     const { id } = req.params;
 
-    const document = await DocumentPrice.findById(id);
-    if (!document) {
+    const deleted = await DocumentPrice.findByIdAndDelete(id);
+
+    if (!deleted) {
       return res.status(404).json({ message: "Document price not found" });
     }
 
-    const updated = await DocumentPrice.findByIdAndUpdate(
-      id,
-      { isVisible: !document.isVisible },
-      { new: true, runValidators: true }
-    );
-
-    res.status(200).json({
-      message: `Document visibility toggled to ${updated.isVisible ? "visible" : "hidden"}`,
-      data: updated,
-    });
+    res.status(200).json({ message: "Document price deleted successfully", data: deleted });
   } catch (error) {
-    res.status(500).json({ message: "Failed to toggle document visibility", error });
+    res.status(500).json({ message: "Failed to delete document price", error });
   }
 };
+
 
 
 module.exports={

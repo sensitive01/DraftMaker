@@ -2,7 +2,7 @@ import React from "react";
 
 const NameCorrectionForm = ({ formData, handleChange }) => {
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-gray-50 rounded-lg shadow">
+    <div className="p-5 max-w-4xl mx-auto bg-gray-50 rounded-lg shadow">
       <h1 className="text-3xl font-bold mb-8 text-center text-blue-600">
         Name Change Affidavit Form
       </h1>
@@ -141,11 +141,11 @@ const NameCorrectionForm = ({ formData, handleChange }) => {
 
         {/* Verification Section */}
         <div className="bg-white p-5 rounded-md shadow-sm">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b-2 border-red-200 pb-2">
             Verification Details
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div>
+          <div className="flex flex-wrap">
+            <div className="w-full md:w-1/3 pr-3 mb-4 md:mb-0">
               <label className="block text-sm font-medium text-red-600 mb-1">
                 Place of Verification
               </label>
@@ -154,77 +154,70 @@ const NameCorrectionForm = ({ formData, handleChange }) => {
                 name="place"
                 value={formData.place}
                 onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2.5 focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full border border-red-300 rounded-md shadow-sm p-2 focus:ring-red-500 focus:border-red-500"
                 required
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-red-600 mb-1">
-                Day
-              </label>
-              <input
-                type="number"
-                name="day"
-                min="1"
-                max="31"
-                value={formData.day}
-                onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2.5 focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
+            <div className="flex w-full md:w-2/3">
+              <div className="w-1/3 pr-2">
+                <label className="block text-sm font-medium text-red-600 mb-1">
+                  Day
+                </label>
+                <input
+                  type="number"
+                  name="day"
+                  min="1"
+                  max="31"
+                  value={formData.day}
+                  onChange={handleChange}
+                  className="block w-full border border-red-300 rounded-md shadow-sm p-2 focus:ring-red-500 focus:border-red-500"
+                  required
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-red-600 mb-1">
-                Month
-              </label>
-              <select
-                name="month"
-                value={formData.month}
-                onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2.5 focus:ring-blue-500 focus:border-blue-500"
-                required
-              >
-                <option value="">Select Month</option>
-                <option value="January">January</option>
-                <option value="February">February</option>
-                <option value="March">March</option>
-                <option value="April">April</option>
-                <option value="May">May</option>
-                <option value="June">June</option>
-                <option value="July">July</option>
-                <option value="August">August</option>
-                <option value="September">September</option>
-                <option value="October">October</option>
-                <option value="November">November</option>
-                <option value="December">December</option>
-              </select>
-            </div>
+              <div className="w-1/3 px-2">
+                <label className="block text-sm font-medium text-red-600 mb-1">
+                  Month
+                </label>
+                <select
+                  name="month"
+                  value={formData.month}
+                  onChange={handleChange}
+                  className="block w-full border border-red-300 rounded-md shadow-sm p-2 focus:ring-red-500 focus:border-red-500"
+                  required
+                >
+                  <option value="">Select Month</option>
+                  <option value="January">January</option>
+                  <option value="February">February</option>
+                  <option value="March">March</option>
+                  <option value="April">April</option>
+                  <option value="May">May</option>
+                  <option value="June">June</option>
+                  <option value="July">July</option>
+                  <option value="August">August</option>
+                  <option value="September">September</option>
+                  <option value="October">October</option>
+                  <option value="November">November</option>
+                  <option value="December">December</option>
+                </select>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-red-600 mb-1">
-                Year
-              </label>
-              <input
-                type="number"
-                name="year"
-                value={formData.year}
-                onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2.5 focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
+              <div className="w-1/3 pl-2">
+                <label className="block text-sm font-medium text-red-600 mb-1">
+                  Year
+                </label>
+                <input
+                  type="number"
+                  name="year"
+                  value={formData.year}
+                  onChange={handleChange}
+                  className="block w-full border border-red-300 rounded-md shadow-sm p-2 focus:ring-red-500 focus:border-red-500"
+                  required
+                />
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className="flex justify-center mt-8">
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-8 py-3 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium text-lg"
-          >
-            Preview Affidavit
-          </button>
         </div>
       </form>
     </div>
