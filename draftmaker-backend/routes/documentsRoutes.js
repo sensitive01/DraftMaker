@@ -63,4 +63,15 @@ documentRouter.put("/update-password-annaxure-payment-data",documentController.u
 documentRouter.post("/save-passport-name-change-data",documentController.createPassportNameChangeData)
 documentRouter.put("/update-passport-name-change-payment-data",documentController.updatePassportNameChangePaymentData)
 
+documentRouter.post("/save-adress-affadavit-data",documentController.createAdressAffadavitData)
+documentRouter.put("/update-adress-affadavit-payment-data",documentController.updateAdressAffadavitPaymentData)
+
+
+documentRouter.post("/save-commercial-data",documentController.createCommercialData)
+documentRouter.put("/update-commercial-payment-data",documentController.updateCommercialPaymentData)
+
+
+documentRouter.post("/save-recidential-data",documentController.createRecidentialData)
+documentRouter.put("/update-recidential-payment-data",documentController.updateRecidentialPaymentData)
+
 module.exports = documentRouter

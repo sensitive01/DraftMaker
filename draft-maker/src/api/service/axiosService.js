@@ -470,3 +470,77 @@ export const createPassportnameChangePaymentData = async (data) => {
     return err;
   }
 };
+
+
+export const sendAddressAffadavitData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-adress-affadavit-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createAddressAffadavitPaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-adress-affadavit-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const sendCommercialData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-commercial-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createCommercialPaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-commercial-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const sendRecidentailData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-recidential-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createRecidentailPaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-recidential-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};

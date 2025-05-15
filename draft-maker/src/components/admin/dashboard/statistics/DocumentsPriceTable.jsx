@@ -524,13 +524,13 @@ const DocumentPriceTable = () => {
                         >
                           {price.status ? <X size={16} /> : <Check size={16} />}
                         </button>
-                        <button
+                        {/* <button
                           className="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors"
                           onClick={() => openDeleteConfirm(price._id)}
                           title="Delete"
                         >
                           <Trash2 size={16} />
-                        </button>
+                        </button> */}
                       </div>
                     </td>
                   </tr>

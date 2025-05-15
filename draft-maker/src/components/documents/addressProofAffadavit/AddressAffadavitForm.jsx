@@ -313,14 +313,7 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
         </div>
       </div>
 
-      <div className="mt-8 text-center">
-        <button
-          type="submit"
-          className="bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-8 rounded-md shadow-md transition duration-300"
-        >
-          Submit Affidavit
-        </button>
-      </div>
+      
     </div>
   );
 };
