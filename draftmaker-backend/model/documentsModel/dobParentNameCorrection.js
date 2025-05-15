@@ -75,6 +75,12 @@ const parentCorrectionFormSchema = new mongoose.Schema(
       type: String,
       default: "Pending",
     },
+    documentType: {
+      type: String,
+    },
+    formId: {
+      type: String,
+    },
     paymentDetails: {
       paymentId: {
         type: String,

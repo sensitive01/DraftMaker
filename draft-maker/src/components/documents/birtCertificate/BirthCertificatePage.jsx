@@ -4,11 +4,15 @@ import BirtCertificateForm from "./BirtCertificateForm";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
-import { birthCerticateNameCorrectionData, birthCerticateNameCorrectionPaymentData } from "../../../api/service/axiosService";
+import {
+  birthCerticateNameCorrectionData,
+  birthCerticateNameCorrectionPaymentData,
+} from "../../../api/service/axiosService";
 
 // Main Page Component containing both form and preview
 export default function BirthCertificatePage() {
   const [formData, setFormData] = useState({
+    formId:"DM-BC-MNC-7",
     parentTitle: "Mr.",
     parentName: "",
     spouseTitle: "Mrs.",
@@ -113,9 +117,8 @@ export default function BirthCertificatePage() {
     options.push({
       id: "draft_estamp_delivery",
       name: "Draft + E-stamp + Delivery",
-      price:
-        (documentDetails.pdfCharge || 0) +
-        (documentDetails.homeDropCharge || 0),
+      price: documentDetails.homeDropCharge || 0,
+
       hasNotary: documentDetails.hasHomeDropNotaryCharge,
       notaryCharge: documentDetails.homeDropNotaryCharge || 0,
       description: "Physical copy delivered to your address",
@@ -167,7 +170,7 @@ export default function BirthCertificatePage() {
         amount: totalPrice * 100,
         currency: "INR",
         name: "Draft Maker",
-        description: `Dual Name Change - ${service.name}`,
+        description: `${documentDetails.documentType} - ${service.name}`,
         handler: function (response) {
           console.log("razorpay response", response);
           handlePaymentSuccess({
@@ -176,7 +179,7 @@ export default function BirthCertificatePage() {
             razorpay_signature: response.razorpay_signature,
             bookingId: bookingId,
             mobileNumber: mobileNumber,
-            documentType: "Dual Name Correction",
+            documentType: documentDetails.documentType,
             fullName: formData.fullName,
             serviceType: service.id,
             serviceName: service.name,
@@ -242,7 +245,7 @@ export default function BirthCertificatePage() {
         signature: paymentData.razorpay_signature,
         bookingId: paymentData.bookingId,
         mobileNumber: paymentData.mobileNumber,
-        documentType: "Dual Name Correction",
+        documentType: documentDetails.documentType,
         fullName: formData.fullName,
         serviceType: paymentData.serviceType,
         serviceName: paymentData.serviceName,
@@ -251,9 +254,8 @@ export default function BirthCertificatePage() {
         status: "success",
       };
 
-      const confirmationResponse = await birthCerticateNameCorrectionPaymentData(
-        paymentConfirmationData
-      );
+      const confirmationResponse =
+        await birthCerticateNameCorrectionPaymentData(paymentConfirmationData);
       if (confirmationResponse.status === 200) {
         const confirmationData = confirmationResponse.data.data;
         console.log("Payment confirmation successful:", confirmationData);
@@ -347,7 +349,7 @@ export default function BirthCertificatePage() {
           setShowServiceOptionsModal={setShowServiceOptionsModal}
           bookingId={bookingId}
           mobileNumber={mobileNumber}
-          documentName={"Dual Name Change"}
+          documentName={documentDetails.documentType}
           getServiceOptions={getServiceOptions}
           handleServiceSelection={handleServiceSelection}
         />

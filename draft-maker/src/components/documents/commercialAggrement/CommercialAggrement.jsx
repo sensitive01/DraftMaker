@@ -5,7 +5,10 @@ import { useParams } from "react-router-dom";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
-import { createCommercialPaymentData, sendCommercialData } from "../../../api/service/axiosService";
+import {
+  createCommercialPaymentData,
+  sendCommercialData,
+} from "../../../api/service/axiosService";
 
 export default function CommercialAggrement() {
   const { type } = useParams();
@@ -37,7 +40,8 @@ export default function CommercialAggrement() {
     noticePeriod: "",
     terminationPeriod: "", // Termination if rent not paid for X months
     paintingCharges: "",
-    usePurpose: "RESIDENTIAL PURPOSE",
+    usePurpose: "Commecial Purpose",
+    formId: "DM-CFD-17",
     bhkConfig: "",
     bedroomCount: "",
     hallCount: "",
@@ -88,7 +92,7 @@ export default function CommercialAggrement() {
       fixtures: updatedFixtures,
     }));
   };
-  
+
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
     setShowMobileModal(true);
@@ -161,9 +165,7 @@ export default function CommercialAggrement() {
     options.push({
       id: "draft_estamp_delivery",
       name: "Draft + E-stamp + Delivery",
-      price:
-        (documentDetails.pdfCharge || 0) +
-        (documentDetails.homeDropCharge || 0),
+      price: documentDetails.homeDropCharge || 0,
       hasNotary: documentDetails.hasHomeDropNotaryCharge,
       notaryCharge: documentDetails.homeDropNotaryCharge || 0,
       description: "Physical copy delivered to your address",
@@ -215,7 +217,7 @@ export default function CommercialAggrement() {
         amount: totalPrice * 100,
         currency: "INR",
         name: "Draft Maker",
-        description: `Dual Name Change - ${service.name}`,
+        description: `${documentDetails.documentType} - ${service.name}`,
         handler: function (response) {
           console.log("razorpay response", response);
           handlePaymentSuccess({
@@ -224,7 +226,7 @@ export default function CommercialAggrement() {
             razorpay_signature: response.razorpay_signature,
             bookingId: bookingId,
             mobileNumber: mobileNumber,
-            documentType: "Dual Name Correction",
+            documentType: documentDetails.documentType,
             fullName: formData.fullName,
             serviceType: service.id,
             serviceName: service.name,
@@ -290,7 +292,7 @@ export default function CommercialAggrement() {
         signature: paymentData.razorpay_signature,
         bookingId: paymentData.bookingId,
         mobileNumber: paymentData.mobileNumber,
-        documentType: "Dual Name Correction",
+        documentType: documentDetails.documentType,
         fullName: formData.fullName,
         serviceType: paymentData.serviceType,
         serviceName: paymentData.serviceName,
@@ -391,7 +393,7 @@ export default function CommercialAggrement() {
           setShowServiceOptionsModal={setShowServiceOptionsModal}
           bookingId={bookingId}
           mobileNumber={mobileNumber}
-          documentName={"Dual Name Change"}
+          documentName={documentDetails.documentType}
           getServiceOptions={getServiceOptions}
           handleServiceSelection={handleServiceSelection}
         />

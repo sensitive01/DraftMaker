@@ -4,11 +4,15 @@ import BirtCertificateParentNameCorrectionPreview from "./BirtCertificateParentN
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
-import { createDobParentNameCorrectionPaymentData, dobParentNameCorrectionData } from "../../../api/service/axiosService";
+import {
+  createDobParentNameCorrectionPaymentData,
+  dobParentNameCorrectionData,
+} from "../../../api/service/axiosService";
 
 // Main Page Component containing both form and preview
 export default function BirthCertificateParentNameCorrectionPage() {
   const [formData, setFormData] = useState({
+    formId:"DM-BCNCP-6",
     fatherTitle: "Mr.",
     fatherName: "",
     motherTitle: "Mrs.",
@@ -117,9 +121,8 @@ export default function BirthCertificateParentNameCorrectionPage() {
     options.push({
       id: "draft_estamp_delivery",
       name: "Draft + E-stamp + Delivery",
-      price:
-        (documentDetails.pdfCharge || 0) +
-        (documentDetails.homeDropCharge || 0),
+      price: documentDetails.homeDropCharge || 0,
+
       hasNotary: documentDetails.hasHomeDropNotaryCharge,
       notaryCharge: documentDetails.homeDropNotaryCharge || 0,
       description: "Physical copy delivered to your address",
@@ -180,7 +183,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
             razorpay_signature: response.razorpay_signature,
             bookingId: bookingId,
             mobileNumber: mobileNumber,
-            documentType: "Dual Name Correction",
+            documentType: documentDetails.documentType,
             fullName: formData.fullName,
             serviceType: service.id,
             serviceName: service.name,
@@ -246,7 +249,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
         signature: paymentData.razorpay_signature,
         bookingId: paymentData.bookingId,
         mobileNumber: paymentData.mobileNumber,
-        documentType: "Dual Name Correction",
+        documentType: documentDetails.documentType,
         fullName: formData.fullName,
         serviceType: paymentData.serviceType,
         serviceName: paymentData.serviceName,
@@ -255,9 +258,8 @@ export default function BirthCertificateParentNameCorrectionPage() {
         status: "success",
       };
 
-      const confirmationResponse = await createDobParentNameCorrectionPaymentData(
-        paymentConfirmationData
-      );
+      const confirmationResponse =
+        await createDobParentNameCorrectionPaymentData(paymentConfirmationData);
       if (confirmationResponse.status === 200) {
         const confirmationData = confirmationResponse.data.data;
         console.log("Payment confirmation successful:", confirmationData);
@@ -351,7 +353,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
           setShowServiceOptionsModal={setShowServiceOptionsModal}
           bookingId={bookingId}
           mobileNumber={mobileNumber}
-          documentName={"Dual Name Change"}
+          documentName={documentDetails.documentType}
           getServiceOptions={getServiceOptions}
           handleServiceSelection={handleServiceSelection}
         />

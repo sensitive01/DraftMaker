@@ -4,10 +4,14 @@ import AffidavitPreview from "./AddressAffadavitPreview";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
-import { createAddressAffadavitPaymentData, sendAddressAffadavitData } from "../../../api/service/axiosService";
+import {
+  createAddressAffadavitPaymentData,
+  sendAddressAffadavitData,
+} from "../../../api/service/axiosService";
 
 const AddressAffidavit = () => {
   const [formData, setFormData] = useState({
+    formId:"DM-AAF-16",
     name: "",
     gender: "",
     age: "",
@@ -67,18 +71,7 @@ const AddressAffidavit = () => {
     }
   };
 
-  const handlePrint = () => {
-    // Create a print-friendly version that hides the form and shows only the preview
-    const printContent = document.querySelector(".print-content");
-    const originalContent = document.body.innerHTML;
 
-    document.body.innerHTML = printContent.innerHTML;
-    window.print();
-    document.body.innerHTML = originalContent;
-
-    // Reattach event handlers after restoring original content
-    window.location.reload();
-  };
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
     setShowMobileModal(true);
@@ -151,9 +144,7 @@ const AddressAffidavit = () => {
     options.push({
       id: "draft_estamp_delivery",
       name: "Draft + E-stamp + Delivery",
-      price:
-        (documentDetails.pdfCharge || 0) +
-        (documentDetails.homeDropCharge || 0),
+      price: documentDetails.homeDropCharge || 0,
       hasNotary: documentDetails.hasHomeDropNotaryCharge,
       notaryCharge: documentDetails.homeDropNotaryCharge || 0,
       description: "Physical copy delivered to your address",
@@ -214,7 +205,7 @@ const AddressAffidavit = () => {
             razorpay_signature: response.razorpay_signature,
             bookingId: bookingId,
             mobileNumber: mobileNumber,
-            documentType: "Dual Name Correction",
+            documentType: documentDetails.documentType,
             fullName: formData.fullName,
             serviceType: service.id,
             serviceName: service.name,
@@ -280,7 +271,7 @@ const AddressAffidavit = () => {
         signature: paymentData.razorpay_signature,
         bookingId: paymentData.bookingId,
         mobileNumber: paymentData.mobileNumber,
-        documentType: "Dual Name Correction",
+        documentType: documentDetails.documentType,
         fullName: formData.fullName,
         serviceType: paymentData.serviceType,
         serviceName: paymentData.serviceName,
@@ -380,7 +371,7 @@ const AddressAffidavit = () => {
           setShowServiceOptionsModal={setShowServiceOptionsModal}
           bookingId={bookingId}
           mobileNumber={mobileNumber}
-          documentName={"Dual Name Change"}
+          documentName={documentDetails.documentType}
           getServiceOptions={getServiceOptions}
           handleServiceSelection={handleServiceSelection}
         />

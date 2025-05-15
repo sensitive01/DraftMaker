@@ -31,6 +31,8 @@ const getAllBookingData = async (req, res) => {
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
 
@@ -44,9 +46,11 @@ const getAllBookingData = async (req, res) => {
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
-    const dobCorrectionData = await nameCorrection.find(
+    const dobCorrectionData = await dobCorrection.find(
       {},
       {
         paymentDetails: 1,
@@ -56,6 +60,8 @@ const getAllBookingData = async (req, res) => {
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
     const gasFormData = await GasFormData.find(
@@ -68,18 +74,22 @@ const getAllBookingData = async (req, res) => {
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
     const docLostData = await documentLost.find(
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        personName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
     const dobNameCorrectionParent = await dobParentNameCorrection.find(
@@ -92,66 +102,78 @@ const getAllBookingData = async (req, res) => {
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
     const bcNameCorrectionData = await birthCertificateNameCorrection.find(
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        parentName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
     const gstNocData = await gstSchema.find(
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        ownerName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
     const metriculationLostData = await metriculationLost.find(
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        name: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
     const khataCorrectionData = await khataCorrection.find(
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        name1: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
     const vehicleInsurenceData = await vehicleInsurence.find(
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        name: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
 
@@ -159,24 +181,28 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        name: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
     const gapPeriodData = await gapPeriodSchema.find(
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        name: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
 
@@ -184,12 +210,14 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        name: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
 
@@ -197,12 +225,14 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        name: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        documentType: 1,
+        formId: 1,
       }
     );
 
@@ -210,12 +240,16 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        name: 1,
+        documentType: 1,
+        formId: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        formId: 1,
+        documentType: 1,
       }
     );
 
@@ -223,12 +257,14 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
         mobileNumber: 1,
+        lesseeName: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        formId: 1,
+        documentType: 1,
       }
     );
 
@@ -236,12 +272,14 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        lesseeName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
         bookingId: 1,
+        formId: 1,
+        documentType: 1,
       }
     );
 
@@ -264,7 +302,7 @@ const getAllBookingData = async (req, res) => {
       ...passportNameChangeData,
       ...adressAffadavitData,
       ...commercialData,
-      ...recidentialData
+      ...recidentialData,
     ];
 
     const formattedData = allBookingData.map((item) => {
@@ -346,12 +384,16 @@ const updateDualNamePaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     const updatedData = await dualNameCorrection.findOneAndUpdate(
       { bookingId },
       {
         paymentStatus: status,
+        documentType,
+        formId,
         paymentDetails: {
           paymentId,
           paidAmount: amount,
@@ -487,6 +529,8 @@ const saveNameCorrectionPaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -510,6 +554,8 @@ const saveNameCorrectionPaymentData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -590,6 +636,8 @@ const saveDobCorrectionPaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -613,6 +661,8 @@ const saveDobCorrectionPaymentData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -693,6 +743,8 @@ const saveGasCorrectionPaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -716,6 +768,8 @@ const saveGasCorrectionPaymentData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -796,6 +850,8 @@ const saveDocumentLostPaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -819,6 +875,8 @@ const saveDocumentLostPaymentData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -897,6 +955,8 @@ const saveDobParentNameCorrection = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -920,6 +980,8 @@ const saveDobParentNameCorrection = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -1000,6 +1062,8 @@ const saveBirthCertificateNameCorrection = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1023,6 +1087,8 @@ const saveBirthCertificateNameCorrection = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -1103,6 +1169,8 @@ const saveGstPaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1126,6 +1194,8 @@ const saveGstPaymentData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -1206,6 +1276,8 @@ const updateMetriculationLostPaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1229,6 +1301,8 @@ const updateMetriculationLostPaymentData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -1309,6 +1383,8 @@ const updateKhataCorrectionPaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1332,6 +1408,8 @@ const updateKhataCorrectionPaymentData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -1412,6 +1490,8 @@ const updateVehicleInsurencePaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1435,6 +1515,8 @@ const updateVehicleInsurencePaymentData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -1515,6 +1597,8 @@ const updateHufPaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1538,6 +1622,8 @@ const updateHufPaymentData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -1618,6 +1704,8 @@ const updateGapPeriodData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1641,6 +1729,8 @@ const updateGapPeriodData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -1721,6 +1811,8 @@ const updatePasswordAnnaxureData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1744,6 +1836,8 @@ const updatePasswordAnnaxureData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -1824,6 +1918,8 @@ const updatePassportNameChangePaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1847,6 +1943,8 @@ const updatePassportNameChangePaymentData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -1927,6 +2025,8 @@ const updateAdressAffadavitPaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1950,6 +2050,8 @@ const updateAdressAffadavitPaymentData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
+          formId,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -2030,6 +2132,7 @@ const updateCommercialPaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -2045,6 +2148,7 @@ const updateCommercialPaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
     });
 
     // ✅ Use $set to avoid overwriting the entire object
@@ -2053,6 +2157,7 @@ const updateCommercialPaymentData = async (req, res) => {
       {
         $set: {
           paymentStatus: status,
+          documentType,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,
           "paymentDetails.serviceType": serviceType,
@@ -2133,6 +2238,8 @@ const updateRecidentialPaymentData = async (req, res) => {
       serviceName,
       includesNotary,
       status,
+      documentType,
+      formId,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -2155,6 +2262,8 @@ const updateRecidentialPaymentData = async (req, res) => {
       { bookingId },
       {
         $set: {
+          documentType,
+          formId,
           paymentStatus: status,
           "paymentDetails.paymentId": paymentId,
           "paymentDetails.paidAmount": amount,

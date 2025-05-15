@@ -44,6 +44,12 @@ const nameChangeSchema = new mongoose.Schema(
       type: Number,
       default: 2025,
     },
+    documentType: {
+      type: String,
+    },
+    formId: {
+      type: String,
+    },
     bookingId: {
       type: String,
     },

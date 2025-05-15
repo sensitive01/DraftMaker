@@ -15,6 +15,9 @@ const affidavitSchema = new mongoose.Schema(
 
       trim: true,
     },
+    documentType: {
+      type: String,
+    },
     gender: {
       type: String,
     },
@@ -49,6 +52,12 @@ const affidavitSchema = new mongoose.Schema(
       type: String,
     },
     bookingId: {
+      type: String,
+    },
+    formId: {
+      type: String,
+    },
+    documentType: {
       type: String,
     },
     mobileNumber: {

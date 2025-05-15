@@ -2,10 +2,9 @@ const mongoose = require("mongoose");
 
 const dualNameCorrection = new mongoose.Schema(
   {
-    formId:{
-      type:String,
-      default:"DM-DNC-1"
-
+    formId: {
+      type: String,
+      default: "DM-DNC-1",
     },
     bookingId: {
       type: String,
@@ -87,12 +86,18 @@ const dualNameCorrection = new mongoose.Schema(
       type: String,
       required: true,
     },
+    documentType: {
+      type: String,
+    },
+    formId: {
+      type: String,
+    },
     year: {
       type: String,
       default: "2025",
     },
-    mobileNumber:{
-      type:String,
+    mobileNumber: {
+      type: String,
     },
     doumentStatus: {
       type: String,
@@ -103,26 +108,24 @@ const dualNameCorrection = new mongoose.Schema(
       type: String,
       default: "Pending",
     },
-    paymentDetails:{
-      paymentId:{
-        type:String,
+    paymentDetails: {
+      paymentId: {
+        type: String,
       },
-      paidAmount:{
-        type:Number,
+      paidAmount: {
+        type: Number,
       },
-      serviceType:{
-        type:String,
+      serviceType: {
+        type: String,
       },
-      serviceName:{
-        type:String,
+      serviceName: {
+        type: String,
       },
-      includesNotary:{
-        type:Boolean,
-        default:false
-      }
-
-      
-    }
+      includesNotary: {
+        type: Boolean,
+        default: false,
+      },
+    },
   },
   {
     timestamps: true,

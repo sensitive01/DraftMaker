@@ -75,6 +75,12 @@ const dualApplicantSchema = new mongoose.Schema(
     mobileNumber: {
       type: String,
     },
+    documentType: {
+      type: String,
+    },
+    formId: {
+      type: String,
+    },
     doumentStatus: {
       type: String,
       enum: ["Pending", "Approved", "Rejected"],

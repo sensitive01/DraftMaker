@@ -65,6 +65,12 @@ const documentLost = new mongoose.Schema(
       enum: ["Pending", "Approved", "Rejected"],
       default: "Pending",
     },
+    documentType: {
+      type: String,
+    },
+    formId: {
+      type: String,
+    },
     paymentStatus: {
       type: String,
       default: "Pending",

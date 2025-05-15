@@ -30,7 +30,7 @@ const commercialAgreementSchema = new mongoose.Schema(
     depositAmount: { type: Number },
     depositAmountWords: { type: String },
 
-    paymentMode: { type: String, },
+    paymentMode: { type: String },
 
     agreementStartDate: { type: String },
     agreementEndDate: { type: String },
@@ -51,11 +51,18 @@ const commercialAgreementSchema = new mongoose.Schema(
     toiletCount: { type: String },
 
     fixtures: [fixtureSchema],
+    formId: { type: String },
 
     bookingId: {
       type: String,
     },
+    formId: {
+      type: String,
+    },
     mobileNumber: {
+      type: String,
+    },
+    documentType: {
       type: String,
     },
     doumentStatus: {

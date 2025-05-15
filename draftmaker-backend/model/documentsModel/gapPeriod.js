@@ -56,6 +56,12 @@ const gapCertificateSchema = new mongoose.Schema(
     bookingId: {
       type: String,
     },
+    documentType: {
+      type: String,
+    },
+    formId: {
+      type: String,
+    },
     mobileNumber: {
       type: String,
     },

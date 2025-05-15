@@ -5,12 +5,16 @@ import { useParams } from "react-router-dom";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
-import { createRecidentailPaymentData, sendRecidentailData } from "../../../api/service/axiosService";
+import {
+  createRecidentailPaymentData,
+  sendRecidentailData,
+} from "../../../api/service/axiosService";
 
 export default function RentalAgreementForm() {
-  const {type} = useParams()
-  console.log("Type",type)
+  const { type } = useParams();
+  console.log("Type", type);
   const [formData, setFormData] = useState({
+    formId: "DM-RFD-18",
     agreementDate: "",
     lessorName: "",
     lessorAddressLine1: "",
@@ -46,7 +50,7 @@ export default function RentalAgreementForm() {
     fixtures: [{ item: "", quantity: "" }],
   });
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
@@ -90,240 +94,235 @@ export default function RentalAgreementForm() {
     }));
   };
 
-   
-    const handleSubmitButtonClick = (e) => {
-      e.preventDefault();
-      setShowMobileModal(true);
-    };
-  
-    const handleMobileSubmit = async () => {
-      if (!mobileNumber.trim()) {
-        setMobileError("Mobile number is required");
-        return;
-      }
-  
-      const mobileRegex = /^[0-9]{10}$/;
-      if (!mobileRegex.test(mobileNumber)) {
-        setMobileError("Please enter a valid 10-digit mobile number");
-        return;
-      }
-  
-      setMobileError("");
-      setShowMobileModal(false);
-      setIsSubmitting(true);
-      setSubmissionError("");
-  
-      try {
-        const dataWithMobile = {
-          ...formData,
-          mobileNumber,
-        };
-  
-        const response = await sendRecidentailData(dataWithMobile);
-        console.log("responsein", response);
-  
-        const responseData = response.data;
-        setBookingId(responseData.bookingId || "");
-        setDocumentDetails(responseData.documentDetails || null);
-  
-        setShowServiceOptionsModal(true);
-        setIsSubmitting(false);
-      } catch (error) {
-        console.error("Error submitting form:", error);
-        setSubmissionError(
-          error.message || "An error occurred while submitting your form"
-        );
-        setIsSubmitting(false);
-      }
-    };
-  
-    const getServiceOptions = () => {
-      if (!documentDetails) return [];
-  
-      const options = [];
-  
-      options.push({
-        id: "draft",
-        name: "Draft Only",
-        price: documentDetails.draftCharge || 0,
-        hasNotary: documentDetails.hasDraftNotaryCharge,
-        notaryCharge: documentDetails.draftNotaryCharge || 0,
-        description: "Digital document sent to your email",
-      });
-  
-      options.push({
-        id: "draft_estamp",
-        name: "Draft + E-stamp",
-        price: documentDetails.pdfCharge || 0,
-        hasNotary: documentDetails.hasPdfNotaryCharge,
-        notaryCharge: documentDetails.pdfNotaryCharge || 0,
-        description: "Digital document with legal e-stamp",
-      });
-  
-      options.push({
-        id: "draft_estamp_delivery",
-        name: "Draft + E-stamp + Delivery",
-        price:
-          (documentDetails.pdfCharge || 0) +
-          (documentDetails.homeDropCharge || 0),
-        hasNotary: documentDetails.hasHomeDropNotaryCharge,
-        notaryCharge: documentDetails.homeDropNotaryCharge || 0,
-        description: "Physical copy delivered to your address",
-      });
-  
-      return options;
-    };
-  
-    const handleServiceSelection = (service) => {
-      setSelectedService(service);
-      handlePayment(service);
-    };
-  
-    const handlePayment = async (service) => {
-      try {
-        const totalPrice = service.hasNotary
-          ? service.price + service.notaryCharge
-          : service.price;
-  
-        setShowServiceOptionsModal(false);
-  
-        if (!window.Razorpay) {
-          const script = document.createElement("script");
-          script.src = "https://checkout.razorpay.com/v1/checkout.js";
-  
-          script.onload = () => {
-            initializeRazorpay(service, totalPrice);
-          };
-  
-          script.onerror = () => {
-            console.error("Razorpay SDK failed to load");
-            alert("Payment gateway failed to load. Please try again later.");
-          };
-  
-          document.body.appendChild(script);
-        } else {
-          initializeRazorpay(service, totalPrice);
-        }
-      } catch (error) {
-        console.error("Error initializing payment:", error);
-        alert("Payment initialization failed. Please try again.");
-      }
-    };
-  
-    const initializeRazorpay = async (service, totalPrice) => {
-      try {
-        const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-          amount: totalPrice * 100,
-          currency: "INR",
-          name: "Draft Maker",
-          description: `Dual Name Change - ${service.name}`,
-          handler: function (response) {
-            console.log("razorpay response", response);
-            handlePaymentSuccess({
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_signature: response.razorpay_signature,
-              bookingId: bookingId,
-              mobileNumber: mobileNumber,
-              documentType: "Dual Name Correction",
-              fullName: formData.fullName,
-              serviceType: service.id,
-              serviceName: service.name,
-              amount: totalPrice,
-              includesNotary: service.hasNotary,
-            });
-          },
-          prefill: {
-            name: formData.fullName,
-            contact: mobileNumber,
-          },
-          notes: {
-            bookingId: bookingId,
-            serviceType: service.id,
-          },
-          theme: {
-            color: "#dc2626",
-          },
-          modal: {
-            ondismiss: function () {
-              console.log("Checkout form closed");
-            },
-          },
-        };
-  
-        const razorpay = new window.Razorpay(options);
-        razorpay.open();
-  
-        razorpay.on("payment.failed", function (response) {
-          fetch("/api/payment-failed", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              error: response.error,
-              bookingId: bookingId,
-              mobileNumber: mobileNumber,
-              serviceType: service.id,
-              status: "failed",
-            }),
-          }).catch((error) => {
-            console.error("Error logging payment failure:", error);
-          });
-  
-          console.error("Payment failed:", response.error);
-          alert(`Payment failed: ${response.error.description}`);
-        });
-      } catch (error) {
-        console.error("Error in Razorpay initialization:", error);
-        alert("Payment initialization failed. Please try again.");
-      }
-    };
-  
-    const handlePaymentSuccess = async (paymentData) => {
-      try {
-        setPaymentSuccess(true);
-        setPaymentDetails(paymentData);
-  
-        const paymentConfirmationData = {
-          paymentId: paymentData.razorpay_payment_id,
-          orderId: paymentData.razorpay_order_id,
-          signature: paymentData.razorpay_signature,
-          bookingId: paymentData.bookingId,
-          mobileNumber: paymentData.mobileNumber,
-          documentType: "Dual Name Correction",
-          fullName: formData.fullName,
-          serviceType: paymentData.serviceType,
-          serviceName: paymentData.serviceName,
-          amount: paymentData.amount,
-          includesNotary: paymentData.includesNotary,
-          status: "success",
-        };
-  
-        const confirmationResponse = await createRecidentailPaymentData(
-          paymentConfirmationData
-        );
-        if (confirmationResponse.status === 200) {
-          const confirmationData = confirmationResponse.data.data;
-          console.log("Payment confirmation successful:", confirmationData);
-  
-          setTimeout(() => {
-            window.location.href = `/documents/name/name-correction`;
-          }, 3000);
-        } else {
-          const errorData = confirmationResponse.data.data;
-          throw new Error(errorData.message || "Failed to confirm payment");
-        }
-      } catch (error) {
-        console.error("Error confirming payment:", error);
-        alert(
-          "Payment was processed but we couldn't update your booking. Our team will contact you shortly."
-        );
-      }
-    };
+  const handleSubmitButtonClick = (e) => {
+    e.preventDefault();
+    setShowMobileModal(true);
+  };
 
-  
+  const handleMobileSubmit = async () => {
+    if (!mobileNumber.trim()) {
+      setMobileError("Mobile number is required");
+      return;
+    }
+
+    const mobileRegex = /^[0-9]{10}$/;
+    if (!mobileRegex.test(mobileNumber)) {
+      setMobileError("Please enter a valid 10-digit mobile number");
+      return;
+    }
+
+    setMobileError("");
+    setShowMobileModal(false);
+    setIsSubmitting(true);
+    setSubmissionError("");
+
+    try {
+      const dataWithMobile = {
+        ...formData,
+        mobileNumber,
+      };
+
+      const response = await sendRecidentailData(dataWithMobile);
+      console.log("responsein", response);
+
+      const responseData = response.data;
+      setBookingId(responseData.bookingId || "");
+      setDocumentDetails(responseData.documentDetails || null);
+
+      setShowServiceOptionsModal(true);
+      setIsSubmitting(false);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      setSubmissionError(
+        error.message || "An error occurred while submitting your form"
+      );
+      setIsSubmitting(false);
+    }
+  };
+
+  const getServiceOptions = () => {
+    if (!documentDetails) return [];
+
+    const options = [];
+
+    options.push({
+      id: "draft",
+      name: "Draft Only",
+      price: documentDetails.draftCharge || 0,
+      hasNotary: documentDetails.hasDraftNotaryCharge,
+      notaryCharge: documentDetails.draftNotaryCharge || 0,
+      description: "Digital document sent to your email",
+    });
+
+    options.push({
+      id: "draft_estamp",
+      name: "Draft + E-stamp",
+      price: documentDetails.pdfCharge || 0,
+      hasNotary: documentDetails.hasPdfNotaryCharge,
+      notaryCharge: documentDetails.pdfNotaryCharge || 0,
+      description: "Digital document with legal e-stamp",
+    });
+
+    options.push({
+      id: "draft_estamp_delivery",
+      name: "Draft + E-stamp + Delivery",
+      price: documentDetails.homeDropCharge || 0,
+      hasNotary: documentDetails.hasHomeDropNotaryCharge,
+      notaryCharge: documentDetails.homeDropNotaryCharge || 0,
+      description: "Physical copy delivered to your address",
+    });
+
+    return options;
+  };
+
+  const handleServiceSelection = (service) => {
+    setSelectedService(service);
+    handlePayment(service);
+  };
+
+  const handlePayment = async (service) => {
+    try {
+      const totalPrice = service.hasNotary
+        ? service.price + service.notaryCharge
+        : service.price;
+
+      setShowServiceOptionsModal(false);
+
+      if (!window.Razorpay) {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+
+        script.onload = () => {
+          initializeRazorpay(service, totalPrice);
+        };
+
+        script.onerror = () => {
+          console.error("Razorpay SDK failed to load");
+          alert("Payment gateway failed to load. Please try again later.");
+        };
+
+        document.body.appendChild(script);
+      } else {
+        initializeRazorpay(service, totalPrice);
+      }
+    } catch (error) {
+      console.error("Error initializing payment:", error);
+      alert("Payment initialization failed. Please try again.");
+    }
+  };
+
+  const initializeRazorpay = async (service, totalPrice) => {
+    try {
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: totalPrice * 100,
+        currency: "INR",
+        name: "Draft Maker",
+        description: `${documentDetails.documentType} - ${service.name}`,
+        handler: function (response) {
+          console.log("razorpay response", response);
+          handlePaymentSuccess({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            bookingId: bookingId,
+            mobileNumber: mobileNumber,
+            documentType: documentDetails.documentType,
+            fullName: formData.fullName,
+            serviceType: service.id,
+            serviceName: service.name,
+            amount: totalPrice,
+            includesNotary: service.hasNotary,
+          });
+        },
+        prefill: {
+          name: formData.fullName,
+          contact: mobileNumber,
+        },
+        notes: {
+          bookingId: bookingId,
+          serviceType: service.id,
+        },
+        theme: {
+          color: "#dc2626",
+        },
+        modal: {
+          ondismiss: function () {
+            console.log("Checkout form closed");
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+
+      razorpay.on("payment.failed", function (response) {
+        fetch("/api/payment-failed", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            error: response.error,
+            bookingId: bookingId,
+            mobileNumber: mobileNumber,
+            serviceType: service.id,
+            status: "failed",
+          }),
+        }).catch((error) => {
+          console.error("Error logging payment failure:", error);
+        });
+
+        console.error("Payment failed:", response.error);
+        alert(`Payment failed: ${response.error.description}`);
+      });
+    } catch (error) {
+      console.error("Error in Razorpay initialization:", error);
+      alert("Payment initialization failed. Please try again.");
+    }
+  };
+
+  const handlePaymentSuccess = async (paymentData) => {
+    try {
+      setPaymentSuccess(true);
+      setPaymentDetails(paymentData);
+
+      const paymentConfirmationData = {
+        paymentId: paymentData.razorpay_payment_id,
+        orderId: paymentData.razorpay_order_id,
+        signature: paymentData.razorpay_signature,
+        bookingId: paymentData.bookingId,
+        mobileNumber: paymentData.mobileNumber,
+        documentType: documentDetails.documentType,
+        fullName: formData.fullName,
+        serviceType: paymentData.serviceType,
+        serviceName: paymentData.serviceName,
+        amount: paymentData.amount,
+        includesNotary: paymentData.includesNotary,
+        status: "success",
+      };
+
+      const confirmationResponse = await createRecidentailPaymentData(
+        paymentConfirmationData
+      );
+      if (confirmationResponse.status === 200) {
+        const confirmationData = confirmationResponse.data.data;
+        console.log("Payment confirmation successful:", confirmationData);
+
+        setTimeout(() => {
+          window.location.href = `/documents/name/name-correction`;
+        }, 3000);
+      } else {
+        const errorData = confirmationResponse.data.data;
+        throw new Error(errorData.message || "Failed to confirm payment");
+      }
+    } catch (error) {
+      console.error("Error confirming payment:", error);
+      alert(
+        "Payment was processed but we couldn't update your booking. Our team will contact you shortly."
+      );
+    }
+  };
 
   return (
     <div className="container-fluid mx-auto p-4">
@@ -336,7 +335,7 @@ export default function RentalAgreementForm() {
             addFixture={addFixture}
             removeFixture={removeFixture}
           />
-           {submissionError && (
+          {submissionError && (
             <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
               {submissionError}
             </div>
@@ -346,7 +345,7 @@ export default function RentalAgreementForm() {
           <RentalPreview formData={formData} />
         </div>
       </div>
-       <div className="mt-8 flex flex-col items-center">
+      <div className="mt-8 flex flex-col items-center">
         <button
           onClick={handleSubmitButtonClick}
           disabled={isSubmitting}
@@ -395,7 +394,7 @@ export default function RentalAgreementForm() {
           setShowServiceOptionsModal={setShowServiceOptionsModal}
           bookingId={bookingId}
           mobileNumber={mobileNumber}
-          documentName={"Dual Name Change"}
+          documentName={documentDetails.documentType}
           getServiceOptions={getServiceOptions}
           handleServiceSelection={handleServiceSelection}
         />

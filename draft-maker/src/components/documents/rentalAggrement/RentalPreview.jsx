@@ -443,22 +443,6 @@ const RentalPreview = ({ formData }) => {
         </div>
       </div>
 
-      {/* Action buttons - responsive */}
-      <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 my-6 px-4">
-        <button
-          className="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white font-medium rounded transition-colors"
-          onClick={handlePrint}
-        >
-          Print Agreement
-        </button>
-        <button
-          className="px-6 py-3 bg-green-700 hover:bg-green-800 text-white font-medium rounded transition-colors"
-          onClick={generatePDF}
-        >
-          Download PDF
-        </button>
-      </div>
-
       {/* CSS for printing and responsive display */}
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap");

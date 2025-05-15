@@ -4,10 +4,14 @@ import PassportNameChangePreview from "./PassportNameChangePreview";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
-import { createPassportnameChangePaymentData, sendPassportNameChangeData } from "../../../api/service/axiosService";
+import {
+  createPassportnameChangePaymentData,
+  sendPassportNameChangeData,
+} from "../../../api/service/axiosService";
 
 const PassportNameChange = () => {
   const [formData, setFormData] = useState({
+    formId:"DM-PNC-15",
     name: "",
     gender: "",
     age: "",
@@ -140,9 +144,8 @@ const PassportNameChange = () => {
     options.push({
       id: "draft_estamp_delivery",
       name: "Draft + E-stamp + Delivery",
-      price:
-        (documentDetails.pdfCharge || 0) +
-        (documentDetails.homeDropCharge || 0),
+      price: documentDetails.homeDropCharge || 0,
+
       hasNotary: documentDetails.hasHomeDropNotaryCharge,
       notaryCharge: documentDetails.homeDropNotaryCharge || 0,
       description: "Physical copy delivered to your address",
@@ -194,7 +197,7 @@ const PassportNameChange = () => {
         amount: totalPrice * 100,
         currency: "INR",
         name: "Draft Maker",
-        description: `Dual Name Change - ${service.name}`,
+        description: `${documentDetails.documentType}  - ${service.name}`,
         handler: function (response) {
           console.log("razorpay response", response);
           handlePaymentSuccess({
@@ -203,7 +206,7 @@ const PassportNameChange = () => {
             razorpay_signature: response.razorpay_signature,
             bookingId: bookingId,
             mobileNumber: mobileNumber,
-            documentType: "Dual Name Correction",
+            documentType: documentDetails.documentType,
             fullName: formData.fullName,
             serviceType: service.id,
             serviceName: service.name,
@@ -269,7 +272,7 @@ const PassportNameChange = () => {
         signature: paymentData.razorpay_signature,
         bookingId: paymentData.bookingId,
         mobileNumber: paymentData.mobileNumber,
-        documentType: "Dual Name Correction",
+        documentType: documentDetails.documentType,
         fullName: formData.fullName,
         serviceType: paymentData.serviceType,
         serviceName: paymentData.serviceName,
@@ -371,7 +374,7 @@ const PassportNameChange = () => {
           setShowServiceOptionsModal={setShowServiceOptionsModal}
           bookingId={bookingId}
           mobileNumber={mobileNumber}
-          documentName={"Dual Name Change"}
+          documentName={documentDetails.documentType}
           getServiceOptions={getServiceOptions}
           handleServiceSelection={handleServiceSelection}
         />

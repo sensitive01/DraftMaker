@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
+
 
 const CommercialPreview = ({ formData }) => {
   const previewRef = useRef(null);
@@ -13,72 +12,6 @@ const CommercialPreview = ({ formData }) => {
       month: "long",
       year: "numeric",
     });
-  };
-
-  // Function to generate PDF
-  const generatePDF = async () => {
-    const input = previewRef.current;
-    if (!input) return;
-
-    try {
-      // Show loading indicator
-      const loadingElement = document.createElement("div");
-      loadingElement.innerText = "Generating PDF...";
-      loadingElement.style.position = "fixed";
-      loadingElement.style.top = "50%";
-      loadingElement.style.left = "50%";
-      loadingElement.style.transform = "translate(-50%, -50%)";
-      loadingElement.style.padding = "20px";
-      loadingElement.style.background = "rgba(0,0,0,0.7)";
-      loadingElement.style.color = "white";
-      loadingElement.style.borderRadius = "8px";
-      loadingElement.style.zIndex = "9999";
-      document.body.appendChild(loadingElement);
-
-      // Get all pages
-      const pages = input.querySelectorAll(".page");
-      const pdf = new jsPDF("p", "mm", "a4");
-
-      // Add custom font if needed
-      // pdf.addFont('Times-Roman', 'Times', 'normal');
-      // pdf.setFont('Times');
-
-      // For each page
-      for (let i = 0; i < pages.length; i++) {
-        const page = pages[i];
-        const canvas = await html2canvas(page, {
-          scale: 2, // Higher scale for better quality
-          useCORS: true,
-          logging: false,
-          allowTaint: true,
-        });
-
-        // A4 size in mm: 210 x 297
-        const imgData = canvas.toDataURL("image/png");
-
-        // Add new page if not first page
-        if (i > 0) {
-          pdf.addPage();
-        }
-
-        // Add image to PDF (fit to A4)
-        pdf.addImage(imgData, "PNG", 0, 0, 210, 297);
-      }
-
-      // Remove loading indicator
-      document.body.removeChild(loadingElement);
-
-      // Save PDF
-      pdf.save("Commercial_Agreement.pdf");
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      alert("Failed to generate PDF. Please try again.");
-    }
-  };
-
-  // Function to print
-  const handlePrint = () => {
-    window.print();
   };
 
   return (
@@ -441,22 +374,6 @@ const CommercialPreview = ({ formData }) => {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Action buttons - responsive */}
-      <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 my-6 px-4">
-        <button
-          className="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white font-medium rounded transition-colors"
-          onClick={handlePrint}
-        >
-          Print Agreement
-        </button>
-        <button
-          className="px-6 py-3 bg-green-700 hover:bg-green-800 text-white font-medium rounded transition-colors"
-          onClick={generatePDF}
-        >
-          Download PDF
-        </button>
       </div>
 
       {/* CSS for printing and responsive display */}

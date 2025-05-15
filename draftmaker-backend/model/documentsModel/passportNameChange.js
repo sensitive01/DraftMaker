@@ -52,6 +52,12 @@ const nameChangeSchema = new mongoose.Schema(
     date: {
       type: String, // You can use Date if it's a JS date object
     },
+    documentType: {
+      type: String,
+    },
+    formId: {
+      type: String,
+    },
     place: {
       type: String,
     },

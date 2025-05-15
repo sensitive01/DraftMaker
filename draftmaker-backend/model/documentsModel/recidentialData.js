@@ -5,56 +5,63 @@ const fixtureSchema = new mongoose.Schema({
   quantity: { type: String },
 });
 
-const recidentailAgreementSchema = new mongoose.Schema({
-  agreementDate: { type: String },
-  lessorName: { type: String },
-  lessorAddressLine1: { type: String },
-  lessorAddressLine2: { type: String },
-  lessorCity: { type: String },
-  lessorState: { type: String },
-  lessorPinCode: { type: String },
+const recidentailAgreementSchema = new mongoose.Schema(
+  {
+    agreementDate: { type: String },
+    lessorName: { type: String },
+    lessorAddressLine1: { type: String },
+    lessorAddressLine2: { type: String },
+    lessorCity: { type: String },
+    lessorState: { type: String },
+    lessorPinCode: { type: String },
 
-  lesseeName: { type: String },
-  lesseeAadhaar: { type: String,  },
-  lesseePermanentAddressLine1: { type: String },
-  lesseePermanentAddressLine2: { type: String },
-  lesseePermanentCity: { type: String },
-  lesseePermanentState: { type: String },
-  lesseePermanentPinCode: { type: String },
+    lesseeName: { type: String },
+    lesseeAadhaar: { type: String },
+    lesseePermanentAddressLine1: { type: String },
+    lesseePermanentAddressLine2: { type: String },
+    lesseePermanentCity: { type: String },
+    lesseePermanentState: { type: String },
+    lesseePermanentPinCode: { type: String },
 
-  rentAmount: { type: Number },
-  rentAmountWords: { type: String },
-  rentDueDate: { type: String, default: "5" },
+    rentAmount: { type: Number },
+    rentAmountWords: { type: String },
+    rentDueDate: { type: String, default: "5" },
 
-  depositAmount: { type: Number },
-  depositAmountWords: { type: String },
+    depositAmount: { type: Number },
+    depositAmountWords: { type: String },
 
-  paymentMode: { type: String},
+    paymentMode: { type: String },
 
-  agreementStartDate: { type: String },
-  agreementEndDate: { type: String },
+    agreementStartDate: { type: String },
+    agreementEndDate: { type: String },
 
-  rentIncreasePercentage: { type: String },
-  noticePeriod: { type: String },
-  terminationPeriod: { type: String },
-  paintingCharges: { type: String },
+    rentIncreasePercentage: { type: String },
+    noticePeriod: { type: String },
+    terminationPeriod: { type: String },
+    paintingCharges: { type: String },
 
-  usePurpose: {
-    type: String,
-  },
+    usePurpose: {
+      type: String,
+    },
 
-  bhkConfig: { type: String },
-  bedroomCount: { type: String },
-  hallCount: { type: String },
-  kitchenCount: { type: String },
-  toiletCount: { type: String },
+    bhkConfig: { type: String },
+    bedroomCount: { type: String },
+    hallCount: { type: String },
+    kitchenCount: { type: String },
+    toiletCount: { type: String },
 
-  fixtures: [fixtureSchema],
+    fixtures: [fixtureSchema],
 
     bookingId: {
       type: String,
     },
     mobileNumber: {
+      type: String,
+    },
+    documentType: {
+      type: String,
+    },
+    formId: {
       type: String,
     },
     doumentStatus: {
@@ -84,8 +91,13 @@ const recidentailAgreementSchema = new mongoose.Schema({
         default: false,
       },
     },
-}, {
-  timestamps: true,
-});
+  },
+  {
+    timestamps: true,
+  }
+);
 
-module.exports = mongoose.model("recidentialAggrement", recidentailAgreementSchema);
+module.exports = mongoose.model(
+  "recidentialAggrement",
+  recidentailAgreementSchema
+);

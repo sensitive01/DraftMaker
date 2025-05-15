@@ -7,6 +7,7 @@ const ServicePackageNotification = ({
   mobileNumber,
   getServiceOptions,
   handleServiceSelection,
+  documentName
 }) => {
   return (
     <div>
@@ -70,7 +71,7 @@ const ServicePackageNotification = ({
                   <div className="flex">
                     <span className="text-gray-600 mr-1">Document Type:</span>
                     <span className="font-semibold text-gray-800">
-                      Dual Name Change
+                     {documentName}
                     </span>
                   </div>
                   <div className="flex">

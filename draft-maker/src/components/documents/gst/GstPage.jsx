@@ -4,10 +4,14 @@ import GstPreview from "./GstPreview";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
-import { gstPaymentData, sendGstCorrectionData } from "../../../api/service/axiosService";
+import {
+  gstPaymentData,
+  sendGstCorrectionData,
+} from "../../../api/service/axiosService";
 
 export default function GstPage() {
   const [formData, setFormData] = useState({
+    formId:"DM-GST-8",
     ownerName: "",
     aadhaarNo: "",
     ownerAddress: "",
@@ -111,9 +115,8 @@ export default function GstPage() {
     options.push({
       id: "draft_estamp_delivery",
       name: "Draft + E-stamp + Delivery",
-      price:
-        (documentDetails.pdfCharge || 0) +
-        (documentDetails.homeDropCharge || 0),
+      price: documentDetails.homeDropCharge || 0,
+
       hasNotary: documentDetails.hasHomeDropNotaryCharge,
       notaryCharge: documentDetails.homeDropNotaryCharge || 0,
       description: "Physical copy delivered to your address",
@@ -165,7 +168,7 @@ export default function GstPage() {
         amount: totalPrice * 100,
         currency: "INR",
         name: "Draft Maker",
-        description: `Dual Name Change - ${service.name}`,
+        description: `${documentDetails.documentType}- ${service.name}`,
         handler: function (response) {
           console.log("razorpay response", response);
           handlePaymentSuccess({
@@ -174,7 +177,7 @@ export default function GstPage() {
             razorpay_signature: response.razorpay_signature,
             bookingId: bookingId,
             mobileNumber: mobileNumber,
-            documentType: "Dual Name Correction",
+            documentType: documentDetails.documentType,
             fullName: formData.fullName,
             serviceType: service.id,
             serviceName: service.name,
@@ -240,7 +243,7 @@ export default function GstPage() {
         signature: paymentData.razorpay_signature,
         bookingId: paymentData.bookingId,
         mobileNumber: paymentData.mobileNumber,
-        documentType: "Dual Name Correction",
+        documentType: documentDetails.documentType,
         fullName: formData.fullName,
         serviceType: paymentData.serviceType,
         serviceName: paymentData.serviceName,
@@ -342,7 +345,7 @@ export default function GstPage() {
           setShowServiceOptionsModal={setShowServiceOptionsModal}
           bookingId={bookingId}
           mobileNumber={mobileNumber}
-          documentName={"Dual Name Change"}
+          documentName={documentDetails.documentType}
           getServiceOptions={getServiceOptions}
           handleServiceSelection={handleServiceSelection}
         />

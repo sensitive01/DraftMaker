@@ -4,10 +4,14 @@ import DobCorrectionPreview from "./DobCorrectionPreview";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
-import { createDobCorrectionPaymentData, sendDobCorrectionData } from "../../../api/service/axiosService";
+import {
+  createDobCorrectionPaymentData,
+  sendDobCorrectionData,
+} from "../../../api/service/axiosService";
 
 export default function DobCorrectionPage() {
   const [formData, setFormData] = useState({
+    formId:"DM-DOBC-3",
     fullName: "",
     relation: "S/o",
     relationName: "",
@@ -114,9 +118,8 @@ export default function DobCorrectionPage() {
     options.push({
       id: "draft_estamp_delivery",
       name: "Draft + E-stamp + Delivery",
-      price:
-        (documentDetails.pdfCharge || 0) +
-        (documentDetails.homeDropCharge || 0),
+      price: documentDetails.homeDropCharge || 0,
+
       hasNotary: documentDetails.hasHomeDropNotaryCharge,
       notaryCharge: documentDetails.homeDropNotaryCharge || 0,
       description: "Physical copy delivered to your address",
@@ -168,7 +171,7 @@ export default function DobCorrectionPage() {
         amount: totalPrice * 100,
         currency: "INR",
         name: "Draft Maker",
-        description: `Dual Name Change - ${service.name}`,
+        description: `${documentDetails.documentType} - ${service.name}`,
         handler: function (response) {
           console.log("razorpay response", response);
           handlePaymentSuccess({
@@ -177,7 +180,7 @@ export default function DobCorrectionPage() {
             razorpay_signature: response.razorpay_signature,
             bookingId: bookingId,
             mobileNumber: mobileNumber,
-            documentType: "Dual Name Correction",
+            documentType: documentDetails.documentType,
             fullName: formData.fullName,
             serviceType: service.id,
             serviceName: service.name,
@@ -243,7 +246,7 @@ export default function DobCorrectionPage() {
         signature: paymentData.razorpay_signature,
         bookingId: paymentData.bookingId,
         mobileNumber: paymentData.mobileNumber,
-        documentType: "Dual Name Correction",
+        documentType: documentDetails.documentType,
         fullName: formData.fullName,
         serviceType: paymentData.serviceType,
         serviceName: paymentData.serviceName,
@@ -280,7 +283,7 @@ export default function DobCorrectionPage() {
         {/* Left column: Form */}
         <div className="print:hidden">
           <DobCorrectionForm formData={formData} handleChange={handleChange} />
-             {submissionError && (
+          {submissionError && (
             <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
               {submissionError}
             </div>
@@ -341,7 +344,7 @@ export default function DobCorrectionPage() {
           setShowServiceOptionsModal={setShowServiceOptionsModal}
           bookingId={bookingId}
           mobileNumber={mobileNumber}
-          documentName={"Dual Name Change"}
+          documentName={documentDetails.documentType}
           getServiceOptions={getServiceOptions}
           handleServiceSelection={handleServiceSelection}
         />

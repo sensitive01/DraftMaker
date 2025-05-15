@@ -4,10 +4,14 @@ import MetriculationPreview from "./MetriculationPreview";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
-import { createMetriculationLostPaymentData, sendMetriculationLostData } from "../../../api/service/axiosService";
+import {
+  createMetriculationLostPaymentData,
+  sendMetriculationLostData,
+} from "../../../api/service/axiosService";
 
 const MatriculationPage = () => {
   const [formData, setFormData] = useState({
+    formId:"DM-MAL-9",
     // Personal details
     name: "",
     relation: "",
@@ -122,9 +126,8 @@ const MatriculationPage = () => {
     options.push({
       id: "draft_estamp_delivery",
       name: "Draft + E-stamp + Delivery",
-      price:
-        (documentDetails.pdfCharge || 0) +
-        (documentDetails.homeDropCharge || 0),
+      price: documentDetails.homeDropCharge || 0,
+
       hasNotary: documentDetails.hasHomeDropNotaryCharge,
       notaryCharge: documentDetails.homeDropNotaryCharge || 0,
       description: "Physical copy delivered to your address",
@@ -176,7 +179,7 @@ const MatriculationPage = () => {
         amount: totalPrice * 100,
         currency: "INR",
         name: "Draft Maker",
-        description: `Dual Name Change - ${service.name}`,
+        description: `${documentDetails.documentType}- ${service.name}`,
         handler: function (response) {
           console.log("razorpay response", response);
           handlePaymentSuccess({
@@ -185,7 +188,7 @@ const MatriculationPage = () => {
             razorpay_signature: response.razorpay_signature,
             bookingId: bookingId,
             mobileNumber: mobileNumber,
-            documentType: "Dual Name Correction",
+            documentType: documentDetails.documentType,
             fullName: formData.fullName,
             serviceType: service.id,
             serviceName: service.name,
@@ -251,7 +254,7 @@ const MatriculationPage = () => {
         signature: paymentData.razorpay_signature,
         bookingId: paymentData.bookingId,
         mobileNumber: paymentData.mobileNumber,
-        documentType: "Dual Name Correction",
+        documentType: documentDetails.documentType,
         fullName: formData.fullName,
         serviceType: paymentData.serviceType,
         serviceName: paymentData.serviceName,
@@ -292,7 +295,7 @@ const MatriculationPage = () => {
         {/* Left column: Form */}
         <div className="print:hidden">
           <MetriculationForm formData={formData} handleChange={handleChange} />
-          
+
           {submissionError && (
             <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
               {submissionError}
@@ -354,7 +357,7 @@ const MatriculationPage = () => {
           setShowServiceOptionsModal={setShowServiceOptionsModal}
           bookingId={bookingId}
           mobileNumber={mobileNumber}
-          documentName={"Dual Name Change"}
+          documentName={documentDetails.documentType}
           getServiceOptions={getServiceOptions}
           handleServiceSelection={handleServiceSelection}
         />
