@@ -1,16 +1,28 @@
 const mongoose = require("mongoose");
 
-const dobCorrectionSchema = new mongoose.Schema(
+const coparcenerSchema = new mongoose.Schema({
+  name: {
+    type: String,
+  },
+  relationship: {
+    type: String,
+  },
+  address: {
+    type: String,
+  },
+});
+
+const hufDeclarationSchema = new mongoose.Schema(
   {
-    bookingId: {
+    title: {
+      type: String,
+      default: "Mr",
+    },
+    name: {
       type: String,
     },
-    fullName: {
+    relationTo: {
       type: String,
-    },
-    relation: {
-      type: String,
-      default: "S/o",
     },
     relationName: {
       type: String,
@@ -18,42 +30,44 @@ const dobCorrectionSchema = new mongoose.Schema(
     age: {
       type: Number,
     },
-    permanentAddress: {
-      type: String,
+
+    address: {
+      line1: { type: String },
+      line2: { type: String },
+      city: { type: String },
+      state: { type: String },
+      pinCode: {
+        type: String,
+      },
     },
+
     aadhaarNo: {
       type: String,
     },
-    dob1: {
+
+    hufName: {
       type: String,
     },
-    document1: {
+    hufExistenceDate: {
       type: String,
     },
-    documentNo1: {
-      type: String,
-    },
-    dob2: {
-      type: String,
-    },
-    document2: {
-      type: String,
-    },
-    documentNo2: {
-      type: String,
-    },
+
     place: {
       type: String,
     },
     day: {
-      type: Number,
+      type: String,
     },
     month: {
       type: String,
     },
     year: {
-      type: Number,
-      default: 2025,
+      type: String,
+    },
+
+    coparceners: {
+      type: [coparcenerSchema],
+      default: [],
     },
     bookingId: {
       type: String,
@@ -94,6 +108,6 @@ const dobCorrectionSchema = new mongoose.Schema(
   }
 );
 
-const dobCorrection = mongoose.model("dobCorrection", dobCorrectionSchema);
+const hufData = mongoose.model("HufDeclaration", hufDeclarationSchema);
 
-module.exports = dobCorrection;
+module.exports = hufData;

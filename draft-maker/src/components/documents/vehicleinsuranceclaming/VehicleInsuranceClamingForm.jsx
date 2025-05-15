@@ -372,20 +372,10 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
           </div>
         </div>
 
-        {/* Form Submit Button */}
-        <div className="flex justify-center">
-          <button
-            type="submit"
-            className="px-8 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300"
-          >
-            Submit Claim
-          </button>
-        </div>
+      
       </form>
 
-      <div className="bg-gray-100 p-6 text-center text-gray-600 text-sm">
-        Please ensure all information provided is accurate and complete.
-      </div>
+
     </div>
   );
 };

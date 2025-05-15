@@ -271,7 +271,7 @@ export default function GasAffidavitForm() {
         }, 3000);
       } else {
         const errorData = confirmationResponse?.data?.data;
-        throw new Error(errorData.message || "Failed to confirm payment");
+        throw new Error(errorData?.message || "Failed to confirm payment");
       }
     } catch (error) {
       console.error("Error confirming payment:", error);

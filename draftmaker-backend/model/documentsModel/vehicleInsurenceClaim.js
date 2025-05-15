@@ -1,59 +1,71 @@
 const mongoose = require("mongoose");
 
-const dobCorrectionSchema = new mongoose.Schema(
+const vehicleAccidentSchema = new mongoose.Schema(
   {
-    bookingId: {
+    title: {
       type: String,
     },
-    fullName: {
+
+    name: {
       type: String,
     },
     relation: {
-      type: String,
-      default: "S/o",
-    },
-    relationName: {
       type: String,
     },
     age: {
       type: Number,
     },
-    permanentAddress: {
+    address: {
       type: String,
     },
     aadhaarNo: {
       type: String,
     },
-    dob1: {
+
+    vehicleNo: {
       type: String,
     },
-    document1: {
+    vehicleModel: {
       type: String,
     },
-    documentNo1: {
+    engineNo: {
       type: String,
     },
-    dob2: {
+    chassisNo: {
       type: String,
     },
-    document2: {
+
+    insurer: {
       type: String,
     },
-    documentNo2: {
+    policyNo: {
       type: String,
     },
+    policyStart: {
+      type: String,
+    },
+    policyEnd: {
+      type: String,
+    },
+
+    driverName: {
+      type: String,
+    },
+    accidentDetails: {
+      type: String,
+    },
+
     place: {
       type: String,
     },
     day: {
-      type: Number,
+      type: String,
     },
     month: {
       type: String,
     },
     year: {
-      type: Number,
-      default: 2025,
+      type: String,
     },
     bookingId: {
       type: String,
@@ -94,6 +106,4 @@ const dobCorrectionSchema = new mongoose.Schema(
   }
 );
 
-const dobCorrection = mongoose.model("dobCorrection", dobCorrectionSchema);
-
-module.exports = dobCorrection;
+module.exports = mongoose.model("VehicleAccident", vehicleAccidentSchema);

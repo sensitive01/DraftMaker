@@ -1,46 +1,32 @@
+// models/TenantAgreementForm.js
 const mongoose = require("mongoose");
 
-const dobCorrectionSchema = new mongoose.Schema(
+const tenantAgreementFormSchema = new mongoose.Schema(
   {
-    bookingId: {
-      type: String,
-    },
-    fullName: {
-      type: String,
-    },
-    relation: {
-      type: String,
-      default: "S/o",
-    },
-    relationName: {
-      type: String,
-    },
-    age: {
-      type: Number,
-    },
-    permanentAddress: {
+    ownerName: {
       type: String,
     },
     aadhaarNo: {
       type: String,
     },
-    dob1: {
+    ownerAddress: {
       type: String,
     },
-    document1: {
+    premisesAddress: {
       type: String,
     },
-    documentNo1: {
+    tenantName: {
       type: String,
     },
-    dob2: {
+    companyName: {
       type: String,
+
+      default: "",
     },
-    document2: {
+    officeAddress: {
       type: String,
-    },
-    documentNo2: {
-      type: String,
+
+      default: "",
     },
     place: {
       type: String,
@@ -53,7 +39,6 @@ const dobCorrectionSchema = new mongoose.Schema(
     },
     year: {
       type: Number,
-      default: 2025,
     },
     bookingId: {
       type: String,
@@ -94,6 +79,6 @@ const dobCorrectionSchema = new mongoose.Schema(
   }
 );
 
-const dobCorrection = mongoose.model("dobCorrection", dobCorrectionSchema);
+const gstModelSchema = mongoose.model("gstSchema", tenantAgreementFormSchema);
 
-module.exports = dobCorrection;
+module.exports = gstModelSchema;

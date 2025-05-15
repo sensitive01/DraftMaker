@@ -151,7 +151,7 @@ export const createNameChangePaymentData = async (data) => {
 export const sendDobCorrectionData = async (document) => {
   try {
     const response = await axiosInstance.post(
-      `/documents/save-name-correction-data`,
+      `/documents/save-dob-correction-data`,
       { document }
     );
     return response;
@@ -163,7 +163,7 @@ export const sendDobCorrectionData = async (document) => {
 export const createDobCorrectionPaymentData = async (data) => {
   try {
     const response = await axiosInstance.put(
-      `/documents/update-name-correction-payment-data`,
+      `/documents/update-dob-correction-payment-data`,
       { data }
     );
     return response;
@@ -286,6 +286,183 @@ export const gstPaymentData = async (data) => {
   try {
     const response = await axiosInstance.put(
       `/documents/update-gst-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+export const sendMetriculationLostData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-metriculation-lost-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createMetriculationLostPaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-metriculation-lost-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const sendKhataCorrectionData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-khata-corrcetion-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const updateKhataCorrectionPaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-khata-correction-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const sendVehicleInsurenceData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-vehicle-insurence-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createVehicleInsurencePaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-vehicle-insurence-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const sendHufData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-huf-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createHufPaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-huf-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+export const sendGapPeriodData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-gap-period-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createGapPeriodPaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-gap-period-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const sendPasswordAnnaxureData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-password-annaxure-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createPasswordAnnaxurePaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-password-annaxure-payment-data`,
+      { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const sendPassportNameChangeData = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/save-passport-name-change-data`,
+      { document }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createPassportnameChangePaymentData = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-passport-name-change-payment-data`,
       { data }
     );
     return response;

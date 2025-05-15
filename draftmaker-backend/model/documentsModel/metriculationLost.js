@@ -1,59 +1,61 @@
 const mongoose = require("mongoose");
 
-const dobCorrectionSchema = new mongoose.Schema(
+const documentVerificationSchema = new mongoose.Schema(
   {
-    bookingId: {
-      type: String,
-    },
-    fullName: {
+    // Personal details
+    name: {
       type: String,
     },
     relation: {
-      type: String,
-      default: "S/o",
-    },
-    relationName: {
       type: String,
     },
     age: {
       type: Number,
     },
-    permanentAddress: {
+    address: {
       type: String,
     },
-    aadhaarNo: {
+    aadhaar: {
       type: String,
     },
-    dob1: {
+
+    // Document details
+    year: {
       type: String,
     },
-    document1: {
+    semester: {
       type: String,
     },
-    documentNo1: {
+    program: {
       type: String,
     },
-    dob2: {
+    authority: {
       type: String,
     },
-    document2: {
+    collegeName: {
       type: String,
     },
-    documentNo2: {
+    batch: {
       type: String,
     },
+    regNumber: {
+      type: String,
+    },
+    documentName: {
+      type: String,
+    },
+
     place: {
       type: String,
     },
     day: {
-      type: Number,
+      type: String,
     },
     month: {
       type: String,
     },
-    year: {
-      type: Number,
-      default: 2025,
+    year_verification: {
+      type: String,
     },
     bookingId: {
       type: String,
@@ -94,6 +96,7 @@ const dobCorrectionSchema = new mongoose.Schema(
   }
 );
 
-const dobCorrection = mongoose.model("dobCorrection", dobCorrectionSchema);
-
-module.exports = dobCorrection;
+module.exports = mongoose.model(
+  "DocumentVerification",
+  documentVerificationSchema
+);

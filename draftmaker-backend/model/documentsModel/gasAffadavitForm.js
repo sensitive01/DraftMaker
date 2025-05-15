@@ -1,18 +1,15 @@
 const mongoose = require("mongoose");
 
-const dobCorrectionSchema = new mongoose.Schema(
+const gasFormDataSchema = new mongoose.Schema(
   {
-    bookingId: {
-      type: String,
-    },
     fullName: {
       type: String,
     },
-    relation: {
+    fatherName: {
       type: String,
-      default: "S/o",
     },
-    relationName: {
+
+    relation: {
       type: String,
     },
     age: {
@@ -24,23 +21,40 @@ const dobCorrectionSchema = new mongoose.Schema(
     aadhaarNo: {
       type: String,
     },
-    dob1: {
+    gasCompanyName: {
       type: String,
     },
-    document1: {
+    serviceAddress: {
       type: String,
     },
-    documentNo1: {
+    connectionDate: {
       type: String,
     },
-    dob2: {
+    consumerNumber: {
       type: String,
     },
-    document2: {
+    subscriptionVoucher: {
       type: String,
     },
-    documentNo2: {
+    cylinderCount: {
+      type: Number,
+    },
+    regulatorCount: {
+      type: Number,
+    },
+    depositAmount: {
+      type: Number,
+    },
+    previousAddress: {
       type: String,
+    },
+    reason: {
+      type: String,
+      default: "shifting",
+    },
+    lostItem: {
+      type: String,
+      default: "subscription",
     },
     place: {
       type: String,
@@ -53,7 +67,6 @@ const dobCorrectionSchema = new mongoose.Schema(
     },
     year: {
       type: Number,
-      default: 2025,
     },
     bookingId: {
       type: String,
@@ -94,6 +107,6 @@ const dobCorrectionSchema = new mongoose.Schema(
   }
 );
 
-const dobCorrection = mongoose.model("dobCorrection", dobCorrectionSchema);
+const GasFormData = mongoose.model("GasFormData", gasFormDataSchema);
 
-module.exports = dobCorrection;
+module.exports = GasFormData;

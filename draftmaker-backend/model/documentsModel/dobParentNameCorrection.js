@@ -1,45 +1,49 @@
 const mongoose = require("mongoose");
 
-const dobCorrectionSchema = new mongoose.Schema(
+const parentCorrectionFormSchema = new mongoose.Schema(
   {
-    bookingId: {
+    fatherTitle: {
       type: String,
     },
-    fullName: {
+    fatherName: {
       type: String,
     },
-    relation: {
-      type: String,
-      default: "S/o",
-    },
-    relationName: {
+    motherTitle: {
       type: String,
     },
-    age: {
-      type: Number,
-    },
-    permanentAddress: {
+    motherName: {
       type: String,
     },
-    aadhaarNo: {
+    address: {
       type: String,
     },
-    dob1: {
+    fatherAadhaar: {
       type: String,
     },
-    document1: {
+    motherAadhaar: {
       type: String,
     },
-    documentNo1: {
+    childRelation: {
+      type: String,
+      enum: ["Daughter", "Son", "Child"],
+      default: "Daughter",
+    },
+    childName: {
       type: String,
     },
-    dob2: {
+    certificateNumber: {
       type: String,
     },
-    document2: {
+    incorrectFatherName: {
       type: String,
     },
-    documentNo2: {
+    incorrectMotherName: {
+      type: String,
+    },
+    correctFatherName: {
+      type: String,
+    },
+    correctMotherName: {
       type: String,
     },
     place: {
@@ -50,6 +54,7 @@ const dobCorrectionSchema = new mongoose.Schema(
     },
     month: {
       type: String,
+      default: "April",
     },
     year: {
       type: Number,
@@ -94,6 +99,9 @@ const dobCorrectionSchema = new mongoose.Schema(
   }
 );
 
-const dobCorrection = mongoose.model("dobCorrection", dobCorrectionSchema);
+const ParentCorrectionForm = mongoose.model(
+  "dobParentNameCorrection",
+  parentCorrectionFormSchema
+);
 
-module.exports = dobCorrection;
+module.exports = ParentCorrectionForm;

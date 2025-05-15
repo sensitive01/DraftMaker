@@ -1,59 +1,73 @@
 const mongoose = require("mongoose");
 
-const dobCorrectionSchema = new mongoose.Schema(
+const dualApplicantSchema = new mongoose.Schema(
   {
-    bookingId: {
+    name1: {
       type: String,
     },
-    fullName: {
+    relation1: {
       type: String,
     },
-    relation: {
-      type: String,
-      default: "S/o",
-    },
-    relationName: {
-      type: String,
-    },
-    age: {
+    age1: {
       type: Number,
     },
-    permanentAddress: {
+    address1: {
       type: String,
     },
-    aadhaarNo: {
+    aadhaar1: {
       type: String,
     },
-    dob1: {
+
+    name2: {
       type: String,
     },
-    document1: {
+    relation2: {
       type: String,
     },
-    documentNo1: {
+    age2: {
+      type: Number,
+    },
+    address2: {
       type: String,
     },
-    dob2: {
+    aadhaar2: {
       type: String,
     },
-    document2: {
+
+    propertyAddress: {
       type: String,
     },
-    documentNo2: {
+    wardNumber: {
       type: String,
     },
+    zone: {
+      type: String,
+    },
+    authority: {
+      type: String,
+    },
+    khataNo: {
+      type: String,
+    },
+    sasNumber: {
+      type: String,
+    },
+
+    authorizedPerson: {
+      type: String,
+    },
+
     place: {
       type: String,
     },
     day: {
-      type: Number,
+      type: String,
     },
     month: {
       type: String,
     },
     year: {
-      type: Number,
-      default: 2025,
+      type: String,
     },
     bookingId: {
       type: String,
@@ -94,6 +108,6 @@ const dobCorrectionSchema = new mongoose.Schema(
   }
 );
 
-const dobCorrection = mongoose.model("dobCorrection", dobCorrectionSchema);
+const khataCorrection = mongoose.model("khataCorrection", dualApplicantSchema);
 
-module.exports = dobCorrection;
+module.exports = khataCorrection;

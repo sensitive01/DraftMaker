@@ -28,10 +28,7 @@ const HufPreview = ({ formData }) => {
     }
   };
 
-  // Function to handle PDF generation
-  const handleGeneratePDF = () => {
-    window.print();
-  };
+
 
   // Format address for display
   const formatAddress = () => {
@@ -51,24 +48,7 @@ const HufPreview = ({ formData }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200">
-      {/* Header with actions */}
-      <div className="bg-gradient-to-r from-gray-100 to-gray-200 p-4 rounded-t-lg flex justify-between items-center">
-        <h2 className="text-lg font-bold text-gray-800">Document Preview</h2>
-        <button
-          onClick={handleGeneratePDF}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm flex items-center"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 mr-1"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V8z" clipRule="evenodd" />
-          </svg>
-          Generate PDF
-        </button>
-      </div>
+    
 
       {/* Print-specific styles */}
       <style jsx global>{`

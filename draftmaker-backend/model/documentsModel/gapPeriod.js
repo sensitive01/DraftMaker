@@ -1,11 +1,20 @@
 const mongoose = require("mongoose");
 
-const dobCorrectionSchema = new mongoose.Schema(
+const gapPeriodSchema = new mongoose.Schema({
+  from: {
+    type: String,
+  },
+  to: {
+    type: String,
+  },
+  reason: {
+    type: String,
+  },
+});
+
+const gapCertificateSchema = new mongoose.Schema(
   {
-    bookingId: {
-      type: String,
-    },
-    fullName: {
+    name: {
       type: String,
     },
     relation: {
@@ -18,42 +27,31 @@ const dobCorrectionSchema = new mongoose.Schema(
     age: {
       type: Number,
     },
-    permanentAddress: {
+    address: {
       type: String,
     },
     aadhaarNo: {
       type: String,
     },
-    dob1: {
-      type: String,
-    },
-    document1: {
-      type: String,
-    },
-    documentNo1: {
-      type: String,
-    },
-    dob2: {
-      type: String,
-    },
-    document2: {
-      type: String,
-    },
-    documentNo2: {
+    authority: {
       type: String,
     },
     place: {
       type: String,
     },
     day: {
-      type: Number,
+      type: String,
     },
     month: {
       type: String,
     },
     year: {
-      type: Number,
-      default: 2025,
+      type: String,
+    },
+
+    gapPeriods: {
+      type: [gapPeriodSchema],
+      default: [],
     },
     bookingId: {
       type: String,
@@ -94,6 +92,6 @@ const dobCorrectionSchema = new mongoose.Schema(
   }
 );
 
-const dobCorrection = mongoose.model("dobCorrection", dobCorrectionSchema);
+const gapPeriod = mongoose.model("GapPeriod", gapCertificateSchema);
 
-module.exports = dobCorrection;
+module.exports = gapPeriod;

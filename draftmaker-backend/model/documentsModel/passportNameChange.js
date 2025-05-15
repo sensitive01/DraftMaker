@@ -1,59 +1,59 @@
 const mongoose = require("mongoose");
 
-const dobCorrectionSchema = new mongoose.Schema(
+const addressSchema = new mongoose.Schema({
+  line1: { type: String },
+  line2: { type: String },
+  city: { type: String },
+  state: { type: String },
+  pinCode: { type: String },
+});
+
+const nameChangeSchema = new mongoose.Schema(
   {
-    bookingId: {
+    name: {
       type: String,
+
+      trim: true,
     },
-    fullName: {
-      type: String,
-    },
-    relation: {
-      type: String,
-      default: "S/o",
-    },
-    relationName: {
+    gender: {
       type: String,
     },
     age: {
       type: Number,
     },
-    permanentAddress: {
+    relatedPersonName: {
       type: String,
+    },
+    permanentAddress: {
+      type: addressSchema,
+    },
+    presentAddress: {
+      type: addressSchema,
     },
     aadhaarNo: {
       type: String,
     },
-    dob1: {
+    passportNo: {
+      type: String,
+      required: false,
+    },
+    currentGivenName: {
       type: String,
     },
-    document1: {
+    currentSurname: {
       type: String,
     },
-    documentNo1: {
+    newGivenName: {
       type: String,
     },
-    dob2: {
+    newSurname: {
       type: String,
     },
-    document2: {
-      type: String,
-    },
-    documentNo2: {
-      type: String,
+    date: {
+      type: String, // You can use Date if it's a JS date object
     },
     place: {
       type: String,
-    },
-    day: {
-      type: Number,
-    },
-    month: {
-      type: String,
-    },
-    year: {
-      type: Number,
-      default: 2025,
     },
     bookingId: {
       type: String,
@@ -94,6 +94,9 @@ const dobCorrectionSchema = new mongoose.Schema(
   }
 );
 
-const dobCorrection = mongoose.model("dobCorrection", dobCorrectionSchema);
+const passportNameChange = mongoose.model(
+  "passoportNameChange",
+  nameChangeSchema
+);
 
-module.exports = dobCorrection;
+module.exports = passportNameChange;

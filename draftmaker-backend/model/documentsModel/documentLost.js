@@ -1,16 +1,16 @@
+// models/FIRFormData.js
 const mongoose = require("mongoose");
 
-const dobCorrectionSchema = new mongoose.Schema(
+const documentLost = new mongoose.Schema(
   {
-    bookingId: {
+    personTitle: {
       type: String,
     },
-    fullName: {
+    personName: {
       type: String,
     },
-    relation: {
+    relationType: {
       type: String,
-      default: "S/o",
     },
     relationName: {
       type: String,
@@ -18,29 +18,29 @@ const dobCorrectionSchema = new mongoose.Schema(
     age: {
       type: Number,
     },
-    permanentAddress: {
+    address: {
       type: String,
     },
-    aadhaarNo: {
+    aadhaarNumber: {
       type: String,
     },
-    dob1: {
+    documentType: {
       type: String,
     },
-    document1: {
+    documentNumber: {
       type: String,
     },
-    documentNo1: {
+    firNumber: {
       type: String,
     },
-    dob2: {
+    firDay: {
+      type: Number,
+    },
+    firMonth: {
       type: String,
     },
-    document2: {
-      type: String,
-    },
-    documentNo2: {
-      type: String,
+    firYear: {
+      type: Number,
     },
     place: {
       type: String,
@@ -53,7 +53,6 @@ const dobCorrectionSchema = new mongoose.Schema(
     },
     year: {
       type: Number,
-      default: 2025,
     },
     bookingId: {
       type: String,
@@ -94,6 +93,6 @@ const dobCorrectionSchema = new mongoose.Schema(
   }
 );
 
-const dobCorrection = mongoose.model("dobCorrection", dobCorrectionSchema);
+const documentLostSchema = mongoose.model("documentLost", documentLost);
 
-module.exports = dobCorrection;
+module.exports = documentLostSchema;
