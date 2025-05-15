@@ -13,6 +13,7 @@ const documentRouter = require("./routes/documentsRoutes");
 const allowedOrigins = [
   "http://localhost:5173",
   "https://draft-maker.vercel.app",
+ " https://draft-maker.vercel.app/admin/login"
 ];
 
 // ✅ CORS Middleware
