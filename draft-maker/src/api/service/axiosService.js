@@ -172,7 +172,6 @@ export const createDobCorrectionPaymentData = async (data) => {
   }
 };
 
-
 export const sendGasCorrectionData = async (document) => {
   try {
     const response = await axiosInstance.post(
@@ -220,7 +219,6 @@ export const createDocumentLostPaymentData = async (data) => {
     return err;
   }
 };
-
 
 export const dobParentNameCorrectionData = async (document) => {
   try {
@@ -272,10 +270,9 @@ export const birthCerticateNameCorrectionPaymentData = async (data) => {
 
 export const sendGstCorrectionData = async (document) => {
   try {
-    const response = await axiosInstance.post(
-      `/documents/save-gst-data`,
-      { document }
-    );
+    const response = await axiosInstance.post(`/documents/save-gst-data`, {
+      document,
+    });
     return response;
   } catch (err) {
     return err;
@@ -293,8 +290,6 @@ export const gstPaymentData = async (data) => {
     return err;
   }
 };
-
-
 
 export const sendMetriculationLostData = async (document) => {
   try {
@@ -320,7 +315,6 @@ export const createMetriculationLostPaymentData = async (data) => {
   }
 };
 
-
 export const sendKhataCorrectionData = async (document) => {
   try {
     const response = await axiosInstance.post(
@@ -344,7 +338,6 @@ export const updateKhataCorrectionPaymentData = async (data) => {
     return err;
   }
 };
-
 
 export const sendVehicleInsurenceData = async (document) => {
   try {
@@ -370,13 +363,11 @@ export const createVehicleInsurencePaymentData = async (data) => {
   }
 };
 
-
 export const sendHufData = async (document) => {
   try {
-    const response = await axiosInstance.post(
-      `/documents/save-huf-data`,
-      { document }
-    );
+    const response = await axiosInstance.post(`/documents/save-huf-data`, {
+      document,
+    });
     return response;
   } catch (err) {
     return err;
@@ -394,8 +385,6 @@ export const createHufPaymentData = async (data) => {
     return err;
   }
 };
-
-
 
 export const sendGapPeriodData = async (document) => {
   try {
@@ -421,7 +410,6 @@ export const createGapPeriodPaymentData = async (data) => {
   }
 };
 
-
 export const sendPasswordAnnaxureData = async (document) => {
   try {
     const response = await axiosInstance.post(
@@ -445,7 +433,6 @@ export const createPasswordAnnaxurePaymentData = async (data) => {
     return err;
   }
 };
-
 
 export const sendPassportNameChangeData = async (document) => {
   try {
@@ -471,7 +458,6 @@ export const createPassportnameChangePaymentData = async (data) => {
   }
 };
 
-
 export const sendAddressAffadavitData = async (document) => {
   try {
     const response = await axiosInstance.post(
@@ -495,7 +481,6 @@ export const createAddressAffadavitPaymentData = async (data) => {
     return err;
   }
 };
-
 
 export const sendCommercialData = async (document) => {
   try {
@@ -538,6 +523,28 @@ export const createRecidentailPaymentData = async (data) => {
     const response = await axiosInstance.put(
       `/documents/update-recidential-payment-data`,
       { data }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getAggrementFormData = async (bookingId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/documents/get-aggrement-preview-data/${bookingId}`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const updateBookingStatus = async (bookingId,status) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-booking-status/${bookingId}`,{status}
     );
     return response;
   } catch (err) {

@@ -4,6 +4,10 @@ const documentController = require("../controller/documentsController")
 
 // documentRouter.get("/get-documents-name-data",documentController.getDocumentNameData)
 documentRouter.get("/get-all-booking-data",documentController.getAllBookingData)
+documentRouter.get("/get-aggrement-preview-data/:bookingId",documentController.getDocumentFormData)
+documentRouter.put("/update-booking-status/:bookingId",documentController.updateBookingStatus)
+
+
 
 documentRouter.post("/save-dual-name-correction-data",documentController.saveDualNameCorrection)
 documentRouter.put("/update-dual-name-payment-data",documentController.updateDualNamePaymentData)

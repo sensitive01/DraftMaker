@@ -39,6 +39,24 @@ import AdminSignUpPage from "./components/admin/signup/AdminSignUpPage";
 import DocumentPriceTable from "./components/admin/dashboard/statistics/DocumentsPriceTable";
 import ResetPasswordComponent from "./components/admin/dashboard/statistics/ResetPasswordComponent";
 import NewBookingTables from "./components/admin/dashboard/statistics/NewBookingTables";
+import RecidentialAggrementPreview from "./components/admin/dashboard/statistics/documentPreview/recedentialPreview/RecidentialAggrementPreview";
+import CommercialAggrementPreview from "./components/admin/dashboard/statistics/documentPreview/commecialAggrement/CommercialAggrementPreview";
+import AddressAffadavitPreview from "./components/admin/dashboard/statistics/documentPreview/addressAffadavit/AddressAffadavitPreview";
+import PassportAffadavitPreview from "./components/admin/dashboard/statistics/documentPreview/passportAffadavit/PassportAffadavitPreview";
+import PassportNameChangePreview from "./components/admin/dashboard/statistics/documentPreview/passportNameChange/PassportNameChangePreview";
+import GapPeriodPreview from "./components/admin/dashboard/statistics/documentPreview/gapPeriod/GapPeriodPreview";
+import HufPreview from "./components/admin/dashboard/statistics/documentPreview/huf/HufPreview";
+import VehicleInsurencePreview from "./components/admin/dashboard/statistics/documentPreview/vehicleInsurence/VehicleInsurencePreview";
+import KhPreview from "./components/admin/dashboard/statistics/documentPreview/kh/KhPreview";
+import MetriculationLostPreview from "./components/admin/dashboard/statistics/documentPreview/metriculationLost/MetriculationLostPreview";
+import GstPreview from "./components/admin/dashboard/statistics/documentPreview/gst/GstPreview";
+import MinorNameCorrectionPreview from "./components/admin/dashboard/statistics/documentPreview/minorNameCorrection/MinorNameCorrectionPreview";
+import BirtCrtificateParentNameCorrection from "./components/admin/dashboard/statistics/documentPreview/birthParentNameCorrection/BirtCrtificateParentNameCorrection";
+import DocumentLostPreview from "./components/admin/dashboard/statistics/documentPreview/documentLost/DocumentLostPreview";
+import GasPreview from "./components/admin/dashboard/statistics/documentPreview/gas/GasPreview";
+import DobCorrectionPreview from "./components/admin/dashboard/statistics/documentPreview/dobCorrection/DobCorrectionPreview";
+import NameChangePreview from "./components/admin/dashboard/statistics/documentPreview/nameChange/NameChangePreview";
+import DualNameChangePreview from "./components/admin/dashboard/statistics/documentPreview/dualNameChange/DualNameChangePreview";
 
 function MainLayout({ children }) {
   return (
@@ -128,7 +146,6 @@ function App() {
         {/* Authentication and Admin Routes */}
         <Routes>
           <Route path="/admin/signup" element={<AdminSignUpPage />} />
-
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin/forgot-password" element={<ForgotPassword />} />
 
@@ -161,6 +178,150 @@ function App() {
             element={
               <ProtectedAdminRoute>
                 <ResetPasswordComponent />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-RFD-18/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <RecidentialAggrementPreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-CFD-17/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <CommercialAggrementPreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-AAF-16/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <AddressAffadavitPreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-PNC-15/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <PassportNameChangePreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-PAF-14/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <PassportAffadavitPreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-GP-13/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <GapPeriodPreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-HUF-12/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <HufPreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-VIC-11/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <VehicleInsurencePreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-KH-10/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <KhPreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-MAL-9/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <MetriculationLostPreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-GST-8/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <GstPreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-BC-MNC-7/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <MinorNameCorrectionPreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-BCNCP-6/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <BirtCrtificateParentNameCorrection />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-DOC-LOST-5/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <DocumentLostPreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-GAS-5/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <GasPreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-DOBC-3/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <DobCorrectionPreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-NC-2/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <NameChangePreview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/document-preview/DM-DNC-1/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <DualNameChangePreview />
               </ProtectedAdminRoute>
             }
           />

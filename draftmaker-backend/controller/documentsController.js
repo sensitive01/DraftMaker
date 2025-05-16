@@ -329,6 +329,133 @@ const getAllBookingData = async (req, res) => {
   }
 };
 
+const getDocumentFormData = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const dualNameData = await dualNameCorrection.find();
+
+    const nameChangeData = await nameCorrection.find();
+    const dobCorrectionData = await dobCorrection.find();
+    const gasFormData = await GasFormData.find();
+    const docLostData = await documentLost.find();
+    const dobNameCorrectionParent = await dobParentNameCorrection.find();
+    const bcNameCorrectionData = await birthCertificateNameCorrection.find();
+    const gstNocData = await gstSchema.find();
+    const metriculationLostData = await metriculationLost.find();
+    const khataCorrectionData = await khataCorrection.find();
+    const vehicleInsurenceData = await vehicleInsurence.find();
+    const hufData = await hufSchema.find();
+    const gapPeriodData = await gapPeriodSchema.find();
+    const passportAnnaxureData = await passportAnnaxure.find();
+    const passportNameChangeData = await passportNameChange.find();
+    const adressAffadavitData = await adressAffadavit.find();
+    const commercialData = await commercialSchema.find();
+    const recidentialData = await recidentialSchema.find();
+
+    // Merge the arrays correctly
+    const allBookingData = [
+      ...dualNameData,
+      ...nameChangeData,
+      ...dobCorrectionData,
+      ...gasFormData,
+      ...docLostData,
+      ...dobNameCorrectionParent,
+      ...bcNameCorrectionData,
+      ...gstNocData,
+      ...metriculationLostData,
+      ...khataCorrectionData,
+      ...vehicleInsurenceData,
+      ...hufData,
+      ...gapPeriodData,
+      ...passportAnnaxureData,
+      ...passportNameChangeData,
+      ...adressAffadavitData,
+      ...commercialData,
+      ...recidentialData,
+    ];
+
+    const formattedData = allBookingData.map((item) => {
+      const date = new Date(item.createdAt);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+
+      return {
+        ...item._doc,
+        createdAt: `${day}-${month}-${year}`,
+      };
+    });
+
+    const previewData = formattedData.find(
+      (data) => data.bookingId === bookingId
+    );
+
+    console.log("previewData", previewData);
+
+    res.status(200).json({
+      message: "Preview data fetched successfully",
+      data: previewData,
+    });
+  } catch (err) {
+    console.log("Error in getting all booking data", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const updateBookingStatus = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const { status } = req.body;
+
+    console.log("Welcome to update the status", bookingId, status);
+
+    const collections = [
+      dualNameCorrection,
+      nameCorrection,
+      dobCorrection,
+      GasFormData,
+      documentLost,
+      dobParentNameCorrection,
+      birthCertificateNameCorrection,
+      gstSchema,
+      metriculationLost,
+      khataCorrection,
+      vehicleInsurence,
+      hufSchema,
+      gapPeriodSchema,
+      passportAnnaxure,
+      passportNameChange,
+      adressAffadavit,
+      commercialSchema,
+      recidentialSchema,
+    ];
+
+    let updatedDoc = null;
+
+    for (let collection of collections) {
+      updatedDoc = await collection.findOneAndUpdate(
+        { _id: bookingId },
+        { $set: { doumentStatus: status } },
+        { new: true }
+      );
+
+      if (updatedDoc) break;
+    }
+
+    if (!updatedDoc) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    res.status(200).json({
+      message: "Booking status updated successfully",
+      data: updatedDoc,
+    });
+  } catch (err) {
+    console.log("Error in updating the status", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 function generateBookingId() {
   const prefix = "DM";
   const randomNumber = Math.floor(1000000 + Math.random() * 9000000);
@@ -2297,6 +2424,7 @@ const updateRecidentialPaymentData = async (req, res) => {
 };
 
 module.exports = {
+  getDocumentFormData,
   updateRecidentialPaymentData,
   createRecidentialData,
   createCommercialData,
@@ -2325,17 +2453,14 @@ module.exports = {
   saveDocumentLostPaymentData,
   createGasCorrection,
   saveGasCorrectionPaymentData,
-
   createDobCorrection,
   saveDobCorrectionPaymentData,
-
   saveNameCorrection,
   saveNameCorrectionPaymentData,
-
   saveDualNameCorrection,
   updateDualNamePaymentData,
   getAllBookingData,
-
   saveDobParentNameCorrection,
   createDobParentNameCorrection,
+  updateBookingStatus,
 };

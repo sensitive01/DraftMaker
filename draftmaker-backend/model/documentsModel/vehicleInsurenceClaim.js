@@ -75,7 +75,6 @@ const vehicleAccidentSchema = new mongoose.Schema(
     },
     doumentStatus: {
       type: String,
-      enum: ["Pending", "Approved", "Rejected"],
       default: "Pending",
     },
     paymentStatus: {

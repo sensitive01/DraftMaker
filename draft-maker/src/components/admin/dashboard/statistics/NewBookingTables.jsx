@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Eye, X, Search, Filter, Calendar } from "lucide-react";
-import { getAllBookingData } from "../../../../api/service/axiosService";
+import { Eye, X, Search, Filter, Calendar, Edit } from "lucide-react";
+import {
+  getAllBookingData,
+  updateBookingStatus,
+} from "../../../../api/service/axiosService";
 import Pagination from "./Pagination";
+import { useNavigate } from "react-router-dom";
 
 const BookingTable = () => {
+  const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,6 +23,12 @@ const BookingTable = () => {
 
   const [selectedBooking, setSelectedBooking] = useState(null);
 
+  // State for modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [statusUpdateBooking, setStatusUpdateBooking] = useState(null);
+  const [newStatus, setNewStatus] = useState("");
+  const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -25,9 +36,16 @@ const BookingTable = () => {
         const response = await getAllBookingData();
 
         const formattedBookings = response.data.data.map((booking) => ({
-          _id:booking._id,
+          _id: booking._id,
           id: booking.bookingId,
-          name: booking.fullName||booking.lesseeName||booking.name||booking.name1||booking.ownerName||booking.parentName||booking.personName,
+          name:
+            booking.fullName ||
+            booking.lesseeName ||
+            booking.name ||
+            booking.name1 ||
+            booking.ownerName ||
+            booking.parentName ||
+            booking.personName,
           phoneNumber: booking.mobileNumber,
           status: booking.doumentStatus,
           paymentId: booking.paymentDetails.paymentId,
@@ -37,8 +55,8 @@ const BookingTable = () => {
           serviceName: booking.paymentDetails.serviceName,
           createdAt: booking.createdAt,
           includesNotary: booking.paymentDetails.includesNotary,
-          documentType:booking.documentType,
-          formId:booking.formId
+          documentType: booking.documentType,
+          formId: booking.formId,
         }));
 
         setBookings(formattedBookings);
@@ -98,9 +116,50 @@ const BookingTable = () => {
 
   const handleViewDetails = (booking) => {
     setSelectedBooking(booking);
-    console.log("booking",booking)
+    navigate(`/admin/document-preview/${booking.formId}/${booking.id}`);
   };
 
+  const handleOpenStatusModal = (booking) => {
+    setStatusUpdateBooking(booking);
+    setNewStatus(booking.status || "");
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setStatusUpdateBooking(null);
+    setNewStatus("");
+  };
+
+  const handleStatusUpdate = async () => {
+    if (!statusUpdateBooking || !newStatus) return;
+
+    try {
+      setStatusUpdateLoading(true);
+
+      // Call your API to update the status
+      await updateBookingStatus(statusUpdateBooking._id, newStatus);
+
+      // Update the local state
+      const updatedBookings = bookings.map((booking) => {
+        if (booking._id === statusUpdateBooking._id) {
+          return { ...booking, status: newStatus };
+        }
+        return booking;
+      });
+
+      setBookings(updatedBookings);
+      setStatusUpdateLoading(false);
+      handleCloseModal();
+
+      // Optional: Show success message
+      alert("Status updated successfully!");
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setStatusUpdateLoading(false);
+      alert("Failed to update status. Please try again.");
+    }
+  };
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -126,6 +185,12 @@ const BookingTable = () => {
         return "bg-red-100 text-red-800";
       case "processing":
         return "bg-blue-100 text-blue-800";
+      case "processed":
+        return "bg-indigo-100 text-indigo-800";
+      case "approved":
+        return "bg-teal-100 text-teal-800";
+      case "delivered":
+        return "bg-emerald-100 text-emerald-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -185,6 +250,9 @@ const BookingTable = () => {
                 <option value="completed">Completed</option>
                 <option value="pending">Pending</option>
                 <option value="processing">Processing</option>
+                <option value="processed">Processed</option>
+                <option value="approved">Approved</option>
+                <option value="delivered">Delivered</option>
                 <option value="cancelled">Cancelled</option>
               </select>
             </div>
@@ -248,6 +316,9 @@ const BookingTable = () => {
                 <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Actions
                 </th>
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                  Update Status
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-red-100">
@@ -281,17 +352,16 @@ const BookingTable = () => {
                         </span>
                       </div>
                     </td>
-                     <td className="p-3">
+                    <td className="p-3">
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-gray-900">
                           {booking.documentType}
                         </span>
                         <span className="text-xs text-gray-500">
-                      {booking.serviceName || "N/A"}
+                          {booking.serviceName || "N/A"}
                         </span>
                       </div>
                     </td>
-                 
                     <td className="p-3 whitespace-nowrap">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(
@@ -327,11 +397,21 @@ const BookingTable = () => {
                         <span className="text-xs font-medium">View</span>
                       </button>
                     </td>
+                    <td className="p-3 whitespace-nowrap">
+                      <button
+                        className="px-2 py-1 bg-purple-100 text-purple-600 rounded-md hover:bg-purple-200 transition-colors flex items-center space-x-1"
+                        onClick={() => handleOpenStatusModal(booking)}
+                        title="Update Status"
+                      >
+                        <Edit size={14} />
+                        <span className="text-xs font-medium">Update</span>
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="p-6 text-center text-gray-500">
+                  <td colSpan="9" className="p-6 text-center text-gray-500">
                     No bookings found matching your criteria
                   </td>
                 </tr>
@@ -353,6 +433,114 @@ const BookingTable = () => {
           />
         )}
       </div>
+
+      {/* Status Update Modal */}
+      {isModalOpen && statusUpdateBooking && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-red-900">
+                Update Document Status
+              </h3>
+              <button
+                onClick={handleCloseModal}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Booking ID
+                </label>
+                <div className="bg-gray-50 p-2 rounded border border-gray-200 text-sm font-medium">
+                  {statusUpdateBooking.id}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Document Type
+                </label>
+                <div className="bg-gray-50 p-2 rounded border border-gray-200 text-sm">
+                  {statusUpdateBooking.documentType || "N/A"}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Service Type
+                </label>
+                <div className="bg-gray-50 p-2 rounded border border-gray-200 text-sm">
+                  {statusUpdateBooking.serviceName || "N/A"}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Current Status
+                </label>
+                <div
+                  className={`p-2 rounded text-sm font-medium ${getStatusBadgeColor(
+                    statusUpdateBooking.status
+                  )}`}
+                >
+                  {statusUpdateBooking.status || "N/A"}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Update Status
+                </label>
+                <select
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="">Select new status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Processed">Processed</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Delivered">Delivered</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={handleCloseModal}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleStatusUpdate}
+                disabled={!newStatus || statusUpdateLoading}
+                className={`px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center ${
+                  !newStatus || statusUpdateLoading
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                {statusUpdateLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                    Updating...
+                  </>
+                ) : (
+                  "Update Status"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
