@@ -1,55 +1,45 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getAggrementFormData } from "../../../../../../api/service/axiosService";
+import {
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  HeadingLevel,
+  AlignmentType,
+  Table,
+  TableRow,
+  TableCell,
+  BorderStyle,
+} from "docx";
+import { saveAs } from "file-saver";
 
 const VehicleInsurencePreview = () => {
   const { bookingId } = useParams();
   const [formData, setFormData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getAggrementFormData(bookingId);
-      console.log("response", response);
-      if (response.status === 200) {
-        setFormData(response?.data?.data);
+      try {
+        setLoading(true);
+        const response = await getAggrementFormData(bookingId);
+        if (response.status === 200) {
+          setFormData(response?.data?.data || {});
+        } else {
+          setError("Failed to fetch data");
+        }
+      } catch (err) {
+        console.error("Error fetching form data:", err);
+        setError("Error loading data");
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
-  }, []);
-  // Helper function to determine if a field needs highlighting
-  const highlightIfEmpty = (value) => {
-    return !value
-      ? "bg-yellow-100 px-2 py-1 border-b border-dashed border-yellow-400"
-      : "";
-  };
-
-  // Check if all form data exists
-  const isFormDataEmpty = !formData;
-
-  if (isFormDataEmpty) {
-    return (
-      <div className="bg-gray-50 p-8 rounded-lg text-center border border-gray-200 shadow-md h-full flex items-center justify-center">
-        <div>
-          <svg
-            className="w-16 h-16 mx-auto text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            ></path>
-          </svg>
-          <p className="mt-4 text-lg text-gray-500 font-medium">
-            Fill the form to see your affidavit preview
-          </p>
-        </div>
-      </div>
-    );
-  }
+  }, [bookingId]);
 
   // Format dates properly
   const formatDate = (dateString) => {
@@ -65,115 +55,372 @@ const VehicleInsurencePreview = () => {
     }
   };
 
+  // Generate Word document
+  const generateWordDocument = async () => {
+    setLoading(true);
+
+    try {
+      // Create a new document
+      const doc = new Document({
+        sections: [
+          {
+            properties: {},
+            children: [
+              new Paragraph({
+                text: `${formData.documentType}`,
+                heading: HeadingLevel.HEADING_1,
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 300 },
+              }),
+
+              new Paragraph({
+                text: "[To be printed on a stamp paper of appropriate value as per State stamp duty laws]",
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 500 },
+                italics: true,
+              }),
+
+              new Paragraph({
+                spacing: { after: 200 },
+                children: [
+                  new TextRun("I, "),
+                  new TextRun({
+                    text: formData.title || "___",
+                  }),
+                  new TextRun(" "),
+                  new TextRun({
+                    text: formData.name || "_______________",
+                    bold: true,
+                  }),
+                  new TextRun(" "),
+                  new TextRun(formData.relation || "______"),
+                  new TextRun(", Aged: "),
+                  new TextRun({
+                    text: formData.age || "___",
+                    bold: true,
+                  }),
+                  new TextRun(" Years,"),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { after: 200 },
+                children: [
+                  new TextRun("Permanent Address: "),
+                  new TextRun({
+                    text: formData.address || "_________________",
+                    bold: true,
+                  }),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { after: 300 },
+                children: [
+                  new TextRun("My Aadhaar No: "),
+                  new TextRun({
+                    text: formData.aadhaar || "__ ____ ____",
+                    bold: true,
+                  }),
+                ],
+              }),
+
+              new Paragraph({
+                text: "Do hereby solemnly affirm and declare as under:",
+                alignment: AlignmentType.CENTER,
+                spacing: { before: 200, after: 300 },
+                bold: true,
+              }),
+
+              // Numbered list
+              new Paragraph({
+                spacing: { after: 200 },
+                children: [
+                  new TextRun("1. I am the owner of the Vehicle No- "),
+                  new TextRun({
+                    text: formData.vehicleNo || "________",
+                    bold: true,
+                  }),
+                  new TextRun(", VEHICLE MODEL: "),
+                  new TextRun({
+                    text: formData.vehicleModel || "________",
+                    bold: true,
+                  }),
+                  new TextRun(", Engine No- "),
+                  new TextRun({
+                    text: formData.engineNo || "________",
+                    bold: true,
+                  }),
+                  new TextRun(", Chassis No: "),
+                  new TextRun({
+                    text: formData.chassisNo || "________",
+                    bold: true,
+                  }),
+                  new TextRun(" Insured with "),
+                  new TextRun({
+                    text: formData.insurer || "________",
+                    bold: true,
+                  }),
+                  new TextRun(" Under Policy No: "),
+                  new TextRun({
+                    text: formData.policyNo || "________",
+                    bold: true,
+                  }),
+                  new TextRun(" for the period "),
+                  new TextRun({
+                    text: formatDate(formData.policyStart) || "________",
+                    bold: true,
+                  }),
+                  new TextRun(" to "),
+                  new TextRun({
+                    text: formatDate(formData.policyEnd) || "________",
+                    bold: true,
+                  }),
+                  new TextRun("."),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { before: 200, after: 200 },
+                children: [
+                  new TextRun("2. Vehicle was Driven by "),
+                  new TextRun({
+                    text: formData.driverName || "________",
+                    bold: true,
+                  }),
+                  new TextRun(" and the Vehicle met with an accident as follows:"),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { before: 100, after: 100, left: 400 },
+                children: [
+                  new TextRun({
+                    text: "DETAILS OF INCIDENT:",
+                    bold: true,
+                  }),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { before: 100, after: 200, left: 400 },
+                children: [
+                  new TextRun({
+                    text: formData.accidentDetails || 
+                    "Please provide detailed information about the accident including date, time, location, and circumstances",
+                    italics: true,
+                  }),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { before: 200, after: 200 },
+                children: [
+                  new TextRun("3. The above accident was reported to the Police Station and the respective police acknowledgement has been submitted alongside other claim documents."),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { before: 200, after: 200 },
+                children: [
+                  new TextRun("4. I hereby confirm that no third-party injury / death / property damage is involved in this accident and there will not be any claim from any third party. In the event of any claim from any third party on account of the above accident, it shall be my responsibility to take such claims and the insurer is fully discharged of the liability under the policy by virtue of settlement of my claim for Damage to the Vehicle."),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { before: 200, after: 300 },
+                children: [
+                  new TextRun("5. I understand that providing false information in this affidavit may result in rejection of my claim and could have legal consequences under applicable laws."),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { before: 300, after: 300 },
+                children: [
+                  new TextRun("I hereby solemnly declare that the above statement is true to the best of my knowledge and belief and that I have not withheld or misrepresented any material facts."),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { before: 300, after: 500 },
+                children: [
+                  new TextRun("Verified at "),
+                  new TextRun({
+                    text: formData.place || "________",
+                    bold: true,
+                  }),
+                  new TextRun(" on this "),
+                  new TextRun({
+                    text: formData.day || "__",
+                    bold: true,
+                  }),
+                  new TextRun(" day of "),
+                  new TextRun({
+                    text: formData.month || "________",
+                    bold: true,
+                  }),
+                  new TextRun(", "),
+                  new TextRun({
+                    text: formData.year || "____",
+                    bold: true,
+                  }),
+                  new TextRun(" that the contents of the above said affidavit are true and correct to the best of my knowledge and belief."),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { before: 800, after: 100 },
+                text: "Signature of Notary Public",
+                alignment: AlignmentType.LEFT,
+              }),
+
+              new Paragraph({
+                spacing: { before: 0, after: 100 },
+                text: "With Seal",
+                alignment: AlignmentType.LEFT,
+              }),
+
+              new Paragraph({
+                spacing: { before: 800, after: 100 },
+                text: "Signature of the Deponent",
+                alignment: AlignmentType.RIGHT,
+              }),
+
+              new Paragraph({
+                text: formData.title ? formData.title + " " + formData.name : "",
+                alignment: AlignmentType.RIGHT,
+              }),
+            ],
+          },
+        ],
+      });
+
+      // Generate the document as a blob
+      const buffer = await Packer.toBlob(doc);
+
+      // Save the document with a meaningful filename
+      const fileName = `Vehicle_Insurance_Affidavit_${formData.name ? formData.name.replace(/\s+/g, "_") : "Document"}.docx`;
+      saveAs(buffer, fileName);
+    } catch (error) {
+      console.error("Error generating Word document:", error);
+      alert("Failed to generate Word document. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        Loading preview...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-64 text-red-500">
+        {error}
+      </div>
+    );
+  }
+
+  // Helper function to check if a field is empty
+  const isEmpty = (value) => {
+    return !value || value.trim() === "";
+  };
+
   return (
-    <div className="bg-white p-10 rounded-lg border-2 border-gray-300 shadow-lg">
-      <div className="max-w-3xl mx-auto">
-        {/* Official Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold uppercase tracking-wider mb-3">
-            AFFIDAVIT
-          </h1>
-          <div className="border-b-2 border-black w-48 mx-auto mb-2"></div>
-          <div className="border-b-2 border-black w-32 mx-auto"></div>
+    <div className="flex flex-col items-center">
+      {/* Download button */}
+      <div className="w-full max-w-2xl mb-4 flex justify-end">
+        <button
+          onClick={generateWordDocument}
+          className="bg-red-600 hover:bg-red-700 text-white px-2 py-2 rounded-md flex items-center"
+          disabled={loading}
+        >
+          {loading ? (
+            <span>Generating...</span>
+          ) : (
+            <>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+              Download
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Simple legal document preview */}
+      <div className="bg-white border border-gray-300 w-full max-w-3xl p-8 font-serif">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold mb-2">{formData.documentType}</h1>
+          <p className="text-sm italic">
+            [To be printed on a stamp paper of appropriate value as per State
+            stamp duty laws]
+          </p>
         </div>
 
-        {/* Official Note */}
-        <div className="text-sm text-gray-500 mb-10 text-center italic">
-          [To be printed on a stamp paper of appropriate value as per State
-          stamp duty laws]
-        </div>
-
-        <div className="space-y-7 text-gray-800 leading-relaxed text-lg">
-          <p className="mb-6">
-            I,{" "}
-            {formData.title ? (
-              formData.title
-            ) : (
-              <span className={highlightIfEmpty(formData.title)}>___</span>
-            )}{" "}
-            {formData.name ? (
-              <span className="font-medium">{formData.name}</span>
-            ) : (
-              <span className={highlightIfEmpty(formData.name)}>
-                _______________
-              </span>
-            )}{" "}
-            {formData.relation ? (
-              `${formData.relation}`
-            ) : (
-              <span className={highlightIfEmpty(formData.relation)}>
-                ______
-              </span>
-            )}
-            , Aged:{" "}
-            <span className={highlightIfEmpty(formData.age)}>
-              {formData.age || "___"}
-            </span>{" "}
-            Years,
+        {/* Content */}
+        <div className="space-y-4 text-base leading-relaxed">
+          <p>
+            I, {formData.title || "___"}{" "}
+            <span className="font-bold">{formData.name || "_______________"}</span>{" "}
+            {formData.relation || "______"}, Aged:{" "}
+            <span className="font-bold">{formData.age || "___"}</span> Years,
           </p>
 
-          <p className="mb-6">
+          <p>
             Permanent Address:{" "}
-            <span className={highlightIfEmpty(formData.address)}>
+            <span className="font-bold">
               {formData.address || "_________________"}
             </span>
           </p>
 
-          <p className="mb-8">
+          <p>
             My Aadhaar No:{" "}
-            <span className={highlightIfEmpty(formData.aadhaar)}>
+            <span className="font-bold">
               {formData.aadhaar || "__ ____ ____"}
             </span>
           </p>
 
-          <p className="font-medium text-xl mb-6">
+          <p className="text-center font-bold mt-6 mb-6">
             Do hereby solemnly affirm and declare as under:
           </p>
 
-          <ol className="list-decimal ml-6 space-y-10">
+          <ol className="list-decimal pl-5 space-y-4">
             <li>
               I am the owner of the Vehicle No-{" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(
-                  formData.vehicleNo
-                )}`}
-              >
-                {formData.vehicleNo || "________"}
-              </span>
-              , VEHICLE MODEL:{" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(
-                  formData.vehicleModel
-                )}`}
-              >
-                {formData.vehicleModel || "________"}
-              </span>
-              , Engine No-{" "}
-              <span className={highlightIfEmpty(formData.engineNo)}>
-                {formData.engineNo || "________"}
-              </span>
-              , Chassis No:{" "}
-              <span className={highlightIfEmpty(formData.chassisNo)}>
-                {formData.chassisNo || "________"}
-              </span>{" "}
+              <span className="font-bold">{formData.vehicleNo || "________"}</span>,
+              VEHICLE MODEL:{" "}
+              <span className="font-bold">{formData.vehicleModel || "________"}</span>,
+              Engine No-{" "}
+              <span className="font-bold">{formData.engineNo || "________"}</span>,
+              Chassis No:{" "}
+              <span className="font-bold">{formData.chassisNo || "________"}</span>{" "}
               Insured with{" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(formData.insurer)}`}
-              >
-                {formData.insurer || "________"}
-              </span>{" "}
+              <span className="font-bold">{formData.insurer || "________"}</span>{" "}
               Under Policy No:{" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(formData.policyNo)}`}
-              >
-                {formData.policyNo || "________"}
-              </span>{" "}
+              <span className="font-bold">{formData.policyNo || "________"}</span>{" "}
               for the period{" "}
-              <span className={highlightIfEmpty(formData.policyStart)}>
+              <span className="font-bold">
                 {formatDate(formData.policyStart) || "________"}
               </span>{" "}
               to{" "}
-              <span className={highlightIfEmpty(formData.policyEnd)}>
+              <span className="font-bold">
                 {formatDate(formData.policyEnd) || "________"}
               </span>
               .
@@ -181,23 +428,11 @@ const VehicleInsurencePreview = () => {
 
             <li>
               Vehicle was Driven by{" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(
-                  formData.driverName
-                )}`}
-              >
-                {formData.driverName || "________"}
-              </span>{" "}
+              <span className="font-bold">{formData.driverName || "________"}</span>{" "}
               and the Vehicle met with an accident as follows:
-              <div className="bg-gray-50 p-6 mt-4 rounded-md border-l-4 border-blue-600">
-                <p className="font-bold text-gray-700 mb-4">
-                  DETAILS OF INCIDENT:
-                </p>
-                <p
-                  className={`italic text-gray-700 leading-relaxed ${highlightIfEmpty(
-                    formData.accidentDetails
-                  )}`}
-                >
+              <div className="ml-5 mt-2 mb-2 pl-4 border-l-2 border-gray-400">
+                <p className="font-bold">DETAILS OF INCIDENT:</p>
+                <p className="italic">
                   {formData.accidentDetails ||
                     "Please provide detailed information about the accident including date, time, location, and circumstances"}
                 </p>
@@ -227,63 +462,34 @@ const VehicleInsurencePreview = () => {
             </li>
           </ol>
 
-          <div className="mt-8 pt-4">
-            <p>
-              I hereby solemnly declare that the above statement is true to the
-              best of my knowledge and belief and that I have not withheld or
-              misrepresented any material facts.
-            </p>
-          </div>
+          <p className="mt-6">
+            I hereby solemnly declare that the above statement is true to the
+            best of my knowledge and belief and that I have not withheld or
+            misrepresented any material facts.
+          </p>
 
-          <div className="mt-8 pt-4">
-            <p>
-              Verified at{" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(formData.place)}`}
-              >
-                {formData.place || "________"}
-              </span>{" "}
-              on this{" "}
-              <span className={highlightIfEmpty(formData.day)}>
-                {formData.day || "__"}
-              </span>{" "}
-              day of{" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(formData.month)}`}
-              >
-                {formData.month || "________"}
-              </span>
-              ,{" "}
-              <span className={highlightIfEmpty(formData.year)}>
-                {formData.year || "____"}
-              </span>{" "}
-              that the contents of the above said affidavit are true and correct
-              to the best of my knowledge and belief.
-            </p>
-          </div>
+          <p className="mt-6">
+            Verified at{" "}
+            <span className="font-bold">{formData.place || "________"}</span> on
+            this <span className="font-bold">{formData.day || "__"}</span> day of{" "}
+            <span className="font-bold">{formData.month || "________"}</span>,{" "}
+            <span className="font-bold">{formData.year || "____"}</span> that the
+            contents of the above said affidavit are true and correct to the best
+            of my knowledge and belief.
+          </p>
 
           {/* Signature Block */}
-          <div className="grid grid-cols-2 gap-8 mt-24 mb-8">
-            <div className="text-left">
-              <div className="h-24 border-b-2 border-black mb-3"></div>
-              <p className="font-medium">Signature of Notary Public</p>
+          <div className="flex justify-between mt-16 pt-16">
+            <div>
+              <p>Signature of Notary Public</p>
               <p className="text-sm text-gray-600">With Seal</p>
             </div>
 
             <div className="text-right">
-              <div className="h-24 border-b-2 border-black mb-3"></div>
-              <p className="font-medium">Signature of the Deponent</p>
+              <p>Signature of the Deponent</p>
               <p className="text-sm text-gray-600">
-                {formData.title ? formData.title : ""}{" "}
-                {formData.name ? formData.name : ""}
+                {formData.title} {formData.name}
               </p>
-            </div>
-          </div>
-
-          {/* Stamp/Seal Placeholder */}
-          <div className="mt-16 mb-6 text-center">
-            <div className="border-2 border-dashed border-gray-300 rounded-full h-40 w-40 mx-auto flex items-center justify-center text-gray-400">
-              <p className="text-sm">Notary Seal</p>
             </div>
           </div>
         </div>

@@ -551,3 +551,15 @@ export const updateBookingStatus = async (bookingId,status) => {
     return err;
   }
 };
+
+
+export const getDashboardStatistics = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/documents/get-dashboard-statistics`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};

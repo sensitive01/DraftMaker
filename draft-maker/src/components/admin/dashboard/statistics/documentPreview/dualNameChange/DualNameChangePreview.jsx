@@ -1,6 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { getAggrementFormData } from "../../../../../../api/service/axiosService";
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from "docx";
+import { saveAs } from "file-saver";
 
 const DualNameChangePreview = () => {
   const pdfTemplateRef = useRef(null);
@@ -35,6 +37,226 @@ const DualNameChangePreview = () => {
     return typeof value === "string" && value.trim() !== "";
   };
 
+  // Format name with prefix if available
+  const formatFullName = () => {
+    let name = "";
+    if (formData?.namePrefix) {
+      name += formData.namePrefix + " ";
+    }
+    name += formData?.fullName || "Mr/Mrs/Ms ...........................";
+    return name;
+  };
+
+  // Format relation details
+  const formatRelationship = () => {
+    let relation = formData?.relation || "D/o, S/o, H/o, W/o";
+    relation += " " + (formData?.relationName || "...................");
+    return relation;
+  };
+
+  // Generate Word document
+  const generateWordDocument = async () => {
+    setLoading(true);
+
+    try {
+      // Create a new document
+      const doc = new Document({
+        sections: [
+          {
+            properties: {},
+            children: [
+              new Paragraph({
+                text: formData.documentType || "AFFIDAVIT",
+                heading: HeadingLevel.HEADING_1,
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 300 },
+              }),
+
+              new Paragraph({
+                spacing: { after: 200 },
+                children: [
+                  new TextRun(`I, `),
+                  new TextRun({
+                    text: formatFullName(),
+                    bold: true,
+                  }),
+                  new TextRun(` ${formatRelationship()}, Aged: `),
+                  new TextRun({
+                    text: formData?.age?.toString() || "......",
+                    bold: true,
+                  }),
+                  new TextRun(` Years,`),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { after: 200 },
+                children: [
+                  new TextRun(`Permanent Address `),
+                  new TextRun({
+                    text: formData?.permanentAddress || "Address Line 1, Address Line 2, City, State, Pin Code",
+                    bold: true,
+                  }),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { after: 200 },
+                children: [
+                  new TextRun(`My Aadhaar No: `),
+                  new TextRun({
+                    text: formData?.aadhaarNo || "0000 0000 0000",
+                    bold: true,
+                  }),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { after: 300 },
+                children: [
+                  new TextRun({
+                    text: `Do hereby solemnly affirm and declare as under:`,
+                    bold: true,
+                  }),
+                ],
+              }),
+
+              // Numbered list items
+              new Paragraph({
+                spacing: { after: 200 },
+                numbering: { reference: "my-numbering", level: 0 },
+                text: `That I am the citizen of India.`,
+              }),
+
+              new Paragraph({
+                spacing: { after: 200 },
+                numbering: { reference: "my-numbering", level: 0 },
+                children: [
+                  new TextRun(`That my name has been recorded as `),
+                  new TextRun({
+                    text: formData?.name1 || "NAME",
+                    bold: true,
+                  }),
+                  new TextRun(`, `),
+                  new TextRun({
+                    text: formData?.document1 || "NAME OF DOCUMENT",
+                    bold: true,
+                  }),
+                  new TextRun(`, `),
+                  new TextRun({
+                    text: formData?.documentNo1 || "DOCUMENT SERIAL NO",
+                    bold: true,
+                  }),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { after: 200 },
+                numbering: { reference: "my-numbering", level: 0 },
+                children: [
+                  new TextRun(`That my name has been recorded as `),
+                  new TextRun({
+                    text: formData?.name2 || "NAME",
+                    bold: true,
+                  }),
+                  new TextRun(`, `),
+                  new TextRun({
+                    text: formData?.document2 || "NAME OF DOCUMENT",
+                    bold: true,
+                  }),
+                  new TextRun(`, `),
+                  new TextRun({
+                    text: formData?.documentNo2 || "DOCUMENT SERIAL NO",
+                    bold: true,
+                  }),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { after: 200 },
+                numbering: { reference: "my-numbering", level: 0 },
+                text: `That I further declare that both the names mentioned hereinabove belongs to one and the same person i.e. "myself".`,
+              }),
+
+              new Paragraph({
+                spacing: { after: 300 },
+                numbering: { reference: "my-numbering", level: 0 },
+                text: `That my statement is true and correct.`,
+              }),
+
+              new Paragraph({
+                spacing: { before: 300, after: 500 },
+                children: [
+                  new TextRun(`Verified at `),
+                  new TextRun({
+                    text: formData?.place || "PLACE",
+                    bold: true,
+                  }),
+                  new TextRun(` on this `),
+                  new TextRun({
+                    text: formData?.day || "XX",
+                    bold: true,
+                  }),
+                  new TextRun(` day of `),
+                  new TextRun({
+                    text: formData?.month || "XXXX",
+                    bold: true,
+                  }),
+                  new TextRun(`, `),
+                  new TextRun({
+                    text: formData?.year || "XXXX",
+                    bold: true,
+                  }),
+                  new TextRun(` that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.`),
+                ],
+              }),
+
+              new Paragraph({
+                spacing: { before: 500 },
+                text: "(Signature of the Deponent)",
+                alignment: AlignmentType.RIGHT,
+              }),
+            ],
+          },
+        ],
+        numbering: {
+          config: [
+            {
+              reference: "my-numbering",
+              levels: [
+                {
+                  level: 0,
+                  format: "decimal",
+                  text: "%1.",
+                  alignment: AlignmentType.START,
+                  style: {
+                    paragraph: {
+                      indent: { left: 720, hanging: 260 },
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      });
+
+      // Generate the document as a blob
+      const buffer = await Packer.toBlob(doc);
+
+      // Save the document with a meaningful filename
+      const fileName = `Dual_Name_Change_Affidavit_${
+        formData.fullName ? formData.fullName.replace(/\s+/g, "_") : "User"
+      }.docx`;
+      saveAs(buffer, fileName);
+    } catch (error) {
+      console.error("Error generating Word document:", error);
+      alert("Failed to generate Word document. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -53,6 +275,37 @@ const DualNameChangePreview = () => {
 
   return (
     <div className="flex flex-col items-center">
+      {/* Download button */}
+      <div className="w-full max-w-2xl mb-4 flex justify-end">
+        <button
+          onClick={generateWordDocument}
+          className="bg-red-600 hover:bg-blue-700 text-white px-2 py-2 rounded-md flex items-center"
+          disabled={loading}
+        >
+          {loading ? (
+            <span>Generating...</span>
+          ) : (
+            <>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+              Download
+            </>
+          )}
+        </button>
+      </div>
+
       {/* Single page preview with continuous content */}
       <div className="bg-white border border-gray-300 shadow font-serif w-full max-w-3xl">
         <div className="relative p-8">
@@ -64,7 +317,7 @@ const DualNameChangePreview = () => {
 
           {/* Page 1 Content */}
           <div className="mb-12">
-            <h1 className="text-center font-bold text-xl mb-6">AFFIDAVIT</h1>
+            <h1 className="text-center font-bold text-xl mb-6">{formData.documentType || "AFFIDAVIT"}</h1>
 
             <p className="mb-4">
               I,{" "}
@@ -73,7 +326,7 @@ const DualNameChangePreview = () => {
                   isFilled(formData?.fullName) ? "" : "bg-yellow-200 px-1"
                 }
               >
-                {formData?.namePrefix || ""}{" "}
+                {formData?.namePrefix ? formData.namePrefix + " " : ""}
                 {formData?.fullName || "Mr/Mrs/Ms ..........................."}
               </span>{" "}
               <span
@@ -210,8 +463,7 @@ const DualNameChangePreview = () => {
                 <span style={{ display: "inline-block", width: "1.5em" }}>
                   {4}.
                 </span>{" "}
-                That I further declare that both the names mentioned here in
-                above belongs to one and the same person i.e. "myself".
+                That I further declare that both the names mentioned hereinabove belongs to one and the same person i.e. "myself".
               </li>
 
               <li style={{ display: "block", counterIncrement: "item" }}>
@@ -262,369 +514,6 @@ const DualNameChangePreview = () => {
             </div>
 
             <div className="mt-24 text-right pr-4">
-              <p>(Signature of the Deponent)</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Hidden elements for download formatting - won't be visible */}
-      <div className="hidden">
-        <div
-          id="pdf-template"
-          ref={pdfTemplateRef}
-          style={{
-            width: "210mm",
-            fontFamily: "Times New Roman",
-            fontSize: "12pt",
-          }}
-        >
-          {/* Page 1 */}
-          <div
-            style={{
-              height: "297mm",
-              position: "relative",
-              padding: "20mm",
-              pageBreakAfter: "always",
-            }}
-          >
-            {/* Corner marks */}
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                borderTop: "1px solid #999",
-                borderLeft: "1px solid #999",
-                width: "16px",
-                height: "16px",
-              }}
-            ></div>
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                right: 0,
-                borderTop: "1px solid #999",
-                borderRight: "1px solid #999",
-                width: "16px",
-                height: "16px",
-              }}
-            ></div>
-            <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                borderBottom: "1px solid #999",
-                borderLeft: "1px solid #999",
-                width: "16px",
-                height: "16px",
-              }}
-            ></div>
-            <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                borderBottom: "1px solid #999",
-                borderRight: "1px solid #999",
-                width: "16px",
-                height: "16px",
-              }}
-            ></div>
-
-            <h1
-              style={{
-                textAlign: "center",
-                fontWeight: "bold",
-                fontSize: "16pt",
-                marginBottom: "24px",
-              }}
-            >
-              AFFIDAVIT
-            </h1>
-
-            <p style={{ marginBottom: "16px", lineHeight: "1.5" }}>
-              I,{" "}
-              <span
-                style={
-                  isFilled(formData?.fullName)
-                    ? {}
-                    : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                }
-              >
-                {formData?.namePrefix ? formData.namePrefix + " " : ""}
-                {formData?.fullName || "Mr/Mrs/Ms ..........................."}
-              </span>{" "}
-              <span
-                style={
-                  isFilled(formData?.relation)
-                    ? {}
-                    : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                }
-              >
-                {formData?.relation || "D/o, S/o, H/o, W/o"}
-              </span>{" "}
-              <span
-                style={
-                  isFilled(formData?.relationName)
-                    ? {}
-                    : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                }
-              >
-                {formData?.relationName || "..................."}
-              </span>
-              , Aged:{" "}
-              <span
-                style={
-                  isFilled(formData?.age?.toString())
-                    ? {}
-                    : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                }
-              >
-                {formData?.age || "......"}
-              </span>{" "}
-              Years,
-            </p>
-
-            <p style={{ marginBottom: "16px", lineHeight: "1.5" }}>
-              Permanent Address{" "}
-              <span
-                style={
-                  isFilled(formData?.permanentAddress)
-                    ? {}
-                    : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                }
-              >
-                {formData?.permanentAddress ||
-                  "Address Line 1, Address Line 2, City, State, Pin Code"}
-              </span>
-            </p>
-
-            <p style={{ marginBottom: "16px", lineHeight: "1.5" }}>
-              My Aadhaar No:{" "}
-              <span
-                style={
-                  isFilled(formData?.aadhaarNo)
-                    ? {}
-                    : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                }
-              >
-                {formData?.aadhaarNo || "0000 0000 0000"}
-              </span>
-            </p>
-
-            <p style={{ marginBottom: "20px", lineHeight: "1.5" }}>
-              Do hereby solemnly affirm and declare as under:
-            </p>
-
-            {/* Start of the numbered list */}
-            <ol
-              style={{
-                listStyleType: "decimal",
-                marginLeft: "20px",
-                lineHeight: "1.6",
-                marginBottom: "16px",
-              }}
-            >
-              <li style={{ marginBottom: "16px" }}>
-                That I am the citizen of India.
-              </li>
-
-              <li style={{ marginBottom: "16px" }}>
-                That my name has been recorded as{" "}
-                <span
-                  style={
-                    isFilled(formData?.name1)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                  }
-                >
-                  {formData?.name1 || "NAME"}
-                </span>
-                ,{" "}
-                <span
-                  style={
-                    isFilled(formData?.document1)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                  }
-                >
-                  {formData?.document1 || "NAME OF DOCUMENT"}
-                </span>
-                ,{" "}
-                <span
-                  style={
-                    isFilled(formData?.documentNo1)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                  }
-                >
-                  {formData?.documentNo1 || "DOCUMENT SERIAL NO"}
-                </span>
-              </li>
-            </ol>
-          </div>
-
-          {/* Page 2 */}
-          <div
-            style={{ height: "297mm", position: "relative", padding: "20mm" }}
-          >
-            {/* Corner marks */}
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                borderTop: "1px solid #999",
-                borderLeft: "1px solid #999",
-                width: "16px",
-                height: "16px",
-              }}
-            ></div>
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                right: 0,
-                borderTop: "1px solid #999",
-                borderRight: "1px solid #999",
-                width: "16px",
-                height: "16px",
-              }}
-            ></div>
-            <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                borderBottom: "1px solid #999",
-                borderLeft: "1px solid #999",
-                width: "16px",
-                height: "16px",
-              }}
-            ></div>
-            <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                borderBottom: "1px solid #999",
-                borderRight: "1px solid #999",
-                width: "16px",
-                height: "16px",
-              }}
-            ></div>
-
-            {/* Continue the numbered list */}
-            <ol
-              style={{
-                listStyleType: "decimal",
-                marginLeft: "20px",
-                lineHeight: "1.6",
-                marginBottom: "24px",
-              }}
-              start="3"
-            >
-              <li style={{ marginBottom: "16px" }}>
-                That my name has been recorded as{" "}
-                <span
-                  style={
-                    isFilled(formData?.name2)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                  }
-                >
-                  {formData?.name2 || "NAME"}
-                </span>
-                ,{" "}
-                <span
-                  style={
-                    isFilled(formData?.document2)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                  }
-                >
-                  {formData?.document2 || "NAME OF DOCUMENT"}
-                </span>
-                ,{" "}
-                <span
-                  style={
-                    isFilled(formData?.documentNo2)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                  }
-                >
-                  {formData?.documentNo2 || "DOCUMENT SERIAL NO"}
-                </span>
-              </li>
-
-              <li style={{ marginBottom: "16px" }}>
-                That I further declare that both the names mentioned{" "}
-                <span style={{ textDecoration: "underline" }}>hereinabove</span>{" "}
-                belongs to one and the same person i.e. "myself".
-              </li>
-
-              <li style={{ marginBottom: "16px" }}>
-                That my statement is true and correct.
-              </li>
-            </ol>
-
-            <div style={{ marginTop: "40px", lineHeight: "1.5" }}>
-              <p>
-                Verified at{" "}
-                <span
-                  style={
-                    isFilled(formData?.place)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                  }
-                >
-                  {formData?.place || "PLACE"}
-                </span>{" "}
-                on this{" "}
-                <span
-                  style={
-                    isFilled(formData?.day)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                  }
-                >
-                  {formData?.day || "XX"}
-                </span>{" "}
-                day of{" "}
-                <span
-                  style={
-                    isFilled(formData?.month)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                  }
-                >
-                  {formData?.month || "XXXX"}
-                </span>
-                ,{" "}
-                <span
-                  style={
-                    isFilled(formData?.year)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
-                  }
-                >
-                  {formData?.year || "XXXX"}
-                </span>{" "}
-                that the contents of the above said affidavit are true and
-                correct to the best of my knowledge and belief.
-              </p>
-            </div>
-
-            <div
-              style={{
-                marginTop: "60px",
-                textAlign: "right",
-                paddingRight: "20px",
-              }}
-            >
               <p>(Signature of the Deponent)</p>
             </div>
           </div>

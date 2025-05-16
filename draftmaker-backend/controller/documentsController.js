@@ -19,6 +19,90 @@ const adressAffadavit = require("../model/documentsModel/adressAffadavit");
 const commercialSchema = require("../model/documentsModel/commercialData");
 const recidentialSchema = require("../model/documentsModel/recidentialData");
 
+const getDashboardStatistics = async (req, res) => {
+  try {
+    const collections = [
+      dualNameCorrection,
+      nameCorrection,
+      dobCorrection,
+      GasFormData,
+      documentLost,
+      dobParentNameCorrection,
+      birthCertificateNameCorrection,
+      gstSchema,
+      metriculationLost,
+      khataCorrection,
+      vehicleInsurence,
+      hufSchema,
+      gapPeriodSchema,
+      passportAnnaxure,
+      passportNameChange,
+      adressAffadavit,
+      commercialSchema,
+      recidentialSchema,
+    ];
+
+    const statusList = [
+      "Pending",
+      "Processing",
+      "Processed",
+      "Approved",
+      "Delivered",
+      "Completed",
+      "Cancelled",
+    ];
+
+    let totalBookings = 0;
+    let totalAmount = 0;
+
+    const statusData = {};
+
+    statusList.forEach((status) => {
+      statusData[status] = { bookings: 0, amount: 0 };
+    });
+
+    for (const collection of collections) {
+      const docs = await collection.find();
+
+      for (const doc of docs) {
+        totalBookings += 1;
+
+        const amount = doc.paymentDetails?.paidAmount || 0;
+        totalAmount += amount;
+
+        const status = doc.doumentStatus || "Pending";
+
+        if (!statusData[status]) {
+          statusData[status] = { bookings: 0, amount: 0 };
+        }
+
+        statusData[status].bookings += 1;
+        statusData[status].amount += amount;
+      }
+    }
+
+    // Final structured response
+    const dashboardStats = {
+      totalBookings,
+      totalAmount,
+      ...Object.fromEntries(
+        Object.entries(statusData).map(([status, value]) => [
+          status.toLowerCase(),
+          value,
+        ])
+      ),
+    };
+
+    res.status(200).json({
+      message: "Dashboard statistics fetched successfully",
+      data: dashboardStats,
+    });
+  } catch (err) {
+    console.log("Error in getting the statistic data", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const getAllBookingData = async (req, res) => {
   try {
     const dualNameData = await dualNameCorrection.find(
@@ -2463,4 +2547,5 @@ module.exports = {
   saveDobParentNameCorrection,
   createDobParentNameCorrection,
   updateBookingStatus,
+  getDashboardStatistics,
 };
