@@ -4,6 +4,7 @@ import VehicleInsuranceClamingPreview from "./VehicleInsuranceClamingPreview";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
+import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
 import {
   createVehicleInsurencePaymentData,
   sendVehicleInsurenceData,
@@ -11,7 +12,7 @@ import {
 
 const VehicleInsuranceClaming = () => {
   const [formData, setFormData] = useState({
-    formId:"DM-VIC-11",
+    formId: "DM-VIC-11",
     title: "",
     name: "",
     relation: "",
@@ -45,18 +46,143 @@ const VehicleInsuranceClaming = () => {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [userName, setUserName] = useState();
+  const [validationError, setValidationError] = useState(""); // Add validation error state
+  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Clear error notification when user starts typing
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
 
+  // Add form validation function
+  const validateForm = () => {
+    if (!formData.title.trim()) {
+      setValidationError("Please select your title");
+      return false;
+    }
+
+    if (!formData.name.trim()) {
+      setValidationError("Please enter your full name");
+      return false;
+    }
+
+    if (!formData.relation.trim()) {
+      setValidationError("Please enter your relation");
+      return false;
+    }
+
+    if (!formData.age.trim()) {
+      setValidationError("Please enter your age");
+      return false;
+    } else if (isNaN(formData.age) || parseInt(formData.age) <= 0) {
+      setValidationError("Please enter a valid age");
+      return false;
+    }
+
+    if (!formData.address.trim()) {
+      setValidationError("Please enter your address");
+      return false;
+    }
+
+    if (!formData.aadhaarNo.trim()) {
+      setValidationError("Please enter your Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.aadhaarNo)) {
+      setValidationError("Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    if (!formData.vehicleNo.trim()) {
+      setValidationError("Please enter your vehicle number");
+      return false;
+    }
+
+    if (!formData.vehicleModel.trim()) {
+      setValidationError("Please enter your vehicle model");
+      return false;
+    }
+
+    if (!formData.engineNo.trim()) {
+      setValidationError("Please enter your engine number");
+      return false;
+    }
+
+    if (!formData.chassisNo.trim()) {
+      setValidationError("Please enter your chassis number");
+      return false;
+    }
+
+    if (!formData.insurer.trim()) {
+      setValidationError("Please enter your insurer name");
+      return false;
+    }
+
+    if (!formData.policyNo.trim()) {
+      setValidationError("Please enter your policy number");
+      return false;
+    }
+
+    if (!formData.policyStart.trim()) {
+      setValidationError("Please enter your policy start date");
+      return false;
+    }
+
+    if (!formData.policyEnd.trim()) {
+      setValidationError("Please enter your policy end date");
+      return false;
+    }
+
+    if (!formData.driverName.trim()) {
+      setValidationError("Please enter driver's name");
+      return false;
+    }
+
+    if (!formData.accidentDetails.trim()) {
+      setValidationError("Please enter accident details");
+      return false;
+    }
+
+    if (!formData.place.trim()) {
+      setValidationError("Please enter the place");
+      return false;
+    }
+
+    if (
+      !formData.day.trim() ||
+      !formData.month.trim() ||
+      !formData.year.trim()
+    ) {
+      setValidationError("Please enter the complete date");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    setShowMobileModal(true);
+
+    // Validate form before showing mobile modal
+    if (validateForm()) {
+      setShowMobileModal(true);
+    } else {
+      setShowErrorNotification(true);
+      // Auto-hide the error notification after 5 seconds
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+    }
   };
 
   const handleMobileSubmit = async () => {
@@ -80,6 +206,7 @@ const VehicleInsuranceClaming = () => {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
+        userName,
       };
 
       const response = await sendVehicleInsurenceData(dataWithMobile);
@@ -194,10 +321,11 @@ const VehicleInsuranceClaming = () => {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
+            userName: userName,
           });
         },
         prefill: {
-          name: formData.fullName,
+          name: userName,
           contact: mobileNumber,
         },
         notes: {
@@ -229,6 +357,7 @@ const VehicleInsuranceClaming = () => {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
+            userName: userName,
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -261,6 +390,7 @@ const VehicleInsuranceClaming = () => {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
+        userName: userName,
       };
 
       const confirmationResponse = await createVehicleInsurencePaymentData(
@@ -290,6 +420,14 @@ const VehicleInsuranceClaming = () => {
       <h1 className="text-3xl font-bold text-center mb-6">
         Vehicle Insurance Form
       </h1>
+
+      {/* Add Error Notification Component */}
+      {showErrorNotification && validationError && (
+        <ErrorNoification
+          validationError={validationError}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Left column: Form */}
@@ -353,6 +491,8 @@ const VehicleInsuranceClaming = () => {
         setMobileNumber={setMobileNumber}
         mobileError={mobileError}
         handleMobileSubmit={handleMobileSubmit}
+        username={userName}
+        setUsername={setUserName}
       />
       {showServiceOptionsModal && (
         <ServicePackageNotification

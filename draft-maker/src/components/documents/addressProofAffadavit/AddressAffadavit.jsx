@@ -8,10 +8,11 @@ import {
   createAddressAffadavitPaymentData,
   sendAddressAffadavitData,
 } from "../../../api/service/axiosService";
+import ErrorNoification from "../serviceNotification/ErrorNoification";
 
 const AddressAffidavit = () => {
   const [formData, setFormData] = useState({
-    formId:"DM-AAF-16",
+    formId: "DM-AAF-16",
     name: "",
     gender: "",
     age: "",
@@ -40,6 +41,8 @@ const AddressAffidavit = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
+  const [validationError, setValidationError] = useState("");
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -49,11 +52,16 @@ const AddressAffidavit = () => {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [userName, setUserName] = useState();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Handle nested objects (addresses)
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+
     if (name.includes(".")) {
       const [parent, child] = name.split(".");
       setFormData((prevState) => ({
@@ -71,10 +79,115 @@ const AddressAffidavit = () => {
     }
   };
 
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      setValidationError("Please enter your name");
+      return false;
+    }
+
+    if (!formData.gender) {
+      setValidationError("Please select your gender");
+      return false;
+    }
+
+    if (!formData.age.trim()) {
+      setValidationError("Please enter your age");
+      return false;
+    } else if (isNaN(formData.age) || parseInt(formData.age) <= 0) {
+      setValidationError("Please enter a valid age");
+      return false;
+    }
+
+    if (!formData.relatedPersonName.trim()) {
+      setValidationError("Please enter your father's/husband's name");
+      return false;
+    }
+
+    if (!formData.permanentAddress.line1.trim()) {
+      setValidationError("Please enter your permanent address line 1");
+      return false;
+    }
+
+    if (!formData.permanentAddress.city.trim()) {
+      setValidationError("Please enter your permanent address city");
+      return false;
+    }
+
+    if (!formData.permanentAddress.state.trim()) {
+      setValidationError("Please enter your permanent address state");
+      return false;
+    }
+
+    if (!formData.permanentAddress.pinCode.trim()) {
+      setValidationError("Please enter your permanent address pin code");
+      return false;
+    } else if (!/^\d{6}$/.test(formData.permanentAddress.pinCode)) {
+      setValidationError("Permanent address pin code must be 6 digits");
+      return false;
+    }
+
+    if (!formData.presentAddress.line1.trim()) {
+      setValidationError("Please enter your present address line 1");
+      return false;
+    }
+
+    if (!formData.presentAddress.city.trim()) {
+      setValidationError("Please enter your present address city");
+      return false;
+    }
+
+    if (!formData.presentAddress.state.trim()) {
+      setValidationError("Please enter your present address state");
+      return false;
+    }
+
+    if (!formData.presentAddress.pinCode.trim()) {
+      setValidationError("Please enter your present address pin code");
+      return false;
+    } else if (!/^\d{6}$/.test(formData.presentAddress.pinCode)) {
+      setValidationError("Present address pin code must be 6 digits");
+      return false;
+    }
+
+    if (!formData.aadhaarNo.trim()) {
+      setValidationError("Please enter your Aadhaar number");
+      return false;
+    }
+
+    if (!formData.currentResidenceAddress.trim()) {
+      setValidationError("Please enter your current residence address");
+      return false;
+    }
+
+    if (!formData.purposeOfAffidavit.trim()) {
+      setValidationError("Please enter the purpose of this affidavit");
+      return false;
+    }
+
+    if (!formData.date) {
+      setValidationError("Please select a date");
+      return false;
+    }
+
+    if (!formData.place.trim()) {
+      setValidationError("Please enter the place");
+      return false;
+    }
+
+    return true;
+  };
 
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    setShowMobileModal(true);
+
+    if (validateForm()) {
+      setShowMobileModal(true);
+    } else {
+      setShowErrorNotification(true);
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+    }
   };
 
   const handleMobileSubmit = async () => {
@@ -98,6 +211,7 @@ const AddressAffidavit = () => {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
+        userName,
       };
 
       const response = await sendAddressAffadavitData(dataWithMobile);
@@ -211,10 +325,11 @@ const AddressAffidavit = () => {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
+            userName: userName,
           });
         },
         prefill: {
-          name: formData.fullName,
+          name: userName,
           contact: mobileNumber,
         },
         notes: {
@@ -245,6 +360,7 @@ const AddressAffidavit = () => {
             bookingId: bookingId,
             mobileNumber: mobileNumber,
             serviceType: service.id,
+            userName: userName,
             status: "failed",
           }),
         }).catch((error) => {
@@ -278,6 +394,7 @@ const AddressAffidavit = () => {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
+        userName: userName,
       };
 
       const confirmationResponse = await createAddressAffadavitPaymentData(
@@ -304,6 +421,13 @@ const AddressAffidavit = () => {
 
   return (
     <div className="container-fluid mx-auto py-8 px-4">
+      {showErrorNotification && validationError && (
+        <ErrorNoification
+          validationError={validationError}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <AddressAffidavitForm
@@ -365,6 +489,8 @@ const AddressAffidavit = () => {
         setMobileNumber={setMobileNumber}
         mobileError={mobileError}
         handleMobileSubmit={handleMobileSubmit}
+        username={userName}
+        setUsername={setUserName}
       />
       {showServiceOptionsModal && (
         <ServicePackageNotification

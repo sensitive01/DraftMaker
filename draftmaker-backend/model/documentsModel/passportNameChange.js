@@ -67,6 +67,9 @@ const nameChangeSchema = new mongoose.Schema(
     mobileNumber: {
       type: String,
     },
+    userName: {
+      type: String,
+    },
     doumentStatus: {
       type: String,
       default: "Pending",

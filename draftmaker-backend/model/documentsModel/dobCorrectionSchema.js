@@ -65,6 +65,9 @@ const dobCorrectionSchema = new mongoose.Schema(
       type: String,
       default: "Pending",
     },
+    userName: {
+      type: String,
+    },
     paymentStatus: {
       type: String,
       default: "Pending",

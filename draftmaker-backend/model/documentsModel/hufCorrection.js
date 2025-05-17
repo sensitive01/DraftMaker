@@ -83,6 +83,9 @@ const hufDeclarationSchema = new mongoose.Schema(
       type: String,
       default: "Pending",
     },
+    userName: {
+      type: String,
+    },
     documentType: {
       type: String,
     },

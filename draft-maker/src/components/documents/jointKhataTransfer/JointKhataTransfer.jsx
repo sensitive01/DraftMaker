@@ -4,6 +4,7 @@ import JoinKhataTransferPreview from "./JoinKhataTransferPreview";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
+import ErrorNotification from "../serviceNotification/ErrorNoification"; // Import the error notification component
 import {
   sendKhataCorrectionData,
   updateKhataCorrectionPaymentData,
@@ -11,7 +12,7 @@ import {
 
 const JointKhataTransfer = () => {
   const [formData, setFormData] = useState({
-    formId:"DM-KH-10",
+    formId: "DM-KH-10",
     // First applicant
     name1: "",
     relation1: "",
@@ -46,6 +47,8 @@ const JointKhataTransfer = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
+  const [validationError, setValidationError] = useState(""); // Add validation error state
+  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -55,17 +58,165 @@ const JointKhataTransfer = () => {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [userName, setUserName] = useState();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Clear error notification when user starts typing
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+    
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   };
+
+  // Add form validation function
+  const validateForm = () => {
+    // Validate first applicant details
+    if (!formData.name1.trim()) {
+      setValidationError("Please enter the first applicant's name");
+      return false;
+    }
+
+    if (!formData.relation1.trim()) {
+      setValidationError("Please enter the first applicant's relation");
+      return false;
+    }
+
+    if (!formData.age1.trim()) {
+      setValidationError("Please enter the first applicant's age");
+      return false;
+    } else if (isNaN(formData.age1) || parseInt(formData.age1) <= 0) {
+      setValidationError("Please enter a valid age for the first applicant");
+      return false;
+    }
+
+    if (!formData.address1.trim()) {
+      setValidationError("Please enter the first applicant's address");
+      return false;
+    }
+
+    if (!formData.aadhaar1.trim()) {
+      setValidationError("Please enter the first applicant's Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.aadhaar1)) {
+      setValidationError("First applicant's Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    // Validate second applicant details
+    if (!formData.name2.trim()) {
+      setValidationError("Please enter the second applicant's name");
+      return false;
+    }
+
+    if (!formData.relation2.trim()) {
+      setValidationError("Please enter the second applicant's relation");
+      return false;
+    }
+
+    if (!formData.age2.trim()) {
+      setValidationError("Please enter the second applicant's age");
+      return false;
+    } else if (isNaN(formData.age2) || parseInt(formData.age2) <= 0) {
+      setValidationError("Please enter a valid age for the second applicant");
+      return false;
+    }
+
+    if (!formData.address2.trim()) {
+      setValidationError("Please enter the second applicant's address");
+      return false;
+    }
+
+    if (!formData.aadhaar2.trim()) {
+      setValidationError("Please enter the second applicant's Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.aadhaar2)) {
+      setValidationError("Second applicant's Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    // Validate property details
+    if (!formData.propertyAddress.trim()) {
+      setValidationError("Please enter the property address");
+      return false;
+    }
+
+    if (!formData.wardNumber.trim()) {
+      setValidationError("Please enter the ward number");
+      return false;
+    }
+
+    if (!formData.zone.trim()) {
+      setValidationError("Please enter the zone");
+      return false;
+    }
+
+    if (!formData.khataNo.trim()) {
+      setValidationError("Please enter the Khata number");
+      return false;
+    }
+
+    if (!formData.sasNumber.trim()) {
+      setValidationError("Please enter the SAS number");
+      return false;
+    }
+
+    // Validate authorized person
+    if (!formData.authorizedPerson.trim()) {
+      setValidationError("Please select an authorized person");
+      return false;
+    }
+
+    // Validate verification details
+    if (!formData.place.trim()) {
+      setValidationError("Please enter the place");
+      return false;
+    }
+
+    if (!formData.day.trim()) {
+      setValidationError("Please enter the day");
+      return false;
+    } else if (
+      isNaN(formData.day) ||
+      parseInt(formData.day) <= 0 ||
+      parseInt(formData.day) > 31
+    ) {
+      setValidationError("Please enter a valid day (1-31)");
+      return false;
+    }
+
+    if (!formData.month.trim()) {
+      setValidationError("Please select a month");
+      return false;
+    }
+
+    if (!formData.year.trim()) {
+      setValidationError("Please enter the year");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    setShowMobileModal(true);
+    
+    // Validate form before showing mobile modal
+    if (validateForm()) {
+      setShowMobileModal(true);
+    } else {
+      setShowErrorNotification(true);
+      // Auto-hide the error notification after 5 seconds
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+    }
   };
 
   const handleMobileSubmit = async () => {
@@ -89,6 +240,7 @@ const JointKhataTransfer = () => {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
+        userName
       };
 
       const response = await sendKhataCorrectionData(dataWithMobile);
@@ -198,15 +350,16 @@ const JointKhataTransfer = () => {
             bookingId: bookingId,
             mobileNumber: mobileNumber,
             documentType: documentDetails.documentType,
-            fullName: formData.fullName,
+            fullName: formData.name1, // Using first applicant's name
             serviceType: service.id,
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
+            userName: userName
           });
         },
         prefill: {
-          name: formData.fullName,
+          name: userName,
           contact: mobileNumber,
         },
         notes: {
@@ -238,6 +391,7 @@ const JointKhataTransfer = () => {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
+            userName: userName
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -264,12 +418,13 @@ const JointKhataTransfer = () => {
         bookingId: paymentData.bookingId,
         mobileNumber: paymentData.mobileNumber,
         documentType: documentDetails.documentType,
-        fullName: formData.fullName,
+        fullName: formData.name1, // Using first applicant's name
         serviceType: paymentData.serviceType,
         serviceName: paymentData.serviceName,
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
+        userName: userName
       };
 
       const confirmationResponse = await updateKhataCorrectionPaymentData(
@@ -296,6 +451,14 @@ const JointKhataTransfer = () => {
 
   return (
     <div className="container-fluid mx-auto p-4 bg-gray-50 min-h-screen">
+      {/* Add Error Notification Component */}
+      {showErrorNotification && validationError && (
+        <ErrorNotification
+          validationError={validationError}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
+      
       <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
         Joint Khata Transfer Application
       </h1>
@@ -362,13 +525,15 @@ const JointKhataTransfer = () => {
         setMobileNumber={setMobileNumber}
         mobileError={mobileError}
         handleMobileSubmit={handleMobileSubmit}
+        username={userName}
+        setUsername={setUserName}
       />
       {showServiceOptionsModal && (
         <ServicePackageNotification
           setShowServiceOptionsModal={setShowServiceOptionsModal}
           bookingId={bookingId}
           mobileNumber={mobileNumber}
-          documentName={"Dual Name Change"}
+          documentName={"Joint Khata Transfer"}
           getServiceOptions={getServiceOptions}
           handleServiceSelection={handleServiceSelection}
         />

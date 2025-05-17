@@ -38,14 +38,7 @@ const BookingTable = () => {
         const formattedBookings = response.data.data.map((booking) => ({
           _id: booking._id,
           id: booking.bookingId || "",
-          name:
-            booking.fullName ||
-            booking.lesseeName ||
-            booking.name ||
-            booking.name1 ||
-            booking.ownerName ||
-            booking.parentName ||
-            booking.personName || "Unknown",
+          name:booking.userName|| "Unknown",
           phoneNumber: booking.mobileNumber || "",
           status: booking.doumentStatus || "",
           paymentId: booking.paymentDetails?.paymentId || "",

@@ -4,6 +4,7 @@ import BirtCertificateParentNameCorrectionPreview from "./BirtCertificateParentN
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
+import ErrorNoification from "../serviceNotification/ErrorNoification";
 import {
   createDobParentNameCorrectionPaymentData,
   dobParentNameCorrectionData,
@@ -12,7 +13,7 @@ import {
 // Main Page Component containing both form and preview
 export default function BirthCertificateParentNameCorrectionPage() {
   const [formData, setFormData] = useState({
-    formId:"DM-BCNCP-6",
+    formId: "DM-BCNCP-6",
     fatherTitle: "Mr.",
     fatherName: "",
     motherTitle: "Mrs.",
@@ -34,6 +35,8 @@ export default function BirthCertificateParentNameCorrectionPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
+  const [validationError, setValidationError] = useState(""); // Added for validation errors
+  const [showErrorNotification, setShowErrorNotification] = useState(false); // Added to control error notification visibility
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -43,15 +46,118 @@ export default function BirthCertificateParentNameCorrectionPage() {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [userName, setUserName] = useState();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Clear error notifications when user makes changes
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+    
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Validation function - checks all required fields
+  const validateForm = () => {
+    // Father validation
+    if (!formData.fatherName.trim()) {
+      setValidationError("Please enter father's name");
+      return false;
+    }
+
+    // Mother validation
+    if (!formData.motherName.trim()) {
+      setValidationError("Please enter mother's name");
+      return false;
+    }
+
+    // Address validation
+    if (!formData.address.trim()) {
+      setValidationError("Please enter your address");
+      return false;
+    }
+
+    // Aadhaar validation - can add pattern validation if needed
+    if (!formData.fatherAadhaar.trim()) {
+      setValidationError("Please enter father's Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.fatherAadhaar)) {
+      setValidationError("Father's Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    if (!formData.motherAadhaar.trim()) {
+      setValidationError("Please enter mother's Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.motherAadhaar)) {
+      setValidationError("Mother's Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    // Child details validation
+    if (!formData.childName.trim()) {
+      setValidationError("Please enter child's name");
+      return false;
+    }
+
+    // Certificate validation
+    if (!formData.certificateNumber.trim()) {
+      setValidationError("Please enter birth certificate number");
+      return false;
+    }
+
+    // Name correction validation
+    if (!formData.incorrectFatherName.trim()) {
+      setValidationError("Please enter incorrect father's name as printed on certificate");
+      return false;
+    }
+
+    if (!formData.incorrectMotherName.trim()) {
+      setValidationError("Please enter incorrect mother's name as printed on certificate");
+      return false;
+    }
+
+    if (!formData.correctFatherName.trim()) {
+      setValidationError("Please enter correct father's name");
+      return false;
+    }
+
+    if (!formData.correctMotherName.trim()) {
+      setValidationError("Please enter correct mother's name");
+      return false;
+    }
+
+    // Date and place validation
+    if (!formData.place.trim()) {
+      setValidationError("Please enter the place");
+      return false;
+    }
+
+    if (!formData.day) {
+      setValidationError("Please select a day");
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    setShowMobileModal(true);
+    
+    // First validate the form
+    if (validateForm()) {
+      setShowMobileModal(true);
+    } else {
+      // Show error notification
+      setShowErrorNotification(true);
+      // Auto-hide notification after 5 seconds
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+    }
   };
 
   const handleMobileSubmit = async () => {
@@ -75,6 +181,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
+        userName
       };
 
       const response = await dobParentNameCorrectionData(dataWithMobile);
@@ -189,10 +296,11 @@ export default function BirthCertificateParentNameCorrectionPage() {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
+            userName:userName
           });
         },
         prefill: {
-          name: formData.fullName,
+          name: userName,
           contact: mobileNumber,
         },
         notes: {
@@ -224,6 +332,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
+            userName:userName
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -255,6 +364,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
         serviceName: paymentData.serviceName,
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
+        userName:userName,
         status: "success",
       };
 
@@ -281,12 +391,19 @@ export default function BirthCertificateParentNameCorrectionPage() {
 
   return (
     <div className="container-fluid mx-auto p-4 bg-gray-50 min-h-screen">
+      {/* Error notification component */}
+      {showErrorNotification && validationError && (
+        <ErrorNoification
+          validationError={validationError}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
+      
       <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
         Birth Certificate Parents' Name Correction
       </h1>
 
       <div className="grid md:grid-cols-2 gap-8">
-        {/* Left column: Form */}
         <div className="print:hidden">
           <BirthCertificateParentNameCorrectionForm
             formData={formData}
@@ -299,7 +416,6 @@ export default function BirthCertificateParentNameCorrectionPage() {
           )}
         </div>
 
-        {/* Right column: Preview */}
         <div>
           <BirtCertificateParentNameCorrectionPreview formData={formData} />
         </div>
@@ -347,6 +463,8 @@ export default function BirthCertificateParentNameCorrectionPage() {
         setMobileNumber={setMobileNumber}
         mobileError={mobileError}
         handleMobileSubmit={handleMobileSubmit}
+        username={userName}
+        setUsername={setUserName}
       />
       {showServiceOptionsModal && (
         <ServicePackageNotification

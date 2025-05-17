@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
+import ErrorNotification from "../serviceNotification/ErrorNoification"; // Import the error notification component
 import {
   createCommercialPaymentData,
   sendCommercialData,
@@ -33,7 +34,6 @@ export default function CommercialAggrement() {
     rentDueDate: "5", // Default is 5th of every month
     depositAmount: "",
     depositAmountWords: "",
-    paymentMode: "", // Cash/Online
     agreementStartDate: "",
     agreementEndDate: "", // Optional: can calculate or allow user input
     rentIncreasePercentage: "",
@@ -51,6 +51,8 @@ export default function CommercialAggrement() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
+  const [validationError, setValidationError] = useState(""); // Add validation error state
+  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -60,9 +62,17 @@ export default function CommercialAggrement() {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [userName, setUserName] = useState();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Clear error notification when user starts typing
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+    
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -70,12 +80,146 @@ export default function CommercialAggrement() {
   };
 
   const handleFixtureChange = (index, field, value) => {
+    // Clear error notification when user modifies fixtures
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+    
     const updatedFixtures = [...formData.fixtures];
     updatedFixtures[index] = { ...updatedFixtures[index], [field]: value };
     setFormData((prev) => ({
       ...prev,
       fixtures: updatedFixtures,
     }));
+  };
+
+  // Add form validation function
+  const validateForm = () => {
+    // Lessor details validation
+    if (!formData.lessorName.trim()) {
+      setValidationError("Please enter lessor's name");
+      return false;
+    }
+
+    if (!formData.lessorAddressLine1.trim()) {
+      setValidationError("Please enter lessor's address");
+      return false;
+    }
+
+    if (!formData.lessorCity.trim()) {
+      setValidationError("Please enter lessor's city");
+      return false;
+    }
+
+    if (!formData.lessorState.trim()) {
+      setValidationError("Please enter lessor's state");
+      return false;
+    }
+
+    if (!formData.lessorPinCode.trim()) {
+      setValidationError("Please enter lessor's PIN code");
+      return false;
+    } else if (!/^\d{6}$/.test(formData.lessorPinCode)) {
+      setValidationError("Lessor's PIN code must be 6 digits");
+      return false;
+    }
+
+    // Lessee details validation
+    if (!formData.lesseeName.trim()) {
+      setValidationError("Please enter lessee's name");
+      return false;
+    }
+
+    if (!formData.lesseeAadhaar.trim()) {
+      setValidationError("Please enter lessee's Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.lesseeAadhaar)) {
+      setValidationError("Lessee's Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    if (!formData.lesseePermanentAddressLine1.trim()) {
+      setValidationError("Please enter lessee's permanent address");
+      return false;
+    }
+
+    if (!formData.lesseePermanentCity.trim()) {
+      setValidationError("Please enter lessee's city");
+      return false;
+    }
+
+    if (!formData.lesseePermanentState.trim()) {
+      setValidationError("Please enter lessee's state");
+      return false;
+    }
+
+    if (!formData.lesseePermanentPinCode.trim()) {
+      setValidationError("Please enter lessee's PIN code");
+      return false;
+    } else if (!/^\d{6}$/.test(formData.lesseePermanentPinCode)) {
+      setValidationError("Lessee's PIN code must be 6 digits");
+      return false;
+    }
+
+    // Agreement details validation
+    if (!formData.rentAmount.trim()) {
+      setValidationError("Please enter rent amount");
+      return false;
+    } else if (isNaN(formData.rentAmount) || parseFloat(formData.rentAmount) <= 0) {
+      setValidationError("Please enter a valid rent amount");
+      return false;
+    }
+
+    if (!formData.rentAmountWords.trim()) {
+      setValidationError("Please enter rent amount in words");
+      return false;
+    }
+
+    if (!formData.depositAmount.trim()) {
+      setValidationError("Please enter deposit amount");
+      return false;
+    } else if (isNaN(formData.depositAmount) || parseFloat(formData.depositAmount) <= 0) {
+      setValidationError("Please enter a valid deposit amount");
+      return false;
+    }
+
+    if (!formData.depositAmountWords.trim()) {
+      setValidationError("Please enter deposit amount in words");
+      return false;
+    }
+
+    if (!formData.bhkConfig.trim()) {
+      setValidationError("Please select BHK configuration");
+      return false;
+    }
+
+    if (!formData.agreementDate.trim()) {
+      setValidationError("Please enter agreement date");
+      return false;
+    }
+
+
+
+    if (!formData.noticePeriod.trim()) {
+      setValidationError("Please enter notice period");
+      return false;
+    } else if (isNaN(formData.noticePeriod) || parseInt(formData.noticePeriod) <= 0) {
+      setValidationError("Please enter a valid notice period in months");
+      return false;
+    }
+
+    // Check if at least one fixture is properly filled
+    const hasValidFixture = formData.fixtures.some(
+      fixture => fixture.item.trim() && fixture.quantity.trim()
+    );
+
+    if (formData.fixtures.length > 0 && !hasValidFixture) {
+      setValidationError("Please enter at least one fixture item and quantity or remove empty entries");
+      return false;
+    }
+
+    return true;
   };
 
   const addFixture = () => {
@@ -95,7 +239,17 @@ export default function CommercialAggrement() {
 
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    setShowMobileModal(true);
+    
+    // Validate form before showing mobile modal
+    if (validateForm()) {
+      setShowMobileModal(true);
+    } else {
+      setShowErrorNotification(true);
+      // Auto-hide the error notification after 5 seconds
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+    }
   };
 
   const handleMobileSubmit = async () => {
@@ -119,6 +273,7 @@ export default function CommercialAggrement() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
+        userName
       };
 
       const response = await sendCommercialData(dataWithMobile);
@@ -232,10 +387,11 @@ export default function CommercialAggrement() {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
+            userName: userName
           });
         },
         prefill: {
-          name: formData.fullName,
+          name: userName,
           contact: mobileNumber,
         },
         notes: {
@@ -267,6 +423,7 @@ export default function CommercialAggrement() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
+            userName: userName
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -299,6 +456,7 @@ export default function CommercialAggrement() {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
+        userName: userName
       };
 
       const confirmationResponse = await createCommercialPaymentData(
@@ -325,6 +483,14 @@ export default function CommercialAggrement() {
 
   return (
     <div className="container-fluid mx-auto p-4">
+      {/* Add Error Notification Component */}
+      {showErrorNotification && validationError && (
+        <ErrorNotification
+          validationError={validationError}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
+      
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-full md:w-1/2">
           <RentalForm
@@ -387,6 +553,8 @@ export default function CommercialAggrement() {
         setMobileNumber={setMobileNumber}
         mobileError={mobileError}
         handleMobileSubmit={handleMobileSubmit}
+        username={userName}
+        setUsername={setUserName}
       />
       {showServiceOptionsModal && (
         <ServicePackageNotification

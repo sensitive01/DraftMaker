@@ -4,6 +4,7 @@ import PassportNameChangePreview from "./PassportNameChangePreview";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
+import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
 import {
   createPassportnameChangePaymentData,
   sendPassportNameChangeData,
@@ -11,7 +12,7 @@ import {
 
 const PassportNameChange = () => {
   const [formData, setFormData] = useState({
-    formId:"DM-PNC-15",
+    formId: "DM-PNC-15",
     name: "",
     gender: "",
     age: "",
@@ -50,9 +51,18 @@ const PassportNameChange = () => {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [userName, setUserName] = useState();
+  const [validationError, setValidationError] = useState(""); // Add validation error state
+  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Clear error notification when user starts typing
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
 
     // Handle nested objects (addresses)
     if (name.includes(".")) {
@@ -72,9 +82,139 @@ const PassportNameChange = () => {
     }
   };
 
+  // Add form validation function
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      setValidationError("Please enter your full name");
+      return false;
+    }
+
+    if (!formData.gender.trim()) {
+      setValidationError("Please select your gender");
+      return false;
+    }
+
+    if (!formData.age.trim()) {
+      setValidationError("Please enter your age");
+      return false;
+    } else if (isNaN(formData.age) || parseInt(formData.age) <= 0) {
+      setValidationError("Please enter a valid age");
+      return false;
+    }
+
+    if (!formData.relatedPersonName.trim()) {
+      setValidationError("Please enter related person's name");
+      return false;
+    }
+
+    // Validate permanent address
+    if (!formData.permanentAddress.line1.trim()) {
+      setValidationError("Please enter your permanent address line 1");
+      return false;
+    }
+
+    if (!formData.permanentAddress.city.trim()) {
+      setValidationError("Please enter your permanent address city");
+      return false;
+    }
+
+    if (!formData.permanentAddress.state.trim()) {
+      setValidationError("Please enter your permanent address state");
+      return false;
+    }
+
+    if (!formData.permanentAddress.pinCode.trim()) {
+      setValidationError("Please enter your permanent address pin code");
+      return false;
+    } else if (!/^\d{6}$/.test(formData.permanentAddress.pinCode)) {
+      setValidationError("Pin code must be 6 digits");
+      return false;
+    }
+
+    // Validate present address
+    if (!formData.presentAddress.line1.trim()) {
+      setValidationError("Please enter your present address line 1");
+      return false;
+    }
+
+    if (!formData.presentAddress.city.trim()) {
+      setValidationError("Please enter your present address city");
+      return false;
+    }
+
+    if (!formData.presentAddress.state.trim()) {
+      setValidationError("Please enter your present address state");
+      return false;
+    }
+
+    if (!formData.presentAddress.pinCode.trim()) {
+      setValidationError("Please enter your present address pin code");
+      return false;
+    } else if (!/^\d{6}$/.test(formData.presentAddress.pinCode)) {
+      setValidationError("Pin code must be 6 digits");
+      return false;
+    }
+
+    if (!formData.aadhaarNo.trim()) {
+      setValidationError("Please enter Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.aadhaarNo)) {
+      setValidationError("Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    if (!formData.passportNo.trim()) {
+      setValidationError("Please enter passport number");
+      return false;
+    }
+
+    if (!formData.currentGivenName.trim()) {
+      setValidationError("Please enter your current given name");
+      return false;
+    }
+
+    if (!formData.currentSurname.trim()) {
+      setValidationError("Please enter your current surname");
+      return false;
+    }
+
+    if (!formData.newGivenName.trim()) {
+      setValidationError("Please enter your new given name");
+      return false;
+    }
+
+    if (!formData.newSurname.trim()) {
+      setValidationError("Please enter your new surname");
+      return false;
+    }
+
+    // Validate verification details
+    if (!formData.place.trim()) {
+      setValidationError("Please enter the place");
+      return false;
+    }
+
+    if (!formData.date.trim()) {
+      setValidationError("Please enter the date");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    setShowMobileModal(true);
+
+    // Validate form before showing mobile modal
+    if (validateForm()) {
+      setShowMobileModal(true);
+    } else {
+      setShowErrorNotification(true);
+      // Auto-hide the error notification after 5 seconds
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+    }
   };
 
   const handleMobileSubmit = async () => {
@@ -98,6 +238,7 @@ const PassportNameChange = () => {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
+        userName,
       };
 
       const response = await sendPassportNameChangeData(dataWithMobile);
@@ -212,10 +353,11 @@ const PassportNameChange = () => {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
+            userName: userName,
           });
         },
         prefill: {
-          name: formData.fullName,
+          name: userName,
           contact: mobileNumber,
         },
         notes: {
@@ -247,6 +389,7 @@ const PassportNameChange = () => {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
+            userName: userName,
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -279,6 +422,7 @@ const PassportNameChange = () => {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
+        userName: userName,
       };
 
       const confirmationResponse = await createPassportnameChangePaymentData(
@@ -308,6 +452,14 @@ const PassportNameChange = () => {
       <h1 className="text-3xl font-bold mb-8 text-center">
         Passport Name Change Affidavit Generator
       </h1>
+
+      {/* Add Error Notification Component */}
+      {showErrorNotification && validationError && (
+        <ErrorNoification
+          validationError={validationError}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
@@ -368,6 +520,8 @@ const PassportNameChange = () => {
         setMobileNumber={setMobileNumber}
         mobileError={mobileError}
         handleMobileSubmit={handleMobileSubmit}
+        username={userName}
+        setUsername={setUserName}
       />
       {showServiceOptionsModal && (
         <ServicePackageNotification

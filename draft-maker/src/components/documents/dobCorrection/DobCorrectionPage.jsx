@@ -4,6 +4,7 @@ import DobCorrectionPreview from "./DobCorrectionPreview";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
+import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
 import {
   createDobCorrectionPaymentData,
   sendDobCorrectionData,
@@ -11,7 +12,7 @@ import {
 
 export default function DobCorrectionPage() {
   const [formData, setFormData] = useState({
-    formId:"DM-DOBC-3",
+    formId: "DM-DOBC-3",
     fullName: "",
     relation: "S/o",
     relationName: "",
@@ -27,10 +28,12 @@ export default function DobCorrectionPage() {
     place: "",
     day: "",
     month: "",
-    year: "2024",
+    year: "2025",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
+  const [validationError, setValidationError] = useState(""); // Add validation error state
+  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -40,15 +43,126 @@ export default function DobCorrectionPage() {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [userName, setUserName] = useState();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Clear error notification when user starts typing
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+    
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Add form validation function
+  const validateForm = () => {
+    // Personal details validation
+    if (!formData.fullName.trim()) {
+      setValidationError("Please enter your full name");
+      return false;
+    }
+
+    if (!formData.relationName.trim()) {
+      setValidationError("Please enter relation name");
+      return false;
+    }
+
+    if (!formData.age.trim()) {
+      setValidationError("Please enter your age");
+      return false;
+    } else if (isNaN(formData.age) || parseInt(formData.age) <= 0) {
+      setValidationError("Please enter a valid age");
+      return false;
+    }
+
+    // Address validation
+    if (!formData.permanentAddress.trim()) {
+      setValidationError("Please enter your permanent address");
+      return false;
+    }
+
+    // Aadhaar validation
+    if (!formData.aadhaarNo.trim()) {
+      setValidationError("Please enter your Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.aadhaarNo)) {
+      setValidationError("Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    // DOB correction details validation
+    if (!formData.dob1.trim()) {
+      setValidationError("Please enter the incorrect date of birth");
+      return false;
+    }
+
+    if (!formData.document1.trim()) {
+      setValidationError("Please enter the document with incorrect DOB");
+      return false;
+    }
+
+    if (!formData.documentNo1.trim()) {
+      setValidationError("Please enter the document number for incorrect DOB");
+      return false;
+    }
+
+    if (!formData.dob2.trim()) {
+      setValidationError("Please enter the correct date of birth");
+      return false;
+    }
+
+    if (!formData.document2.trim()) {
+      setValidationError("Please enter the document with correct DOB");
+      return false;
+    }
+
+    if (!formData.documentNo2.trim()) {
+      setValidationError("Please enter the document number for correct DOB");
+      return false;
+    }
+
+    // Date and place validation
+    if (!formData.day.trim()) {
+      setValidationError("Please enter the day");
+      return false;
+    } else if (
+      isNaN(formData.day) ||
+      parseInt(formData.day) <= 0 ||
+      parseInt(formData.day) > 31
+    ) {
+      setValidationError("Please enter a valid day (1-31)");
+      return false;
+    }
+
+    if (!formData.month.trim()) {
+      setValidationError("Please select a month");
+      return false;
+    }
+
+    if (!formData.place.trim()) {
+      setValidationError("Please enter the place");
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    setShowMobileModal(true);
+    
+    // Validate form before showing mobile modal
+    if (validateForm()) {
+      setShowMobileModal(true);
+    } else {
+      setShowErrorNotification(true);
+      // Auto-hide the error notification after 5 seconds
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+    }
   };
 
   const handleMobileSubmit = async () => {
@@ -72,6 +186,7 @@ export default function DobCorrectionPage() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
+        userName
       };
 
       const response = await sendDobCorrectionData(dataWithMobile);
@@ -119,7 +234,6 @@ export default function DobCorrectionPage() {
       id: "draft_estamp_delivery",
       name: "Draft + E-stamp + Delivery",
       price: documentDetails.homeDropCharge || 0,
-
       hasNotary: documentDetails.hasHomeDropNotaryCharge,
       notaryCharge: documentDetails.homeDropNotaryCharge || 0,
       description: "Physical copy delivered to your address",
@@ -186,10 +300,11 @@ export default function DobCorrectionPage() {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
+            userName: userName
           });
         },
         prefill: {
-          name: formData.fullName,
+          name: userName,
           contact: mobileNumber,
         },
         notes: {
@@ -221,6 +336,7 @@ export default function DobCorrectionPage() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
+            userName: userName
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -253,6 +369,7 @@ export default function DobCorrectionPage() {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
+        userName: userName
       };
 
       const confirmationResponse = await createDobCorrectionPaymentData(
@@ -279,6 +396,18 @@ export default function DobCorrectionPage() {
 
   return (
     <div className="container-fluid mx-auto py-8">
+      {/* Add Error Notification Component */}
+      {showErrorNotification && validationError && (
+        <ErrorNoification
+          validationError={validationError}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
+      
+      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
+        Date of Birth Correction
+      </h1>
+      
       <div className="grid md:grid-cols-2 gap-8">
         {/* Left column: Form */}
         <div className="print:hidden">
@@ -338,6 +467,8 @@ export default function DobCorrectionPage() {
         setMobileNumber={setMobileNumber}
         mobileError={mobileError}
         handleMobileSubmit={handleMobileSubmit}
+        username={userName}
+        setUsername={setUserName}
       />
       {showServiceOptionsModal && (
         <ServicePackageNotification

@@ -4,6 +4,7 @@ import MetriculationPreview from "./MetriculationPreview";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
+import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
 import {
   createMetriculationLostPaymentData,
   sendMetriculationLostData,
@@ -11,7 +12,7 @@ import {
 
 const MatriculationPage = () => {
   const [formData, setFormData] = useState({
-    formId:"DM-MAL-9",
+    formId: "DM-MAL-9",
     // Personal details
     name: "",
     relation: "",
@@ -37,6 +38,8 @@ const MatriculationPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
+  const [validationError, setValidationError] = useState(""); // Add validation error state
+  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -46,17 +49,137 @@ const MatriculationPage = () => {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [userName, setUserName] = useState();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Clear error notification when user starts typing
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   };
+
+  // Add form validation function
+  const validateForm = () => {
+    // Validate personal details
+    if (!formData.name.trim()) {
+      setValidationError("Please enter your name");
+      return false;
+    }
+
+    if (!formData.relation.trim()) {
+      setValidationError("Please enter your relation");
+      return false;
+    }
+
+    if (!formData.age.trim()) {
+      setValidationError("Please enter your age");
+      return false;
+    } else if (isNaN(formData.age) || parseInt(formData.age) <= 0) {
+      setValidationError("Please enter a valid age");
+      return false;
+    }
+
+    if (!formData.address.trim()) {
+      setValidationError("Please enter your address");
+      return false;
+    }
+
+    if (!formData.aadhaar.trim()) {
+      setValidationError("Please enter Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.aadhaar)) {
+      setValidationError("Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    // Validate document details
+    if (!formData.year.trim()) {
+      setValidationError("Please enter the year");
+      return false;
+    }
+
+    if (!formData.semester.trim()) {
+      setValidationError("Please enter the semester");
+      return false;
+    }
+
+    if (!formData.program.trim()) {
+      setValidationError("Please enter the program");
+      return false;
+    }
+
+    if (!formData.authority.trim()) {
+      setValidationError("Please enter the authority");
+      return false;
+    }
+
+    if (!formData.collegeName.trim()) {
+      setValidationError("Please enter the college name");
+      return false;
+    }
+
+    if (!formData.batch.trim()) {
+      setValidationError("Please enter the batch");
+      return false;
+    }
+
+    if (!formData.regNumber.trim()) {
+      setValidationError("Please enter the registration number");
+      return false;
+    }
+
+    // Validate verification details
+    if (!formData.place.trim()) {
+      setValidationError("Please enter the place");
+      return false;
+    }
+
+    if (!formData.day.trim()) {
+      setValidationError("Please enter the day");
+      return false;
+    } else if (
+      isNaN(formData.day) ||
+      parseInt(formData.day) <= 0 ||
+      parseInt(formData.day) > 31
+    ) {
+      setValidationError("Please enter a valid day (1-31)");
+      return false;
+    }
+
+    if (!formData.month.trim()) {
+      setValidationError("Please select a month");
+      return false;
+    }
+
+    if (!formData.year_verification.trim()) {
+      setValidationError("Please enter the year");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    setShowMobileModal(true);
+
+    // Validate form before showing mobile modal
+    if (validateForm()) {
+      setShowMobileModal(true);
+    } else {
+      setShowErrorNotification(true);
+      // Auto-hide the error notification after 5 seconds
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+    }
   };
 
   const handleMobileSubmit = async () => {
@@ -80,6 +203,7 @@ const MatriculationPage = () => {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
+        userName,
       };
 
       const response = await sendMetriculationLostData(dataWithMobile);
@@ -189,15 +313,16 @@ const MatriculationPage = () => {
             bookingId: bookingId,
             mobileNumber: mobileNumber,
             documentType: documentDetails.documentType,
-            fullName: formData.fullName,
+            fullName: formData.name, // Changed from fullName to name to match formData structure
             serviceType: service.id,
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
+            userName: userName,
           });
         },
         prefill: {
-          name: formData.fullName,
+          name: userName,
           contact: mobileNumber,
         },
         notes: {
@@ -229,6 +354,7 @@ const MatriculationPage = () => {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
+            userName: userName,
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -255,12 +381,13 @@ const MatriculationPage = () => {
         bookingId: paymentData.bookingId,
         mobileNumber: paymentData.mobileNumber,
         documentType: documentDetails.documentType,
-        fullName: formData.fullName,
+        fullName: formData.name, // Changed from fullName to name to match formData structure
         serviceType: paymentData.serviceType,
         serviceName: paymentData.serviceName,
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
+        userName: userName,
       };
 
       const confirmationResponse = await createMetriculationLostPaymentData(
@@ -287,6 +414,14 @@ const MatriculationPage = () => {
 
   return (
     <div className="container-fluid mx-auto p-4 bg-gray-50 min-h-screen">
+      {/* Add Error Notification Component */}
+      {showErrorNotification && validationError && (
+        <ErrorNoification
+          validationError={validationError}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
+
       <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
         Matriculation Certificate Lost Affidavit
       </h1>
@@ -351,6 +486,8 @@ const MatriculationPage = () => {
         setMobileNumber={setMobileNumber}
         mobileError={mobileError}
         handleMobileSubmit={handleMobileSubmit}
+        username={userName}
+        setUsername={setUserName}
       />
       {showServiceOptionsModal && (
         <ServicePackageNotification

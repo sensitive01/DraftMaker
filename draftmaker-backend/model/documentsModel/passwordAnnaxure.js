@@ -103,6 +103,9 @@ const passportAffidavitSchema = new mongoose.Schema(
     formId: {
       type: String,
     },
+    userName: {
+      type: String,
+    },
     paymentStatus: {
       type: String,
       default: "Pending",

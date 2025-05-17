@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
+import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
 import {
   createRecidentailPaymentData,
   sendRecidentailData,
@@ -34,7 +35,6 @@ export default function RentalAgreementForm() {
     rentDueDate: "5", // Default is 5th of every month
     depositAmount: "",
     depositAmountWords: "",
-    paymentMode: "", // Cash/Online
     agreementStartDate: "",
     agreementEndDate: "", // Optional: can calculate or allow user input
     rentIncreasePercentage: "",
@@ -61,9 +61,19 @@ export default function RentalAgreementForm() {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [userName, setUserName] = useState();
+  const [validationError, setValidationError] = useState(""); // Add validation error state
+  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Clear error notification when user starts typing
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -71,6 +81,12 @@ export default function RentalAgreementForm() {
   };
 
   const handleFixtureChange = (index, field, value) => {
+    // Clear error notification when user starts typing
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+
     const updatedFixtures = [...formData.fixtures];
     updatedFixtures[index] = { ...updatedFixtures[index], [field]: value };
     setFormData((prev) => ({
@@ -94,9 +110,170 @@ export default function RentalAgreementForm() {
     }));
   };
 
+  // Add form validation function
+  const validateForm = () => {
+    if (!formData.agreementDate.trim()) {
+      setValidationError("Please enter the agreement date");
+      return false;
+    }
+
+    if (!formData.lessorName.trim()) {
+      setValidationError("Please enter lessor's name");
+      return false;
+    }
+
+    if (!formData.lessorAddressLine1.trim()) {
+      setValidationError("Please enter lessor's address line 1");
+      return false;
+    }
+
+    if (!formData.lessorCity.trim()) {
+      setValidationError("Please enter lessor's city");
+      return false;
+    }
+
+    if (!formData.lessorState.trim()) {
+      setValidationError("Please enter lessor's state");
+      return false;
+    }
+
+    if (!formData.lessorPinCode.trim()) {
+      setValidationError("Please enter lessor's PIN code");
+      return false;
+    } else if (!/^\d{6}$/.test(formData.lessorPinCode)) {
+      setValidationError("Lessor's PIN code must be 6 digits");
+      return false;
+    }
+
+    if (!formData.lesseeName.trim()) {
+      setValidationError("Please enter lessee's name");
+      return false;
+    }
+
+    if (!formData.lesseeAadhaar.trim()) {
+      setValidationError("Please enter lessee's Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.lesseeAadhaar)) {
+      setValidationError("Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    if (!formData.lesseePermanentAddressLine1.trim()) {
+      setValidationError("Please enter lessee's permanent address line 1");
+      return false;
+    }
+
+    if (!formData.lesseePermanentCity.trim()) {
+      setValidationError("Please enter lessee's permanent city");
+      return false;
+    }
+
+    if (!formData.lesseePermanentState.trim()) {
+      setValidationError("Please enter lessee's permanent state");
+      return false;
+    }
+
+    if (!formData.lesseePermanentPinCode.trim()) {
+      setValidationError("Please enter lessee's permanent PIN code");
+      return false;
+    } else if (!/^\d{6}$/.test(formData.lesseePermanentPinCode)) {
+      setValidationError("Lessee's permanent PIN code must be 6 digits");
+      return false;
+    }
+
+    if (!formData.rentAmount.trim()) {
+      setValidationError("Please enter rent amount");
+      return false;
+    } else if (
+      isNaN(formData.rentAmount) ||
+      parseFloat(formData.rentAmount) <= 0
+    ) {
+      setValidationError("Please enter a valid rent amount");
+      return false;
+    }
+
+    if (!formData.rentAmountWords.trim()) {
+      setValidationError("Please enter rent amount in words");
+      return false;
+    }
+
+    if (!formData.depositAmount.trim()) {
+      setValidationError("Please enter deposit amount");
+      return false;
+    } else if (
+      isNaN(formData.depositAmount) ||
+      parseFloat(formData.depositAmount) <= 0
+    ) {
+      setValidationError("Please enter a valid deposit amount");
+      return false;
+    }
+
+    if (!formData.depositAmountWords.trim()) {
+      setValidationError("Please enter deposit amount in words");
+      return false;
+    }
+
+
+
+
+    if (!formData.noticePeriod.trim()) {
+      setValidationError("Please enter notice period");
+      return false;
+    }
+
+    if (!formData.bhkConfig.trim()) {
+      setValidationError("Please enter BHK configuration");
+      return false;
+    }
+
+    if (!formData.bedroomCount.trim()) {
+      setValidationError("Please enter bedroom count");
+      return false;
+    } else if (
+      isNaN(formData.bedroomCount) ||
+      parseInt(formData.bedroomCount) < 0
+    ) {
+      setValidationError("Please enter a valid bedroom count");
+      return false;
+    }
+
+    if (!formData.hallCount.trim()) {
+      setValidationError("Please enter hall count");
+      return false;
+    } else if (isNaN(formData.hallCount) || parseInt(formData.hallCount) < 0) {
+      setValidationError("Please enter a valid hall count");
+      return false;
+    }
+
+
+
+    if (!formData.toiletCount.trim()) {
+      setValidationError("Please enter toilet count");
+      return false;
+    } else if (
+      isNaN(formData.toiletCount) ||
+      parseInt(formData.toiletCount) < 0
+    ) {
+      setValidationError("Please enter a valid toilet count");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    setShowMobileModal(true);
+
+    // Validate form before showing mobile modal
+    if (validateForm()) {
+      setShowMobileModal(true);
+    } else {
+      setShowErrorNotification(true);
+      // Auto-hide the error notification after 5 seconds
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+    }
   };
 
   const handleMobileSubmit = async () => {
@@ -120,6 +297,7 @@ export default function RentalAgreementForm() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
+        userName,
       };
 
       const response = await sendRecidentailData(dataWithMobile);
@@ -233,10 +411,11 @@ export default function RentalAgreementForm() {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
+            userName: userName,
           });
         },
         prefill: {
-          name: formData.fullName,
+          name: userName,
           contact: mobileNumber,
         },
         notes: {
@@ -268,6 +447,7 @@ export default function RentalAgreementForm() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
+            userName: userName,
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -300,6 +480,7 @@ export default function RentalAgreementForm() {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
+        userName: userName,
       };
 
       const confirmationResponse = await createRecidentailPaymentData(
@@ -326,6 +507,18 @@ export default function RentalAgreementForm() {
 
   return (
     <div className="container-fluid mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-8 text-center">
+        Rental Agreement Generator
+      </h1>
+
+      {/* Add Error Notification Component */}
+      {showErrorNotification && validationError && (
+        <ErrorNoification
+          validationError={validationError}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
+
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-full md:w-1/2">
           <RentalForm
@@ -388,6 +581,8 @@ export default function RentalAgreementForm() {
         setMobileNumber={setMobileNumber}
         mobileError={mobileError}
         handleMobileSubmit={handleMobileSubmit}
+        username={userName}
+        setUsername={setUserName}
       />
       {showServiceOptionsModal && (
         <ServicePackageNotification

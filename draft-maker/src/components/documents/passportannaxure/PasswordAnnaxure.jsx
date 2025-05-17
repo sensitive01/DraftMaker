@@ -4,6 +4,7 @@ import PassportAnnaxurePreview from "./PassportAnnaxurePreview";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
+import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
 import {
   createPasswordAnnaxurePaymentData,
   sendPasswordAnnaxureData,
@@ -12,7 +13,7 @@ import {
 export default function PasswordAnnaxure() {
   // Initialize state with default values
   const [formData, setFormData] = useState({
-    formId:"DM-PAF-14",
+    formId: "DM-PAF-14",
     name: "",
     relationType: "", // Changed from relationToName to relationType (dropdown)
     guardianName: "", // Added for guardian's name
@@ -52,9 +53,19 @@ export default function PasswordAnnaxure() {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [userName, setUserName] = useState();
+  const [validationError, setValidationError] = useState(""); // Add validation error state
+  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Clear error notification when user starts typing
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
@@ -62,6 +73,12 @@ export default function PasswordAnnaxure() {
   };
 
   const handleDetailChange = (field, value) => {
+    // Clear error notification when user changes details
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+
     setFormData((prevState) => ({
       ...prevState,
       [field]: value,
@@ -69,6 +86,12 @@ export default function PasswordAnnaxure() {
   };
 
   const handleResidenceChange = (index, field, value) => {
+    // Clear error notification when user changes residence details
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+
     const updatedResidences = [...formData.residences];
     updatedResidences[index] = {
       ...updatedResidences[index],
@@ -89,9 +112,81 @@ export default function PasswordAnnaxure() {
     }));
   };
 
+  // Add form validation function
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      setValidationError("Please enter your full name");
+      return false;
+    }
+
+    if (!formData.relationType.trim()) {
+      setValidationError("Please select a relation type");
+      return false;
+    }
+
+    if (!formData.guardianName.trim()) {
+      setValidationError("Please enter guardian name");
+      return false;
+    }
+
+    if (!formData.age.trim()) {
+      setValidationError("Please enter your age");
+      return false;
+    } else if (isNaN(formData.age) || parseInt(formData.age) <= 0) {
+      setValidationError("Please enter a valid age");
+      return false;
+    }
+
+    if (!formData.permanentAddress.trim()) {
+      setValidationError("Please enter your permanent address");
+      return false;
+    }
+
+    if (!formData.presentAddress.trim()) {
+      setValidationError("Please enter your present address");
+      return false;
+    }
+
+    if (!formData.aadhaarNo.trim()) {
+      setValidationError("Please enter Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.aadhaarNo)) {
+      setValidationError("Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    if (!formData.passportNo.trim()) {
+      setValidationError("Please enter passport number");
+      return false;
+    }
+
+    // Validate verification details
+    if (!formData.place.trim()) {
+      setValidationError("Please enter the place");
+      return false;
+    }
+
+    if (!formData.date.trim()) {
+      setValidationError("Please enter the date");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    setShowMobileModal(true);
+
+    // Validate form before showing mobile modal
+    if (validateForm()) {
+      setShowMobileModal(true);
+    } else {
+      setShowErrorNotification(true);
+      // Auto-hide the error notification after 5 seconds
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+    }
   };
 
   const handleMobileSubmit = async () => {
@@ -115,6 +210,7 @@ export default function PasswordAnnaxure() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
+        userName,
       };
 
       const response = await sendPasswordAnnaxureData(dataWithMobile);
@@ -224,15 +320,16 @@ export default function PasswordAnnaxure() {
             bookingId: bookingId,
             mobileNumber: mobileNumber,
             documentType: documentDetails.documentType,
-            fullName: formData.fullName,
+            fullName: formData.name,
             serviceType: service.id,
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
+            userName: userName,
           });
         },
         prefill: {
-          name: formData.fullName,
+          name: userName,
           contact: mobileNumber,
         },
         notes: {
@@ -264,6 +361,7 @@ export default function PasswordAnnaxure() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
+            userName: userName,
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -290,12 +388,13 @@ export default function PasswordAnnaxure() {
         bookingId: paymentData.bookingId,
         mobileNumber: paymentData.mobileNumber,
         documentType: documentDetails.documentType,
-        fullName: formData.fullName,
+        fullName: formData.name,
         serviceType: paymentData.serviceType,
         serviceName: paymentData.serviceName,
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
+        userName: userName,
       };
 
       const confirmationResponse = await createPasswordAnnaxurePaymentData(
@@ -325,6 +424,14 @@ export default function PasswordAnnaxure() {
       <h1 className="text-3xl font-bold text-center mb-6">
         Annexure F - Passport Declaration Form
       </h1>
+
+      {/* Add Error Notification Component */}
+      {showErrorNotification && validationError && (
+        <ErrorNoification
+          validationError={validationError}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Left column: Form */}
@@ -391,6 +498,8 @@ export default function PasswordAnnaxure() {
         setMobileNumber={setMobileNumber}
         mobileError={mobileError}
         handleMobileSubmit={handleMobileSubmit}
+        username={userName}
+        setUsername={setUserName}
       />
       {showServiceOptionsModal && (
         <ServicePackageNotification

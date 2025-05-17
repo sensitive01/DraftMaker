@@ -73,6 +73,9 @@ const gapCertificateSchema = new mongoose.Schema(
       type: String,
       default: "Pending",
     },
+    userName: {
+      type: String,
+    },
     paymentDetails: {
       paymentId: {
         type: String,

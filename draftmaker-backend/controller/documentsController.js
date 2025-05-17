@@ -109,7 +109,6 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -117,6 +116,7 @@ const getAllBookingData = async (req, res) => {
         bookingId: 1,
         documentType: 1,
         formId: 1,
+        userName:1
       }
     );
 
@@ -124,7 +124,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -138,7 +138,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -152,7 +152,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -166,7 +166,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        personName: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -180,7 +180,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        fullName: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -194,7 +194,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        parentName: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -208,7 +208,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        ownerName: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -222,7 +222,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        name: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -236,7 +236,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        name1: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -250,7 +250,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        name: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -265,7 +265,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        name: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -279,7 +279,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        name: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -294,7 +294,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        name: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -309,7 +309,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        name: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -324,7 +324,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        name: 1,
+        userName:1,
         documentType: 1,
         formId: 1,
         mobileNumber: 1,
@@ -342,7 +342,7 @@ const getAllBookingData = async (req, res) => {
       {
         paymentDetails: 1,
         mobileNumber: 1,
-        lesseeName: 1,
+        userName:1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
@@ -356,7 +356,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        lesseeName: 1,
+        userName:1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -584,9 +584,9 @@ const saveDualNameCorrection = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: formData.fullName,
       mobileNumber: formData.mobileNumber,
       documentDetails: documentName,
+      username: formData.userName,
     });
   } catch (err) {
     res.status(500).json({
@@ -725,9 +725,9 @@ const saveNameCorrection = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
+      username: document.userName,
     });
   } catch (err) {
     console.log("Error in create name correction", err);
@@ -832,7 +832,7 @@ const createDobCorrection = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -939,7 +939,7 @@ const createGasCorrection = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -1046,7 +1046,7 @@ const createDocumentLost = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -1151,7 +1151,7 @@ const createDobParentNameCorrection = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -1258,7 +1258,7 @@ const createBirthCertificateNameCorrection = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -1365,7 +1365,7 @@ const saveGstData = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -1472,7 +1472,7 @@ const createMetriculationLostData = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -1579,7 +1579,7 @@ const createKhataCorrectionData = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -1686,7 +1686,7 @@ const createVehicleInsurenceData = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -1793,7 +1793,7 @@ const createHufData = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -1900,7 +1900,7 @@ const createGapPeriodData = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -2007,7 +2007,7 @@ const createPasswordAnnaxureData = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -2114,7 +2114,7 @@ const createPassportNameChangeData = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -2221,7 +2221,7 @@ const createAdressAffadavitData = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -2328,7 +2328,7 @@ const createCommercialData = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });
@@ -2434,7 +2434,7 @@ const createRecidentialData = async (req, res) => {
       message: "Dual name correction data saved successfully",
       bookingId,
       documentType: documentName.documentType,
-      username: document.fullName,
+      username: document.userName,
       mobileNumber: document.mobileNumber,
       documentDetails: documentName,
     });

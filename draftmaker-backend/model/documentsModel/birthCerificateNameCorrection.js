@@ -1,11 +1,10 @@
-
 const mongoose = require("mongoose");
 
 const nameCorrectionFormSchema = new mongoose.Schema(
   {
     parentTitle: {
       type: String,
-      enum: ["Mr.", "Mrs.", "Dr.", "Shri"], 
+      enum: ["Mr.", "Mrs.", "Dr.", "Shri"],
       default: "Mr.",
     },
     parentName: {
@@ -70,11 +69,14 @@ const nameCorrectionFormSchema = new mongoose.Schema(
       type: String,
       default: "Pending",
     },
+    userName: {
+      type: String,
+    },
     paymentStatus: {
       type: String,
       default: "Pending",
     },
-        documentType: {
+    documentType: {
       type: String,
     },
     formId: {

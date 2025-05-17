@@ -4,6 +4,7 @@ import GasAffadavitPreview from "./GasAffadavitPreview";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
+import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
 import {
   createGassAffadavitPaymentData,
   sendGasCorrectionData,
@@ -11,7 +12,7 @@ import {
 
 export default function GasAffidavitForm() {
   const [formData, setFormData] = useState({
-    formId:"DM-GAS-5",
+    formId: "DM-GAS-5",
     fullName: "",
     relation: "S/o", // Default relation
     fatherName: "",
@@ -36,6 +37,8 @@ export default function GasAffidavitForm() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
+  const [validationError, setValidationError] = useState(""); // Add validation error state
+  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -45,14 +48,141 @@ export default function GasAffidavitForm() {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [userName, setUserName] = useState();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Clear error notification when user starts typing
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+    
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  // Add form validation function
+  const validateForm = () => {
+    // Personal details validation
+    if (!formData.fullName.trim()) {
+      setValidationError("Please enter your full name");
+      return false;
+    }
+
+    if (!formData.fatherName.trim()) {
+      setValidationError("Please enter father's/relation's name");
+      return false;
+    }
+
+    if (!formData.age.trim()) {
+      setValidationError("Please enter your age");
+      return false;
+    } else if (isNaN(formData.age) || parseInt(formData.age) <= 0) {
+      setValidationError("Please enter a valid age");
+      return false;
+    }
+
+    // Address validation
+    if (!formData.permanentAddress.trim()) {
+      setValidationError("Please enter your permanent address");
+      return false;
+    }
+
+    // Aadhaar validation
+    if (!formData.aadhaarNo.trim()) {
+      setValidationError("Please enter your Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.aadhaarNo)) {
+      setValidationError("Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    // Gas connection details validation
+    if (!formData.gasCompanyName.trim()) {
+      setValidationError("Please enter the gas company name");
+      return false;
+    }
+
+    if (!formData.serviceAddress.trim()) {
+      setValidationError("Please enter the service address");
+      return false;
+    }
+
+    if (!formData.connectionDate.trim()) {
+      setValidationError("Please enter the connection date");
+      return false;
+    }
+
+    if (!formData.consumerNumber.trim()) {
+      setValidationError("Please enter the consumer number");
+      return false;
+    }
+    
+    // Validation for subscription voucher
+    if (!formData.subscriptionVoucher.trim()) {
+      setValidationError("Please enter the subscription voucher details");
+      return false;
+    }
+    
+    // Validation for deposit amount
+    if (!formData.depositAmount.trim()) {
+      setValidationError("Please enter the deposit amount");
+      return false;
+    } else if (isNaN(formData.depositAmount) || parseFloat(formData.depositAmount) <= 0) {
+      setValidationError("Please enter a valid deposit amount");
+      return false;
+    }
+
+    if (formData.reason === "shifting" && !formData.previousAddress.trim()) {
+      setValidationError("Please enter your previous address");
+      return false;
+    }
+
+    // Date and place validation
+    if (!formData.day.trim()) {
+      setValidationError("Please enter the day");
+      return false;
+    } else if (
+      isNaN(formData.day) ||
+      parseInt(formData.day) <= 0 ||
+      parseInt(formData.day) > 31
+    ) {
+      setValidationError("Please enter a valid day (1-31)");
+      return false;
+    }
+
+    if (!formData.month.trim()) {
+      setValidationError("Please select a month");
+      return false;
+    }
+
+    if (!formData.year.trim()) {
+      setValidationError("Please enter the year");
+      return false;
+    }
+
+    if (!formData.place.trim()) {
+      setValidationError("Please enter the place");
+      return false;
+    }
+
+    return true;
+  };
+  
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    setShowMobileModal(true);
+    
+    // Validate form before showing mobile modal
+    if (validateForm()) {
+      setShowMobileModal(true);
+    } else {
+      setShowErrorNotification(true);
+      // Auto-hide the error notification after 5 seconds
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+    }
   };
 
   const handleMobileSubmit = async () => {
@@ -76,6 +206,7 @@ export default function GasAffidavitForm() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
+        userName
       };
 
       const response = await sendGasCorrectionData(dataWithMobile);
@@ -190,10 +321,11 @@ export default function GasAffidavitForm() {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
+            userName:userName
           });
         },
         prefill: {
-          name: formData.fullName,
+          name: userName,
           contact: mobileNumber,
         },
         notes: {
@@ -225,6 +357,7 @@ export default function GasAffidavitForm() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
+            userName:userName
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -257,6 +390,7 @@ export default function GasAffidavitForm() {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
+        userName:userName
       };
 
       const confirmationResponse = await createGassAffadavitPaymentData(
@@ -283,6 +417,14 @@ export default function GasAffidavitForm() {
 
   return (
     <div className="container-fluid mx-auto p-4 bg-gray-50 min-h-screen">
+      {/* Add Error Notification Component */}
+      {showErrorNotification && validationError && (
+        <ErrorNoification
+          validationError={validationError}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
+      
       <h1 className="text-2xl font-bold text-center mb-6">
         Document Loss Affidavit
       </h1>
@@ -346,6 +488,8 @@ export default function GasAffidavitForm() {
         setMobileNumber={setMobileNumber}
         mobileError={mobileError}
         handleMobileSubmit={handleMobileSubmit}
+        username={userName}
+        setUsername={setUserName}
       />
       {showServiceOptionsModal && (
         <ServicePackageNotification

@@ -4,6 +4,7 @@ import DocumentLostPreview from "./DocumentLostPreview";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
+import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
 import {
   createDocumentLostPaymentData,
   sendDocumentLostData,
@@ -12,7 +13,7 @@ import {
 // Main Page Component containing both form and preview
 export default function DocumentLostPage() {
   const [formData, setFormData] = useState({
-    formId:"DM-DOC-LOST-5",
+    formId: "DM-DOC-LOST-5",
     personTitle: "Mr.",
     personName: "",
     relationType: "S/o",
@@ -33,6 +34,8 @@ export default function DocumentLostPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
+  const [validationError, setValidationError] = useState(""); // Add validation error state
+  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -42,13 +45,134 @@ export default function DocumentLostPage() {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [userName, setUserName] = useState();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Clear error notification when user starts typing
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+    
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  // Add form validation function
+  const validateForm = () => {
+    // Personal details validation
+    if (!formData.personName.trim()) {
+      setValidationError("Please enter your full name");
+      return false;
+    }
+
+    if (!formData.relationName.trim()) {
+      setValidationError("Please enter relation name");
+      return false;
+    }
+
+    if (!formData.age.trim()) {
+      setValidationError("Please enter your age");
+      return false;
+    } else if (isNaN(formData.age) || parseInt(formData.age) <= 0) {
+      setValidationError("Please enter a valid age");
+      return false;
+    }
+
+    // Address validation
+    if (!formData.address.trim()) {
+      setValidationError("Please enter your address");
+      return false;
+    }
+
+    // Aadhaar validation
+    if (!formData.aadhaarNumber.trim()) {
+      setValidationError("Please enter your Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.aadhaarNumber)) {
+      setValidationError("Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    // Document details validation
+    if (!formData.documentType.trim()) {
+      setValidationError("Please enter the document type");
+      return false;
+    }
+
+    if (!formData.documentNumber.trim()) {
+      setValidationError("Please enter the document number");
+      return false;
+    }
+
+    // FIR details validation
+    if (!formData.firNumber.trim()) {
+      setValidationError("Please enter the FIR number");
+      return false;
+    }
+
+    if (!formData.firDay.trim()) {
+      setValidationError("Please enter the FIR day");
+      return false;
+    } else if (
+      isNaN(formData.firDay) ||
+      parseInt(formData.firDay) <= 0 ||
+      parseInt(formData.firDay) > 31
+    ) {
+      setValidationError("Please enter a valid day (1-31) for FIR date");
+      return false;
+    }
+
+    if (!formData.firMonth.trim()) {
+      setValidationError("Please select the FIR month");
+      return false;
+    }
+
+    if (!formData.firYear.trim()) {
+      setValidationError("Please enter the FIR year");
+      return false;
+    }
+
+    // Date and place validation
+    if (!formData.day.trim()) {
+      setValidationError("Please enter the day");
+      return false;
+    } else if (
+      isNaN(formData.day) ||
+      parseInt(formData.day) <= 0 ||
+      parseInt(formData.day) > 31
+    ) {
+      setValidationError("Please enter a valid day (1-31)");
+      return false;
+    }
+
+    if (!formData.month.trim()) {
+      setValidationError("Please select a month");
+      return false;
+    }
+
+    if (!formData.place.trim()) {
+      setValidationError("Please enter the place");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    setShowMobileModal(true);
+    
+    // Validate form before showing mobile modal
+    if (validateForm()) {
+      setShowMobileModal(true);
+    } else {
+      setShowErrorNotification(true);
+      // Auto-hide the error notification after 5 seconds
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+    }
   };
 
   const handleMobileSubmit = async () => {
@@ -72,6 +196,7 @@ export default function DocumentLostPage() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
+        userName
       };
 
       const response = await sendDocumentLostData(dataWithMobile);
@@ -186,10 +311,11 @@ export default function DocumentLostPage() {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
+            userName:userName
           });
         },
         prefill: {
-          name: formData.fullName,
+          name: userName,
           contact: mobileNumber,
         },
         notes: {
@@ -221,6 +347,7 @@ export default function DocumentLostPage() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
+            userName:userName
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -253,6 +380,7 @@ export default function DocumentLostPage() {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
+        userName:userName
       };
 
       const confirmationResponse = await createDocumentLostPaymentData(
@@ -279,6 +407,14 @@ export default function DocumentLostPage() {
 
   return (
     <div className="container-fluid mx-auto p-4 bg-gray-50 min-h-screen">
+      {/* Add Error Notification Component */}
+      {showErrorNotification && validationError && (
+        <ErrorNoification
+          validationError={validationError}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
+      
       <h1 className="text-2xl font-bold text-center mb-6">
         Document Loss Affidavit
       </h1>
@@ -342,6 +478,8 @@ export default function DocumentLostPage() {
         setMobileNumber={setMobileNumber}
         mobileError={mobileError}
         handleMobileSubmit={handleMobileSubmit}
+        username={userName}
+        setUsername={setUserName}
       />
       {showServiceOptionsModal && (
         <ServicePackageNotification

@@ -4,6 +4,7 @@ import GstPreview from "./GstPreview";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
+import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
 import {
   gstPaymentData,
   sendGstCorrectionData,
@@ -11,7 +12,7 @@ import {
 
 export default function GstPage() {
   const [formData, setFormData] = useState({
-    formId:"DM-GST-8",
+    formId: "DM-GST-8",
     ownerName: "",
     aadhaarNo: "",
     ownerAddress: "",
@@ -26,6 +27,8 @@ export default function GstPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
+  const [validationError, setValidationError] = useState(""); // Add validation error state
+  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -35,17 +38,108 @@ export default function GstPage() {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [userName, setUserName] = useState();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Clear error notification when user starts typing
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+    
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
+
+  // Add form validation function
+  const validateForm = () => {
+    // Validate owner details
+    if (!formData.ownerName.trim()) {
+      setValidationError("Please enter the owner's name");
+      return false;
+    }
+
+    if (!formData.aadhaarNo.trim()) {
+      setValidationError("Please enter Aadhaar number");
+      return false;
+    } else if (!/^\d{12}$/.test(formData.aadhaarNo)) {
+      setValidationError("Aadhaar number must be 12 digits");
+      return false;
+    }
+
+    if (!formData.ownerAddress.trim()) {
+      setValidationError("Please enter the owner's address");
+      return false;
+    }
+
+    if (!formData.premisesAddress.trim()) {
+      setValidationError("Please enter the premises address");
+      return false;
+    }
+
+    if (!formData.tenantName.trim()) {
+      setValidationError("Please enter the tenant's name");
+      return false;
+    }
+
+    if (!formData.companyName.trim()) {
+      setValidationError("Please enter the company name");
+      return false;
+    }
+
+    if (!formData.officeAddress.trim()) {
+      setValidationError("Please enter the office address");
+      return false;
+    }
+
+    // Validate date and place
+    if (!formData.place.trim()) {
+      setValidationError("Please enter the place");
+      return false;
+    }
+
+    if (!formData.day.trim()) {
+      setValidationError("Please enter the day");
+      return false;
+    } else if (
+      isNaN(formData.day) ||
+      parseInt(formData.day) <= 0 ||
+      parseInt(formData.day) > 31
+    ) {
+      setValidationError("Please enter a valid day (1-31)");
+      return false;
+    }
+
+    if (!formData.month.trim()) {
+      setValidationError("Please select a month");
+      return false;
+    }
+
+    if (!formData.year.trim()) {
+      setValidationError("Please enter the year");
+      return false;
+    }
+
+    return true;
+  };
+  
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    setShowMobileModal(true);
+    
+    // Validate form before showing mobile modal
+    if (validateForm()) {
+      setShowMobileModal(true);
+    } else {
+      setShowErrorNotification(true);
+      // Auto-hide the error notification after 5 seconds
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+    }
   };
 
   const handleMobileSubmit = async () => {
@@ -69,6 +163,7 @@ export default function GstPage() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
+        userName
       };
 
       const response = await sendGstCorrectionData(dataWithMobile);
@@ -178,15 +273,16 @@ export default function GstPage() {
             bookingId: bookingId,
             mobileNumber: mobileNumber,
             documentType: documentDetails.documentType,
-            fullName: formData.fullName,
+            fullName: formData.ownerName,
             serviceType: service.id,
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
+            userName: userName
           });
         },
         prefill: {
-          name: formData.fullName,
+          name: userName,
           contact: mobileNumber,
         },
         notes: {
@@ -218,6 +314,7 @@ export default function GstPage() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
+            userName: userName
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -244,12 +341,13 @@ export default function GstPage() {
         bookingId: paymentData.bookingId,
         mobileNumber: paymentData.mobileNumber,
         documentType: documentDetails.documentType,
-        fullName: formData.fullName,
+        fullName: formData.ownerName,
         serviceType: paymentData.serviceType,
         serviceName: paymentData.serviceName,
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
+        userName: userName
       };
 
       const confirmationResponse = await gstPaymentData(
@@ -276,6 +374,14 @@ export default function GstPage() {
 
   return (
     <div className="container-fluid mx-auto p-4 bg-gray-50 min-h-screen">
+      {/* Add Error Notification Component */}
+      {showErrorNotification && validationError && (
+        <ErrorNoification
+          validationError={validationError}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
+
       <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
         GST No Objection Certificate
       </h1>
@@ -339,6 +445,8 @@ export default function GstPage() {
         setMobileNumber={setMobileNumber}
         mobileError={mobileError}
         handleMobileSubmit={handleMobileSubmit}
+        username={userName}
+        setUsername={setUserName}
       />
       {showServiceOptionsModal && (
         <ServicePackageNotification

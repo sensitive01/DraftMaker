@@ -168,27 +168,7 @@ export default function AffidavitDisplay({ data, onEdit }) {
         </div>
       </div>
 
-      {/* Control buttons moved to bottom */}
-      <div className="flex justify-center items-center p-4 bg-gray-50 rounded-b-lg border-t">
-        <button
-          onClick={handleGeneratePDF}
-          className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm flex items-center shadow-sm"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 mr-2"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V8z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Generate PDF (A4)
-        </button>
-      </div>
+ 
 
       {/* Print-specific styles */}
       <style jsx global>{`

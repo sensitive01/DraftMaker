@@ -1,11 +1,21 @@
 import React from "react";
 
-const MobileNumberInput = ({showMobileModal,mobileNumber ,setShowMobileModal,setMobileNumber,mobileError,handleMobileSubmit}) => {
+const MobileNumberInput = ({
+  showMobileModal,
+  mobileNumber,
+  setShowMobileModal,
+  setMobileNumber,
+  mobileError,
+  handleMobileSubmit,
+  username,
+  setUsername,
+  usernameError
+}) => {
   return (
     <div>
       {" "}
       {showMobileModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 mt-20">
           <div className="bg-white rounded-xl p-8 shadow-2xl w-full max-w-md transform transition-all border-t-4 border-red-600">
             {/* Modal Header with Red Accent */}
             <div className="mb-6">
@@ -25,7 +35,7 @@ const MobileNumberInput = ({showMobileModal,mobileNumber ,setShowMobileModal,set
                       d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                     />
                   </svg>
-                  Mobile Verification
+                  User Verification
                 </h2>
                 <button
                   onClick={() => setShowMobileModal(false)}
@@ -48,14 +58,55 @@ const MobileNumberInput = ({showMobileModal,mobileNumber ,setShowMobileModal,set
                 </button>
               </div>
               <div className="h-0.5 w-full bg-gray-100 my-4"></div>
-              <p className="text-gray-600 mt-2">
-                Please provide your mobile number to proceed with your
-                application. We'll send you important updates about your
-                document.
-              </p>
+   
             </div>
 
+            {/* Username Field */}
             <div className="mb-6">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Username
+              </label>
+              <div className="relative mt-1 rounded-md shadow-sm">
+                <input
+                  type="text"
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter your username"
+                  className={`block w-full px-4 py-3 text-base border ${
+                    usernameError
+                      ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                      : "border-gray-300 focus:ring-red-500 focus:border-red-500"
+                  } rounded-md shadow-sm`}
+                />
+                {usernameError && (
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-red-500"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              {usernameError && (
+                <p className="mt-2 text-sm text-red-600">{usernameError}</p>
+              )}
+             
+            </div>
+
+            {/* Mobile Number Field with Top Margin */}
+            <div className="mb-6 mt-8">
               <label
                 htmlFor="mobileNumber"
                 className="block text-sm font-medium text-gray-700 mb-1"
