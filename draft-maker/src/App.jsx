@@ -529,7 +529,6 @@ const GoTop = () => {
   );
 };
 
-// Video Modal Component
 const VideoModal = () => {
   return (
     <div

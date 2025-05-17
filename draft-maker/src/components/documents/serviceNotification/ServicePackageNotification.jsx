@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const ServicePackageNotification = ({
   showServiceOptionsModal,
@@ -7,12 +7,23 @@ const ServicePackageNotification = ({
   mobileNumber,
   getServiceOptions,
   handleServiceSelection,
-  documentName
+  documentName,
 }) => {
+  const [selectedService, setSelectedService] = useState(null);
+
+  const handlePackageSelect = (service) => {
+    setSelectedService(service);
+  };
+
+  const handlePayment = () => {
+    if (selectedService) {
+      handleServiceSelection(selectedService);
+    }
+  };
+
   return (
     <div>
-      {" "}
-      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 mt-20">
         <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl transform transition-all border-t-4 border-red-600 overflow-hidden">
           {/* Modal Header with Close Button - Compressed padding */}
           <div className="sticky top-0 bg-white z-10 px-6 py-3 border-b border-gray-100 flex items-center justify-between">
@@ -71,7 +82,7 @@ const ServicePackageNotification = ({
                   <div className="flex">
                     <span className="text-gray-600 mr-1">Document Type:</span>
                     <span className="font-semibold text-gray-800">
-                     {documentName}
+                      {documentName}
                     </span>
                   </div>
                   <div className="flex">
@@ -93,8 +104,12 @@ const ServicePackageNotification = ({
               {getServiceOptions().map((service) => (
                 <button
                   key={service.id}
-                  onClick={() => handleServiceSelection(service)}
-                  className="bg-white border border-gray-200 hover:border-red-500 rounded-lg p-3 flex flex-col text-left transition-all hover:shadow-md group"
+                  onClick={() => handlePackageSelect(service)}
+                  className={`bg-white border ${
+                    selectedService && selectedService.id === service.id
+                      ? "border-red-500 ring-2 ring-red-200"
+                      : "border-gray-200 hover:border-red-500"
+                  } rounded-lg p-3 flex flex-col text-left transition-all hover:shadow-md group`}
                 >
                   <div className="flex items-center mb-2">
                     {/* Service Icon based on type */}
@@ -155,6 +170,25 @@ const ServicePackageNotification = ({
                         {service.name}
                       </span>
                     </div>
+
+                    {selectedService && selectedService.id === service.id && (
+                      <div className="flex items-center justify-center bg-green-100 rounded-full h-6 w-6">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-green-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex-1">
@@ -195,6 +229,32 @@ const ServicePackageNotification = ({
               >
                 Cancel
               </button>
+
+              {selectedService && (
+                <button
+                  onClick={handlePayment}
+                  className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition flex items-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                  Pay ₹
+                  {selectedService.hasNotary
+                    ? selectedService.price + selectedService.notaryCharge
+                    : selectedService.price}
+                </button>
+              )}
             </div>
           </div>
         </div>

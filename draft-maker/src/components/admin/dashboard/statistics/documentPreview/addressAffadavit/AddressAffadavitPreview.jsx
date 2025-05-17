@@ -270,11 +270,11 @@ export default function AddressAffidavitPreview() {
     <div className="bg-gray-100 min-h-screen py-8">
       <div className="max-w-4xl mx-auto">
         {/* Header with download button in the top right */}
-        <div className="mb-6 bg-white rounded-t-lg shadow-md px-8 py-4 flex justify-end items-center">
+        <div className="mb-6 bg-gray-100 rounded-t-lg px-8 py-4 flex justify-end items-center">
           <button
             onClick={generateWordDocument}
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 flex items-center space-x-2 shadow-sm"
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 flex items-center space-x-2 shadow-sm"
           >
             {loading ? (
               <div className="flex items-center">
@@ -425,12 +425,7 @@ export default function AddressAffidavitPreview() {
               </div>
             </div>
             
-            {/* Legal stamp placeholder */}
-            <div className="mt-10 flex justify-start">
-              <div className="border-2 border-dashed border-gray-400 w-32 h-32 flex items-center justify-center text-gray-500 text-sm text-center p-2">
-                Space for<br/>Legal Stamp
-              </div>
-            </div>
+
           </div>
         </div>
       </div>

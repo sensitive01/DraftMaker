@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { CSSTransition, TransitionGroup } from "react-transition-group"; // Make sure to install this dependency
 import { getDocumentName } from "../api/service/axiosService";
 
 export default function DocumentServices() {
@@ -156,19 +155,22 @@ export default function DocumentServices() {
     },
   ];
 
-  useEffect(()=>{
-    const fetchData = async()=>{
-      const response = await getDocumentName()
-      console.log("Response documents service",response.data.data)
+  useEffect(() => {
+    const fetchData = async() => {
+      const response = await getDocumentName();
+      console.log("Response documents service", response.data.data);
+    };
+    fetchData();
+  }, []);
 
+  // Add useEffect to navigate when activeIndex changes
+  useEffect(() => {
+    // Navigate to the active document's path
+    if (documentTypes[activeIndex]) {
+      const path = documentTypes[activeIndex].path;
+      navigate(path);
     }
-    fetchData()
-
-  },[])
-
-  const handleDocumentClick = (path) => {
-    navigate(path);
-  };
+  }, [activeIndex, navigate]);
 
   // Navigation functions with sliding animation for arrows
   const moveLeft = () => {
@@ -232,7 +234,7 @@ export default function DocumentServices() {
             isHovered={hoveredIndex === doc.id}
             onMouseEnter={() => setHoveredIndex(doc.id)}
             onMouseLeave={() => setHoveredIndex(null)}
-            onClick={() => handleDocumentClick(doc.path)}
+            onClick={() => setActiveIndex(index)} // Update to just change the activeIndex
           />
         );
       }
@@ -244,8 +246,6 @@ export default function DocumentServices() {
   return (
     <div className="bg-gradient-to-br from-white to-gray-50 py-4">
       <div className="max-w-6xl mx-auto px-4">
-
-
         <div className="relative h-80">
           {/* Left Navigation Arrow with Slide Effect */}
           <button

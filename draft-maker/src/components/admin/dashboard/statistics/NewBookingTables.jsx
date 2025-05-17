@@ -37,7 +37,7 @@ const BookingTable = () => {
 
         const formattedBookings = response.data.data.map((booking) => ({
           _id: booking._id,
-          id: booking.bookingId,
+          id: booking.bookingId || "",
           name:
             booking.fullName ||
             booking.lesseeName ||
@@ -45,18 +45,18 @@ const BookingTable = () => {
             booking.name1 ||
             booking.ownerName ||
             booking.parentName ||
-            booking.personName,
-          phoneNumber: booking.mobileNumber,
-          status: booking.doumentStatus,
-          paymentId: booking.paymentDetails.paymentId,
-          paymentStatus: booking.paymentStatus,
-          amount: booking.paymentDetails.paidAmount,
-          serviceType: booking.paymentDetails.serviceType,
-          serviceName: booking.paymentDetails.serviceName,
-          createdAt: booking.createdAt,
-          includesNotary: booking.paymentDetails.includesNotary,
-          documentType: booking.documentType,
-          formId: booking.formId,
+            booking.personName || "Unknown",
+          phoneNumber: booking.mobileNumber || "",
+          status: booking.doumentStatus || "",
+          paymentId: booking.paymentDetails?.paymentId || "",
+          paymentStatus: booking.paymentStatus || "",
+          amount: booking.paymentDetails?.paidAmount || "",
+          serviceType: booking.paymentDetails?.serviceType || "",
+          serviceName: booking.paymentDetails?.serviceName || "",
+          createdAt: booking.createdAt || "",
+          includesNotary: booking.paymentDetails?.includesNotary || false,
+          documentType: booking.documentType || "",
+          formId: booking.formId || "",
         }));
 
         setBookings(formattedBookings);
@@ -77,14 +77,14 @@ const BookingTable = () => {
 
     if (filterStatus !== "all") {
       result = result.filter(
-        (booking) => booking.status.toLowerCase() === filterStatus.toLowerCase()
+        (booking) => (booking.status || "").toLowerCase() === filterStatus.toLowerCase()
       );
     }
 
     if (filterPaymentStatus !== "all") {
       result = result.filter(
         (booking) =>
-          booking.paymentStatus.toLowerCase() ===
+          (booking.paymentStatus || "").toLowerCase() ===
           filterPaymentStatus.toLowerCase()
       );
     }
@@ -93,10 +93,12 @@ const BookingTable = () => {
       const lowercasedSearch = searchTerm.toLowerCase();
       result = result.filter(
         (booking) =>
-          booking.id.toLowerCase().includes(lowercasedSearch) ||
-          booking.name.toLowerCase().includes(lowercasedSearch) ||
-          booking.phoneNumber.toLowerCase().includes(lowercasedSearch) ||
-          booking.paymentId.toLowerCase().includes(lowercasedSearch)
+          (booking.id || "").toLowerCase().includes(lowercasedSearch) ||
+          (booking.name || "").toLowerCase().includes(lowercasedSearch) ||
+          (booking.phoneNumber || "").toLowerCase().includes(lowercasedSearch) ||
+          (booking.paymentId || "").toLowerCase().includes(lowercasedSearch)||
+          (booking.documentType || "").toLowerCase().includes(lowercasedSearch)
+
       );
     }
 
@@ -176,7 +178,7 @@ const BookingTable = () => {
   };
 
   const getStatusBadgeColor = (status) => {
-    switch (status?.toLowerCase()) {
+    switch ((status || "").toLowerCase()) {
       case "completed":
         return "bg-green-100 text-green-800";
       case "pending":
