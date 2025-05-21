@@ -1,12 +1,15 @@
-import { useNavigate } from "react-router-dom";
+
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getDocumentName } from "../api/service/axiosService";
 
 export default function DocumentServices() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState("");
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [autoNavigationEnabled, setAutoNavigationEnabled] = useState(true);
 
   const documentTypes = [
     {
@@ -155,6 +158,7 @@ export default function DocumentServices() {
     },
   ];
 
+  
   useEffect(() => {
     const fetchData = async() => {
       const response = await getDocumentName();
@@ -163,14 +167,24 @@ export default function DocumentServices() {
     fetchData();
   }, []);
 
-  // Add useEffect to navigate when activeIndex changes
+  // Find the matching document type based on current location path
   useEffect(() => {
-    // Navigate to the active document's path
-    if (documentTypes[activeIndex]) {
-      const path = documentTypes[activeIndex].path;
-      navigate(path);
+    // Only set active index based on URL when component first mounts
+    // This prevents auto-navigation from changing the URL repeatedly
+    const currentPath = location.pathname;
+    const foundIndex = documentTypes.findIndex(doc => doc.path === currentPath);
+    
+    if (foundIndex !== -1) {
+      setActiveIndex(foundIndex);
     }
-  }, [activeIndex, navigate]);
+  }, [location.pathname]);
+
+  // Modified to only navigate when user explicitly clicks on a carousel item
+  const handleDocumentClick = (index) => {
+    setActiveIndex(index);
+    const path = documentTypes[index].path;
+    navigate(path);
+  };
 
   // Navigation functions with sliding animation for arrows
   const moveLeft = () => {
@@ -186,8 +200,14 @@ export default function DocumentServices() {
     }
 
     const newActive = activeIndex - 1;
-    setActiveIndex(newActive < 0 ? documentTypes.length - 1 : newActive);
+    const newIndex = newActive < 0 ? documentTypes.length - 1 : newActive;
+    
+    setActiveIndex(newIndex);
     setDirection("left");
+    
+    // Only navigate when arrows are clicked
+    const path = documentTypes[newIndex].path;
+    navigate(path);
   };
 
   const moveRight = () => {
@@ -202,8 +222,14 @@ export default function DocumentServices() {
       }, 300);
     }
 
-    setActiveIndex((activeIndex + 1) % documentTypes.length);
+    const newIndex = (activeIndex + 1) % documentTypes.length;
+    
+    setActiveIndex(newIndex);
     setDirection("right");
+    
+    // Only navigate when arrows are clicked
+    const path = documentTypes[newIndex].path;
+    navigate(path);
   };
 
   // Generate carousel items
@@ -234,7 +260,7 @@ export default function DocumentServices() {
             isHovered={hoveredIndex === doc.id}
             onMouseEnter={() => setHoveredIndex(doc.id)}
             onMouseLeave={() => setHoveredIndex(null)}
-            onClick={() => setActiveIndex(index)} // Update to just change the activeIndex
+            onClick={() => handleDocumentClick(index)} // Use the explicit navigation handler
           />
         );
       }
@@ -312,6 +338,8 @@ export default function DocumentServices() {
               onClick={() => {
                 setDirection(index > activeIndex ? "right" : "left");
                 setActiveIndex(index);
+                // Explicit navigation
+                navigate(doc.path);
               }}
               aria-label={`Go to ${doc.title}`}
             />
