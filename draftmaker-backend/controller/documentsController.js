@@ -116,7 +116,7 @@ const getAllBookingData = async (req, res) => {
         bookingId: 1,
         documentType: 1,
         formId: 1,
-        userName:1
+        userName: 1,
       }
     );
 
@@ -124,7 +124,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -138,7 +138,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -152,7 +152,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -166,7 +166,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -180,7 +180,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -194,7 +194,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -208,7 +208,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -222,7 +222,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -236,7 +236,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -250,7 +250,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -265,7 +265,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -279,7 +279,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -294,7 +294,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -309,7 +309,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -324,7 +324,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         documentType: 1,
         formId: 1,
         mobileNumber: 1,
@@ -342,7 +342,7 @@ const getAllBookingData = async (req, res) => {
       {
         paymentDetails: 1,
         mobileNumber: 1,
-        userName:1,
+        userName: 1,
         doumentStatus: 1,
         paymentStatus: 1,
         createdAt: 1,
@@ -356,7 +356,7 @@ const getAllBookingData = async (req, res) => {
       {},
       {
         paymentDetails: 1,
-        userName:1,
+        userName: 1,
         mobileNumber: 1,
         doumentStatus: 1,
         paymentStatus: 1,
@@ -563,9 +563,12 @@ const saveDualNameCorrection = async (req, res) => {
   try {
     const { formData } = req.body;
 
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-DNC-1",
-    });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-DNC-1",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -610,6 +613,9 @@ const updateDualNamePaymentData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     const updatedData = await dualNameCorrection.findOneAndUpdate(
@@ -625,6 +631,9 @@ const updateDualNamePaymentData = async (req, res) => {
           serviceName,
           includesNotary,
         },
+        selectedStampDuty,
+        selectedDeliveryCharge,
+        serviceDetails,
       },
       { new: true }
     );
@@ -710,7 +719,10 @@ const saveNameCorrection = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({ formId: "DM-NC-2" });
+    const documentName = await documentPriceData.findOne(
+      { formId: "DM-NC-2" },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -755,22 +767,15 @@ const saveNameCorrectionPaymentData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
     if (!bookingId) {
       return res.status(400).json({ message: "Booking ID is required." });
     }
-
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
 
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await nameCorrection.findOneAndUpdate(
@@ -785,6 +790,9 @@ const saveNameCorrectionPaymentData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
         },
       },
       { new: true }
@@ -815,9 +823,12 @@ const createDobCorrection = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-DOBC-3",
-    });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-DOBC-3",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -862,22 +873,15 @@ const saveDobCorrectionPaymentData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
     if (!bookingId) {
       return res.status(400).json({ message: "Booking ID is required." });
     }
-
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
 
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await dobCorrection.findOneAndUpdate(
@@ -892,6 +896,9 @@ const saveDobCorrectionPaymentData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
         },
       },
       { new: true }
@@ -922,9 +929,12 @@ const createGasCorrection = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-GAS-5",
-    });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-GAS-5",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -969,22 +979,15 @@ const saveGasCorrectionPaymentData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
     if (!bookingId) {
       return res.status(400).json({ message: "Booking ID is required." });
     }
-
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
 
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await GasFormData.findOneAndUpdate(
@@ -999,6 +1002,9 @@ const saveGasCorrectionPaymentData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
         },
       },
       { new: true }
@@ -1031,7 +1037,7 @@ const createDocumentLost = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne({
       formId: "DM-DOC-LOST-5",
-    });
+    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1076,22 +1082,15 @@ const saveDocumentLostPaymentData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
     if (!bookingId) {
       return res.status(400).json({ message: "Booking ID is required." });
     }
-
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
 
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await documentLost.findOneAndUpdate(
@@ -1106,6 +1105,9 @@ const saveDocumentLostPaymentData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
         },
       },
       { new: true }
@@ -1136,7 +1138,7 @@ const createDobParentNameCorrection = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({ formId: "DM-NC-2" });
+    const documentName = await documentPriceData.findOne({ formId: "DM-NC-2" },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1188,16 +1190,6 @@ const saveDobParentNameCorrection = async (req, res) => {
       return res.status(400).json({ message: "Booking ID is required." });
     }
 
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
-
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await dobParentNameCorrection.findOneAndUpdate(
       { bookingId },
@@ -1243,7 +1235,7 @@ const createBirthCertificateNameCorrection = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne({
       formId: "DM-BC-MNC-7",
-    });
+    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1295,16 +1287,6 @@ const saveBirthCertificateNameCorrection = async (req, res) => {
       return res.status(400).json({ message: "Booking ID is required." });
     }
 
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
-
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await birthCertificateNameCorrection.findOneAndUpdate(
       { bookingId },
@@ -1350,7 +1332,7 @@ const saveGstData = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne({
       formId: "DM-GST-8",
-    });
+    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1395,22 +1377,15 @@ const saveGstPaymentData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
     if (!bookingId) {
       return res.status(400).json({ message: "Booking ID is required." });
     }
-
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
 
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await gstSchema.findOneAndUpdate(
@@ -1425,6 +1400,9 @@ const saveGstPaymentData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
         },
       },
       { new: true }
@@ -1457,7 +1435,7 @@ const createMetriculationLostData = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne({
       formId: "DM-MAL-9",
-    });
+    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1502,22 +1480,15 @@ const updateMetriculationLostPaymentData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
     if (!bookingId) {
       return res.status(400).json({ message: "Booking ID is required." });
     }
-
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
 
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await metriculationLost.findOneAndUpdate(
@@ -1532,6 +1503,9 @@ const updateMetriculationLostPaymentData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
         },
       },
       { new: true }
@@ -1564,7 +1538,7 @@ const createKhataCorrectionData = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne({
       formId: "DM-KH-10",
-    });
+    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1609,22 +1583,15 @@ const updateKhataCorrectionPaymentData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
     if (!bookingId) {
       return res.status(400).json({ message: "Booking ID is required." });
     }
-
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
 
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await khataCorrection.findOneAndUpdate(
@@ -1639,6 +1606,9 @@ const updateKhataCorrectionPaymentData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
         },
       },
       { new: true }
@@ -1671,7 +1641,7 @@ const createVehicleInsurenceData = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne({
       formId: "DM-VIC-11",
-    });
+    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1716,22 +1686,15 @@ const updateVehicleInsurencePaymentData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
     if (!bookingId) {
       return res.status(400).json({ message: "Booking ID is required." });
     }
-
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
 
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await vehicleInsurence.findOneAndUpdate(
@@ -1746,6 +1709,9 @@ const updateVehicleInsurencePaymentData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
         },
       },
       { new: true }
@@ -1778,7 +1744,7 @@ const createHufData = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne({
       formId: "DM-HUF-12",
-    });
+    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1823,22 +1789,15 @@ const updateHufPaymentData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
     if (!bookingId) {
       return res.status(400).json({ message: "Booking ID is required." });
     }
-
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
 
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await hufSchema.findOneAndUpdate(
@@ -1853,6 +1812,9 @@ const updateHufPaymentData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
         },
       },
       { new: true }
@@ -1885,7 +1847,7 @@ const createGapPeriodData = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne({
       formId: "DM-GP-13",
-    });
+    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1937,16 +1899,6 @@ const updateGapPeriodData = async (req, res) => {
       return res.status(400).json({ message: "Booking ID is required." });
     }
 
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
-
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await gapPeriodSchema.findOneAndUpdate(
       { bookingId },
@@ -1992,7 +1944,7 @@ const createPasswordAnnaxureData = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne({
       formId: "DM-PAF-14",
-    });
+    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -2044,16 +1996,6 @@ const updatePasswordAnnaxureData = async (req, res) => {
       return res.status(400).json({ message: "Booking ID is required." });
     }
 
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
-
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await passportAnnaxure.findOneAndUpdate(
       { bookingId },
@@ -2099,7 +2041,7 @@ const createPassportNameChangeData = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne({
       formId: "DM-PNC-15",
-    });
+    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -2144,22 +2086,15 @@ const updatePassportNameChangePaymentData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
     if (!bookingId) {
       return res.status(400).json({ message: "Booking ID is required." });
     }
-
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
 
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await passportNameChange.findOneAndUpdate(
@@ -2174,6 +2109,9 @@ const updatePassportNameChangePaymentData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
         },
       },
       { new: true }
@@ -2204,9 +2142,12 @@ const createAdressAffadavitData = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-AAF-16",
-    });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-AAF-16",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -2236,7 +2177,7 @@ const createAdressAffadavitData = async (req, res) => {
 
 const updateAdressAffadavitPaymentData = async (req, res) => {
   try {
-    // ✅ Ensure the request body and data are present
+    console.log("Welcome to update the address affadavit", req.body);
     if (!req.body || !req.body.data) {
       return res.status(400).json({ message: "Invalid request data." });
     }
@@ -2251,22 +2192,15 @@ const updateAdressAffadavitPaymentData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
     if (!bookingId) {
       return res.status(400).json({ message: "Booking ID is required." });
     }
-
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
 
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await adressAffadavit.findOneAndUpdate(
@@ -2281,6 +2215,9 @@ const updateAdressAffadavitPaymentData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedDeliveryCharge,
+          serviceDetails,
+          selectedStampDuty,
         },
       },
       { new: true }
@@ -2313,7 +2250,7 @@ const createCommercialData = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne({
       formId: "DM-CFD-17",
-    });
+    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -2357,6 +2294,9 @@ const updateCommercialPaymentData = async (req, res) => {
       includesNotary,
       status,
       documentType,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -2387,6 +2327,9 @@ const updateCommercialPaymentData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
         },
       },
       { new: true }
@@ -2419,7 +2362,7 @@ const createRecidentialData = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne({
       formId: "DM-RFD-18",
-    });
+    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -2464,22 +2407,15 @@ const updateRecidentialPaymentData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
     if (!bookingId) {
       return res.status(400).json({ message: "Booking ID is required." });
     }
-
-    console.log("Updating bookingId:", bookingId);
-    console.log("Updating with:", {
-      paymentId,
-      amount,
-      serviceType,
-      serviceName,
-      includesNotary,
-      status,
-    });
 
     // ✅ Use $set to avoid overwriting the entire object
     const updatedData = await recidentialSchema.findOneAndUpdate(
@@ -2494,6 +2430,9 @@ const updateRecidentialPaymentData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
         },
       },
       { new: true }

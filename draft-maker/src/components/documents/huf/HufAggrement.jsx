@@ -9,8 +9,10 @@ import {
   createHufPaymentData,
   sendHufData,
 } from "../../../api/service/axiosService";
+import { useNavigate } from "react-router-dom";
 
 export default function HufAgreement() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     formId: "DM-HUF-12",
     title: "Mr",
@@ -32,10 +34,7 @@ export default function HufAgreement() {
     day: "",
     month: "",
     year: "",
-    coparceners: [
-      { name: "", relationship: "", address: "" },
-  
-    ],
+    coparceners: [{ name: "", relationship: "", address: "" }],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
@@ -288,9 +287,18 @@ export default function HufAgreement() {
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
+      navigate("/documents/payment-page", {
+        state: {
+          bookingId: responseData.bookingId,
+          documentDetails: responseData.documentDetails,
+          mobileNumber,
+          userName,
+          formId: "DM-HUF-12"
+        },
+      });
 
-      setShowServiceOptionsModal(true);
-      setIsSubmitting(false);
+      // setShowServiceOptionsModal(true);
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(

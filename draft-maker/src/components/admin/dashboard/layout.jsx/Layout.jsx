@@ -12,12 +12,15 @@ import {
   HelpCircle,
   LockKeyhole,
   Files,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 
 const Layout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [expandedMenus, setExpandedMenus] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
   const adminInfo = localStorage.getItem("admin")
@@ -50,6 +53,13 @@ const Layout = ({ children }) => {
     setIsProfileMenuOpen(!isProfileMenuOpen);
   };
 
+  const toggleSubmenu = (menuKey) => {
+    setExpandedMenus(prev => ({
+      ...prev,
+      [menuKey]: !prev[menuKey]
+    }));
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("admin");
     navigate("/login");
@@ -66,8 +76,30 @@ const Layout = ({ children }) => {
       {
         icon: BookOpen,
         label: "Document Price",
-        path: "/admin/documents-price-table",
-        isActive: location.pathname === "/admin/documents-price-table",
+        path: "/admin/documents-price-table-table",
+        isActive: location.pathname.includes("/admin/documents-price-table") || 
+                  location.pathname.includes("/admin/documents-stamp-duty-table") ||
+                  location.pathname.includes("/admin/document-type-price") ||
+                  location.pathname.includes("/admin/delivery-type-price"),
+        hasSubmenu: true,
+        submenuKey: "documentPrice",
+        submenuItems: [
+          {
+            label: "Draft Price",
+            path: "/admin/documents-price-table",
+            isActive: location.pathname === "/admin/documents-price-table",
+          },
+          {
+            label: "Document Stamp Price",
+            path: "/admin/documents-stamp-duty-table",
+            isActive: location.pathname === "/admin/documents-stamp-duty-table",
+          },
+          {
+            label: "Delivery Type Price",
+            path: "/admin/delivery-type-price",
+            isActive: location.pathname === "/admin/delivery-type-price",
+          },
+        ]
       },
       {
         icon: Files,
@@ -95,36 +127,104 @@ const Layout = ({ children }) => {
     const renderNavItems = (items) =>
       items.map((item) => (
         <li key={item.path} className="mb-2">
-          <Link
-            to={item.path}
-            className={`
-            flex items-center p-3 rounded-lg transition-all duration-300 group
-            ${
-              item.isActive
-                ? "bg-red-600 text-white shadow-md"
-                : "text-red-900 hover:bg-red-100 hover:text-red-700"
-            }
-            ${isSidebarOpen && !isMobile ? "justify-start" : "justify-center"}
-          `}
-          >
-            <item.icon
-              size={22}
+          {item.hasSubmenu ? (
+            <div>
+              <div
+                onClick={() => toggleSubmenu(item.submenuKey)}
+                className={`
+                  flex items-center p-3 rounded-lg transition-all duration-300 group cursor-pointer
+                  ${
+                    item.isActive
+                      ? "bg-red-600 text-white shadow-md"
+                      : "text-red-900 hover:bg-red-100 hover:text-red-700"
+                  }
+                  ${isSidebarOpen && !isMobile ? "justify-between" : "justify-center"}
+                `}
+              >
+                <div className="flex items-center">
+                  <item.icon
+                    size={22}
+                    className={`
+                      ${isSidebarOpen && !isMobile ? "mr-3" : ""}
+                      ${item.isActive ? "text-current" : "text-red-600"}
+                    `}
+                  />
+                  <span
+                    className={`
+                      font-medium
+                      ${!isSidebarOpen && !isMobile ? "hidden" : ""}
+                      ${isMobile && !isSidebarOpen ? "hidden" : ""}
+                    `}
+                  >
+                    {item.label}
+                  </span>
+                </div>
+                {(isSidebarOpen || isMobile) && (
+                  <div className="ml-auto">
+                    {expandedMenus[item.submenuKey] ? (
+                      <ChevronDown size={16} className={item.isActive ? "text-current" : "text-red-600"} />
+                    ) : (
+                      <ChevronRight size={16} className={item.isActive ? "text-current" : "text-red-600"} />
+                    )}
+                  </div>
+                )}
+              </div>
+              
+              {/* Submenu */}
+              {expandedMenus[item.submenuKey] && (isSidebarOpen || isMobile) && (
+                <ul className="ml-6 mt-2 space-y-1">
+                  {item.submenuItems.map((subItem) => (
+                    <li key={subItem.path}>
+                      <Link
+                        to={subItem.path}
+                        className={`
+                          flex items-center p-2 rounded-lg transition-all duration-300 text-sm
+                          ${
+                            subItem.isActive
+                              ? "bg-red-500 text-white shadow-md"
+                              : "text-red-800 hover:bg-red-50 hover:text-red-700"
+                          }
+                        `}
+                      >
+                        <span className="font-medium">{subItem.label}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : (
+            <Link
+              to={item.path}
               className={`
-                ${isSidebarOpen && !isMobile ? "mr-3" : ""}
-                ${item.isActive ? "text-current" : "text-red-600"}
+                flex items-center p-3 rounded-lg transition-all duration-300 group
+                ${
+                  item.isActive
+                    ? "bg-red-600 text-white shadow-md"
+                    : "text-red-900 hover:bg-red-100 hover:text-red-700"
+                }
+                ${isSidebarOpen && !isMobile ? "justify-start" : "justify-center"}
               `}
-            />
-            <span
-              className={`
-              font-medium
-              ${!isSidebarOpen && !isMobile ? "hidden" : ""}
-              ${isMobile && !isSidebarOpen ? "hidden" : ""}
-              ${isSidebarOpen ? "ml-3" : ""}
-            `}
             >
-              {item.label}
-            </span>
-          </Link>
+              <item.icon
+                size={22}
+                className={`
+                  ${isSidebarOpen && !isMobile ? "mr-3" : ""}
+                  ${item.isActive ? "text-current" : "text-red-600"}
+                `}
+              />
+              <span
+                className={`
+                  font-medium
+                  ${!isSidebarOpen && !isMobile ? "hidden" : ""}
+                  ${isMobile && !isSidebarOpen ? "hidden" : ""}
+                  ${isSidebarOpen ? "ml-3" : ""}
+                `}
+              >
+                {item.label}
+              </span>
+            </Link>
+          )}
         </li>
       ));
 
@@ -137,17 +237,17 @@ const Layout = ({ children }) => {
             </div>
             <span
               className={`
-              font-bold text-lg text-red-900 
-              ${!isSidebarOpen && !isMobile ? "hidden" : ""}
-              ${isMobile && !isSidebarOpen ? "hidden" : ""}
-            `}
+                font-bold text-lg text-red-900 
+                ${!isSidebarOpen && !isMobile ? "hidden" : ""}
+                ${isMobile && !isSidebarOpen ? "hidden" : ""}
+              `}
             >
              Draft Maker
             </span>
           </div>
         </div>
 
-        <nav className="flex-1 p-2 bg-white">
+        <nav className="flex-1 p-2 bg-white overflow-y-auto">
           <ul className="space-y-1">{renderNavItems(navItems)}</ul>
         </nav>
 

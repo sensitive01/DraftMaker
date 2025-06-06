@@ -1,7 +1,7 @@
 import { useState } from "react";
 import RentalForm from "./RentalForm";
 import RentalPreview from "./RentalPreview";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
@@ -12,6 +12,7 @@ import {
 } from "../../../api/service/axiosService";
 
 export default function RentalAgreementForm() {
+  const navigate = useNavigate();
   const { type } = useParams();
   console.log("Type", type);
   const [formData, setFormData] = useState({
@@ -32,14 +33,14 @@ export default function RentalAgreementForm() {
     lesseePermanentPinCode: "",
     rentAmount: "",
     rentAmountWords: "",
-    rentDueDate: "5", // Default is 5th of every month
+    rentDueDate: "5",
     depositAmount: "",
     depositAmountWords: "",
     agreementStartDate: "",
-    agreementEndDate: "", // Optional: can calculate or allow user input
+    agreementEndDate: "",
     rentIncreasePercentage: "",
     noticePeriod: "",
-    terminationPeriod: "", // Termination if rent not paid for X months
+    terminationPeriod: "",
     paintingCharges: "",
     usePurpose: "RESIDENTIAL PURPOSE",
     bhkConfig: "",
@@ -62,13 +63,12 @@ export default function RentalAgreementForm() {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [userName, setUserName] = useState();
-  const [validationError, setValidationError] = useState(""); // Add validation error state
-  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
+  const [validationError, setValidationError] = useState("");
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Clear error notification when user starts typing
     if (showErrorNotification) {
       setShowErrorNotification(false);
       setValidationError("");
@@ -81,7 +81,6 @@ export default function RentalAgreementForm() {
   };
 
   const handleFixtureChange = (index, field, value) => {
-    // Clear error notification when user starts typing
     if (showErrorNotification) {
       setShowErrorNotification(false);
       setValidationError("");
@@ -213,9 +212,6 @@ export default function RentalAgreementForm() {
       return false;
     }
 
-
-
-
     if (!formData.noticePeriod.trim()) {
       setValidationError("Please enter notice period");
       return false;
@@ -244,8 +240,6 @@ export default function RentalAgreementForm() {
       setValidationError("Please enter a valid hall count");
       return false;
     }
-
-
 
     if (!formData.toiletCount.trim()) {
       setValidationError("Please enter toilet count");
@@ -306,9 +300,18 @@ export default function RentalAgreementForm() {
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
+      navigate("/documents/payment-page", {
+        state: {
+          bookingId: responseData.bookingId,
+          documentDetails: responseData.documentDetails,
+          mobileNumber,
+          userName,
+          formId: "DM-RFD-18",
+        },
+      });
 
-      setShowServiceOptionsModal(true);
-      setIsSubmitting(false);
+      // setShowServiceOptionsModal(true);
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(

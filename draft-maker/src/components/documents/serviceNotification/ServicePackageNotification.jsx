@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { getStampAndDeliveryCharges } from "../../../api/service/axiosService";
 
 const ServicePackageNotification = ({
   showServiceOptionsModal,
@@ -10,6 +11,17 @@ const ServicePackageNotification = ({
   documentName,
 }) => {
   const [selectedService, setSelectedService] = useState(null);
+
+
+  useEffect(()=>{
+    const fetchData = async()=>{
+      const reponse = await getStampAndDeliveryCharges()
+      console.log(reponse)
+
+    }
+    fetchData()
+
+  },[])
 
   const handlePackageSelect = (service) => {
     setSelectedService(service);

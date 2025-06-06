@@ -9,8 +9,10 @@ import {
   sendKhataCorrectionData,
   updateKhataCorrectionPaymentData,
 } from "../../../api/service/axiosService";
+import { useNavigate } from "react-router-dom";
 
 const JointKhataTransfer = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     formId: "DM-KH-10",
     // First applicant
@@ -62,13 +64,13 @@ const JointKhataTransfer = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Clear error notification when user starts typing
     if (showErrorNotification) {
       setShowErrorNotification(false);
       setValidationError("");
     }
-    
+
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
@@ -206,7 +208,7 @@ const JointKhataTransfer = () => {
 
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    
+
     // Validate form before showing mobile modal
     if (validateForm()) {
       setShowMobileModal(true);
@@ -240,7 +242,7 @@ const JointKhataTransfer = () => {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
-        userName
+        userName,
       };
 
       const response = await sendKhataCorrectionData(dataWithMobile);
@@ -249,9 +251,18 @@ const JointKhataTransfer = () => {
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
+      navigate("/documents/payment-page", {
+        state: {
+          bookingId: responseData.bookingId,
+          documentDetails: responseData.documentDetails,
+          mobileNumber,
+          userName,
+          formId: "DM-KH-10",
+        },
+      });
 
-      setShowServiceOptionsModal(true);
-      setIsSubmitting(false);
+      // setShowServiceOptionsModal(true);
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -355,7 +366,7 @@ const JointKhataTransfer = () => {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
-            userName: userName
+            userName: userName,
           });
         },
         prefill: {
@@ -391,7 +402,7 @@ const JointKhataTransfer = () => {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
-            userName: userName
+            userName: userName,
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -424,7 +435,7 @@ const JointKhataTransfer = () => {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
-        userName: userName
+        userName: userName,
       };
 
       const confirmationResponse = await updateKhataCorrectionPaymentData(
@@ -458,7 +469,7 @@ const JointKhataTransfer = () => {
           setShowErrorNotification={setShowErrorNotification}
         />
       )}
-      
+
       <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
         Joint Khata Transfer Application
       </h1>

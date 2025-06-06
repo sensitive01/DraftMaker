@@ -35,7 +35,7 @@ const MobileNumberInput = ({
                       d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                     />
                   </svg>
-                  User Verification
+                  Requestor Details
                 </h2>
                 <button
                   onClick={() => setShowMobileModal(false)}
@@ -67,7 +67,7 @@ const MobileNumberInput = ({
                 htmlFor="username"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Username
+                Requestor Name
               </label>
               <div className="relative mt-1 rounded-md shadow-sm">
                 <input
@@ -75,7 +75,7 @@ const MobileNumberInput = ({
                   id="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter your username"
+                  placeholder="Enter your name"
                   className={`block w-full px-4 py-3 text-base border ${
                     usernameError
                       ? "border-red-300 focus:ring-red-500 focus:border-red-500"
@@ -111,7 +111,7 @@ const MobileNumberInput = ({
                 htmlFor="mobileNumber"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Mobile Number
+                Requestor Mobile Number
               </label>
               <div className="relative mt-1 rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">

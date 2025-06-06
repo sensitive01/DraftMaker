@@ -9,8 +9,10 @@ import {
   sendAddressAffadavitData,
 } from "../../../api/service/axiosService";
 import ErrorNoification from "../serviceNotification/ErrorNoification";
+import { useNavigate } from "react-router-dom";
 
 const AddressAffidavit = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     formId: "DM-AAF-16",
     name: "",
@@ -53,6 +55,7 @@ const AddressAffidavit = () => {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [userName, setUserName] = useState();
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -221,8 +224,13 @@ const AddressAffidavit = () => {
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
 
-      setShowServiceOptionsModal(true);
-      setIsSubmitting(false);
+      navigate("/documents/payment-page",{state:{bookingId:responseData.bookingId,documentDetails:responseData.documentDetails,mobileNumber,userName,formId: "DM-AAF-16"}})
+
+
+
+
+      // setShowServiceOptionsModal(true);
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -310,7 +318,7 @@ const AddressAffidavit = () => {
         amount: totalPrice * 100,
         currency: "INR",
         name: "Draft Maker",
-        description: `Dual Name Change - ${service.name}`,
+        description: `${documentDetails.documentType}- ${service.name}`,
         handler: function (response) {
           console.log("razorpay response", response);
           handlePaymentSuccess({

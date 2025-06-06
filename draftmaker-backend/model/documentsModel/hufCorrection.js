@@ -12,6 +12,35 @@ const coparcenerSchema = new mongoose.Schema({
   },
 });
 
+// Stamp duty subschema
+const stampDutySchema = new mongoose.Schema({
+  documentType: String,
+  articleNo: String,
+  calculationType: String,
+  fixedAmount: Number,
+  percentage: Number,
+  minAmount: Number,
+  maxAmount: Number,
+}, { _id: false });
+
+// Delivery charge subschema
+const deliveryChargeSchema = new mongoose.Schema({
+  serviceName: String,
+  description: String,
+  charge: Number,
+  serviceType: String,
+}, { _id: false });
+
+// Service details subschema
+const serviceDetailsSchema = new mongoose.Schema({
+  basePrice: Number,
+  notaryCharge: Number,
+  stampDutyAmount: Number,
+  deliveryCharge: Number,
+  requiresStamp: Boolean,
+  requiresDelivery: Boolean,
+}, { _id: false });
+
 const hufDeclarationSchema = new mongoose.Schema(
   {
     title: {
@@ -109,6 +138,20 @@ const hufDeclarationSchema = new mongoose.Schema(
         type: Boolean,
         default: false,
       },
+    },
+
+    // Added stamp duty, delivery charge, and service details fields
+    selectedStampDuty: {
+      type: stampDutySchema,
+      default: null,
+    },
+    selectedDeliveryCharge: {
+      type: deliveryChargeSchema,
+      default: null,
+    },
+    serviceDetails: {
+      type: serviceDetailsSchema,
+      default: null,
     },
   },
   {

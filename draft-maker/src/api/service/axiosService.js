@@ -563,3 +563,102 @@ export const getDashboardStatistics = async () => {
     return err;
   }
 };
+
+export const createStampDuty = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/document-price/create-stamp-duty-price`,{document}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+export const getStamDocumentData = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/document-price/get-stamp-duty-price`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const updateStampDutyData = async (documentData,documentId) => {
+  try {
+    const response = await axiosInstance.put(
+      `/document-price/update-stamp-duty-price/${documentId}`,{documentData}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+export const updateStampStatus = async (documentId, currentStatus) => {
+  try {
+    const response = await axiosInstance.put(
+      `/document-price/update-stamp-duty-status/${documentId}`,{currentStatus}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getDeliveryChargeData = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/document-price/get-delivery-charge-price`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createDelivaryCharge = async (document) => {
+  try {
+    const response = await axiosInstance.post(
+      `/document-price/create-delivery-charge-price`,{document}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const updateDelivaryCharge = async (documentData,documentId) => {
+  try {
+    const response = await axiosInstance.put(
+      `/document-price/update-delivery-charge-price/${documentId}`,{documentData}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+}
+
+export const updateDeliveryPriceStatus = async (documentId, currentStatus) => {
+  try {
+    const response = await axiosInstance.put(
+      `/document-price/update-delivery-charge-status/${documentId}`,{currentStatus}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const getStampAndDeliveryCharges = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/document-price/get-stamp-delivery-price-data`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};

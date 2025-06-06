@@ -1,7 +1,7 @@
 import { useState } from "react";
 import RentalForm from "./CommercialForm";
 import CommercialPreview from "./CommercialPreview";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
@@ -12,6 +12,7 @@ import {
 } from "../../../api/service/axiosService";
 
 export default function CommercialAggrement() {
+  const navigate = useNavigate();
   const { type } = useParams();
   console.log("Type", type);
   const [formData, setFormData] = useState({
@@ -66,13 +67,13 @@ export default function CommercialAggrement() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Clear error notification when user starts typing
     if (showErrorNotification) {
       setShowErrorNotification(false);
       setValidationError("");
     }
-    
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -85,7 +86,7 @@ export default function CommercialAggrement() {
       setShowErrorNotification(false);
       setValidationError("");
     }
-    
+
     const updatedFixtures = [...formData.fixtures];
     updatedFixtures[index] = { ...updatedFixtures[index], [field]: value };
     setFormData((prev) => ({
@@ -166,7 +167,10 @@ export default function CommercialAggrement() {
     if (!formData.rentAmount.trim()) {
       setValidationError("Please enter rent amount");
       return false;
-    } else if (isNaN(formData.rentAmount) || parseFloat(formData.rentAmount) <= 0) {
+    } else if (
+      isNaN(formData.rentAmount) ||
+      parseFloat(formData.rentAmount) <= 0
+    ) {
       setValidationError("Please enter a valid rent amount");
       return false;
     }
@@ -179,7 +183,10 @@ export default function CommercialAggrement() {
     if (!formData.depositAmount.trim()) {
       setValidationError("Please enter deposit amount");
       return false;
-    } else if (isNaN(formData.depositAmount) || parseFloat(formData.depositAmount) <= 0) {
+    } else if (
+      isNaN(formData.depositAmount) ||
+      parseFloat(formData.depositAmount) <= 0
+    ) {
       setValidationError("Please enter a valid deposit amount");
       return false;
     }
@@ -199,23 +206,26 @@ export default function CommercialAggrement() {
       return false;
     }
 
-
-
     if (!formData.noticePeriod.trim()) {
       setValidationError("Please enter notice period");
       return false;
-    } else if (isNaN(formData.noticePeriod) || parseInt(formData.noticePeriod) <= 0) {
+    } else if (
+      isNaN(formData.noticePeriod) ||
+      parseInt(formData.noticePeriod) <= 0
+    ) {
       setValidationError("Please enter a valid notice period in months");
       return false;
     }
 
     // Check if at least one fixture is properly filled
     const hasValidFixture = formData.fixtures.some(
-      fixture => fixture.item.trim() && fixture.quantity.trim()
+      (fixture) => fixture.item.trim() && fixture.quantity.trim()
     );
 
     if (formData.fixtures.length > 0 && !hasValidFixture) {
-      setValidationError("Please enter at least one fixture item and quantity or remove empty entries");
+      setValidationError(
+        "Please enter at least one fixture item and quantity or remove empty entries"
+      );
       return false;
     }
 
@@ -239,7 +249,7 @@ export default function CommercialAggrement() {
 
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    
+
     // Validate form before showing mobile modal
     if (validateForm()) {
       setShowMobileModal(true);
@@ -273,7 +283,7 @@ export default function CommercialAggrement() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
-        userName
+        userName,
       };
 
       const response = await sendCommercialData(dataWithMobile);
@@ -282,9 +292,18 @@ export default function CommercialAggrement() {
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
+      navigate("/documents/payment-page", {
+        state: {
+          bookingId: responseData.bookingId,
+          documentDetails: responseData.documentDetails,
+          mobileNumber,
+          userName,
+          formId: "DM-CFD-17"
+        },
+      });
 
-      setShowServiceOptionsModal(true);
-      setIsSubmitting(false);
+      // setShowServiceOptionsModal(true);
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -387,7 +406,7 @@ export default function CommercialAggrement() {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
-            userName: userName
+            userName: userName,
           });
         },
         prefill: {
@@ -423,7 +442,7 @@ export default function CommercialAggrement() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
-            userName: userName
+            userName: userName,
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -456,7 +475,7 @@ export default function CommercialAggrement() {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
-        userName: userName
+        userName: userName,
       };
 
       const confirmationResponse = await createCommercialPaymentData(
@@ -490,7 +509,7 @@ export default function CommercialAggrement() {
           setShowErrorNotification={setShowErrorNotification}
         />
       )}
-      
+
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-full md:w-1/2">
           <RentalForm

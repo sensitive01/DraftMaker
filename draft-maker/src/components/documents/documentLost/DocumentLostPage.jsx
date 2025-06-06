@@ -9,9 +9,11 @@ import {
   createDocumentLostPaymentData,
   sendDocumentLostData,
 } from "../../../api/service/axiosService";
+import { useNavigate } from "react-router-dom";
 
 // Main Page Component containing both form and preview
 export default function DocumentLostPage() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     formId: "DM-DOC-LOST-5",
     personTitle: "Mr.",
@@ -49,13 +51,13 @@ export default function DocumentLostPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Clear error notification when user starts typing
     if (showErrorNotification) {
       setShowErrorNotification(false);
       setValidationError("");
     }
-    
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -162,7 +164,7 @@ export default function DocumentLostPage() {
 
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    
+
     // Validate form before showing mobile modal
     if (validateForm()) {
       setShowMobileModal(true);
@@ -196,7 +198,7 @@ export default function DocumentLostPage() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
-        userName
+        userName,
       };
 
       const response = await sendDocumentLostData(dataWithMobile);
@@ -205,9 +207,18 @@ export default function DocumentLostPage() {
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
+      navigate("/documents/payment-page", {
+        state: {
+          bookingId: responseData.bookingId,
+          documentDetails: responseData.documentDetails,
+          mobileNumber,
+          userName,
+          formId: "DM-DOC-LOST-5",
+        },
+      });
 
-      setShowServiceOptionsModal(true);
-      setIsSubmitting(false);
+      // setShowServiceOptionsModal(true);
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -311,7 +322,7 @@ export default function DocumentLostPage() {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
-            userName:userName
+            userName: userName,
           });
         },
         prefill: {
@@ -347,7 +358,7 @@ export default function DocumentLostPage() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
-            userName:userName
+            userName: userName,
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -380,7 +391,7 @@ export default function DocumentLostPage() {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
-        userName:userName
+        userName: userName,
       };
 
       const confirmationResponse = await createDocumentLostPaymentData(
@@ -414,7 +425,7 @@ export default function DocumentLostPage() {
           setShowErrorNotification={setShowErrorNotification}
         />
       )}
-      
+
       <h1 className="text-2xl font-bold text-center mb-6">
         Document Loss Affidavit
       </h1>

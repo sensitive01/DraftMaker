@@ -9,8 +9,10 @@ import ServicePackageNotification from "../serviceNotification/ServicePackageNot
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
 import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
+import { useNavigate } from "react-router-dom";
 
 export default function DualNameChange() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     formId: "DM-DNC-1",
     namePrefix: "",
@@ -51,13 +53,13 @@ export default function DualNameChange() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Clear error notification when user starts typing
     if (showErrorNotification) {
       setShowErrorNotification(false);
       setValidationError("");
     }
-    
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -156,7 +158,7 @@ export default function DualNameChange() {
 
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    
+
     // Validate form before showing mobile modal
     if (validateForm()) {
       setShowMobileModal(true);
@@ -190,7 +192,7 @@ export default function DualNameChange() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
-        userName
+        userName,
       };
 
       const response = await sendDualNameCorrectionData(dataWithMobile);
@@ -199,9 +201,18 @@ export default function DualNameChange() {
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
+      navigate("/documents/payment-page", {
+        state: {
+          bookingId: responseData.bookingId,
+          documentDetails: responseData.documentDetails,
+          mobileNumber,
+          userName,
+          formId: "DM-DNC-1",
+        },
+      });
 
-      setShowServiceOptionsModal(true);
-      setIsSubmitting(false);
+      // setShowServiceOptionsModal(true);
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -305,7 +316,7 @@ export default function DualNameChange() {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
-            userName:userName
+            userName: userName,
           });
         },
         prefill: {
@@ -341,7 +352,7 @@ export default function DualNameChange() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
-            userName:userName
+            userName: userName,
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -374,7 +385,7 @@ export default function DualNameChange() {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
-        userName:userName
+        userName: userName,
       };
 
       const confirmationResponse = await createDualNameChangePaymentData(
@@ -408,11 +419,11 @@ export default function DualNameChange() {
           setShowErrorNotification={setShowErrorNotification}
         />
       )}
-      
+
       <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
         Dual Name Change/Correction
       </h1>
-      
+
       <div className="grid md:grid-cols-2 gap-8">
         <div className="print:hidden">
           <DualNameChangeForm formData={formData} handleChange={handleChange} />

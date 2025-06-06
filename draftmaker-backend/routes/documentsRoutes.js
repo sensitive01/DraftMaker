@@ -79,4 +79,14 @@ documentRouter.put("/update-commercial-payment-data",documentController.updateCo
 documentRouter.post("/save-recidential-data",documentController.createRecidentialData)
 documentRouter.put("/update-recidential-payment-data",documentController.updateRecidentialPaymentData)
 
+
+
+
+
+
+
+
+
+
+
 module.exports = documentRouter

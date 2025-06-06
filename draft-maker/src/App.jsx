@@ -57,6 +57,9 @@ import GasPreview from "./components/admin/dashboard/statistics/documentPreview/
 import DobCorrectionPreview from "./components/admin/dashboard/statistics/documentPreview/dobCorrection/DobCorrectionPreview";
 import NameChangePreview from "./components/admin/dashboard/statistics/documentPreview/nameChange/NameChangePreview";
 import DualNameChangePreview from "./components/admin/dashboard/statistics/documentPreview/dualNameChange/DualNameChangePreview";
+import StampDutyTable from "./components/admin/dashboard/statistics/StampDutyTable";
+import DeliveryChargesTable from "./components/admin/dashboard/statistics/DeliveryChargesTable";
+import DocumentPaymentPage from "./components/documents/DocumentPaymentPage";
 
 function MainLayout({ children }) {
   return (
@@ -115,6 +118,34 @@ function MainLayout({ children }) {
   );
 }
 
+function PaymentLayout({ children }) {
+  return (
+    <div className="page_wrapper">
+      <div className="top_home_wraper white_option">
+        <div className="content-wrapper">
+          <div className="container">
+            <div className="anim_line dark_bg">
+              {[...Array(9)].map((_, index) => (
+                <span key={index}>
+                  <img src={animLogo} alt="anim_line" />
+                </span>
+              ))}
+            </div>
+          </div>
+          <Header />
+        </div>
+      </div>
+
+      <div style={{ marginTop: '120px' }}> {/* Adjust this value based on your header height */}
+        {children}
+      </div>
+
+      <NeedSupport />
+      <Footer />
+    </div>
+  );
+}
+
 function App() {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -162,6 +193,22 @@ function App() {
             element={
               <ProtectedAdminRoute>
                 <DocumentPriceTable />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/documents-stamp-duty-table"
+            element={
+              <ProtectedAdminRoute>
+                <StampDutyTable />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/delivery-type-price"
+            element={
+              <ProtectedAdminRoute>
+                <DeliveryChargesTable />
               </ProtectedAdminRoute>
             }
           />
@@ -487,6 +534,16 @@ function App() {
         <GoTop />
         <VideoModal />
       </div>
+      <Routes>
+        <Route
+          path="/documents/payment-page"
+          element={
+            <PaymentLayout>
+              <DocumentPaymentPage />
+            </PaymentLayout>
+          }
+        />
+      </Routes>
     </Router>
   );
 }

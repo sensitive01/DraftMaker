@@ -1,5 +1,43 @@
 const mongoose = require("mongoose");
 
+// Stamp Duty Subschema
+const stampDutySchema = new mongoose.Schema(
+  {
+    documentType: String,
+    articleNo: String,
+    calculationType: String,
+    fixedAmount: Number,
+    percentage: Number,
+    minAmount: Number,
+    maxAmount: Number,
+  },
+  { _id: false }
+);
+
+// Delivery Charge Subschema
+const deliveryChargeSchema = new mongoose.Schema(
+  {
+    serviceName: String,
+    description: String,
+    charge: Number,
+    serviceType: String,
+  },
+  { _id: false }
+);
+
+// Service Details Subschema
+const serviceDetailsSchema = new mongoose.Schema(
+  {
+    basePrice: Number,
+    notaryCharge: Number,
+    stampDutyAmount: Number,
+    deliveryCharge: Number,
+    requiresStamp: Boolean,
+    requiresDelivery: Boolean,
+  },
+  { _id: false }
+);
+
 const nameCorrectionFormSchema = new mongoose.Schema(
   {
     parentTitle: {
@@ -7,98 +45,71 @@ const nameCorrectionFormSchema = new mongoose.Schema(
       enum: ["Mr.", "Mrs.", "Dr.", "Shri"],
       default: "Mr.",
     },
-    parentName: {
-      type: String,
-    },
+    parentName: { type: String },
     spouseTitle: {
       type: String,
       enum: ["Mrs.", "Ms.", "Dr.", "Smt."],
       default: "Mrs.",
     },
-    spouseName: {
-      type: String,
-    },
-    address: {
-      type: String,
-    },
-    parentAadhaar: {
-      type: String,
-    },
-    spouseAadhaar: {
-      type: String,
-    },
+    spouseName: { type: String },
+    address: { type: String },
+    parentAadhaar: { type: String },
+    spouseAadhaar: { type: String },
     childRelation: {
       type: String,
       enum: ["Daughter", "Son", "Child"],
       default: "Daughter",
     },
-    childName: {
-      type: String,
-    },
-    certificateNumber: {
-      type: String,
-    },
-    incorrectName: {
-      type: String,
-    },
-    correctName: {
-      type: String,
-    },
-    place: {
-      type: String,
-    },
-    day: {
-      type: Number,
-    },
+    childName: { type: String },
+    certificateNumber: { type: String },
+    incorrectName: { type: String },
+    correctName: { type: String },
+    place: { type: String },
+    day: { type: Number },
     month: {
       type: String,
       default: "April",
     },
     year: {
       type: Number,
-
       default: 2025,
     },
-    bookingId: {
-      type: String,
-    },
-    mobileNumber: {
-      type: String,
-    },
+    bookingId: { type: String },
+    mobileNumber: { type: String },
+    userName: { type: String },
     doumentStatus: {
       type: String,
       default: "Pending",
-    },
-    userName: {
-      type: String,
     },
     paymentStatus: {
       type: String,
       default: "Pending",
     },
-    documentType: {
-      type: String,
-    },
-    formId: {
-      type: String,
-    },
+    documentType: { type: String },
+    formId: { type: String },
+
     paymentDetails: {
-      paymentId: {
-        type: String,
-      },
-      paidAmount: {
-        type: Number,
-      },
-      serviceType: {
-        type: String,
-      },
-      serviceName: {
-        type: String,
-      },
+      paymentId: String,
+      paidAmount: Number,
+      serviceType: String,
+      serviceName: String,
       includesNotary: {
         type: Boolean,
         default: false,
       },
+    },
+
+    selectedStampDuty: {
+      type: stampDutySchema,
+      default: null,
+    },
+    selectedDeliveryCharge: {
+      type: deliveryChargeSchema,
+      default: null,
+    },
+    serviceDetails: {
+      type: serviceDetailsSchema,
+      default: null,
     },
   },
   {
@@ -107,7 +118,7 @@ const nameCorrectionFormSchema = new mongoose.Schema(
 );
 
 const BirthCertificateNameCorrection = mongoose.model(
-  "birtCertificateNameCorrection",
+  "birthCertificateNameCorrection",
   nameCorrectionFormSchema
 );
 

@@ -9,8 +9,10 @@ import {
   gstPaymentData,
   sendGstCorrectionData,
 } from "../../../api/service/axiosService";
+import { useNavigate } from "react-router-dom";
 
 export default function GstPage() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     formId: "DM-GST-8",
     ownerName: "",
@@ -42,13 +44,13 @@ export default function GstPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Clear error notification when user starts typing
     if (showErrorNotification) {
       setShowErrorNotification(false);
       setValidationError("");
     }
-    
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -126,10 +128,10 @@ export default function GstPage() {
 
     return true;
   };
-  
+
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    
+
     // Validate form before showing mobile modal
     if (validateForm()) {
       setShowMobileModal(true);
@@ -163,7 +165,7 @@ export default function GstPage() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
-        userName
+        userName,
       };
 
       const response = await sendGstCorrectionData(dataWithMobile);
@@ -172,9 +174,18 @@ export default function GstPage() {
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
+      navigate("/documents/payment-page", {
+        state: {
+          bookingId: responseData.bookingId,
+          documentDetails: responseData.documentDetails,
+          mobileNumber,
+          userName,
+          formId: "DM-GST-8"
+        },
+      });
 
-      setShowServiceOptionsModal(true);
-      setIsSubmitting(false);
+      // setShowServiceOptionsModal(true);
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -278,7 +289,7 @@ export default function GstPage() {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
-            userName: userName
+            userName: userName,
           });
         },
         prefill: {
@@ -314,7 +325,7 @@ export default function GstPage() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
-            userName: userName
+            userName: userName,
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -347,7 +358,7 @@ export default function GstPage() {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
-        userName: userName
+        userName: userName,
       };
 
       const confirmationResponse = await gstPaymentData(

@@ -1,99 +1,88 @@
-// models/FIRFormData.js
 const mongoose = require("mongoose");
 
-const documentLost = new mongoose.Schema(
+// Stamp duty subschema
+const stampDutySchema = new mongoose.Schema(
   {
-    personTitle: {
-      type: String,
-    },
-    personName: {
-      type: String,
-    },
-    relationType: {
-      type: String,
-    },
-    relationName: {
-      type: String,
-    },
-    age: {
-      type: Number,
-    },
-    address: {
-      type: String,
-    },
-    aadhaarNumber: {
-      type: String,
-    },
-    documentType: {
-      type: String,
-    },
-    documentNumber: {
-      type: String,
-    },
-    firNumber: {
-      type: String,
-    },
-    firDay: {
-      type: Number,
-    },
-    firMonth: {
-      type: String,
-    },
-    firYear: {
-      type: Number,
-    },
-    place: {
-      type: String,
-    },
-    day: {
-      type: Number,
-    },
-    month: {
-      type: String,
-    },
-    year: {
-      type: Number,
-    },
-    bookingId: {
-      type: String,
-    },
-    mobileNumber: {
-      type: String,
-    },
-    doumentStatus: {
-      type: String,
-      default: "Pending",
-    },
-    userName: {
-      type: String,
-    },
-    documentType: {
-      type: String,
-    },
-    formId: {
-      type: String,
-    },
-    paymentStatus: {
-      type: String,
-      default: "Pending",
-    },
+    documentType: String,
+    articleNo: String,
+    calculationType: String,
+    fixedAmount: Number,
+    percentage: Number,
+    minAmount: Number,
+    maxAmount: Number,
+  },
+  { _id: false }
+);
+
+// Delivery charge subschema
+const deliveryChargeSchema = new mongoose.Schema(
+  {
+    serviceName: String,
+    description: String,
+    charge: Number,
+    serviceType: String,
+  },
+  { _id: false }
+);
+
+// Service details subschema
+const serviceDetailsSchema = new mongoose.Schema(
+  {
+    basePrice: Number,
+    notaryCharge: Number,
+    stampDutyAmount: Number,
+    deliveryCharge: Number,
+    requiresStamp: Boolean,
+    requiresDelivery: Boolean,
+  },
+  { _id: false }
+);
+
+const documentLostSchema = new mongoose.Schema(
+  {
+    personTitle: { type: String },
+    personName: { type: String },
+    relationType: { type: String },
+    relationName: { type: String },
+    age: { type: Number },
+    address: { type: String },
+    aadhaarNumber: { type: String },
+    documentType: { type: String },
+    documentNumber: { type: String },
+    firNumber: { type: String },
+    firDay: { type: Number },
+    firMonth: { type: String },
+    firYear: { type: Number },
+    place: { type: String },
+    day: { type: Number },
+    month: { type: String },
+    year: { type: Number },
+    bookingId: { type: String },
+    mobileNumber: { type: String },
+    documentStatus: { type: String, default: "Pending" },
+    userName: { type: String },
+    formId: { type: String },
+    paymentStatus: { type: String, default: "Pending" },
     paymentDetails: {
-      paymentId: {
-        type: String,
-      },
-      paidAmount: {
-        type: Number,
-      },
-      serviceType: {
-        type: String,
-      },
-      serviceName: {
-        type: String,
-      },
-      includesNotary: {
-        type: Boolean,
-        default: false,
-      },
+      paymentId: { type: String },
+      paidAmount: { type: Number },
+      serviceType: { type: String },
+      serviceName: { type: String },
+      includesNotary: { type: Boolean, default: false },
+    },
+
+    // Added fields for stamp duty, delivery charge, and service details
+    selectedStampDuty: {
+      type: stampDutySchema,
+      default: null,
+    },
+    selectedDeliveryCharge: {
+      type: deliveryChargeSchema,
+      default: null,
+    },
+    serviceDetails: {
+      type: serviceDetailsSchema,
+      default: null,
     },
   },
   {
@@ -101,6 +90,6 @@ const documentLost = new mongoose.Schema(
   }
 );
 
-const documentLostSchema = mongoose.model("documentLost", documentLost);
+const DocumentLost = mongoose.model("documentLost", documentLostSchema);
 
-module.exports = documentLostSchema;
+module.exports = DocumentLost;

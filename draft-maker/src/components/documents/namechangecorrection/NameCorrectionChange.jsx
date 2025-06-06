@@ -9,8 +9,10 @@ import {
   createNameChangePaymentData,
   sendNameCorrectionData,
 } from "../../../api/service/axiosService";
+import { useNavigate } from "react-router-dom";
 
 export default function NameCorrectionChange() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     formId: "DM-NC-2",
     prefix: "",
@@ -56,8 +58,6 @@ export default function NameCorrectionChange() {
 
   // Add form validation function
   const validateForm = () => {
-
-
     if (!formData.fullName.trim()) {
       setValidationError("Please enter your full name");
       return false;
@@ -180,9 +180,18 @@ export default function NameCorrectionChange() {
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
+      navigate("/documents/payment-page", {
+        state: {
+          bookingId: responseData.bookingId,
+          documentDetails: responseData.documentDetails,
+          mobileNumber,
+          userName,
+          formId: "DM-NC-2",
+        },
+      });
 
-      setShowServiceOptionsModal(true);
-      setIsSubmitting(false);
+      // setShowServiceOptionsModal(true);
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(

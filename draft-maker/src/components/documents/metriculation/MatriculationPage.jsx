@@ -9,8 +9,10 @@ import {
   createMetriculationLostPaymentData,
   sendMetriculationLostData,
 } from "../../../api/service/axiosService";
+import { useNavigate } from "react-router-dom";
 
 const MatriculationPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     formId: "DM-MAL-9",
     // Personal details
@@ -212,9 +214,18 @@ const MatriculationPage = () => {
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
+      navigate("/documents/payment-page", {
+        state: {
+          bookingId: responseData.bookingId,
+          documentDetails: responseData.documentDetails,
+          mobileNumber,
+          userName,
+          formId: "DM-MAL-9"
+        },
+      });
 
-      setShowServiceOptionsModal(true);
-      setIsSubmitting(false);
+      // setShowServiceOptionsModal(true);
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(

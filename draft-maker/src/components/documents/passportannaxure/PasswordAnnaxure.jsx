@@ -9,8 +9,10 @@ import {
   createPasswordAnnaxurePaymentData,
   sendPasswordAnnaxureData,
 } from "../../../api/service/axiosService";
+import { useNavigate } from "react-router-dom";
 
 export default function PasswordAnnaxure() {
+  const navigate = useNavigate();
   // Initialize state with default values
   const [formData, setFormData] = useState({
     formId: "DM-PAF-14",
@@ -219,9 +221,18 @@ export default function PasswordAnnaxure() {
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
+      navigate("/documents/payment-page", {
+        state: {
+          bookingId: responseData.bookingId,
+          documentDetails: responseData.documentDetails,
+          mobileNumber,
+          userName,
+          formId: "DM-PAF-14",
+        },
+      });
 
-      setShowServiceOptionsModal(true);
-      setIsSubmitting(false);
+      // setShowServiceOptionsModal(true);
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(

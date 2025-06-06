@@ -9,9 +9,11 @@ import {
   createDobParentNameCorrectionPaymentData,
   dobParentNameCorrectionData,
 } from "../../../api/service/axiosService";
+import { useNavigate } from "react-router-dom";
 
 // Main Page Component containing both form and preview
 export default function BirthCertificateParentNameCorrectionPage() {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     formId: "DM-BCNCP-6",
     fatherTitle: "Mr.",
@@ -190,9 +192,10 @@ export default function BirthCertificateParentNameCorrectionPage() {
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
+          navigate("/documents/payment-page",{state:{bookingId:responseData.bookingId,documentDetails:responseData.documentDetails,mobileNumber,userName,formId: "DM-BCNCP-6"}})
 
-      setShowServiceOptionsModal(true);
-      setIsSubmitting(false);
+      // setShowServiceOptionsModal(true);
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -466,7 +469,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
         username={userName}
         setUsername={setUserName}
       />
-      {showServiceOptionsModal && (
+      {/* {showServiceOptionsModal && (
         <ServicePackageNotification
           setShowServiceOptionsModal={setShowServiceOptionsModal}
           bookingId={bookingId}
@@ -475,7 +478,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
           getServiceOptions={getServiceOptions}
           handleServiceSelection={handleServiceSelection}
         />
-      )}
+      )} */}
       {paymentSuccess && paymentDetails && (
         <PaymentConfirmation
           paymentSuccess={paymentSuccess}

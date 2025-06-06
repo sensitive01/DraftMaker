@@ -9,8 +9,10 @@ import {
   createDobCorrectionPaymentData,
   sendDobCorrectionData,
 } from "../../../api/service/axiosService";
+import { useNavigate } from "react-router-dom";
 
 export default function DobCorrectionPage() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     formId: "DM-DOBC-3",
     fullName: "",
@@ -47,13 +49,13 @@ export default function DobCorrectionPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Clear error notification when user starts typing
     if (showErrorNotification) {
       setShowErrorNotification(false);
       setValidationError("");
     }
-    
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -152,7 +154,7 @@ export default function DobCorrectionPage() {
 
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    
+
     // Validate form before showing mobile modal
     if (validateForm()) {
       setShowMobileModal(true);
@@ -186,7 +188,7 @@ export default function DobCorrectionPage() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
-        userName
+        userName,
       };
 
       const response = await sendDobCorrectionData(dataWithMobile);
@@ -195,9 +197,18 @@ export default function DobCorrectionPage() {
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
+      navigate("/documents/payment-page", {
+        state: {
+          bookingId: responseData.bookingId,
+          documentDetails: responseData.documentDetails,
+          mobileNumber,
+          userName,
+          formId: "DM-DOBC-3",
+        },
+      });
 
-      setShowServiceOptionsModal(true);
-      setIsSubmitting(false);
+      // setShowServiceOptionsModal(true);
+      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -300,7 +311,7 @@ export default function DobCorrectionPage() {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
-            userName: userName
+            userName: userName,
           });
         },
         prefill: {
@@ -336,7 +347,7 @@ export default function DobCorrectionPage() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
-            userName: userName
+            userName: userName,
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -369,7 +380,7 @@ export default function DobCorrectionPage() {
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
         status: "success",
-        userName: userName
+        userName: userName,
       };
 
       const confirmationResponse = await createDobCorrectionPaymentData(
@@ -403,11 +414,11 @@ export default function DobCorrectionPage() {
           setShowErrorNotification={setShowErrorNotification}
         />
       )}
-      
+
       <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
         Date of Birth Correction
       </h1>
-      
+
       <div className="grid md:grid-cols-2 gap-8">
         {/* Left column: Form */}
         <div className="print:hidden">
