@@ -675,3 +675,14 @@ export const sendTheEstampData = async (orderData) => {
 };
 
 
+export const getBookedEstampData = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/document-price/get-e-stamp-booking-data`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+

@@ -61,6 +61,7 @@ import StampDutyTable from "./components/admin/dashboard/statistics/StampDutyTab
 import DeliveryChargesTable from "./components/admin/dashboard/statistics/DeliveryChargesTable";
 import DocumentPaymentPage from "./components/documents/DocumentPaymentPage";
 import BuyEStampDocuments from "./components/buyStampDocuments/BuyEStampDocuments";
+import EstampBookingTable from "./components/admin/dashboard/statistics/EstampBookingTable";
 
 function MainLayout({ children }) {
   return (
@@ -137,7 +138,9 @@ function PaymentLayout({ children }) {
         </div>
       </div>
 
-      <div style={{ marginTop: '120px' }}> {/* Adjust this value based on your header height */}
+      <div style={{ marginTop: "120px" }}>
+        {" "}
+        {/* Adjust this value based on your header height */}
         {children}
       </div>
 
@@ -218,6 +221,14 @@ function App() {
             element={
               <ProtectedAdminRoute>
                 <NewBookingTables />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/e-stamp-booking-table"
+            element={
+              <ProtectedAdminRoute>
+                <EstampBookingTable />
               </ProtectedAdminRoute>
             }
           />
@@ -545,7 +556,7 @@ function App() {
           }
         />
 
-         <Route
+        <Route
           path="/documents/buy-e-stamp"
           element={
             <PaymentLayout>

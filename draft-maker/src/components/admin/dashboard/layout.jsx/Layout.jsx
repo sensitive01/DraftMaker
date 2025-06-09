@@ -23,8 +23,8 @@ const Layout = ({ children }) => {
   const [expandedMenus, setExpandedMenus] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
-  const adminInfo = localStorage.getItem("admin")
-  console.log("adminInfo",adminInfo)
+  const adminInfo = localStorage.getItem("admin");
+  console.log("adminInfo", adminInfo);
 
   useEffect(() => {
     const handleResize = () => {
@@ -54,9 +54,9 @@ const Layout = ({ children }) => {
   };
 
   const toggleSubmenu = (menuKey) => {
-    setExpandedMenus(prev => ({
+    setExpandedMenus((prev) => ({
       ...prev,
-      [menuKey]: !prev[menuKey]
+      [menuKey]: !prev[menuKey],
     }));
   };
 
@@ -77,10 +77,11 @@ const Layout = ({ children }) => {
         icon: BookOpen,
         label: "Document Price",
         path: "/admin/documents-price-table-table",
-        isActive: location.pathname.includes("/admin/documents-price-table") || 
-                  location.pathname.includes("/admin/documents-stamp-duty-table") ||
-                  location.pathname.includes("/admin/document-type-price") ||
-                  location.pathname.includes("/admin/delivery-type-price"),
+        isActive:
+          location.pathname.includes("/admin/documents-price-table") ||
+          location.pathname.includes("/admin/documents-stamp-duty-table") ||
+          location.pathname.includes("/admin/document-type-price") ||
+          location.pathname.includes("/admin/delivery-type-price"),
         hasSubmenu: true,
         submenuKey: "documentPrice",
         submenuItems: [
@@ -99,13 +100,19 @@ const Layout = ({ children }) => {
             path: "/admin/delivery-type-price",
             isActive: location.pathname === "/admin/delivery-type-price",
           },
-        ]
+        ],
       },
       {
         icon: Files,
         label: "New Bookings",
         path: "/admin/documents-new-booking-table",
         isActive: location.pathname === "/admin/documents-new-booking-table",
+      },
+      {
+        icon: Files,
+        label: "E-Stamp Bookings",
+        path: "/admin/e-stamp-booking-table",
+        isActive: location.pathname === "/admin/e-stamp-booking-table",
       },
     ];
 
@@ -138,7 +145,11 @@ const Layout = ({ children }) => {
                       ? "bg-red-600 text-white shadow-md"
                       : "text-red-900 hover:bg-red-100 hover:text-red-700"
                   }
-                  ${isSidebarOpen && !isMobile ? "justify-between" : "justify-center"}
+                  ${
+                    isSidebarOpen && !isMobile
+                      ? "justify-between"
+                      : "justify-center"
+                  }
                 `}
               >
                 <div className="flex items-center">
@@ -162,22 +173,33 @@ const Layout = ({ children }) => {
                 {(isSidebarOpen || isMobile) && (
                   <div className="ml-auto">
                     {expandedMenus[item.submenuKey] ? (
-                      <ChevronDown size={16} className={item.isActive ? "text-current" : "text-red-600"} />
+                      <ChevronDown
+                        size={16}
+                        className={
+                          item.isActive ? "text-current" : "text-red-600"
+                        }
+                      />
                     ) : (
-                      <ChevronRight size={16} className={item.isActive ? "text-current" : "text-red-600"} />
+                      <ChevronRight
+                        size={16}
+                        className={
+                          item.isActive ? "text-current" : "text-red-600"
+                        }
+                      />
                     )}
                   </div>
                 )}
               </div>
-              
+
               {/* Submenu */}
-              {expandedMenus[item.submenuKey] && (isSidebarOpen || isMobile) && (
-                <ul className="ml-6 mt-2 space-y-1">
-                  {item.submenuItems.map((subItem) => (
-                    <li key={subItem.path}>
-                      <Link
-                        to={subItem.path}
-                        className={`
+              {expandedMenus[item.submenuKey] &&
+                (isSidebarOpen || isMobile) && (
+                  <ul className="ml-6 mt-2 space-y-1">
+                    {item.submenuItems.map((subItem) => (
+                      <li key={subItem.path}>
+                        <Link
+                          to={subItem.path}
+                          className={`
                           flex items-center p-2 rounded-lg transition-all duration-300 text-sm
                           ${
                             subItem.isActive
@@ -185,13 +207,13 @@ const Layout = ({ children }) => {
                               : "text-red-800 hover:bg-red-50 hover:text-red-700"
                           }
                         `}
-                      >
-                        <span className="font-medium">{subItem.label}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                        >
+                          <span className="font-medium">{subItem.label}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
             </div>
           ) : (
             <Link
@@ -203,7 +225,11 @@ const Layout = ({ children }) => {
                     ? "bg-red-600 text-white shadow-md"
                     : "text-red-900 hover:bg-red-100 hover:text-red-700"
                 }
-                ${isSidebarOpen && !isMobile ? "justify-start" : "justify-center"}
+                ${
+                  isSidebarOpen && !isMobile
+                    ? "justify-start"
+                    : "justify-center"
+                }
               `}
             >
               <item.icon
@@ -242,7 +268,7 @@ const Layout = ({ children }) => {
                 ${isMobile && !isSidebarOpen ? "hidden" : ""}
               `}
             >
-             Draft Maker
+              Draft Maker
             </span>
           </div>
         </div>

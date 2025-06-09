@@ -1,7 +1,7 @@
 const DocumentPrice = require("../model/documentPriceSchema");
 const stampDutySchema = require("../model/stampDutyModel");
-const deliveryChargeModel = require("../model/deliveryChargeModel")
-const EstampPayment = require("../model/eStampPaymentSchema")
+const deliveryChargeModel = require("../model/deliveryChargeModel");
+const EstampPayment = require("../model/eStampPaymentSchema");
 
 const getAllDocumentPrices = async (req, res) => {
   try {
@@ -243,38 +243,43 @@ const updateStampDocumentStatus = async (req, res) => {
   }
 };
 
-
 const addServiceItem = async (req, res) => {
   try {
-    const {document} = req.body;
+    const { document } = req.body;
     const newService = await deliveryChargeModel.create({
       ...document,
       serviceName: document.serviceName?.trim(),
       description: document.description?.trim(),
       deliveryTime: document.deliveryTime?.trim(),
     });
-    res.status(201).json({ message: "Service added successfully", data: newService });
+    res
+      .status(201)
+      .json({ message: "Service added successfully", data: newService });
   } catch (err) {
-    res.status(500).json({ message: "Internal server error", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: err.message });
   }
 };
-
 
 const getAllServiceItems = async (req, res) => {
   try {
     const services = await deliveryChargeModel.find();
-    res.status(200).json({ message: "Services fetched successfully", data: services });
+    res
+      .status(200)
+      .json({ message: "Services fetched successfully", data: services });
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch services", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch services", error: err.message });
   }
 };
-
 
 const updateServiceItem = async (req, res) => {
   try {
     const { serviceId } = req.params;
     const { documentData } = req.body;
-    console.log(documentData)
+    console.log(documentData);
     const updatedService = await deliveryChargeModel.findByIdAndUpdate(
       serviceId,
       {
@@ -288,37 +293,43 @@ const updateServiceItem = async (req, res) => {
     if (!documentData) {
       return res.status(404).json({ message: "Service not found" });
     }
-    res.status(200).json({ message: "Service updated successfully", data: updatedService });
+    res
+      .status(200)
+      .json({ message: "Service updated successfully", data: updatedService });
   } catch (err) {
-    res.status(500).json({ message: "Internal server error", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: err.message });
   }
 };
-
 
 const updateServiceItemStatus = async (req, res) => {
   try {
     const { documentId } = req.params;
     const { currentStatus } = req.body;
-    console.log("currentStatus",currentStatus)
+    console.log("currentStatus", currentStatus);
 
     const updatedService = await deliveryChargeModel.findByIdAndUpdate(
       documentId,
       { status: currentStatus },
       { new: true }
     );
-    console.log("updatedService",updatedService)
+    console.log("updatedService", updatedService);
     if (!updatedService) {
       return res.status(404).json({ message: "Service not found" });
     }
     res.status(200).json({
-      message: `Service status updated to ${currentStatus ? "Active" : "Inactive"}`,
+      message: `Service status updated to ${
+        currentStatus ? "Active" : "Inactive"
+      }`,
       data: updatedService,
     });
   } catch (err) {
-    res.status(500).json({ message: "Failed to update status", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to update status", error: err.message });
   }
 };
-
 
 const getStampDeiveryChargeData = async (req, res) => {
   try {
@@ -339,38 +350,50 @@ const getStampDeiveryChargeData = async (req, res) => {
   }
 };
 
-
-
-
 const saveTheEstampData = async (req, res) => {
   try {
     const { orderData } = req.body;
     console.log("OrderData", orderData);
 
-    const newPayment = new EstampPayment(orderData);  // Directly pass the whole object
+    const newPayment = new EstampPayment(orderData); // Directly pass the whole object
     await newPayment.save();
 
     res.status(201).json({
       success: true,
-      message: 'E-stamp payment data saved successfully',
-      data: newPayment
+      message: "E-stamp payment data saved successfully",
+      data: newPayment,
     });
   } catch (err) {
     console.error("Error in saving the data", err);
     res.status(500).json({
       success: false,
-      message: 'Failed to save e-stamp payment data',
-      error: err.message
+      message: "Failed to save e-stamp payment data",
+      error: err.message,
     });
   }
 };
 
+const getEstampBookingData = async (req, res) => {
+  try {
+    const eStampData = await EstampPayment.find().sort({ createdAt: -1 }); // Latest first
 
-
-
-
+    res.status(200).json({
+      success: true,
+      message: "E-stamp booking data fetched successfully",
+      data: eStampData,
+    });
+  } catch (err) {
+    console.log("Error in getting the booking data", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch e-stamp booking data",
+      error: err.message,
+    });
+  }
+};
 
 module.exports = {
+  getEstampBookingData,
   getStampDeiveryChargeData,
   updateServiceItemStatus,
   updateServiceItem,
@@ -384,5 +407,5 @@ module.exports = {
   createDocumentPrice,
   updateDocumentPrice,
   deleteDocumentPrice,
-  saveTheEstampData
+  saveTheEstampData,
 };
