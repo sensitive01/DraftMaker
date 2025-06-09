@@ -662,3 +662,16 @@ export const getStampAndDeliveryCharges = async () => {
     return err;
   }
 };
+
+export const sendTheEstampData = async (orderData) => {
+  try {
+    const response = await axiosInstance.post(
+      `/document-price/save-estamp-data`,{orderData}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+

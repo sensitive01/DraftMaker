@@ -1,6 +1,7 @@
 const DocumentPrice = require("../model/documentPriceSchema");
 const stampDutySchema = require("../model/stampDutyModel");
 const deliveryChargeModel = require("../model/deliveryChargeModel")
+const EstampPayment = require("../model/eStampPaymentSchema")
 
 const getAllDocumentPrices = async (req, res) => {
   try {
@@ -341,8 +342,28 @@ const getStampDeiveryChargeData = async (req, res) => {
 
 
 
+const saveTheEstampData = async (req, res) => {
+  try {
+    const { orderData } = req.body;
+    console.log("OrderData", orderData);
 
+    const newPayment = new EstampPayment(orderData);  // Directly pass the whole object
+    await newPayment.save();
 
+    res.status(201).json({
+      success: true,
+      message: 'E-stamp payment data saved successfully',
+      data: newPayment
+    });
+  } catch (err) {
+    console.error("Error in saving the data", err);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to save e-stamp payment data',
+      error: err.message
+    });
+  }
+};
 
 
 
@@ -363,4 +384,5 @@ module.exports = {
   createDocumentPrice,
   updateDocumentPrice,
   deleteDocumentPrice,
+  saveTheEstampData
 };

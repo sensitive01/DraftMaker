@@ -60,6 +60,7 @@ import DualNameChangePreview from "./components/admin/dashboard/statistics/docum
 import StampDutyTable from "./components/admin/dashboard/statistics/StampDutyTable";
 import DeliveryChargesTable from "./components/admin/dashboard/statistics/DeliveryChargesTable";
 import DocumentPaymentPage from "./components/documents/DocumentPaymentPage";
+import BuyEStampDocuments from "./components/buyStampDocuments/BuyEStampDocuments";
 
 function MainLayout({ children }) {
   return (
@@ -540,6 +541,15 @@ function App() {
           element={
             <PaymentLayout>
               <DocumentPaymentPage />
+            </PaymentLayout>
+          }
+        />
+
+         <Route
+          path="/documents/buy-e-stamp"
+          element={
+            <PaymentLayout>
+              <BuyEStampDocuments />
             </PaymentLayout>
           }
         />

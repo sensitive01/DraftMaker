@@ -234,7 +234,7 @@ const Header = () => {
                 <div className="sub_menu">
                   <ul>
                     <li>
-                      <Link to="#" onClick={closeMenu}>
+                      <Link to="/documents/buy-e-stamp" onClick={closeMenu}>
                         Buy E-Stamp Paper
                       </Link>
                     </li>
