@@ -34,9 +34,9 @@ const MatriculationPage = () => {
 
     // Verification
     place: "",
-    day: "",
-    month: "",
-    year_verification: "",
+    day: "1",
+    month: "April",
+    year_verification: "2025",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");

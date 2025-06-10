@@ -1,39 +1,51 @@
 const mongoose = require("mongoose");
 
 // Fixture subschema
-const fixtureSchema = new mongoose.Schema({
-  item: { type: String },
-  quantity: { type: String },
-}, { _id: false });
+const fixtureSchema = new mongoose.Schema(
+  {
+    item: { type: String },
+    quantity: { type: String },
+  },
+  { _id: false }
+);
 
 // Stamp duty subschema
-const stampDutySchema = new mongoose.Schema({
-  documentType: String,
-  articleNo: String,
-  calculationType: String,
-  fixedAmount: Number,
-  percentage: Number,
-  minAmount: Number,
-  maxAmount: Number,
-}, { _id: false });
+const stampDutySchema = new mongoose.Schema(
+  {
+    documentType: String,
+    articleNo: String,
+    calculationType: String,
+    fixedAmount: Number,
+    percentage: Number,
+    minAmount: Number,
+    maxAmount: Number,
+  },
+  { _id: false }
+);
 
 // Delivery charge subschema
-const deliveryChargeSchema = new mongoose.Schema({
-  serviceName: String,
-  description: String,
-  charge: Number,
-  serviceType: String,
-}, { _id: false });
+const deliveryChargeSchema = new mongoose.Schema(
+  {
+    serviceName: String,
+    description: String,
+    charge: Number,
+    serviceType: String,
+  },
+  { _id: false }
+);
 
 // Service details subschema
-const serviceDetailsSchema = new mongoose.Schema({
-  basePrice: Number,
-  notaryCharge: Number,
-  stampDutyAmount: Number,
-  deliveryCharge: Number,
-  requiresStamp: Boolean,
-  requiresDelivery: Boolean,
-}, { _id: false });
+const serviceDetailsSchema = new mongoose.Schema(
+  {
+    basePrice: Number,
+    notaryCharge: Number,
+    stampDutyAmount: Number,
+    deliveryCharge: Number,
+    requiresStamp: Boolean,
+    requiresDelivery: Boolean,
+  },
+  { _id: false }
+);
 
 const commercialAgreementSchema = new mongoose.Schema(
   {
@@ -116,10 +128,17 @@ const commercialAgreementSchema = new mongoose.Schema(
       type: serviceDetailsSchema,
       default: null,
     },
+
+    commercialType: { type: String },
+    squareFeet: { type: String },
+    additionaldetails: { type: String },
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = mongoose.model("commercialAggrement", commercialAgreementSchema);
+module.exports = mongoose.model(
+  "commercialAggrement",
+  commercialAgreementSchema
+);

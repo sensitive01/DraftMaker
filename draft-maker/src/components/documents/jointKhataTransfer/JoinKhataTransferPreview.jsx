@@ -1,4 +1,5 @@
 import React from "react";
+import { getDayWithSuffix } from "../../../utils/dateFormat";
 
 const JoinKhataTransferPreview = ({ formData }) => {
     // Function to highlight empty fields with a light yellow background
@@ -14,7 +15,6 @@ const JoinKhataTransferPreview = ({ formData }) => {
             AFFIDAVIT
           </h1>
           <div className="border-b-2 border-black w-48 mx-auto mb-2"></div>
-          <div className="border-b-2 border-black w-32 mx-auto"></div>
         </div>
   
         {/* Official Note */}
@@ -172,9 +172,9 @@ const JoinKhataTransferPreview = ({ formData }) => {
               </span>{" "}
               on this{" "}
               <span className={`font-medium ${highlightIfEmpty(formData.day)}`}>
-                {formData.day || "XX"}
+                {getDayWithSuffix(formData.day) || "XX"}
               </span>{" "}
-              day of{" "}
+          {" "}
               <span
                 className={`font-medium ${highlightIfEmpty(formData.month)}`}
               >
@@ -194,7 +194,6 @@ const JoinKhataTransferPreview = ({ formData }) => {
           {/* Signature Block */}
           <div className="grid grid-cols-2 gap-8 mt-16 mb-8">
             <div className="text-right col-span-2">
-              <div className="h-24 border-b-2 border-black mb-3"></div>
               <p className="font-medium">Signature of the Deponents</p>
               <div className="text-sm text-gray-600 mt-1">
                 <p>{formData.name1 ? formData.name1 : ""}</p>

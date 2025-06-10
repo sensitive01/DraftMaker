@@ -25,7 +25,7 @@ export default function NameCorrectionChange() {
     oldName: "",
     newName: "",
     place: "",
-    day: "",
+    day: "1",
     month: "",
     year: "2025",
   });

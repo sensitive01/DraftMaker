@@ -48,6 +48,7 @@ export default function RentalAgreementForm() {
     hallCount: "",
     kitchenCount: "",
     toiletCount: "",
+    additionaldetails:"",
     fixtures: [{ item: "", quantity: "" }],
   });
 

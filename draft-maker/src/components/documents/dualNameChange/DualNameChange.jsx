@@ -159,12 +159,10 @@ export default function DualNameChange() {
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
 
-    // Validate form before showing mobile modal
     if (validateForm()) {
       setShowMobileModal(true);
     } else {
       setShowErrorNotification(true);
-      // Auto-hide the error notification after 5 seconds
       setTimeout(() => {
         setShowErrorNotification(false);
       }, 5000);
@@ -412,7 +410,6 @@ export default function DualNameChange() {
 
   return (
     <div className="container-fluid mx-auto py-8">
-      {/* Add Error Notification Component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
           validationError={validationError}

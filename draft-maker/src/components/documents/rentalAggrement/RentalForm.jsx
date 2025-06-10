@@ -357,6 +357,18 @@ const RentalForm = ({
                   className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 h-24"
                 ></textarea>
               </div>
+               <div>
+                <label className="block text-sm font-medium text-red-600 mb-2">
+                  Additional Details
+                </label>
+                <textarea
+                  name="additionaldetails"
+                  value={formData.additionaldetails || ""}
+                  onChange={handleChange}
+                  placeholder="Additional Details"
+                  className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 h-24"
+                ></textarea>
+              </div>
 
               {/* Second Row - Configuration */}
               <div>

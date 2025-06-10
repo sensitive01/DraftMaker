@@ -22,7 +22,7 @@ export default function PassportAnnaxurePreview({ formData }) {
       <div className="space-y-6 text-sm">
         <div className="mb-4">
           <p>
-            I, Mr/Mrs/Ms{" "}
+            I,{" "}
             <span className="font-medium underline px-1">{formData.name}</span>{" "}
             {formData.relationType}{" "}
             <span className="font-medium underline px-1">

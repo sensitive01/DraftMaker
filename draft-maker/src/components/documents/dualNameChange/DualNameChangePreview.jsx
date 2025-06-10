@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { getDayWithSuffix } from "../../../utils/dateFormat";
 
 const DualNameChangePreview = ({ formData }) => {
   const pdfTemplateRef = useRef(null);
@@ -111,15 +112,15 @@ const DualNameChangePreview = ({ formData }) => {
                 >
                   {formData?.name1 || "NAME"}
                 </span>
-                ,{" "}
+                ,{" "}   Name of document-
                 <span
                   className={
                     isFilled(formData?.document1) ? "" : "bg-yellow-200 px-1"
                   }
                 >
-                  {formData?.document1 || "NAME OF DOCUMENT"}
+               {formData?.document1 || "NAME OF DOCUMENT"}
                 </span>
-                ,{" "}
+                ,{" "} Document Serial No-
                 <span
                   className={
                     isFilled(formData?.documentNo1) ? "" : "bg-yellow-200 px-1"
@@ -141,7 +142,7 @@ const DualNameChangePreview = ({ formData }) => {
                 >
                   {formData?.name2 || "NAME"}
                 </span>
-                ,{" "}
+                ,{" "}  Name of document-
                 <span
                   className={
                     isFilled(formData?.document2) ? "" : "bg-yellow-200 px-1"
@@ -149,7 +150,7 @@ const DualNameChangePreview = ({ formData }) => {
                 >
                   {formData?.document2 || "NAME OF DOCUMENT"}
                 </span>
-                ,{" "}
+                ,{" "}Document Serial No-
                 <span
                   className={
                     isFilled(formData?.documentNo2) ? "" : "bg-yellow-200 px-1"
@@ -191,9 +192,8 @@ const DualNameChangePreview = ({ formData }) => {
                     isFilled(formData?.day) ? "" : "bg-yellow-200 px-1"
                   }
                 >
-                  {formData?.day || "XX"}
-                </span>{" "}
-                day of{" "}
+                  {getDayWithSuffix(formData?.day) || "XX"}   {" "}
+                </span>
                 <span
                   className={
                     isFilled(formData?.month) ? "" : "bg-yellow-200 px-1"

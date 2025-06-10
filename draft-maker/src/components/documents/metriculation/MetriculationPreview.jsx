@@ -1,4 +1,5 @@
 import React from "react";
+import { getDayWithSuffix } from "../../../utils/dateFormat";
 
 const MetriculationPreview = ({ formData }) => {
   // Function to highlight empty fields
@@ -10,11 +11,10 @@ const MetriculationPreview = ({ formData }) => {
     <div className="bg-white p-6 rounded-lg border-2 border-gray-300 shadow-lg overflow-auto h-full">
       {/* Official Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold uppercase tracking-wider mb-3 underline">
+        <h1 className="text-3xl font-bold uppercase tracking-wider mb-3">
           AFFIDAVIT
         </h1>
         <div className="border-b-2 border-black w-48 mx-auto mb-2"></div>
-        <div className="border-b-2 border-black w-32 mx-auto"></div>
       </div>
 
       <div className="space-y-4 text-gray-800 leading-relaxed">
@@ -138,9 +138,9 @@ const MetriculationPreview = ({ formData }) => {
             </span>{" "}
             on this{" "}
             <span className={`font-medium ${highlightIfEmpty(formData.day)}`}>
-              {formData.day || "XX"}
+              {getDayWithSuffix(formData.day) || "XX"}
             </span>{" "}
-            day of{" "}
+            {" "}
             <span className={`font-medium ${highlightIfEmpty(formData.month)}`}>
               {formData.month || "XXXX"}
             </span>
@@ -160,7 +160,6 @@ const MetriculationPreview = ({ formData }) => {
         {/* Signature Block */}
         <div className="grid grid-cols-1 mt-24 mb-8">
           <div className="text-right">
-            <div className="h-24 border-b-2 border-black mb-3"></div>
             <p className="font-medium">Signature of the Deponent</p>
             <div className="text-sm text-gray-600 mt-1">
               <p>{formData.name ? formData.name : ""}</p>

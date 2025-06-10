@@ -1,36 +1,48 @@
 const mongoose = require("mongoose");
 
 // Sub-schemas
-const fixtureSchema = new mongoose.Schema({
-  item: { type: String },
-  quantity: { type: String },
-}, { _id: false });
+const fixtureSchema = new mongoose.Schema(
+  {
+    item: { type: String },
+    quantity: { type: String },
+  },
+  { _id: false }
+);
 
-const stampDutySchema = new mongoose.Schema({
-  documentType: String,
-  articleNo: String,
-  calculationType: String,
-  fixedAmount: Number,
-  percentage: Number,
-  minAmount: Number,
-  maxAmount: Number,
-}, { _id: false });
+const stampDutySchema = new mongoose.Schema(
+  {
+    documentType: String,
+    articleNo: String,
+    calculationType: String,
+    fixedAmount: Number,
+    percentage: Number,
+    minAmount: Number,
+    maxAmount: Number,
+  },
+  { _id: false }
+);
 
-const deliveryChargeSchema = new mongoose.Schema({
-  serviceName: String,
-  description: String,
-  charge: Number,
-  serviceType: String,
-}, { _id: false });
+const deliveryChargeSchema = new mongoose.Schema(
+  {
+    serviceName: String,
+    description: String,
+    charge: Number,
+    serviceType: String,
+  },
+  { _id: false }
+);
 
-const serviceDetailsSchema = new mongoose.Schema({
-  basePrice: Number,
-  notaryCharge: Number,
-  stampDutyAmount: Number,
-  deliveryCharge: Number,
-  requiresStamp: Boolean,
-  requiresDelivery: Boolean,
-}, { _id: false });
+const serviceDetailsSchema = new mongoose.Schema(
+  {
+    basePrice: Number,
+    notaryCharge: Number,
+    stampDutyAmount: Number,
+    deliveryCharge: Number,
+    requiresStamp: Boolean,
+    requiresDelivery: Boolean,
+  },
+  { _id: false }
+);
 
 const recidentailAgreementSchema = new mongoose.Schema(
   {
@@ -108,10 +120,14 @@ const recidentailAgreementSchema = new mongoose.Schema(
       type: serviceDetailsSchema,
       default: null,
     },
+    additionaldetails: { type: String },
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = mongoose.model("recidentialAggrement", recidentailAgreementSchema);
+module.exports = mongoose.model(
+  "recidentialAggrement",
+  recidentailAgreementSchema
+);

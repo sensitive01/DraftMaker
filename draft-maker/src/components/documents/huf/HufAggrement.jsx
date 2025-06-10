@@ -31,9 +31,9 @@ export default function HufAgreement() {
     hufName: "",
     hufExistenceDate: "",
     place: "",
-    day: "",
-    month: "",
-    year: "",
+    day: "1",
+    month: "April",
+    year: "2025",
     coparceners: [{ name: "", relationship: "", address: "" }],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);

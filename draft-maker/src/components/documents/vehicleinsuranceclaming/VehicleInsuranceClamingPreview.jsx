@@ -1,4 +1,5 @@
 import React from "react";
+import { getDayWithSuffix } from "../../../utils/dateFormat";
 
 const VehicleInsuranceClaimingPreview = ({ formData }) => {
   // Helper function to determine if a field needs highlighting
@@ -231,9 +232,9 @@ const VehicleInsuranceClaimingPreview = ({ formData }) => {
               </span>{" "}
               on this{" "}
               <span className={highlightIfEmpty(formData.day)}>
-                {formData.day || "__"}
+                {getDayWithSuffix(formData.day) || "__"}
               </span>{" "}
-              day of{" "}
+             {" "}
               <span
                 className={`font-medium ${highlightIfEmpty(formData.month)}`}
               >
@@ -251,13 +252,11 @@ const VehicleInsuranceClaimingPreview = ({ formData }) => {
           {/* Signature Block */}
           <div className="grid grid-cols-2 gap-8 mt-24 mb-8">
             <div className="text-left">
-              <div className="h-24 border-b-2 border-black mb-3"></div>
               <p className="font-medium">Signature of Notary Public</p>
               <p className="text-sm text-gray-600">With Seal</p>
             </div>
 
             <div className="text-right">
-              <div className="h-24 border-b-2 border-black mb-3"></div>
               <p className="font-medium">Signature of the Deponent</p>
               <p className="text-sm text-gray-600">
                 {formData.title ? formData.title : ""}{" "}

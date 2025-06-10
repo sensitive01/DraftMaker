@@ -1,3 +1,5 @@
+import { getDayWithSuffix } from "../../../utils/dateFormat";
+
 export default function AffidavitDisplay({ data, onEdit }) {
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -156,7 +158,7 @@ export default function AffidavitDisplay({ data, onEdit }) {
         <p className="mb-10 font-serif text-base leading-relaxed">
           Verified at{" "}
           <HighlightedField value={data.place} placeholder="PLACE" /> on this{" "}
-          <HighlightedField value={data.day} placeholder="XX" /> day of{" "}
+          <HighlightedField value={getDayWithSuffix(data.day)} placeholder="XX" />{" "}
           <HighlightedField value={data.month} placeholder="XXXX" />,{" "}
           <HighlightedField value={data.year} placeholder="XXXX" /> that the
           contents of the above said affidavit are true and correct to the best

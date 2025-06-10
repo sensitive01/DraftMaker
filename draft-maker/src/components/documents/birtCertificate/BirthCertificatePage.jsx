@@ -29,9 +29,9 @@ export default function BirthCertificatePage() {
     incorrectName: "",
     correctName: "",
     place: "",
-    day: "",
+    day: "1",
     month: "April",
-    year: "2024",
+    year: "2025",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");

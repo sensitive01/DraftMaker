@@ -58,7 +58,7 @@ export default function PassportAnnaxureForm({
 
             <div className="form-group col-span-3">
               <label className="block text-sm font-medium text-red-600 mb-2">
-                Guardian's Name
+                 Name
               </label>
               <input
                 type="text"
@@ -66,7 +66,7 @@ export default function PassportAnnaxureForm({
                 value={formData.guardianName}
                 onChange={handleChange}
                 className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none"
-                placeholder="Enter guardian's name"
+                placeholder="Enter  name"
               />
             </div>
           </div>

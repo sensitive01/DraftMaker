@@ -357,59 +357,48 @@ const CommercialForm = ({
                   className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 h-24"
                 ></textarea>
               </div>
+              <div>
+                <label className="block text-sm font-medium text-red-600 mb-2">
+                  Additional Details
+                </label>
+                <textarea
+                  name="additionaldetails"
+                  value={formData.additionaldetails || ""}
+                  onChange={handleChange}
+                  placeholder="Additional Details"
+                  className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 h-24"
+                ></textarea>
+              </div>
 
               {/* Second Row - Configuration */}
               <div>
-                <label className="block text-sm font-medium text-red-600 mb-2">
-                  Configuration
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+         
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-red-600 mb-2">
-                      Configuration
+                      Commercial Type
                     </label>
-                    <input
-                      type="text"
-                      name="bhkConfig"
-                      value={formData.bhkConfig || ""}
+                    <select
+                      name="commercialType"
+                      value={formData.commercialType || ""}
                       onChange={handleChange}
-                      placeholder="e.g. 2BHK"
                       className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                    />
+                    >
+                      <option value="">Select Type</option>
+                      <option value="shop">Shop</option>
+                      <option value="office">Office</option>
+                    </select>
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-red-600 mb-2">
-                      Bedrooms
+                      Square Feet
                     </label>
                     <input
-                      type="text"
-                      name="bedroomCount"
-                      value={formData.bedroomCount || ""}
+                      type="number"
+                      name="squareFeet"
+                      value={formData.squareFeet || ""}
                       onChange={handleChange}
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-red-600 mb-2">
-                      Halls
-                    </label>
-                    <input
-                      type="text"
-                      name="hallCount"
-                      value={formData.hallCount || ""}
-                      onChange={handleChange}
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-red-600 mb-2">
-                      Toilets
-                    </label>
-                    <input
-                      type="text"
-                      name="toiletCount"
-                      value={formData.toiletCount || ""}
-                      onChange={handleChange}
+                      placeholder="Enter area in sq ft"
                       className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                     />
                   </div>

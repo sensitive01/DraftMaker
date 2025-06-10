@@ -28,7 +28,7 @@ export default function DobCorrectionPage() {
     document2: "",
     documentNo2: "",
     place: "",
-    day: "",
+    day: "1",
     month: "",
     year: "2025",
   });

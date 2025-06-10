@@ -1,4 +1,5 @@
 import React from "react";
+import { getDayWithSuffix } from "../../../utils/dateFormat";
 
 const GstPreview = ({ formData }) => {
   return (
@@ -56,7 +57,7 @@ const GstPreview = ({ formData }) => {
         <p className="mb-8 leading-relaxed">
           Verified at{" "}
           <span className="font-bold">{formData?.place || "________"}</span> on
-          this <span className="font-bold">{formData?.day || "__"}</span> day of{" "}
+          this <span className="font-bold">{getDayWithSuffix(formData?.day )|| "__"}</span> {" "}
           <span className="font-bold">{formData?.month || "_______"}</span>,
           <span className="font-bold"> {formData?.year || "____"}</span> that the
           contents of the above said affidavit are true and correct to the best

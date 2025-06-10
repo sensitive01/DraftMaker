@@ -1,4 +1,5 @@
 import React from "react";
+import { getDayWithSuffix } from "../../../utils/dateFormat";
 
 const NameCorrectionPreview = ({ formData }) => {
   return (
@@ -37,45 +38,40 @@ const NameCorrectionPreview = ({ formData }) => {
 
       {/* Declaration Points */}
       <div className="mb-8">
-        <ol className="list-decimal pl-8 space-y-4">
-          <li>That I am a citizen of India.</li>
-
-          <li>
-            That my name has been recorded as{" "}
-            <span className="font-semibold ">{formData.oldName}</span>{" "}
-            (old name) in my official documents.
-          </li>
-
-          <li>
-            That now I have changed my name permanently to{" "}
-            <span className="font-semibold ">{formData.newName}</span>{" "}
-            (new name) in place of my previous name i.e.,{" "}
-            <span className="">{formData.oldName}</span> (old name).
-          </li>
-
-          <li>
-            That in future I will be known by my new name i.e.,{" "}
-            <span className="font-semibold ">{formData.newName}</span>{" "}
-            for all purposes.
-          </li>
-
-          <li>
-            That I further declare that both the names mentioned hereinabove
+        <div className="mb-8 space-y-4">
+          <p>1. That I am a citizen of India.</p>
+          <p>
+            2. That my name has been recorded as{" "}
+            <span className="font-semibold">{formData.oldName}</span> (old name)
+            in my official documents.
+          </p>
+          <p>
+            3. That now I have changed my name permanently to{" "}
+            <span className="font-semibold">{formData.newName}</span> (new name)
+            in place of my previous name i.e., <span>{formData.oldName}</span>{" "}
+            (old name).
+          </p>
+          <p>
+            4. That in future I will be known by my new name i.e.,{" "}
+            <span className="font-semibold">{formData.newName}</span> for all
+            purposes.
+          </p>
+          <p>
+            5. That I further declare that both the names mentioned hereinabove
             belong to one and the same person i.e., "myself".
-          </li>
-
-          <li>
-            That my statement is true and correct to the best of my knowledge
+          </p>
+          <p>
+            6. That my statement is true and correct to the best of my knowledge
             and belief.
-          </li>
-        </ol>
+          </p>
+        </div>
       </div>
 
       {/* Verification */}
       <div className="mb-12 mt-8">
         <p className="leading-relaxed">
           Verified at <span className="font-semibold">{formData.place}</span> on
-          this <span className="font-semibold">{formData.day}</span> day of{" "}
+          this <span className="font-semibold">{getDayWithSuffix(formData.day)}</span> {" "}
           <span className="font-semibold">{formData.month}</span>,{" "}
           <span className="font-semibold">{formData.year}</span> that the
           contents of the above said affidavit are true and correct to the best
@@ -98,8 +94,6 @@ const NameCorrectionPreview = ({ formData }) => {
           </div>
         </div>
       </div>
-
-     
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import { getDayWithSuffix } from '../../../utils/dateFormat';
 
 const HufPreview = ({ formData }) => {
   // Function to determine if a field should be highlighted
@@ -182,7 +183,7 @@ const HufPreview = ({ formData }) => {
 
         <p className="mb-10 leading-relaxed">
           Verified at <Field value={formData.place} placeholder="[PLACE]" inline /> on this{" "}
-          <Field value={formData.day} placeholder="[DAY]" inline /> day of{" "}
+          <Field value={getDayWithSuffix(formData.day)} placeholder="[DAY]" inline /> {" "}
           <Field value={formData.month} placeholder="[MONTH]" inline />,{" "}
           <Field value={formData.year} placeholder="[YEAR]" inline /> that the contents of the above said
           affidavit are true and correct to the best of my knowledge and belief.

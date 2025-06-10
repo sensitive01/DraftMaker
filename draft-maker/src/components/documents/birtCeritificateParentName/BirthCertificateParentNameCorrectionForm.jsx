@@ -98,8 +98,8 @@ const BirthCertificateParentNameCorrectionForm = ({formData,handleChange}) => {
           onChange={handleChange}
           className="border p-2 w-full"
         >
-          <option>Daughter</option>
-          <option>Son</option>
+          <option>Daughter's</option>
+          <option>Son's</option>
         </select>
       </div>
       

@@ -23,9 +23,9 @@ export default function GstPage() {
     companyName: "",
     officeAddress: "",
     place: "",
-    day: "",
-    month: "",
-    year: "",
+    day: "1",
+    month: "April",
+    year: "2025",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");

@@ -23,7 +23,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
     address: "",
     fatherAadhaar: "",
     motherAadhaar: "",
-    childRelation: "Daughter",
+    childRelation: "Daughter's",
     childName: "",
     certificateNumber: "",
     incorrectFatherName: "",
@@ -31,7 +31,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
     correctFatherName: "",
     correctMotherName: "",
     place: "",
-    day: "",
+    day: "1",
     month: "April",
     year: "2024",
   });

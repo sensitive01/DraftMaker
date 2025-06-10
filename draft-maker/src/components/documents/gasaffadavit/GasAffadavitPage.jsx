@@ -33,9 +33,9 @@ export default function GasAffidavitForm() {
     reason: "shifting",
     lostItem: "subscription",
     place: "",
-    day: "",
+    day: "1",
     month: "",
-    year: "",
+    year: "2025",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");

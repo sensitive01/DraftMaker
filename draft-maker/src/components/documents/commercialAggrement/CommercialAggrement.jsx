@@ -48,6 +48,9 @@ export default function CommercialAggrement() {
     hallCount: "",
     kitchenCount: "",
     toiletCount: "",
+    commercialType:"",
+    squareFeet:"",
+    additionaldetails:"",
     fixtures: [{ item: "", quantity: "" }],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);

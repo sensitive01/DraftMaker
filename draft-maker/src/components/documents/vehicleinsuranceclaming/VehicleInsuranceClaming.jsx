@@ -32,9 +32,9 @@ const VehicleInsuranceClaming = () => {
     driverName: "",
     accidentDetails: "",
     place: "",
-    day: "",
-    month: "",
-    year: "",
+    day: "1",
+    month: "April",
+    year: "2025",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);

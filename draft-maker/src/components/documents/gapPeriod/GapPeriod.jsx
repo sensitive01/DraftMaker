@@ -23,8 +23,8 @@ export default function GapPeriod() {
     aadhaarNo: "",
     authority: "",
     place: "",
-    day: "",
-    month: "",
+    day: "1",
+    month: "April",
     year: "2025",
     gapPeriods: [{ from: "", to: "", reason: "" }],
   });
