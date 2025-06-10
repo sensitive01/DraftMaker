@@ -10,8 +10,11 @@ const BuyEStampDocuments = () => {
   // Form states
   const [firstPartyName, setFirstPartyName] = useState("");
   const [secondPartyName, setSecondPartyName] = useState("");
+  const [stampDutyPayer, setStampDutyPayer] = useState(""); // New field
   const [selectedDocument, setSelectedDocument] = useState("");
-  const [deliveryType, setDeliveryType] = useState("in-store"); // 'in-store' or 'delivery'
+  const [considerationAmount, setConsiderationAmount] = useState(""); // New field
+  const [description, setDescription] = useState(""); // New field
+  const [deliveryType, setDeliveryType] = useState("in-store");
   const [selectedDeliveryService, setSelectedDeliveryService] = useState("");
 
   // Modal states
@@ -41,6 +44,21 @@ const BuyEStampDocuments = () => {
     fetchData();
   }, []);
 
+  // Calculate progress percentage
+  const calculateProgress = () => {
+    let completedSteps = 0;
+    const totalSteps = 6; // firstParty, secondParty, stampDutyPayer, selectedDocument, considerationAmount, description
+
+    if (firstPartyName.trim()) completedSteps++;
+    if (secondPartyName.trim()) completedSteps++;
+    if (stampDutyPayer) completedSteps++;
+    if (selectedDocument) completedSteps++;
+    if (considerationAmount.trim()) completedSteps++;
+    if (description.trim()) completedSteps++;
+
+    return Math.round((completedSteps / totalSteps) * 100);
+  };
+
   const validateForm = () => {
     const errors = {};
 
@@ -52,8 +70,22 @@ const BuyEStampDocuments = () => {
       errors.secondPartyName = "Second party name is required";
     }
 
+    if (!stampDutyPayer) {
+      errors.stampDutyPayer = "Please select who pays the stamp duty";
+    }
+
     if (!selectedDocument) {
       errors.selectedDocument = "Please select a document type";
+    }
+
+    if (!considerationAmount.trim()) {
+      errors.considerationAmount = "Consideration amount is required";
+    } else if (isNaN(considerationAmount) || parseFloat(considerationAmount) <= 0) {
+      errors.considerationAmount = "Please enter a valid amount";
+    }
+
+    if (!description.trim()) {
+      errors.description = "Description is required";
     }
 
     if (deliveryType === "delivery" && !selectedDeliveryService) {
@@ -91,26 +123,28 @@ const BuyEStampDocuments = () => {
     );
   };
 
-  const calculateStampAmount = (documentData, value = 0) => {
-    if (!documentData) return 0;
-
-    if (documentData.calculationType === "fixed") {
-      return documentData.fixedAmount;
-    } else if (documentData.calculationType === "percentage") {
-      const calculatedAmount = (value * documentData.percentage) / 100;
-      const minAmount = documentData.minAmount || 0;
-      const maxAmount = documentData.maxAmount || Infinity;
-
-      return Math.max(minAmount, Math.min(calculatedAmount, maxAmount));
+  // Updated stamp duty calculation based on consideration amount
+  const calculateStampAmount = () => {
+    if (!considerationAmount || isNaN(considerationAmount)) return 0;
+    
+    const amount = parseFloat(considerationAmount);
+    let stampDuty = 0;
+    
+    if (amount <= 100000) {
+      // 1% for amounts up to 1 lakh
+      stampDuty = (amount * 1) / 100;
+    } else {
+      // 2% for amounts exceeding 1 lakh
+      stampDuty = (amount * 2) / 100;
     }
-    return 0;
+    
+    // Minimum stamp duty is ₹100
+    return Math.max(stampDuty, 100);
   };
 
   const getTotalAmount = () => {
-    const documentData = getSelectedDocumentData();
     const deliveryData = getSelectedDeliveryData();
-
-    const stampAmount = calculateStampAmount(documentData);
+    const stampAmount = calculateStampAmount();
     const deliveryAmount =
       deliveryType === "delivery" && deliveryData ? deliveryData.charge : 0;
 
@@ -123,11 +157,13 @@ const BuyEStampDocuments = () => {
     }
   };
 
-  // Optional: Helper function to reset form after successful payment
   const resetForm = () => {
     setFirstPartyName("");
     setSecondPartyName("");
+    setStampDutyPayer("");
     setSelectedDocument("");
+    setConsiderationAmount("");
+    setDescription("");
     setDeliveryType("in-store");
     setSelectedDeliveryService("");
     setRequestorName("");
@@ -136,14 +172,11 @@ const BuyEStampDocuments = () => {
     setPaymentErrors({});
   };
 
-  // Optional: Function to send data to backend (implement as needed)
   const sendOrderToBackend = async (orderData) => {
     try {
-      const response = await sendTheEstampData(orderData)
-      console.log(response)
-      return response
-      
-      
+      const response = await sendTheEstampData(orderData);
+      console.log(response);
+      return response;
     } catch (error) {
       console.error('Error sending order to backend:', error);
       throw error;
@@ -152,7 +185,6 @@ const BuyEStampDocuments = () => {
 
   const handlePayment = () => {
     if (validatePaymentForm()) {
-      // Prepare all the data to send to backend
       const selectedDocumentData = getSelectedDocumentData();
       const selectedDeliveryData = getSelectedDeliveryData();
       
@@ -160,18 +192,16 @@ const BuyEStampDocuments = () => {
         // Party Information
         firstPartyName: firstPartyName.trim(),
         secondPartyName: secondPartyName.trim(),
+        stampDutyPayer: stampDutyPayer,
         
         // Document Information
         selectedDocumentId: selectedDocument,
         documentType: selectedDocumentData?.documentType,
-        documentCalculationType: selectedDocumentData?.calculationType,
-        documentFixedAmount: selectedDocumentData?.fixedAmount,
-        documentPercentage: selectedDocumentData?.percentage,
-        documentMinAmount: selectedDocumentData?.minAmount,
-        documentMaxAmount: selectedDocumentData?.maxAmount,
+        considerationAmount: parseFloat(considerationAmount),
+        description: description.trim(),
         
         // Calculated Amounts
-        stampDutyAmount: calculateStampAmount(selectedDocumentData),
+        stampDutyAmount: calculateStampAmount(),
         
         // Delivery Information
         deliveryType: deliveryType,
@@ -193,23 +223,20 @@ const BuyEStampDocuments = () => {
         currency: "INR"
       };
 
-      // Integrate Razorpay here
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: getTotalAmount() * 100, // Amount in paise
+        amount: getTotalAmount() * 100,
         currency: "INR",
         name: "E-Stamp Service",
         description: `${selectedDocumentData?.documentType} - ${
           deliveryType === "delivery" ? "With Delivery" : "In-Store Pickup"
         }`,
         handler: function (response) {
-          // Payment successful - log all data
           console.log("=== PAYMENT SUCCESSFUL ===");
           console.log("Razorpay Response:", response);
           console.log("=== ORDER DETAILS TO SEND TO BACKEND ===");
           console.log(JSON.stringify(paymentData, null, 2));
           
-          // Add payment response data to the payload
           const finalPaymentData = {
             ...paymentData,
             razorpayPaymentId: response.razorpay_payment_id,
@@ -222,13 +249,10 @@ const BuyEStampDocuments = () => {
           console.log("=== FINAL PAYLOAD WITH PAYMENT DETAILS ===");
           console.log(JSON.stringify(finalPaymentData, null, 2));
           
-          // Here you would typically send this data to your backend
-          // Example API call (uncomment and modify as needed):
           sendOrderToBackend(finalPaymentData)
             .then(result => {
               console.log("Order saved successfully:", result);
               alert("Payment successful! Order has been processed.");
-              // Reset form or redirect to success page
               resetForm();
             })
             .catch(error => {
@@ -238,9 +262,6 @@ const BuyEStampDocuments = () => {
           
           alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
           setShowPaymentModal(false);
-          
-          // Optional: Reset form after successful payment
-          // resetForm();
         },
         prefill: {
           name: requestorName,
@@ -337,6 +358,20 @@ const BuyEStampDocuments = () => {
             <p className="mt-1 text-gray-600">
               Complete the form below to purchase your e-stamp document
             </p>
+            
+            {/* Progress Bar */}
+            <div className="mt-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-gray-700">Form Completion</span>
+                <span className="text-sm font-medium text-red-600">{calculateProgress()}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-red-600 h-2 rounded-full transition-all duration-300 ease-out"
+                  style={{ width: `${calculateProgress()}%` }}
+                ></div>
+              </div>
+            </div>
           </div>
 
           <div className="p-6">
@@ -395,13 +430,61 @@ const BuyEStampDocuments = () => {
               </div>
             </div>
 
+            {/* Stamp Duty Payer Selection */}
+            <div className="mb-6">
+              <label
+                htmlFor="stampDutyPayer"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Who Pays the Stamp Duty? *
+              </label>
+              <div className="relative">
+                <select
+                  id="stampDutyPayer"
+                  value={stampDutyPayer}
+                  onChange={(e) => setStampDutyPayer(e.target.value)}
+                  className={`w-full px-4 py-2.5 border ${
+                    formErrors.stampDutyPayer
+                      ? "border-red-300"
+                      : "border-gray-300"
+                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
+                >
+                  <option value="" className="text-gray-500">
+                    Select who pays the stamp duty
+                  </option>
+                  <option value="first-party">First Party</option>
+                  <option value="second-party">Second Party</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              {formErrors.stampDutyPayer && (
+                <p className="mt-1 text-sm text-red-600">
+                  {formErrors.stampDutyPayer}
+                </p>
+              )}
+            </div>
+
             {/* Document Type Selection */}
             <div className="mb-6">
               <label
                 htmlFor="documentType"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Document Type *
+                Stamp Article *
               </label>
               <div className="relative">
                 <select
@@ -415,20 +498,14 @@ const BuyEStampDocuments = () => {
                   } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
                 >
                   <option value="" className="text-gray-500">
-                    Select a document type
+                    Select a stamp article
                   </option>
                   {stampDutyData.map((doc) => (
                     <option key={doc._id} value={doc._id} className="py-2">
-                      {doc.documentType} - ₹
-                      {doc.calculationType === "fixed"
-                        ? doc.fixedAmount
-                        : `${doc.percentage}% (Min: ₹${doc.minAmount || 0}${
-                            doc.maxAmount ? `, Max: ₹${doc.maxAmount}` : ""
-                          })`}
+                      {doc.documentType}
                     </option>
                   ))}
                 </select>
-                {/* Custom dropdown arrow */}
                 <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                   <svg
                     className="w-4 h-4 text-gray-400"
@@ -450,9 +527,38 @@ const BuyEStampDocuments = () => {
                   {formErrors.selectedDocument}
                 </p>
               )}
+            </div>
 
-              {/* Show selected document details */}
-              {selectedDocument && (
+            {/* Consideration Amount */}
+            <div className="mb-6">
+              <label
+                htmlFor="considerationAmount"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Consideration Amount (₹) *
+              </label>
+              <input
+                type="number"
+                id="considerationAmount"
+                value={considerationAmount}
+                onChange={(e) => setConsiderationAmount(e.target.value)}
+                placeholder="Enter consideration amount"
+                min="0"
+                step="0.01"
+                className={`w-full px-4 py-2.5 border ${
+                  formErrors.considerationAmount
+                    ? "border-red-300"
+                    : "border-gray-300"
+                } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+              />
+              {formErrors.considerationAmount && (
+                <p className="mt-1 text-sm text-red-600">
+                  {formErrors.considerationAmount}
+                </p>
+              )}
+              
+              {/* Show stamp duty calculation */}
+              {considerationAmount && !isNaN(considerationAmount) && parseFloat(considerationAmount) > 0 && (
                 <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
                   <div className="flex items-start">
                     <svg
@@ -470,15 +576,47 @@ const BuyEStampDocuments = () => {
                     </svg>
                     <div className="text-sm">
                       <p className="font-medium text-blue-800">
-                        {getSelectedDocumentData()?.documentType}
+                        Stamp Duty Calculation:
                       </p>
                       <p className="text-blue-600 mt-1">
-                        Stamp Duty: ₹
-                        {calculateStampAmount(getSelectedDocumentData())}
+                        {parseFloat(considerationAmount) <= 100000 
+                          ? `1% of ₹${parseFloat(considerationAmount).toLocaleString('en-IN')} = ₹${calculateStampAmount()}`
+                          : `2% of ₹${parseFloat(considerationAmount).toLocaleString('en-IN')} = ₹${calculateStampAmount()}`
+                        }
+                      </p>
+                      <p className="text-blue-500 text-xs mt-1">
+                        (Minimum: ₹100, Rate: {parseFloat(considerationAmount) <= 100000 ? '1%' : '2%'} for amounts {parseFloat(considerationAmount) <= 100000 ? 'up to ₹1,00,000' : 'above ₹1,00,000'})
                       </p>
                     </div>
                   </div>
                 </div>
+              )}
+            </div>
+
+            {/* Description */}
+            <div className="mb-6">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Description *
+              </label>
+              <textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Enter document description"
+                rows="3"
+                className={`w-full px-4 py-2.5 border ${
+                  formErrors.description
+                    ? "border-red-300"
+                    : "border-gray-300"
+                } rounded-md focus:ring-red-500 focus:border-red-500 text-sm resize-vertical`}
+              />
+              {formErrors.description && (
+                <p className="mt-1 text-sm text-red-600">
+                  {formErrors.description}
+                </p>
               )}
             </div>
 
@@ -578,7 +716,7 @@ const BuyEStampDocuments = () => {
               </div>
             </div>
 
-            {/* Delivery Service Selection (shown when delivery is selected) */}
+            {/* Delivery Service Selection */}
             {deliveryType === "delivery" && (
               <div className="mb-6">
                 <label
