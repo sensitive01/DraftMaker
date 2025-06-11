@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { getStampAndDeliveryCharges, sendTheEstampData } from "../../api/service/axiosService";
+import {
+  getStampAndDeliveryCharges,
+  sendTheEstampData,
+} from "../../api/service/axiosService";
 
 const BuyEStampDocuments = () => {
   const [stampDutyData, setStampDutyData] = useState([]);
@@ -10,10 +13,10 @@ const BuyEStampDocuments = () => {
   // Form states
   const [firstPartyName, setFirstPartyName] = useState("");
   const [secondPartyName, setSecondPartyName] = useState("");
-  const [stampDutyPayer, setStampDutyPayer] = useState(""); // New field
+  const [stampDutyPayer, setStampDutyPayer] = useState("");
   const [selectedDocument, setSelectedDocument] = useState("");
-  const [considerationAmount, setConsiderationAmount] = useState(""); // New field
-  const [description, setDescription] = useState(""); // New field
+  const [considerationAmount, setConsiderationAmount] = useState("");
+  const [description, setDescription] = useState("");
   const [deliveryType, setDeliveryType] = useState("in-store");
   const [selectedDeliveryService, setSelectedDeliveryService] = useState("");
 
@@ -25,6 +28,9 @@ const BuyEStampDocuments = () => {
   // Error states
   const [formErrors, setFormErrors] = useState({});
   const [paymentErrors, setPaymentErrors] = useState({});
+
+  // Service charge including GST (fixed for all documents)
+  const SERVICE_CHARGE = 210;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,21 +52,28 @@ const BuyEStampDocuments = () => {
 
   // Calculate progress percentage
   const calculateProgress = () => {
+    const selectedDocumentData = getSelectedDocumentData();
+    const isFixedType = selectedDocumentData?.calculationType === "fixed";
+
     let completedSteps = 0;
-    const totalSteps = 6; // firstParty, secondParty, stampDutyPayer, selectedDocument, considerationAmount, description
+    let totalSteps = isFixedType ? 5 : 6; // firstParty, secondParty, stampDutyPayer, selectedDocument, description, (considerationAmount only for percentage)
 
     if (firstPartyName.trim()) completedSteps++;
     if (secondPartyName.trim()) completedSteps++;
     if (stampDutyPayer) completedSteps++;
     if (selectedDocument) completedSteps++;
-    if (considerationAmount.trim()) completedSteps++;
     if (description.trim()) completedSteps++;
+
+    // Only count consideration amount for percentage type
+    if (!isFixedType && considerationAmount.trim()) completedSteps++;
 
     return Math.round((completedSteps / totalSteps) * 100);
   };
 
   const validateForm = () => {
     const errors = {};
+    const selectedDocumentData = getSelectedDocumentData();
+    const isFixedType = selectedDocumentData?.calculationType === "fixed";
 
     if (!firstPartyName.trim()) {
       errors.firstPartyName = "First party name is required";
@@ -78,10 +91,16 @@ const BuyEStampDocuments = () => {
       errors.selectedDocument = "Please select a document type";
     }
 
-    if (!considerationAmount.trim()) {
-      errors.considerationAmount = "Consideration amount is required";
-    } else if (isNaN(considerationAmount) || parseFloat(considerationAmount) <= 0) {
-      errors.considerationAmount = "Please enter a valid amount";
+    // Only validate consideration amount for percentage type
+    if (!isFixedType) {
+      if (!considerationAmount.trim()) {
+        errors.considerationAmount = "Consideration amount is required";
+      } else if (
+        isNaN(considerationAmount) ||
+        parseFloat(considerationAmount) <= 0
+      ) {
+        errors.considerationAmount = "Please enter a valid amount";
+      }
     }
 
     if (!description.trim()) {
@@ -123,23 +142,62 @@ const BuyEStampDocuments = () => {
     );
   };
 
-  // Updated stamp duty calculation based on consideration amount
+  // Updated stamp duty calculation based on document type and consideration amount
   const calculateStampAmount = () => {
-    if (!considerationAmount || isNaN(considerationAmount)) return 0;
-    
-    const amount = parseFloat(considerationAmount);
-    let stampDuty = 0;
-    
-    if (amount <= 100000) {
-      // 1% for amounts up to 1 lakh
-      stampDuty = (amount * 1) / 100;
-    } else {
-      // 2% for amounts exceeding 1 lakh
-      stampDuty = (amount * 2) / 100;
+    const selectedDocumentData = getSelectedDocumentData();
+    if (!selectedDocumentData) return 0;
+
+    // For fixed calculation type
+    if (selectedDocumentData.calculationType === "fixed") {
+      return selectedDocumentData.fixedAmount;
     }
-    
-    // Minimum stamp duty is ₹100
-    return Math.max(stampDuty, 100);
+
+    // For percentage calculation type
+    if (selectedDocumentData.calculationType === "percentage") {
+      if (!considerationAmount || isNaN(considerationAmount)) return 0;
+
+      const amount = parseFloat(considerationAmount);
+      const percentage = selectedDocumentData.percentage;
+      const minAmount = selectedDocumentData.minAmount;
+      const maxAmount = selectedDocumentData.maxAmount;
+
+      let stampDuty = 0;
+
+      // If minAmount and maxAmount are both 0, use the custom 1%/2% logic
+      if (minAmount === 0 && maxAmount === 0) {
+        if (amount <= 100000) {
+          stampDuty = (amount * 1) / 100; // 1% for amounts up to 1 lakh
+        } else {
+          stampDuty = (amount * 2) / 100; // 2% for amounts above 1 lakh
+        }
+        // Minimum stamp duty is ₹100
+        stampDuty = Math.max(stampDuty, 100);
+      } else {
+        // Use the percentage from the document data
+        if (amount <= 100000) {
+          stampDuty = (amount * percentage) / 100;
+          // Apply minimum amount if specified
+          if (minAmount > 0) {
+            stampDuty = Math.max(stampDuty, minAmount);
+          }
+        } else {
+          // For amounts above 1 lakh, if maxAmount is specified, use it as fixed amount
+          if (maxAmount > 0) {
+            stampDuty = maxAmount;
+          } else {
+            stampDuty = (amount * percentage) / 100;
+            // Apply minimum amount if specified
+            if (minAmount > 0) {
+              stampDuty = Math.max(stampDuty, minAmount);
+            }
+          }
+        }
+      }
+
+      return Math.round(stampDuty);
+    }
+
+    return 0;
   };
 
   const getTotalAmount = () => {
@@ -148,7 +206,7 @@ const BuyEStampDocuments = () => {
     const deliveryAmount =
       deliveryType === "delivery" && deliveryData ? deliveryData.charge : 0;
 
-    return stampAmount + deliveryAmount;
+    return stampAmount + SERVICE_CHARGE + deliveryAmount;
   };
 
   const handleProceedToPayment = () => {
@@ -178,7 +236,7 @@ const BuyEStampDocuments = () => {
       console.log(response);
       return response;
     } catch (error) {
-      console.error('Error sending order to backend:', error);
+      console.error("Error sending order to backend:", error);
       throw error;
     }
   };
@@ -187,40 +245,48 @@ const BuyEStampDocuments = () => {
     if (validatePaymentForm()) {
       const selectedDocumentData = getSelectedDocumentData();
       const selectedDeliveryData = getSelectedDeliveryData();
-      
+
       const paymentData = {
         // Party Information
         firstPartyName: firstPartyName.trim(),
         secondPartyName: secondPartyName.trim(),
         stampDutyPayer: stampDutyPayer,
-        
+
         // Document Information
         selectedDocumentId: selectedDocument,
         documentType: selectedDocumentData?.documentType,
-        considerationAmount: parseFloat(considerationAmount),
+        calculationType: selectedDocumentData?.calculationType,
+        considerationAmount:
+          selectedDocumentData?.calculationType === "percentage"
+            ? parseFloat(considerationAmount)
+            : null,
         description: description.trim(),
-        
+
         // Calculated Amounts
         stampDutyAmount: calculateStampAmount(),
-        
+        serviceCharge: SERVICE_CHARGE,
+
         // Delivery Information
         deliveryType: deliveryType,
         selectedDeliveryServiceId: selectedDeliveryService || null,
         deliveryServiceName: selectedDeliveryData?.serviceName || null,
-        deliveryCharge: deliveryType === "delivery" && selectedDeliveryData ? selectedDeliveryData.charge : 0,
+        deliveryCharge:
+          deliveryType === "delivery" && selectedDeliveryData
+            ? selectedDeliveryData.charge
+            : 0,
         deliveryDescription: selectedDeliveryData?.description || null,
-        
+
         // Payment Information
         requestorName: requestorName.trim(),
         mobileNumber: mobileNumber.trim(),
         totalAmount: getTotalAmount(),
-        
+
         // Timestamp
         orderDate: new Date().toISOString(),
-        
+
         // Additional metadata
         paymentMethod: "razorpay",
-        currency: "INR"
+        currency: "INR",
       };
 
       const options = {
@@ -236,31 +302,35 @@ const BuyEStampDocuments = () => {
           console.log("Razorpay Response:", response);
           console.log("=== ORDER DETAILS TO SEND TO BACKEND ===");
           console.log(JSON.stringify(paymentData, null, 2));
-          
+
           const finalPaymentData = {
             ...paymentData,
             razorpayPaymentId: response.razorpay_payment_id,
             razorpayOrderId: response.razorpay_order_id || null,
             razorpaySignature: response.razorpay_signature || null,
             paymentStatus: "completed",
-            paymentCompletedAt: new Date().toISOString()
+            paymentCompletedAt: new Date().toISOString(),
           };
-          
+
           console.log("=== FINAL PAYLOAD WITH PAYMENT DETAILS ===");
           console.log(JSON.stringify(finalPaymentData, null, 2));
-          
+
           sendOrderToBackend(finalPaymentData)
-            .then(result => {
+            .then((result) => {
               console.log("Order saved successfully:", result);
               alert("Payment successful! Order has been processed.");
               resetForm();
             })
-            .catch(error => {
+            .catch((error) => {
               console.error("Error saving order:", error);
-              alert("Payment successful but there was an issue saving your order. Please contact support.");
+              alert(
+                "Payment successful but there was an issue saving your order. Please contact support."
+              );
             });
-          
-          alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
+
+          alert(
+            "Payment successful! Payment ID: " + response.razorpay_payment_id
+          );
           setShowPaymentModal(false);
         },
         prefill: {
@@ -271,17 +341,17 @@ const BuyEStampDocuments = () => {
           color: "#dc2626",
         },
         modal: {
-          ondismiss: function() {
+          ondismiss: function () {
             console.log("Payment modal closed by user");
-          }
-        }
+          },
+        },
       };
 
       const rzp = new window.Razorpay(options);
-      rzp.on('payment.failed', function (response) {
+      rzp.on("payment.failed", function (response) {
         console.log("=== PAYMENT FAILED ===");
         console.log("Error:", response.error);
-        
+
         const failedPaymentData = {
           ...paymentData,
           paymentStatus: "failed",
@@ -290,17 +360,66 @@ const BuyEStampDocuments = () => {
           errorDescription: response.error.description,
           errorSource: response.error.source,
           errorStep: response.error.step,
-          errorReason: response.error.reason
+          errorReason: response.error.reason,
         };
-        
+
         console.log("=== FAILED PAYMENT DATA ===");
         console.log(JSON.stringify(failedPaymentData, null, 2));
-        
+
         alert("Payment failed: " + response.error.description);
       });
-      
+
       rzp.open();
     }
+  };
+
+  // Helper function to get calculation explanation
+  const getCalculationExplanation = () => {
+    const selectedDocumentData = getSelectedDocumentData();
+    if (!selectedDocumentData) return null;
+
+    if (selectedDocumentData.calculationType === "fixed") {
+      return `Fixed stamp duty of ₹${selectedDocumentData.fixedAmount}`;
+    }
+
+    if (
+      selectedDocumentData.calculationType === "percentage" &&
+      considerationAmount &&
+      !isNaN(considerationAmount)
+    ) {
+      const amount = parseFloat(considerationAmount);
+      const percentage = selectedDocumentData.percentage;
+      const minAmount = selectedDocumentData.minAmount;
+      const maxAmount = selectedDocumentData.maxAmount;
+
+      if (minAmount === 0 && maxAmount === 0) {
+        return amount <= 100000
+          ? `1% of ₹${amount.toLocaleString(
+              "en-IN"
+            )} = ₹${calculateStampAmount()} (Minimum: ₹100)`
+          : `2% of ₹${amount.toLocaleString(
+              "en-IN"
+            )} = ₹${calculateStampAmount()}`;
+      } else {
+        if (amount <= 100000) {
+          return `${percentage}% of ₹${amount.toLocaleString(
+            "en-IN"
+          )} = ₹${calculateStampAmount()}${
+            minAmount > 0 ? ` (Minimum: ₹${minAmount})` : ""
+          }`;
+        } else {
+          return maxAmount > 0
+            ? `Fixed amount of ₹${maxAmount} for amounts above ₹1,00,000`
+            : `${percentage}% of ₹${amount.toLocaleString(
+                "en-IN"
+              )} = ₹${calculateStampAmount()}${
+                minAmount > 0 ? ` (Minimum: ₹${minAmount})` : ""
+              }`;
+        }
+      }
+    }
+
+    return null;
   };
 
   if (loading) {
@@ -358,15 +477,19 @@ const BuyEStampDocuments = () => {
             <p className="mt-1 text-gray-600">
               Complete the form below to purchase your e-stamp document
             </p>
-            
+
             {/* Progress Bar */}
             <div className="mt-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700">Form Completion</span>
-                <span className="text-sm font-medium text-red-600">{calculateProgress()}%</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Form Completion
+                </span>
+                <span className="text-sm font-medium text-red-600">
+                  {calculateProgress()}%
+                </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
+                <div
                   className="bg-red-600 h-2 rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${calculateProgress()}%` }}
                 ></div>
@@ -490,7 +613,10 @@ const BuyEStampDocuments = () => {
                 <select
                   id="documentType"
                   value={selectedDocument}
-                  onChange={(e) => setSelectedDocument(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedDocument(e.target.value);
+                    setConsiderationAmount(""); // Reset consideration amount when document changes
+                  }}
                   className={`w-full px-4 py-2.5 border ${
                     formErrors.selectedDocument
                       ? "border-red-300"
@@ -502,7 +628,10 @@ const BuyEStampDocuments = () => {
                   </option>
                   {stampDutyData.map((doc) => (
                     <option key={doc._id} value={doc._id} className="py-2">
-                      {doc.documentType}
+                      {doc.documentType}{" "}
+                      {doc.calculationType === "fixed"
+                        ? "(Fixed)"
+                        : "(Percentage)"}
                     </option>
                   ))}
                 </select>
@@ -529,69 +658,66 @@ const BuyEStampDocuments = () => {
               )}
             </div>
 
-            {/* Consideration Amount */}
-            <div className="mb-6">
-              <label
-                htmlFor="considerationAmount"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Consideration Amount (₹) *
-              </label>
-              <input
-                type="number"
-                id="considerationAmount"
-                value={considerationAmount}
-                onChange={(e) => setConsiderationAmount(e.target.value)}
-                placeholder="Enter consideration amount"
-                min="0"
-                step="0.01"
-                className={`w-full px-4 py-2.5 border ${
-                  formErrors.considerationAmount
-                    ? "border-red-300"
-                    : "border-gray-300"
-                } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-              />
-              {formErrors.considerationAmount && (
-                <p className="mt-1 text-sm text-red-600">
-                  {formErrors.considerationAmount}
-                </p>
-              )}
-              
-              {/* Show stamp duty calculation */}
-              {considerationAmount && !isNaN(considerationAmount) && parseFloat(considerationAmount) > 0 && (
-                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                  <div className="flex items-start">
-                    <svg
-                      className="w-4 h-4 text-blue-500 mt-0.5 mr-2 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <div className="text-sm">
-                      <p className="font-medium text-blue-800">
-                        Stamp Duty Calculation:
-                      </p>
-                      <p className="text-blue-600 mt-1">
-                        {parseFloat(considerationAmount) <= 100000 
-                          ? `1% of ₹${parseFloat(considerationAmount).toLocaleString('en-IN')} = ₹${calculateStampAmount()}`
-                          : `2% of ₹${parseFloat(considerationAmount).toLocaleString('en-IN')} = ₹${calculateStampAmount()}`
-                        }
-                      </p>
-                      <p className="text-blue-500 text-xs mt-1">
-                        (Minimum: ₹100, Rate: {parseFloat(considerationAmount) <= 100000 ? '1%' : '2%'} for amounts {parseFloat(considerationAmount) <= 100000 ? 'up to ₹1,00,000' : 'above ₹1,00,000'})
-                      </p>
-                    </div>
-                  </div>
+            {/* Consideration Amount - Only show for percentage calculation type */}
+            {selectedDocument &&
+              getSelectedDocumentData()?.calculationType === "percentage" && (
+                <div className="mb-6">
+                  <label
+                    htmlFor="considerationAmount"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Consideration Amount (₹) *
+                  </label>
+                  <input
+                    type="number"
+                    id="considerationAmount"
+                    value={considerationAmount}
+                    onChange={(e) => setConsiderationAmount(e.target.value)}
+                    placeholder="Enter consideration amount"
+                    min="0"
+                    step="0.01"
+                    className={`w-full px-4 py-2.5 border ${
+                      formErrors.considerationAmount
+                        ? "border-red-300"
+                        : "border-gray-300"
+                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                  />
+                  {formErrors.considerationAmount && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {formErrors.considerationAmount}
+                    </p>
+                  )}
                 </div>
               )}
-            </div>
+
+            {/* Show stamp duty calculation */}
+            {selectedDocument && getCalculationExplanation() && (
+              <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <div className="flex items-start">
+                  <svg
+                    className="w-4 h-4 text-blue-500 mt-0.5 mr-2 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <div className="text-sm">
+                    <p className="font-medium text-blue-800">
+                      Stamp Duty Calculation:
+                    </p>
+                    <p className="text-blue-600 mt-1">
+                      {getCalculationExplanation()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Description */}
             <div className="mb-6">
@@ -608,9 +734,7 @@ const BuyEStampDocuments = () => {
                 placeholder="Enter document description"
                 rows="3"
                 className={`w-full px-4 py-2.5 border ${
-                  formErrors.description
-                    ? "border-red-300"
-                    : "border-gray-300"
+                  formErrors.description ? "border-red-300" : "border-gray-300"
                 } rounded-md focus:ring-red-500 focus:border-red-500 text-sm resize-vertical`}
               />
               {formErrors.description && (
@@ -832,7 +956,15 @@ const BuyEStampDocuments = () => {
                   <div className="flex justify-between items-center py-1">
                     <span className="text-gray-700">Stamp Duty:</span>
                     <span className="font-medium text-gray-900">
-                      ₹{calculateStampAmount(getSelectedDocumentData())}
+                      ₹{calculateStampAmount()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-gray-700">
+                      Service Charge (Inc. GST):
+                    </span>
+                    <span className="font-medium text-gray-900">
+                      ₹{SERVICE_CHARGE}
                     </span>
                   </div>
                   {deliveryType === "delivery" && selectedDeliveryService && (
