@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { getAggrementFormData } from "../../../../../../api/service/axiosService";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from "docx";
 import { saveAs } from "file-saver";
+import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
 
 const NameChangePreview = () => {
   const { bookingId } = useParams();
@@ -345,7 +346,7 @@ const NameChangePreview = () => {
         <div className="mb-12 mt-8">
           <p className="leading-relaxed">
             Verified at <span className="font-semibold">{formData.place}</span> on
-            this <span className="font-semibold">{formData.day}</span> day of{" "}
+            this <span className="font-semibold">{getDayWithSuffix(formData.day)}</span>{" "}
             <span className="font-semibold">{formData.month}</span>,{" "}
             <span className="font-semibold">{formData.year}</span> that the
             contents of the above said affidavit are true and correct to the best

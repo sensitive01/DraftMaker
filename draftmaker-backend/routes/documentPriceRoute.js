@@ -22,6 +22,10 @@ documentPriceRouter.put("/update-delivery-charge-status/:documentId",documentPri
 documentPriceRouter.get("/get-stamp-delivery-price-data",documentPriceController.getStampDeiveryChargeData)
 documentPriceRouter.post("/save-estamp-data",documentPriceController.saveTheEstampData)
 documentPriceRouter.get("/get-e-stamp-booking-data",documentPriceController.getEstampBookingData)
+documentPriceRouter.get("/get-individial-e-stamp-booking-data/:stampBookingId",documentPriceController.getIndividualStampBookingData)
+documentPriceRouter.put("/update-individial-e-stamp-booking-data/:stampBookingId",documentPriceController.updateIndividualStampBookingDataStatus)
+
+
 
 
 

@@ -1,7 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { getAggrementFormData } from "../../../../../../api/service/axiosService";
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from "docx";
+import {
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  HeadingLevel,
+  AlignmentType,
+} from "docx";
 import { saveAs } from "file-saver";
 
 const DocumentLostPreview = () => {
@@ -60,7 +67,9 @@ const DocumentLostPreview = () => {
                 children: [
                   new TextRun(`I, `),
                   new TextRun({
-                    text: `${formData.personTitle || "Mr/Mrs/Ms"} ${formData.personName || "................................"}`,
+                    text: `${formData.personTitle || "Mr/Mrs/Ms"} ${
+                      formData.personName || "................................"
+                    }`,
                     bold: true,
                   }),
                   new TextRun(` ${formData.relationType || "D/o"} `),
@@ -82,7 +91,9 @@ const DocumentLostPreview = () => {
                 children: [
                   new TextRun(`Permanent Address `),
                   new TextRun({
-                    text: formData?.address || "[Address Line 1, Address Line 2, City, State, Pin Code]",
+                    text:
+                      formData?.address ||
+                      "[Address Line 1, Address Line 2, City, State, Pin Code]",
                     bold: true,
                   }),
                 ],
@@ -114,7 +125,9 @@ const DocumentLostPreview = () => {
                 spacing: { after: 200 },
                 numbering: { reference: "my-numbering", level: 0 },
                 children: [
-                  new TextRun(`That I have inadvertently misplaced the original `),
+                  new TextRun(
+                    `That I have inadvertently misplaced the original `
+                  ),
                   new TextRun({
                     text: formData.documentType || "DOCUMENT NAME",
                     bold: true,
@@ -129,7 +142,9 @@ const DocumentLostPreview = () => {
                     text: formData.documentNumber || "...........",
                     bold: true,
                   }),
-                  new TextRun(`, which I am unable to trace even after extensive search.`),
+                  new TextRun(
+                    `, which I am unable to trace even after extensive search.`
+                  ),
                 ],
               }),
 
@@ -144,7 +159,9 @@ const DocumentLostPreview = () => {
                   }),
                   new TextRun(` on DATE: `),
                   new TextRun({
-                    text: `${formData.firDay || "XX"}/${formData.firMonth || "XX"}/${formData.firYear || "XXXX"}`,
+                    text: `${formData.firDay || "XX"}/${
+                      formData.firMonth || "XX"
+                    }/${formData.firYear || "XXXX"}`,
                     bold: true,
                   }),
                   new TextRun(` reporting about the loss of `),
@@ -160,12 +177,16 @@ const DocumentLostPreview = () => {
                 spacing: { after: 200 },
                 numbering: { reference: "my-numbering", level: 0 },
                 children: [
-                  new TextRun(`That I hereby request the Company/ Developer to provide me with the duplicate copy of `),
+                  new TextRun(
+                    `That I hereby request the Company/ Developer to provide me with the duplicate copy of `
+                  ),
                   new TextRun({
                     text: formData.documentType || "DOCUMENT",
                     bold: true,
                   }),
-                  new TextRun(` for the purpose of my records and fulfillment of any requirement which may arise in future.`),
+                  new TextRun(
+                    ` for the purpose of my records and fulfillment of any requirement which may arise in future.`
+                  ),
                 ],
               }),
 
@@ -198,7 +219,9 @@ const DocumentLostPreview = () => {
                     text: formData?.year || "XXXX",
                     bold: true,
                   }),
-                  new TextRun(` that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.`),
+                  new TextRun(
+                    ` that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.`
+                  ),
                 ],
               }),
 
@@ -207,9 +230,10 @@ const DocumentLostPreview = () => {
                 text: "(Signature of the Deponent)",
                 alignment: AlignmentType.RIGHT,
               }),
-              
+
               new Paragraph({
-                text: formData?.personName || "................................",
+                text:
+                  formData?.personName || "................................",
                 alignment: AlignmentType.RIGHT,
               }),
             ],
@@ -319,20 +343,48 @@ const DocumentLostPreview = () => {
 
             <p className="mb-4 text-justify">
               I,{" "}
-              <span className={isFilled(formData?.personTitle) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+              <span
+                className={
+                  isFilled(formData?.personTitle)
+                    ? "font-bold"
+                    : "bg-yellow-200 px-1 font-bold"
+                }
+              >
                 {formData?.personTitle || "Mr/Mrs/Ms"}
               </span>{" "}
-              <span className={isFilled(formData?.personName) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+              <span
+                className={
+                  isFilled(formData?.personName)
+                    ? "font-bold"
+                    : "bg-yellow-200 px-1 font-bold"
+                }
+              >
                 {formData?.personName || "................................"}
               </span>{" "}
-              <span className={isFilled(formData?.relationType) ? "" : "bg-yellow-200 px-1"}>
+              <span
+                className={
+                  isFilled(formData?.relationType) ? "" : "bg-yellow-200 px-1"
+                }
+              >
                 {formData?.relationType || "D/o"}
               </span>{" "}
-              <span className={isFilled(formData?.relationName) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+              <span
+                className={
+                  isFilled(formData?.relationName)
+                    ? "font-bold"
+                    : "bg-yellow-200 px-1 font-bold"
+                }
+              >
                 {formData?.relationName || "........................"}
               </span>
               , Aged:{" "}
-              <span className={isFilled(formData?.age?.toString()) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+              <span
+                className={
+                  isFilled(formData?.age?.toString())
+                    ? "font-bold"
+                    : "bg-yellow-200 px-1 font-bold"
+                }
+              >
                 {formData?.age || "......"}
               </span>{" "}
               Years,
@@ -340,14 +392,27 @@ const DocumentLostPreview = () => {
 
             <p className="mb-4 text-justify">
               Permanent Address{" "}
-              <span className={isFilled(formData?.address) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
-                {formData?.address || "[Address Line 1, Address Line 2, City, State, Pin Code]"}
+              <span
+                className={
+                  isFilled(formData?.address)
+                    ? "font-bold"
+                    : "bg-yellow-200 px-1 font-bold"
+                }
+              >
+                {formData?.address ||
+                  "[Address Line 1, Address Line 2, City, State, Pin Code]"}
               </span>
             </p>
 
             <p className="mb-4 text-justify">
               My Aadhaar No:{" "}
-              <span className={isFilled(formData?.aadhaarNumber) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+              <span
+                className={
+                  isFilled(formData?.aadhaarNumber)
+                    ? "font-bold"
+                    : "bg-yellow-200 px-1 font-bold"
+                }
+              >
                 {formData?.aadhaarNumber || "0000 0000 0000"}
               </span>
             </p>
@@ -359,15 +424,33 @@ const DocumentLostPreview = () => {
             <ol className="list-decimal pl-6 space-y-4">
               <li className="text-justify">
                 That I have inadvertently misplaced the original{" "}
-                <span className={isFilled(formData?.documentType) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+                <span
+                  className={
+                    isFilled(formData?.documentType)
+                      ? "font-bold"
+                      : "bg-yellow-200 px-1 font-bold"
+                  }
+                >
                   {formData?.documentType || "DOCUMENT NAME"}
                 </span>
                 ,{" "}
-                <span className={isFilled(formData?.documentType) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+                <span
+                  className={
+                    isFilled(formData?.documentType)
+                      ? "font-bold"
+                      : "bg-yellow-200 px-1 font-bold"
+                  }
+                >
                   {formData?.documentType || "DOCUMENT"}
                 </span>{" "}
                 SERIAL NO:{" "}
-                <span className={isFilled(formData?.documentNumber) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+                <span
+                  className={
+                    isFilled(formData?.documentNumber)
+                      ? "font-bold"
+                      : "bg-yellow-200 px-1 font-bold"
+                  }
+                >
                   {formData?.documentNumber || "..........."}
                 </span>
                 , which I am unable to trace even after extensive search.
@@ -375,55 +458,107 @@ const DocumentLostPreview = () => {
 
               <li className="text-justify">
                 That an FIR has been lodged bearing No{" "}
-                <span className={isFilled(formData?.firNumber) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+                <span
+                  className={
+                    isFilled(formData?.firNumber)
+                      ? "font-bold"
+                      : "bg-yellow-200 px-1 font-bold"
+                  }
+                >
                   {formData?.firNumber || "XXXX"}
                 </span>{" "}
                 on DATE:{" "}
-                <span className={
-                  (isFilled(formData?.firDay) && isFilled(formData?.firMonth) && isFilled(formData?.firYear)) ? 
-                  "font-bold" : "bg-yellow-200 px-1 font-bold"
-                }>
-                  {formData?.firDay || "XX"}/{formData?.firMonth || "XX"}/{formData?.firYear || "XXXX"}
+                <span
+                  className={
+                    isFilled(formData?.firDay) &&
+                    isFilled(formData?.firMonth) &&
+                    isFilled(formData?.firYear)
+                      ? "font-bold"
+                      : "bg-yellow-200 px-1 font-bold"
+                  }
+                >
+                  {formData?.firDay || "XX"}/{formData?.firMonth || "XX"}/
+                  {formData?.firYear || "XXXX"}
                 </span>{" "}
                 reporting about the loss of{" "}
-                <span className={isFilled(formData?.documentType) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+                <span
+                  className={
+                    isFilled(formData?.documentType)
+                      ? "font-bold"
+                      : "bg-yellow-200 px-1 font-bold"
+                  }
+                >
                   {formData?.documentType || "DOCUMENT"}
                 </span>
                 , The copy of the same is enclosed herewith.
               </li>
 
               <li className="text-justify">
-                That I hereby request the Company/ Developer to provide me with the duplicate copy of{" "}
-                <span className={isFilled(formData?.documentType) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+                That I hereby request the Company/ Developer to provide me with
+                the duplicate copy of{" "}
+                <span
+                  className={
+                    isFilled(formData?.documentType)
+                      ? "font-bold"
+                      : "bg-yellow-200 px-1 font-bold"
+                  }
+                >
                   {formData?.documentType || "DOCUMENT"}
                 </span>{" "}
-                for the purpose of my records and fulfillment of any requirement which may arise in future.
+                for the purpose of my records and fulfillment of any requirement
+                which may arise in future.
               </li>
 
               <li className="text-justify">
-                That I undertake to inform your good office if the original document is found in future.
+                That I undertake to inform your good office if the original
+                document is found in future.
               </li>
             </ol>
 
             <div className="mt-12">
               <p className="text-justify">
                 Verified at{" "}
-                <span className={isFilled(formData?.place) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+                <span
+                  className={
+                    isFilled(formData?.place)
+                      ? "font-bold"
+                      : "bg-yellow-200 px-1 font-bold"
+                  }
+                >
                   {formData?.place || "PLACE"}
                 </span>{" "}
                 on this{" "}
-                <span className={isFilled(formData?.day) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+                <span
+                  className={
+                    isFilled(formData?.day)
+                      ? "font-bold"
+                      : "bg-yellow-200 px-1 font-bold"
+                  }
+                >
                   {formData?.day || "XX"}
                 </span>{" "}
                 day of{" "}
-                <span className={isFilled(formData?.month) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+                <span
+                  className={
+                    isFilled(formData?.month)
+                      ? "font-bold"
+                      : "bg-yellow-200 px-1 font-bold"
+                  }
+                >
                   {formData?.month || "XXXX"}
                 </span>
                 ,{" "}
-                <span className={isFilled(formData?.year) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
+                <span
+                  className={
+                    isFilled(formData?.year)
+                      ? "font-bold"
+                      : "bg-yellow-200 px-1 font-bold"
+                  }
+                >
                   {formData?.year || "XXXX"}
                 </span>{" "}
-                that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.
+                that the contents of the above said affidavit are true and
+                correct to the best of my knowledge and belief.
               </p>
             </div>
 

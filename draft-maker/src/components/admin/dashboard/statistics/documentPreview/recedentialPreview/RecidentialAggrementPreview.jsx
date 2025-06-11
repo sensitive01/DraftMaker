@@ -443,9 +443,11 @@ const RecidentialAggrementPreview = () => {
                   new TextRun({
                     text: `${formData.bhkConfig || "XBHK"}, ${
                       formData.bedroomCount || "X"
-                    } bedroom, ${formData.hallCount || "X"} Hall, ${
-                      formData.kitchenCount || "X"
-                    } Kitchen with ${formData.toiletCount || "X"} Toilets`,
+                    } bedroom, ${formData.hallCount || "X"} Hall, 
+                    ${
+                      formData.kitchenCount || "1"
+                    } Kitchen with ${formData.toiletCount || "1"} 
+                    Toilets`,
                     bold: true,
                   }),
                   new TextRun(
@@ -741,57 +743,6 @@ const RecidentialAggrementPreview = () => {
   return (
     <>
       <div className="max-w-full overflow-x-auto py-4">
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={generateWordDocument}
-            disabled={loading}
-            className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 flex items-center"
-          >
-            {loading ? (
-              <>
-                <svg
-                  className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Processing...
-              </>
-            ) : (
-              <>
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                  ></path>
-                </svg>
-                Download
-              </>
-            )}
-          </button>
-        </div>
         <div ref={previewRef} className="print-container">
           {/* Page 1 */}
           <div className="page relative bg-white shadow-md mx-auto mb-8">
@@ -804,7 +755,7 @@ const RecidentialAggrementPreview = () => {
             {/* Content with proper legal document padding */}
             <div className="p-8 md:p-10 lg:p-12">
               <div className="text-center font-bold text-xl mb-8 underline tracking-wide">
-               {formData.documentType}
+                RENTAL AGREEMENT
               </div>
 
               <p className="mb-5 text-justify leading-relaxed">
@@ -890,69 +841,88 @@ const RecidentialAggrementPreview = () => {
                 NOW THIS AGREEMENT WITNESSETH AS FOLLOWS:
               </p>
 
-              <ol className="list-decimal pl-8 mb-5 space-y-4">
-                <li className="text-justify leading-relaxed">
-                  <span className="font-semibold">Rent:</span> The LESSEE shall
-                  pay a monthly rent of Rs.{" "}
-                  <span className="font-semibold">
-                    {formData.rentAmount || "00,000"}
-                  </span>{" "}
-                  /- (Rupees{" "}
-                  <span className="font-semibold">
-                    {formData.rentAmountWords || "In Words Only"}
-                  </span>
-                  ) Including Maintenance Charges on or before 5<sup>th</sup> of
-                  every month of English calendar.
-                </li>
-                <li className="text-justify leading-relaxed">
-                  <span className="font-semibold">Deposit:</span> The LESSEE
-                  have paid a total sum of Rs.{" "}
-                  <span className="font-semibold">
-                    {formData.depositAmount || "00,000"}
-                  </span>
-                  /- (Rupees{" "}
-                  <span className="font-semibold">
-                    {formData.depositAmountWords || "In Words Only"}
-                  </span>
-                  ) Paid Rs{" "}
-                  <span className="font-semibold">
-                    {formData.depositAmount || "00,000"}
-                  </span>{" "}
-                  by way of cash/online as security deposit and advance which
-                  the LESSOR hereby acknowledges the said sum shall carry no
-                  interest but refundable to the LESSEE on the termination of
-                  the tenancy.
-                </li>
-                <li className="text-justify leading-relaxed">
-                  <span className="font-semibold">Duration:</span> The Tenancy
-                  shall be in force for a period of 11 (Eleven) months
-                  commencing from{" "}
-                  <span className="font-semibold">
-                    {formatDate(formData.agreementStartDate)}
-                  </span>{" "}
-                  and the month of tenancy being the English calendar month.
-                  After the expiry of 11 months the LESSEE shall pay an increase
-                  of{" "}
-                  <span className="font-semibold">
-                    {formData.rentIncreasePercentage || "00"}%
-                  </span>{" "}
-                  in the existing rent.
-                </li>
-                <li className="text-justify leading-relaxed">
-                  <span className="font-semibold">Sub-letting:</span> The LESSEE
-                  shall not use the premises for any offensive or objectionable
-                  purpose and shall not have consent of the LESSOR hereby to
-                  sublet, under let or part with the possession to whomsoever or
-                  make any alteration.
-                </li>
-                <li className="text-justify leading-relaxed">
-                  <span className="font-semibold">
-                    Delivery back of possession:
-                  </span>{" "}
-                  On termination of the tenancy period to any renewal thereof,
-                  the LESSEE shall deliver back vacant possession of the
-                </li>
-              </ol>
+              <div className="pl-8 mb-5 space-y-4">
+                <div className="text-justify leading-relaxed flex">
+                  <span className="font-semibold mr-3 flex-shrink-0">1.</span>
+                  <div>
+                    <span className="font-semibold">Rent:</span> The LESSEE
+                    shall pay a monthly rent of Rs.{" "}
+                    <span className="font-semibold">
+                      {formData.rentAmount || "00,000"}
+                    </span>{" "}
+                    /- (Rupees{" "}
+                    <span className="font-semibold">
+                      {formData.rentAmountWords || "In Words Only"}
+                    </span>
+                    ) Including Maintenance Charges on or before 5<sup>th</sup>{" "}
+                    of every month of English calendar.
+                  </div>
+                </div>
+
+                <div className="text-justify leading-relaxed flex">
+                  <span className="font-semibold mr-3 flex-shrink-0">2.</span>
+                  <div>
+                    <span className="font-semibold">Deposit:</span> The LESSEE
+                    have paid a total sum of Rs.{" "}
+                    <span className="font-semibold">
+                      {formData.depositAmount || "00,000"}
+                    </span>
+                    /- (Rupees{" "}
+                    <span className="font-semibold">
+                      {formData.depositAmountWords || "In Words Only"}
+                    </span>
+                    ) Paid Rs{" "}
+                    <span className="font-semibold">
+                      {formData.depositAmount || "00,000"}
+                    </span>{" "}
+                    by way of cash/online as security deposit and advance which
+                    the LESSOR hereby acknowledges the said sum shall carry no
+                    interest but refundable to the LESSEE on the termination of
+                    the tenancy.
+                  </div>
+                </div>
+
+                <div className="text-justify leading-relaxed flex">
+                  <span className="font-semibold mr-3 flex-shrink-0">3.</span>
+                  <div>
+                    <span className="font-semibold">Duration:</span> The Tenancy
+                    shall be in force for a period of 11 (Eleven) months
+                    commencing from{" "}
+                    <span className="font-semibold">
+                      {formatDate(formData.agreementStartDate)}
+                    </span>{" "}
+                    and the month of tenancy being the English calendar month.
+                    After the expiry of 11 months the LESSEE shall pay an
+                    increase of{" "}
+                    <span className="font-semibold">
+                      {formData.rentIncreasePercentage || "00"}%
+                    </span>{" "}
+                    in the existing rent.
+                  </div>
+                </div>
+
+                <div className="text-justify leading-relaxed flex">
+                  <span className="font-semibold mr-3 flex-shrink-0">4.</span>
+                  <div>
+                    <span className="font-semibold">Sub-letting:</span> The
+                    LESSEE shall not use the premises for any offensive or
+                    objectionable purpose and shall not have consent of the
+                    LESSOR hereby to sublet, under let or part with the
+                    possession to whomsoever or make any alteration.
+                  </div>
+                </div>
+
+                <div className="text-justify leading-relaxed flex">
+                  <span className="font-semibold mr-3 flex-shrink-0">5.</span>
+                  <div>
+                    <span className="font-semibold">
+                      Delivery back of possession:
+                    </span>{" "}
+                    On termination of the tenancy period to any renewal thereof,
+                    the LESSEE shall deliver back vacant possession of the
+                  </div>
+                </div>
+              </div>
 
               <div className="absolute bottom-3 right-3 text-xs text-gray-500">
                 Page 1 of 3
@@ -973,66 +943,103 @@ const RecidentialAggrementPreview = () => {
                 it was handed over at the time of joining.
               </p>
 
-              <ol className="list-decimal pl-8 mb-5 space-y-4" start="6">
-                <li className="text-justify leading-relaxed">
-                  <span className="font-semibold">Notice:</span> If the LESSOR
-                  or the LESSEE wishes to terminate the Commercial Agreement
-                  period each party should issue{" "}
-                  <span className="font-semibold">
-                    {formData.noticePeriod || "..."}
-                  </span>{" "}
-                  month notice in writing to each other.
-                </li>
-                <li className="text-justify leading-relaxed">
-                  <span className="font-semibold">
-                    Additions and alterations:
-                  </span>{" "}
-                  The LESSEE shall not cause any damages to the fixed fixtures
-                  on the above said property. Any damages caused shall be
-                  repaired at the cost of the LESSEE.
-                </li>
-                <li className="text-justify leading-relaxed">
-                  <span className="font-semibold">Terminate:</span> The LESSOR
-                  shall have the right to terminate the tenancy if the LESSEEs
-                  fails to pay the rents regularly for a consecutive period of{" "}
-                  <span className="font-semibold">
-                    {formData.defaultPeriod || "2"}
-                  </span>{" "}
-                  Months or commits breach of any of the terms herein mentioned
-                  and take possession of the premises.
-                </li>
-                <li className="text-justify leading-relaxed">
-                  <span className="font-semibold">
-                    Painting and Cleaning Charges:
-                  </span>{" "}
-                  At the time of vacating the premises the LESSEE shall pay{" "}
-                  <span className="font-semibold">
-                    Rs. {formData.paintingCharges || "..."}
-                  </span>{" "}
-                  as a painting and cleaning charges or such amount will be
-                  deducted from the deposit amount.
-                </li>
-                <li className="text-justify leading-relaxed">
-                  <span className="font-semibold">
-                    Electricity and other Taxes:
-                  </span>{" "}
-                  The LESSEE shall bear and pay the Electrical charges consumed
-                  as per the meter provided to concerned authorities and the
-                  LESSOR shall pay the property taxes.
-                </li>
-                <li className="text-justify leading-relaxed">
-                  <span className="font-semibold">Inspection:</span> The LESSOR
-                  or his representatives shall be entitled to enter the premises
-                  with prior appointment to inspect the same to satisfy himself
-                  that the premises if being and used in accordance with the
-                  terms of Agreement.
-                </li>
-                <li className="text-justify leading-relaxed">
-                  The LESSEE shall use the premises for{" "}
-                  <span className="font-semibold">"RESIDENTIAL PURPOSE"</span>{" "}
-                  only.
-                </li>
-              </ol>
+              <div className="pl-8 mb-5 space-y-4">
+                <div className="text-justify leading-relaxed flex">
+                  <span className="font-semibold mr-3 flex-shrink-0">6.</span>
+                  <div>
+                    <span className="font-semibold">Notice:</span> If the LESSOR
+                    or the LESSEE wishes to terminate the Commercial Agreement
+                    period each party should issue{" "}
+                    <span className="font-semibold">
+                      {formData.noticePeriod || "..."}
+                    </span>{" "}
+                    month notice in writing to each other.
+                  </div>
+                </div>
+
+                <div className="text-justify leading-relaxed flex">
+                  <span className="font-semibold mr-3 flex-shrink-0">7.</span>
+                  <div>
+                    <span className="font-semibold">
+                      Additions and alterations:
+                    </span>{" "}
+                    The LESSEE shall not cause any damages to the fixed fixtures
+                    on the above said property. Any damages caused shall be
+                    repaired at the cost of the LESSEE.
+                  </div>
+                </div>
+
+                <div className="text-justify leading-relaxed flex">
+                  <span className="font-semibold mr-3 flex-shrink-0">8.</span>
+                  <div>
+                    <span className="font-semibold">Terminate:</span> The LESSOR
+                    shall have the right to terminate the tenancy if the LESSEEs
+                    fails to pay the rents regularly for a consecutive period of{" "}
+                    <span className="font-semibold">
+                      {formData.defaultPeriod || "2"}
+                    </span>{" "}
+                    Months or commits breach of any of the terms herein
+                    mentioned and take possession of the premises.
+                  </div>
+                </div>
+
+                <div className="text-justify leading-relaxed flex">
+                  <span className="font-semibold mr-3 flex-shrink-0">9.</span>
+                  <div>
+                    <span className="font-semibold">
+                      Painting and Cleaning Charges:
+                    </span>{" "}
+                    At the time of vacating the premises the LESSEE shall pay{" "}
+                    <span className="font-semibold">
+                      Rs. {formData.paintingCharges || "..."}
+                    </span>{" "}
+                    as a painting and cleaning charges or such amount will be
+                    deducted from the deposit amount.
+                  </div>
+                </div>
+
+                <div className="text-justify leading-relaxed flex">
+                  <span className="font-semibold mr-3 flex-shrink-0">10.</span>
+                  <div>
+                    <span className="font-semibold">
+                      Electricity and other Taxes:
+                    </span>{" "}
+                    The LESSEE shall bear and pay the Electrical charges
+                    consumed as per the meter provided to concerned authorities
+                    and the LESSOR shall pay the property taxes.
+                  </div>
+                </div>
+
+                <div className="text-justify leading-relaxed flex">
+                  <span className="font-semibold mr-3 flex-shrink-0">11.</span>
+                  <div>
+                    <span className="font-semibold">Inspection:</span> The
+                    LESSOR or his representatives shall be entitled to enter the
+                    premises with prior appointment to inspect the same to
+                    satisfy himself that the premises if being and used in
+                    accordance with the terms of Agreement.
+                  </div>
+                </div>
+
+                <div className="text-justify leading-relaxed flex">
+                  <span className="font-semibold mr-3 flex-shrink-0">12.</span>
+                  <div>
+                    The LESSEE shall use the premises for{" "}
+                    <span className="font-semibold">"RESIDENTIAL PURPOSE"</span>{" "}
+                    only.
+                  </div>
+                </div>
+                {formData.additionaldetails && (
+                  <div className="text-justify leading-relaxed flex">
+                    <span className="font-semibold mr-3 flex-shrink-0">
+                      13.
+                    </span>
+                    <div className="font-semibold">
+                      {formData.additionaldetails}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <div className="mt-10 mb-6">
                 <div className="text-center font-bold mb-5 text-lg underline">
@@ -1040,8 +1047,17 @@ const RecidentialAggrementPreview = () => {
                 </div>
                 <p className="text-justify leading-relaxed">
                   All the piece and parcel of the premises at{" "}
-                  <span className="font-semibold">
-                    {formData.propertyAddress || "Complete Property Address"}
+                  <span>
+                    {formData.lessorAddressLine1 ||
+                      "LESSOR Address Line 1, Address Line 2, City, State, Pin Code"}
+                    {formData.lessorAddressLine2
+                      ? ", " + formData.lessorAddressLine2
+                      : ""}
+                    {formData.lessorCity ? ", " + formData.lessorCity : ""}
+                    {formData.lessorState ? ", " + formData.lessorState : ""}
+                    {formData.lessorPinCode
+                      ? " - " + formData.lessorPinCode
+                      : ""}
                   </span>{" "}
                   and consisting of{" "}
                   <span className="font-semibold">

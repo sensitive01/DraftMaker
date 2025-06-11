@@ -10,6 +10,7 @@ import {
   AlignmentType,
 } from "docx";
 import { saveAs } from "file-saver";
+import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
 
 const KhPreview = () => {
   const { bookingId } = useParams();
@@ -448,8 +449,8 @@ const KhPreview = () => {
           <p className="mt-8">
             Verified at{" "}
             <span className="font-bold">{formData.place || "PLACE"}</span> on
-            this <span className="font-bold">{formData.day || "XX"}</span> day
-            of <span className="font-bold">{formData.month || "XXXX"}</span>,{" "}
+            this <span className="font-bold">{getDayWithSuffix(formData.day) || "XX"}</span> 
+           {""} <span className="font-bold">{formData.month || "XXXX"}</span>,{" "}
             <span className="font-bold">{formData.year || "XXXX"}</span> that
             the contents of the above said affidavit are true and correct to the
             best of my knowledge and belief.

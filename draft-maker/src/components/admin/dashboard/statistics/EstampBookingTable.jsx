@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Eye, X, Search, Filter, Calendar, Edit } from "lucide-react";
-import { getBookedEstampData } from "../../../../api/service/axiosService";
+import {
+  getBookedEstampData,
+  updateEstampBookingStatus,
+} from "../../../../api/service/axiosService";
 import Pagination from "./Pagination";
 import { useNavigate } from "react-router-dom";
 
@@ -12,14 +15,18 @@ const EstampBookingTable = () => {
   const [error, setError] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [filterPaymentStatus, setFilterPaymentStatus] = useState("all");
   const [filterDeliveryType, setFilterDeliveryType] = useState("all");
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  const [selectedBooking, setSelectedBooking] = useState(null);
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  // State for status update modal
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [statusUpdateBooking, setStatusUpdateBooking] = useState(null);
+  const [newStatus, setNewStatus] = useState("");
+  const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,6 +37,7 @@ const EstampBookingTable = () => {
         if (response.data && response.data.data) {
           const formattedBookings = response.data.data.map((booking) => ({
             _id: booking._id,
+            id: booking._id, // Using _id as the booking ID
             firstPartyName: booking.firstPartyName || "N/A",
             secondPartyName: booking.secondPartyName || "N/A",
             documentType: booking.documentType || "N/A",
@@ -40,6 +48,9 @@ const EstampBookingTable = () => {
             orderDate: booking.orderDate
               ? new Date(booking.orderDate).toLocaleDateString()
               : "N/A",
+            status: booking.documentStatus || "Pending", // Using payment status as default status
+            paymentStatus: booking.paymentStatus || "Pending",
+            paymentId: booking.razorpayPaymentId || "N/A",
             // Additional fields for preview
             selectedDocumentId: booking.selectedDocumentId || "",
             documentCalculationType: booking.documentCalculationType || "",
@@ -57,10 +68,12 @@ const EstampBookingTable = () => {
             razorpayPaymentId: booking.razorpayPaymentId || "",
             razorpayOrderId: booking.razorpayOrderId || "",
             razorpaySignature: booking.razorpaySignature || "",
-            paymentStatus: booking.paymentStatus || "",
             paymentCompletedAt: booking.paymentCompletedAt
               ? new Date(booking.paymentCompletedAt).toLocaleString()
               : "",
+            considerationAmount: booking.considerationAmount || 0,
+            stampDutyPayer: booking.stampDutyPayer || "",
+            description: booking.description || "",
             createdAt: booking.createdAt
               ? new Date(booking.createdAt).toLocaleString()
               : "",
@@ -85,6 +98,13 @@ const EstampBookingTable = () => {
 
   useEffect(() => {
     let result = bookings;
+
+    if (filterStatus !== "all") {
+      result = result.filter(
+        (booking) =>
+          (booking.status || "").toLowerCase() === filterStatus.toLowerCase()
+      );
+    }
 
     if (filterPaymentStatus !== "all") {
       result = result.filter(
@@ -121,15 +141,19 @@ const EstampBookingTable = () => {
           (booking.documentType || "")
             .toLowerCase()
             .includes(lowercasedSearch) ||
-          (booking.razorpayPaymentId || "")
-            .toLowerCase()
-            .includes(lowercasedSearch)
+          (booking.paymentId || "").toLowerCase().includes(lowercasedSearch)
       );
     }
 
     setFilteredBookings(result);
     setCurrentPage(1);
-  }, [searchTerm, filterPaymentStatus, filterDeliveryType, bookings]);
+  }, [
+    searchTerm,
+    filterStatus,
+    filterPaymentStatus,
+    filterDeliveryType,
+    bookings,
+  ]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -141,14 +165,52 @@ const EstampBookingTable = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // Updated handleViewDetails function to navigate to details page
   const handleViewDetails = (booking) => {
-    setSelectedBooking(booking);
-    setIsPreviewModalOpen(true);
+    // Navigate to the details page with the booking _id
+    navigate(`/admin/estamp-booking-details/${booking._id}`);
   };
 
-  const handleClosePreviewModal = () => {
-    setIsPreviewModalOpen(false);
-    setSelectedBooking(null);
+  const handleOpenStatusModal = (booking) => {
+    setStatusUpdateBooking(booking);
+    setNewStatus(booking.status || "");
+    setIsStatusModalOpen(true);
+  };
+
+  const handleCloseStatusModal = () => {
+    setIsStatusModalOpen(false);
+    setStatusUpdateBooking(null);
+    setNewStatus("");
+  };
+
+  const handleStatusUpdate = async () => {
+    if (!statusUpdateBooking || !newStatus) return;
+
+    try {
+      setStatusUpdateLoading(true);
+
+      // Call API to update the status
+      await updateEstampBookingStatus(statusUpdateBooking._id, newStatus);
+
+      // Update local state
+      const updatedBookings = bookings.map((booking) => {
+        if (booking._id === statusUpdateBooking._id) {
+          return { ...booking, status: newStatus };
+        }
+        return booking;
+      });
+
+      setBookings(updatedBookings);
+      setStatusUpdateLoading(false);
+      handleCloseStatusModal();
+
+      // Show success message
+      alert("Status updated successfully!");
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setStatusUpdateLoading(false);
+      alert("Failed to update status. Please try again.");
+    }
   };
 
   const handleSearchChange = (e) => {
@@ -161,8 +223,29 @@ const EstampBookingTable = () => {
 
   const clearFilters = () => {
     setSearchTerm("");
+    setFilterStatus("all");
     setFilterPaymentStatus("all");
     setFilterDeliveryType("all");
+  };
+
+  const getStatusBadgeColor = (status) => {
+    switch ((status || "").toLowerCase()) {
+      case "Approved":
+        return "bg-green-100 text-green-800";
+      case "Pending":
+        return "bg-yellow-900 text-yellow-800";
+      case "Cancelled":
+        return "bg-red-100 text-red-800";
+      case "processing":
+        return "bg-blue-100 text-blue-800";
+      case "Processed":
+        return "bg-indigo-200 text-indigo-800";
+
+      case "Delivered":
+        return "bg-emerald-900 text-emerald-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   };
 
   const getPaymentStatusBadgeColor = (status) => {
@@ -233,6 +316,23 @@ const EstampBookingTable = () => {
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <div className="w-full sm:w-auto">
               <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white"
+              >
+                <option value="all">All Statuses</option>
+                <option value="Completed">Completed</option>
+                <option value="Pending">Pending</option>
+                <option value="Processing">Processing</option>
+                <option value="Processed">Processed</option>
+                <option value="Approved">Approved</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            <div className="w-full sm:w-auto">
+              <select
                 value={filterPaymentStatus}
                 onChange={(e) => setFilterPaymentStatus(e.target.value)}
                 className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white"
@@ -279,32 +379,35 @@ const EstampBookingTable = () => {
           <table className="w-full">
             <thead className="bg-red-50 border-b border-red-100">
               <tr>
-                <th className="px-4 py-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Sl. No.
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
-                  Order Date
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                  Booking ID & Date
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Party Details
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
-                  Document Type
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                  Document & Service Type
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
-                  Delivery Service
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                  Document Status
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
-                  Requestor Details
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
-                  Total Amount
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Payment Status
                 </th>
-                <th className="px-4 py-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                  Payment ID
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                  Total Amount
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Actions
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                  Update Status
                 </th>
               </tr>
             </thead>
@@ -312,20 +415,25 @@ const EstampBookingTable = () => {
               {currentItems.length > 0 ? (
                 currentItems.map((booking, index) => (
                   <tr
-                    key={booking._id}
+                    key={booking.id}
                     className="hover:bg-red-50 transition-colors duration-200"
                   >
-                    <td className="px-4 py-5 whitespace-nowrap text-sm text-gray-600 font-medium">
+                    <td className="p-3 whitespace-nowrap text-sm text-gray-600 font-medium">
                       {indexOfFirstItem + index + 1}
                     </td>
-                    <td className="px-6 py-5 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
-                        <Calendar size={14} className="mr-2 text-gray-500" />
-                        {booking.orderDate}
+                    <td className="p-3 whitespace-nowrap">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold text-red-900">
+                          {booking.id.substring(0, 8)}...
+                        </span>
+                        <div className="flex items-center text-xs text-gray-500 mt-1">
+                          <Calendar size={12} className="mr-1" />
+                          {booking.orderDate}
+                        </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col space-y-1">
+                    <td className="p-3">
+                      <div className="flex flex-col">
                         <span className="text-sm font-medium text-gray-900">
                           First: {booking.firstPartyName}
                         </span>
@@ -334,58 +442,65 @@ const EstampBookingTable = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-5">
-                      <span className="text-sm text-gray-900 font-medium">
-                        {booking.documentType}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className="text-sm text-gray-900">
-                        {booking.deliveryServiceName}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col space-y-1">
+                    <td className="p-3">
+                      <div className="flex flex-col">
                         <span className="text-sm font-medium text-gray-900">
-                          {booking.requestorName}
+                          {booking.documentType}
                         </span>
                         <span className="text-xs text-gray-500">
-                          {booking.mobileNumber}
+                          {booking.deliveryServiceName || "N/A"}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-5 whitespace-nowrap">
-                      <span className="text-sm font-semibold text-green-600">
-                        {formatAmount(booking.totalAmount)}
+                    <td className="p-3 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(
+                          booking.status
+                        )}`}
+                      >
+                        {booking.status || "N/A"}
                       </span>
                     </td>
-                    <td className="px-6 py-5 whitespace-nowrap">
+                    <td className="p-3 whitespace-nowrap">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${getPaymentStatusBadgeColor(
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusBadgeColor(
                           booking.paymentStatus
                         )}`}
                       >
                         {booking.paymentStatus}
                       </span>
                     </td>
-                    <td className="px-4 py-5 whitespace-nowrap">
+                    <td className="p-3 whitespace-nowrap text-sm font-mono text-gray-700">
+                      {booking.paymentId.substring(0, 8)}...
+                    </td>
+                    <td className="p-3 whitespace-nowrap text-sm font-semibold text-green-600">
+                      {formatAmount(booking.totalAmount)}
+                    </td>
+                    <td className="p-3 whitespace-nowrap">
                       <button
-                        className="px-3 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center space-x-1 text-sm"
+                        className="px-2 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center space-x-1"
                         onClick={() => handleViewDetails(booking)}
                         title="View Details"
                       >
                         <Eye size={14} />
-                        <span className="font-medium">View</span>
+                        <span className="text-xs font-medium">View</span>
+                      </button>
+                    </td>
+                    <td className="p-3 whitespace-nowrap">
+                      <button
+                        className="px-2 py-1 bg-purple-100 text-purple-600 rounded-md hover:bg-purple-200 transition-colors flex items-center space-x-1"
+                        onClick={() => handleOpenStatusModal(booking)}
+                        title="Update Status"
+                      >
+                        <Edit size={14} />
+                        <span className="text-xs font-medium">Update</span>
                       </button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan="9"
-                    className="px-6 py-8 text-center text-gray-500"
-                  >
+                  <td colSpan="10" className="p-6 text-center text-gray-500">
                     No e-stamp bookings found matching your criteria
                   </td>
                 </tr>
@@ -408,280 +523,100 @@ const EstampBookingTable = () => {
         )}
       </div>
 
-      {/* Preview Modal - Fully Scrollable with Margins */}
-      {isPreviewModalOpen && selectedBooking && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
-          <div className="min-h-screen flex items-start justify-center p-6">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl my-8">
-              {/* Modal Header */}
-              <div className="bg-white border-b border-gray-200 p-6 rounded-t-lg">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-red-900">
-                    E-Stamp Booking Details
-                  </h3>
-                  <button
-                    onClick={handleClosePreviewModal}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    <X size={24} />
-                  </button>
+      {/* Status Update Modal */}
+      {isStatusModalOpen && statusUpdateBooking && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-red-900">
+                Update E-Stamp Booking Status
+              </h3>
+              <button
+                onClick={handleCloseStatusModal}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Booking ID
+                </label>
+                <div className="bg-gray-50 p-2 rounded border border-gray-200 text-sm font-medium">
+                  {statusUpdateBooking.id.substring(0, 8)}...
                 </div>
               </div>
 
-              {/* Modal Content */}
-              <div className="p-6 space-y-8">
-                {/* Basic Information */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <h4 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-3">
-                      Party Information
-                    </h4>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">
-                          First Party Name
-                        </label>
-                        <div className="bg-gray-50 p-3 rounded-lg border text-sm">
-                          {selectedBooking.firstPartyName}
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">
-                          Second Party Name
-                        </label>
-                        <div className="bg-gray-50 p-3 rounded-lg border text-sm">
-                          {selectedBooking.secondPartyName}
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">
-                          Requestor Name
-                        </label>
-                        <div className="bg-gray-50 p-3 rounded-lg border text-sm">
-                          {selectedBooking.requestorName}
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">
-                          Mobile Number
-                        </label>
-                        <div className="bg-gray-50 p-3 rounded-lg border text-sm">
-                          {selectedBooking.mobileNumber}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <h4 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-3">
-                      Document Information
-                    </h4>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">
-                          Document Type
-                        </label>
-                        <div className="bg-gray-50 p-3 rounded-lg border text-sm">
-                          {selectedBooking.documentType}
-                        </div>
-                      </div>
-                      {selectedBooking.selectedDocumentId && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-600 mb-2">
-                            Document ID
-                          </label>
-                          <div className="bg-gray-50 p-3 rounded-lg border text-sm font-mono">
-                            {selectedBooking.selectedDocumentId}
-                          </div>
-                        </div>
-                      )}
-                      {selectedBooking.documentCalculationType && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-600 mb-2">
-                            Calculation Type
-                          </label>
-                          <div className="bg-gray-50 p-3 rounded-lg border text-sm">
-                            {selectedBooking.documentCalculationType}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Amount Details */}
-                <div className="space-y-6">
-                  <h4 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-3">
-                    Amount Details
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {selectedBooking.documentFixedAmount > 0 && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">
-                          Fixed Amount
-                        </label>
-                        <div className="bg-green-50 p-3 rounded-lg border border-green-200 text-sm font-semibold text-green-600">
-                          {formatAmount(selectedBooking.documentFixedAmount)}
-                        </div>
-                      </div>
-                    )}
-                    {selectedBooking.stampDutyAmount > 0 && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">
-                          Stamp Duty Amount
-                        </label>
-                        <div className="bg-blue-50 p-3 rounded-lg border border-blue-200 text-sm font-semibold text-blue-600">
-                          {formatAmount(selectedBooking.stampDutyAmount)}
-                        </div>
-                      </div>
-                    )}
-                    {selectedBooking.deliveryCharge > 0 && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">
-                          Delivery Charge
-                        </label>
-                        <div className="bg-orange-50 p-3 rounded-lg border border-orange-200 text-sm font-semibold text-orange-600">
-                          {formatAmount(selectedBooking.deliveryCharge)}
-                        </div>
-                      </div>
-                    )}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-2">
-                        Total Amount
-                      </label>
-                      <div className="bg-red-50 p-3 rounded-lg border border-red-200 text-sm font-bold text-red-600">
-                        {formatAmount(selectedBooking.totalAmount)}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Delivery Information */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <h4 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-3">
-                      Delivery Information
-                    </h4>
-                    <div className="space-y-4">
-                      {selectedBooking.deliveryType && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-600 mb-2">
-                            Delivery Type
-                          </label>
-                          <div className="bg-gray-50 p-3 rounded-lg border text-sm capitalize">
-                            {selectedBooking.deliveryType}
-                          </div>
-                        </div>
-                      )}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">
-                          Delivery Service
-                        </label>
-                        <div className="bg-gray-50 p-3 rounded-lg border text-sm">
-                          {selectedBooking.deliveryServiceName}
-                        </div>
-                      </div>
-                      {selectedBooking.deliveryDescription && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-600 mb-2">
-                            Delivery Description
-                          </label>
-                          <div className="bg-gray-50 p-3 rounded-lg border text-sm">
-                            {selectedBooking.deliveryDescription}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <h4 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-3">
-                      Payment Information
-                    </h4>
-                    <div className="space-y-4">
-                      {selectedBooking.paymentMethod && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-600 mb-2">
-                            Payment Method
-                          </label>
-                          <div className="bg-gray-50 p-3 rounded-lg border text-sm capitalize">
-                            {selectedBooking.paymentMethod}
-                          </div>
-                        </div>
-                      )}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">
-                          Payment Status
-                        </label>
-                        <div
-                          className={`p-3 rounded-lg text-sm font-medium ${getPaymentStatusBadgeColor(
-                            selectedBooking.paymentStatus
-                          )}`}
-                        >
-                          {selectedBooking.paymentStatus}
-                        </div>
-                      </div>
-                      {selectedBooking.razorpayPaymentId && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-600 mb-2">
-                            Razorpay Payment ID
-                          </label>
-                          <div className="bg-gray-50 p-3 rounded-lg border text-sm font-mono break-all">
-                            {selectedBooking.razorpayPaymentId}
-                          </div>
-                        </div>
-                      )}
-                      {selectedBooking.paymentCompletedAt && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-600 mb-2">
-                            Payment Completed At
-                          </label>
-                          <div className="bg-gray-50 p-3 rounded-lg border text-sm">
-                            {selectedBooking.paymentCompletedAt}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Timestamps */}
-                <div className="space-y-6">
-                  <h4 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-3">
-                    Timeline
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-2">
-                        Order Date
-                      </label>
-                      <div className="bg-gray-50 p-3 rounded-lg border text-sm">
-                        {selectedBooking.orderDate}
-                      </div>
-                    </div>
-                    {selectedBooking.createdAt && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">
-                          Created At
-                        </label>
-                        <div className="bg-gray-50 p-3 rounded-lg border text-sm">
-                          {selectedBooking.createdAt}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Document Type
+                </label>
+                <div className="bg-gray-50 p-2 rounded border border-gray-200 text-sm">
+                  {statusUpdateBooking.documentType || "N/A"}
                 </div>
               </div>
 
-              {/* Modal Footer */}
-              <div className="bg-gray-50 border-t border-gray-200 p-6 rounded-b-lg">
-                <button
-                  onClick={handleClosePreviewModal}
-                  className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Current Status
+                </label>
+                <div
+                  className={`p-2 rounded text-sm font-medium ${getStatusBadgeColor(
+                    statusUpdateBooking.status
+                  )}`}
                 >
-                  Close
-                </button>
+                  {statusUpdateBooking.status || "N/A"}
+                </div>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Update Status
+                </label>
+                <select
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="">Select new status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Processed">Processed</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Delivered">Delivered</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={handleCloseStatusModal}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleStatusUpdate}
+                disabled={!newStatus || statusUpdateLoading}
+                className={`px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center ${
+                  !newStatus || statusUpdateLoading
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                {statusUpdateLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                    Updating...
+                  </>
+                ) : (
+                  "Update Status"
+                )}
+              </button>
             </div>
           </div>
         </div>

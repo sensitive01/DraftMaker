@@ -391,8 +391,64 @@ const getEstampBookingData = async (req, res) => {
     });
   }
 };
+const getIndividualStampBookingData = async (req, res) => {
+  try {
+    const {stampBookingId}=req.params
+    const eStampData = await EstampPayment.findOne({_id:stampBookingId})
+
+    res.status(200).json({
+      success: true,
+      message: "E-stamp booking data fetched successfully",
+      data: eStampData,
+    });
+  } catch (err) {
+    console.log("Error in getting the booking data", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch e-stamp booking data",
+      error: err.message,
+    });
+  }
+};
+
+const updateIndividualStampBookingDataStatus = async (req, res) => {
+  try {
+    const { stampBookingId } = req.params;
+    const { status } = req.body;
+
+    // Update the documentStatus field
+    const eStampData = await EstampPayment.findByIdAndUpdate(
+      stampBookingId,
+      { documentStatus: status },
+      { new: true } // Return the updated document
+    );
+
+    if (!eStampData) {
+      return res.status(404).json({
+        success: false,
+        message: "E-stamp booking not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "E-stamp booking status updated successfully",
+      data: eStampData,
+    });
+  } catch (err) {
+    console.log("Error in updating the booking data", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update e-stamp booking status",
+      error: err.message,
+    });
+  }
+};
+
 
 module.exports = {
+  updateIndividualStampBookingDataStatus,
+  getIndividualStampBookingData,
   getEstampBookingData,
   getStampDeiveryChargeData,
   updateServiceItemStatus,

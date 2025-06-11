@@ -405,7 +405,7 @@ const RentalPreview = ({ formData }) => {
                     {formData.bhkConfig || "XBHK"},{" "}
                     {formData.bedroomCount || "X"} bedroom,{" "}
                     {formData.hallCount || "X"} Hall,{" "}
-                    {formData.kitchenCount || "X"} Kitchen with{" "}
+                    {formData.kitchenCount || "1"} Kitchen with{" "}
                     {formData.toiletCount || "X"} Toilets
                   </span>
                   , provided with electricity and water facilities.

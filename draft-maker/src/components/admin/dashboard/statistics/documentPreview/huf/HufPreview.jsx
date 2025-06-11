@@ -14,6 +14,7 @@ import {
   BorderStyle,
 } from "docx";
 import { saveAs } from "file-saver";
+import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
 
 const HufPreview = () => {
   const { bookingId } = useParams();
@@ -542,8 +543,8 @@ const HufPreview = () => {
           <p className="mt-8">
             Verified at{" "}
             <span className="font-bold">{formData.place || "[PLACE]"}</span> on
-            this <span className="font-bold">{formData.day || "[DAY]"}</span>{" "}
-            day of{" "}
+            this <span className="font-bold">{getDayWithSuffix(formData.day) || "[DAY]"}</span>{" "}
+           {" "}
             <span className="font-bold">{formData.month || "[MONTH]"}</span>,{" "}
             <span className="font-bold">{formData.year || "[YEAR]"}</span> that
             the contents of the above said affidavit are true and correct to the

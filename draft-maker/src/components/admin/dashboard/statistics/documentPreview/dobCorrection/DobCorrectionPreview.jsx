@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getAggrementFormData } from "../../../../../../api/service/axiosService";
 import { Download } from "lucide-react";
+import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
 
 const DobCorrectionPreview = () => {
   const { bookingId } = useParams();
@@ -209,8 +210,9 @@ const DobCorrectionPreview = () => {
                 {formData.place || "_________"}
               </span>{" "}
               on this{" "}
-              <span className="font-semibold">{formData.day || "___"}</span> day
-              of{" "}
+              <span className="font-semibold">
+                {getDayWithSuffix(formData.day) || "___"}
+              </span>{" "}
               <span className="font-semibold">
                 {formData.month || "________"}
               </span>

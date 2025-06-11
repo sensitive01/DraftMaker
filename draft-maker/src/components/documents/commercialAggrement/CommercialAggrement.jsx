@@ -199,10 +199,7 @@ export default function CommercialAggrement() {
       return false;
     }
 
-    if (!formData.bhkConfig.trim()) {
-      setValidationError("Please select BHK configuration");
-      return false;
-    }
+
 
     if (!formData.agreementDate.trim()) {
       setValidationError("Please enter agreement date");

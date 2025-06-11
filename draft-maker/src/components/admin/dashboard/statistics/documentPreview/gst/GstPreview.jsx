@@ -10,6 +10,7 @@ import {
   AlignmentType,
 } from "docx";
 import { saveAs } from "file-saver";
+import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
 
 const GstPreview = () => {
   const { bookingId } = useParams();
@@ -54,7 +55,7 @@ const GstPreview = () => {
             properties: {},
             children: [
               new Paragraph({
-                text:`${formData.documentType}`,
+                text: `${formData.documentType}`,
                 heading: HeadingLevel.HEADING_1,
                 alignment: AlignmentType.CENTER,
                 spacing: { after: 200 },
@@ -340,9 +341,8 @@ const GstPreview = () => {
                   !isFilled(formData?.day) ? "bg-yellow-50" : ""
                 }`}
               >
-                {formData?.day || "__"}
+                {getDayWithSuffix(formData?.day) || "__"}
               </span>{" "}
-              day of{" "}
               <span
                 className={`font-bold ${
                   !isFilled(formData?.month) ? "bg-yellow-50" : ""
@@ -362,8 +362,6 @@ const GstPreview = () => {
               that the contents of the above said affidavit are true and correct
               to the best of my knowledge and belief.
             </p>
-
-            
           </div>
         </div>
       </div>

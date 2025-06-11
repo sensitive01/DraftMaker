@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Document, Packer } from "docx";
 import { saveAs } from "file-saver";
+import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
 
 const EnhancedGapPeriodPreview = () => {
   const [data, setFormData] = useState({});
@@ -350,9 +351,9 @@ const EnhancedGapPeriodPreview = () => {
                     isFilled(data?.day) ? "" : "bg-yellow-200 px-1"
                   }
                 >
-                  {data?.day || "XX"}
+                  {getDayWithSuffix(data?.day) || "XX"}
                 </span>{" "}
-                day of{" "}
+                {" "}
                 <span
                   className={
                     isFilled(data?.month) ? "" : "bg-yellow-200 px-1"

@@ -10,6 +10,7 @@ import {
   AlignmentType,
 } from "docx";
 import { saveAs } from "file-saver";
+import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
 
 const BirthCertificateParentNameCorrection = () => {
   const { bookingId } = useParams();
@@ -540,9 +541,8 @@ const BirthCertificateParentNameCorrection = () => {
                       : "bg-yellow-200 px-1 font-bold"
                   }
                 >
-                  {formData?.day || "XX"}
+                  {getDayWithSuffix(formData?.day) || "XX"}
                 </span>{" "}
-                day of{" "}
                 <span
                   className={
                     isFilled(formData?.month)

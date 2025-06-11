@@ -39,11 +39,9 @@ const estampPaymentSchema = new mongoose.Schema(
     },
     deliveryType: {
       type: String,
-      enum: ["pickup", "delivery"],
     },
     selectedDeliveryServiceId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "DeliveryService",
+      type: String,
     },
     deliveryServiceName: {
       type: String,
@@ -70,7 +68,6 @@ const estampPaymentSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["razorpay", "cash", "wallet"],
     },
     currency: {
       type: String,
@@ -91,6 +88,21 @@ const estampPaymentSchema = new mongoose.Schema(
     },
     paymentCompletedAt: {
       type: Date,
+    },
+    considerationAmount: {
+      type: Number,
+    },
+    documentStatus: {
+      type: String,
+      default: "Pending",
+    },
+
+    stampDutyPayer: {
+      type: String,
+    },
+
+    description: {
+      type: String,
     },
   },
   { timestamps: true }

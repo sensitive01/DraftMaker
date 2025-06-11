@@ -685,4 +685,24 @@ export const getBookedEstampData = async () => {
     return err;
   }
 };
+export const getEstampBookingData = async (estampId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/document-price/get-individial-e-stamp-booking-data/${estampId}`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
 
+export const updateEstampBookingStatus = async (estampId,status) => {
+  try {
+    const response = await axiosInstance.put(
+      `/document-price/update-individial-e-stamp-booking-data/${estampId}`,{status}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};

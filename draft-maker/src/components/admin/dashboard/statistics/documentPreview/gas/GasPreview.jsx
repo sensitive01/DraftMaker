@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { getAggrementFormData } from "../../../../../../api/service/axiosService";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from "docx";
 import { saveAs } from "file-saver";
+import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
 
 const GasPreview = () => {
   const pdfTemplateRef = useRef(null);
@@ -496,7 +497,7 @@ const GasPreview = () => {
                 </span>{" "}
                 on this{" "}
                 <span className={isFilled(formData?.day) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>
-                  {formData?.day || "..."}
+                  {getDayWithSuffix(formData?.day) || "..."}
                 </span>{" "}
                 day of{" "}
                 <span className={isFilled(formData?.month) ? "font-bold" : "bg-yellow-200 px-1 font-bold"}>

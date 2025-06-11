@@ -62,6 +62,7 @@ import DeliveryChargesTable from "./components/admin/dashboard/statistics/Delive
 import DocumentPaymentPage from "./components/documents/DocumentPaymentPage";
 import BuyEStampDocuments from "./components/buyStampDocuments/BuyEStampDocuments";
 import EstampBookingTable from "./components/admin/dashboard/statistics/EstampBookingTable";
+import EstampDetails from "./components/admin/dashboard/statistics/EstampDetails";
 
 function MainLayout({ children }) {
   return (
@@ -232,6 +233,14 @@ function App() {
               </ProtectedAdminRoute>
             }
           />
+                  <Route
+          path="/admin/estamp-booking-details/:estampId"
+          element={
+            <ProtectedAdminRoute>
+              <EstampDetails />
+            </ProtectedAdminRoute>
+          }
+        />
           <Route
             path="/admin/reset-password"
             element={
@@ -390,7 +399,7 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={<Navigate to="/documents/rental/:type" replace />}
+            element={<Navigate to="/documents/commercial/commercial-lease" replace />}
           />
 
           <Route
@@ -564,6 +573,7 @@ function App() {
             </PaymentLayout>
           }
         />
+
       </Routes>
     </Router>
   );

@@ -103,9 +103,7 @@ const BuyEStampDocuments = () => {
       }
     }
 
-    if (!description.trim()) {
-      errors.description = "Description is required";
-    }
+
 
     if (deliveryType === "delivery" && !selectedDeliveryService) {
       errors.selectedDeliveryService = "Please select a delivery service";
@@ -142,17 +140,14 @@ const BuyEStampDocuments = () => {
     );
   };
 
-  // Updated stamp duty calculation based on document type and consideration amount
   const calculateStampAmount = () => {
     const selectedDocumentData = getSelectedDocumentData();
     if (!selectedDocumentData) return 0;
 
-    // For fixed calculation type
     if (selectedDocumentData.calculationType === "fixed") {
       return selectedDocumentData.fixedAmount;
     }
 
-    // For percentage calculation type
     if (selectedDocumentData.calculationType === "percentage") {
       if (!considerationAmount || isNaN(considerationAmount)) return 0;
 
@@ -408,7 +403,7 @@ const BuyEStampDocuments = () => {
             minAmount > 0 ? ` (Minimum: ₹${minAmount})` : ""
           }`;
         } else {
-          return maxAmount > 0
+          return maxAmount >= 0
             ? `Fixed amount of ₹${maxAmount} for amounts above ₹1,00,000`
             : `${percentage}% of ₹${amount.toLocaleString(
                 "en-IN"
@@ -725,7 +720,7 @@ const BuyEStampDocuments = () => {
                 htmlFor="description"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Description *
+                Description 
               </label>
               <textarea
                 id="description"

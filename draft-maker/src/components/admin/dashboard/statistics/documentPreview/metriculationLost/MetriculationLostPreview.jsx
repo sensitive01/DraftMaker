@@ -10,6 +10,7 @@ import {
   AlignmentType,
 } from "docx";
 import { saveAs } from "file-saver";
+import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
 
 const MatriculationLostPreview = () => {
   const { bookingId } = useParams();
@@ -490,9 +491,9 @@ const MatriculationLostPreview = () => {
                   <span
                     className={`font-medium ${highlightIfEmpty(formData.day)}`}
                   >
-                    {formData.day || "XX"}
+                    {getDayWithSuffix(formData.day) || "XX"}
                   </span>{" "}
-                  day of{" "}
+                  {" "}
                   <span
                     className={`font-medium ${highlightIfEmpty(
                       formData.month

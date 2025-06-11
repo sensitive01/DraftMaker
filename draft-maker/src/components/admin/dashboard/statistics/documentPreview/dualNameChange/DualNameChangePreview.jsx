@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { getAggrementFormData } from "../../../../../../api/service/axiosService";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from "docx";
 import { saveAs } from "file-saver";
+import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
 
 const DualNameChangePreview = () => {
   const pdfTemplateRef = useRef(null);
@@ -490,9 +491,9 @@ const DualNameChangePreview = () => {
                     isFilled(formData?.day) ? "" : "bg-yellow-200 px-1"
                   }
                 >
-                  {formData?.day || "XX"}
+                  {getDayWithSuffix(formData?.day) || "XX"}
                 </span>{" "}
-                day of{" "}
+                {" "}
                 <span
                   className={
                     isFilled(formData?.month) ? "" : "bg-yellow-200 px-1"
