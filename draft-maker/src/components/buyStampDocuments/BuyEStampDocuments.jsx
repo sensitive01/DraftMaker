@@ -718,35 +718,97 @@ const BuyEStampDocuments = () => {
                 </p>
               )}
             </div>
-            <input
-              type="checkbox"
-              onClick={() => setIsConsideration(true)}
-            ></input>
-
-            {isConsideration && (
-              <div>
-                <label
-                  htmlFor="considerationAmount"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Consideration Amount (₹) *
+            <div className="mb-6">
+              {/* Toggle Switch with Clear State Indicators */}
+              <div className="flex items-center">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isConsideration}
+                    onChange={() => setIsConsideration(!isConsideration)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-red-600 transition-colors duration-200">
+                    {/* Knob with check/x indicator */}
+                    <div
+                      className={`absolute top-0.5 left-0.5 flex items-center justify-center w-5 h-5 bg-white rounded-full transition-transform duration-200 ${
+                        isConsideration ? "transform translate-x-5" : ""
+                      }`}
+                    >
+                      {isConsideration ? (
+                        <svg
+                          className="w-3 h-3 text-red-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          className="w-3 h-3 text-gray-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                  <span className="ml-3 text-sm font-medium text-gray-700">
+                    {isConsideration ? (
+                      <span className="text-red-600">
+                        Consideration Amount Enabled
+                      </span>
+                    ) : (
+                      "Add Consideration Amount"
+                    )}
+                  </span>
                 </label>
-                <input
-                  type="number"
-                  id="considerationAmount"
-                  value={considerationAmount}
-                  onChange={(e) => setConsiderationAmount(e.target.value)}
-                  placeholder="Enter consideration amount"
-                  min="0"
-                  step="0.01"
-                  className={`w-full px-4 py-2.5 border ${
-                    formErrors.considerationAmount
-                      ? "border-red-300"
-                      : "border-gray-300"
-                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-                />
               </div>
-            )}
+
+              {/* Input Box - Only shown when toggle is ON */}
+              {isConsideration && (
+                <div className="mt-4 animate-fadeIn">
+                  <label
+                    htmlFor="considerationAmount"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Consideration Amount (₹) *
+                  </label>
+                  <input
+                    type="number"
+                    id="considerationAmount"
+                    value={considerationAmount}
+                    onChange={(e) => setConsiderationAmount(e.target.value)}
+                    placeholder="Enter consideration amount"
+                    min="0"
+                    step="0.01"
+                    className={`w-full px-4 py-2.5 border ${
+                      formErrors.considerationAmount
+                        ? "border-red-300"
+                        : "border-gray-300"
+                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                  />
+                  {formErrors.considerationAmount && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {formErrors.considerationAmount}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Consideration Amount - Only show for percentage calculation type */}
             {selectedDocument &&

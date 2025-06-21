@@ -103,6 +103,291 @@ const getDashboardStatistics = async (req, res) => {
   }
 };
 
+const trackMyDocumentStatus = async (req, res) => {
+  try {
+    const { mobile } = req.body;
+
+    // Filter to use in every find query
+    const filter = { mobileNumber: mobile,paymentStatus:"success" };
+
+    const dualNameData = await dualNameCorrection.find(filter, {
+      paymentDetails: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+      userName: 1,
+    });
+
+    const nameChangeData = await nameCorrection.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const dobCorrectionData = await dobCorrection.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const gasFormData = await GasFormData.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const docLostData = await documentLost.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const dobNameCorrectionParent = await dobParentNameCorrection.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const bcNameCorrectionData = await birthCertificateNameCorrection.find(
+      filter,
+      {
+        paymentDetails: 1,
+        userName: 1,
+        mobileNumber: 1,
+        doumentStatus: 1,
+        paymentStatus: 1,
+        createdAt: 1,
+        bookingId: 1,
+        documentType: 1,
+        formId: 1,
+      }
+    );
+
+    const gstNocData = await gstSchema.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const metriculationLostData = await metriculationLost.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const khataCorrectionData = await khataCorrection.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const vehicleInsurenceData = await vehicleInsurence.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const hufData = await hufSchema.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const gapPeriodData = await gapPeriodSchema.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const passportAnnaxureData = await passportAnnaxure.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const passportNameChangeData = await passportNameChange.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const adressAffadavitData = await adressAffadavit.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const commercialData = await commercialSchema.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    const recidentialData = await recidentialSchema.find(filter, {
+      paymentDetails: 1,
+      userName: 1,
+      mobileNumber: 1,
+      doumentStatus: 1,
+      paymentStatus: 1,
+      createdAt: 1,
+      bookingId: 1,
+      documentType: 1,
+      formId: 1,
+    });
+
+    // Combine all arrays
+    let allBookingData = [
+      ...dualNameData,
+      ...nameChangeData,
+      ...dobCorrectionData,
+      ...gasFormData,
+      ...docLostData,
+      ...dobNameCorrectionParent,
+      ...bcNameCorrectionData,
+      ...gstNocData,
+      ...metriculationLostData,
+      ...khataCorrectionData,
+      ...vehicleInsurenceData,
+      ...hufData,
+      ...gapPeriodData,
+      ...passportAnnaxureData,
+      ...passportNameChangeData,
+      ...adressAffadavitData,
+      ...commercialData,
+      ...recidentialData,
+    ];
+
+    // Sort by createdAt descending
+    allBookingData.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    // Format date
+    const formattedData = allBookingData.map((item) => {
+      const date = new Date(item.createdAt);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+
+      let hours = date.getHours();
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      const seconds = String(date.getSeconds()).padStart(2, "0");
+      const ampm = hours >= 12 ? "PM" : "AM";
+
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+      const formattedHours = String(hours).padStart(2, "0");
+
+      return {
+        ...item._doc,
+        createdAt: `${day}-${month}-${year} ${formattedHours}:${minutes}:${seconds} ${ampm}`,
+      };
+    });
+
+    res.status(200).json({
+      message: "Documents data fetched successfully",
+      data: formattedData,
+    });
+  } catch (err) {
+    console.error("Error in getting all Documents data:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const getAllBookingData = async (req, res) => {
   try {
     const dualNameData = await dualNameCorrection.find(
@@ -1035,9 +1320,12 @@ const createDocumentLost = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-DOC-LOST-5",
-    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-DOC-LOST-5",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1138,7 +1426,10 @@ const createDobParentNameCorrection = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({ formId: "DM-NC-2" },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
+    const documentName = await documentPriceData.findOne(
+      { formId: "DM-NC-2" },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1233,9 +1524,12 @@ const createBirthCertificateNameCorrection = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-BC-MNC-7",
-    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-BC-MNC-7",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1330,9 +1624,12 @@ const saveGstData = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-GST-8",
-    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-GST-8",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1433,9 +1730,12 @@ const createMetriculationLostData = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-MAL-9",
-    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-MAL-9",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1536,9 +1836,12 @@ const createKhataCorrectionData = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-KH-10",
-    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-KH-10",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1639,9 +1942,12 @@ const createVehicleInsurenceData = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-VIC-11",
-    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-VIC-11",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1742,9 +2048,12 @@ const createHufData = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-HUF-12",
-    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-HUF-12",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1845,9 +2154,12 @@ const createGapPeriodData = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-GP-13",
-    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-GP-13",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -1942,9 +2254,12 @@ const createPasswordAnnaxureData = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-PAF-14",
-    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-PAF-14",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -2039,9 +2354,12 @@ const createPassportNameChangeData = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-PNC-15",
-    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-PNC-15",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -2248,9 +2566,12 @@ const createCommercialData = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-CFD-17",
-    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-CFD-17",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -2360,9 +2681,12 @@ const createRecidentialData = async (req, res) => {
   try {
     console.log("Welcome to create name correction", req.body);
     const { document } = req.body;
-    const documentName = await documentPriceData.findOne({
-      formId: "DM-RFD-18",
-    },{ documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 });
+    const documentName = await documentPriceData.findOne(
+      {
+        formId: "DM-RFD-18",
+      },
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+    );
 
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
@@ -2460,6 +2784,7 @@ const updateRecidentialPaymentData = async (req, res) => {
 };
 
 module.exports = {
+  trackMyDocumentStatus,
   getDocumentFormData,
   updateRecidentialPaymentData,
   createRecidentialData,

@@ -5,6 +5,8 @@ const documentController = require("../controller/documentsController")
 // documentRouter.get("/get-documents-name-data",documentController.getDocumentNameData)
 documentRouter.get("/get-dashboard-statistics",documentController.getDashboardStatistics)
 documentRouter.get("/get-all-booking-data",documentController.getAllBookingData)
+documentRouter.post("/track-my-document-status",documentController.trackMyDocumentStatus)
+
 documentRouter.get("/get-aggrement-preview-data/:bookingId",documentController.getDocumentFormData)
 documentRouter.put("/update-booking-status/:bookingId",documentController.updateBookingStatus)
 

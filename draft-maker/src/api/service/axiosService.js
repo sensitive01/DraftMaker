@@ -706,3 +706,14 @@ export const updateEstampBookingStatus = async (estampId,status) => {
     return err;
   }
 };
+
+export const trackMyDocumentStatus = async (mobile) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/track-my-document-status`,{mobile}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};

@@ -221,8 +221,9 @@ const DocumentPaymentPage = () => {
                 : 0,
               requiresStamp: service.requiresStamp,
               requiresDelivery: service.requiresDelivery,
-              deliveryAddress: selectedService?.requiresDelivery ? JSON.stringify(deliveryAddress) : null,
-
+              deliveryAddress: selectedService?.requiresDelivery
+                ? JSON.stringify(deliveryAddress)
+                : null,
             },
           });
         },
@@ -847,6 +848,20 @@ const DocumentPaymentPage = () => {
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
                       placeholder="Enter phone number"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      value={deliveryAddress.email}
+                      onChange={(e) =>
+                        handleAddressChange("email", e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+                      placeholder="Enter your email"
                     />
                   </div>
 

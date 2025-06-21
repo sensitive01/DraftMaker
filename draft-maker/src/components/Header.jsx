@@ -229,6 +229,11 @@ const Header = () => {
                 </div>
               </li>
               <li className="nav-item">
+                <Link className="nav-link dark_btn" to="/documents/track-my-documents" onClick={closeMenu}>
+                  Track <i className="icofont-arrow-right"></i>
+                </Link>
+              </li>
+              <li className="nav-item">
                 <Link className="nav-link dark_btn" to="#" onClick={closeMenu}>
                   Contact Us <i className="icofont-arrow-right"></i>
                 </Link>
