@@ -29,7 +29,7 @@ const DraftHeading = () => {
           </li>
           <li>
             <a
-              href="/documents/residential-lease"
+              href="/documents/rental/residential-lease"
               className="hover:text-red-900 transition-colors"
             >
               {agrType || ""}

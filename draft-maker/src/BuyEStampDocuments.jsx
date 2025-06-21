@@ -1111,11 +1111,11 @@ const BuyEStampDocuments = () => {
                         id="emailId"
                         value={deliveryAddress.email}
                         onChange={(e) =>
-                          setDeliveryAddress((prev) => ({
-                            ...prev,
-                            email: e.target.value,
-                          }))
-                        }
+                        setDeliveryAddress((prev) => ({
+                          ...prev,
+                          email: e.target.value,
+                        }))
+                      }
                         placeholder="Enter Your Email Id"
                         className={`w-full pl-3  py-2.5 border ${
                           formErrors.emailId

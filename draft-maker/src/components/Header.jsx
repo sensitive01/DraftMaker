@@ -56,7 +56,7 @@ const Header = () => {
                   <ul>
                     <li>
                       <Link
-                        to="/documents/residential-lease"
+                        to="/documents/rental/residential-lease"
                         onClick={closeMenu}
                       >
                         Residential
@@ -64,7 +64,7 @@ const Header = () => {
                     </li>
                     <li>
                       <Link
-                        to="/documents/commercial-lease"
+                        to="/documents/commercial/commercial-lease"
                         onClick={closeMenu}
                       >
                         Commercial
@@ -82,6 +82,14 @@ const Header = () => {
                 </span>
                 <div className="sub_menu">
                   <ul>
+                    <li>
+                      <Link
+                        to="/documents/address/addressaffadavit"
+                        onClick={closeMenu}
+                      >
+                        Adress Affadavit
+                      </Link>
+                    </li>
                     <li>
                       <Link
                         to="/documents/dual-name/dual-name-correction"
@@ -202,28 +210,7 @@ const Header = () => {
                   </ul>
                 </div>
               </li>
-              <li className="nav-item has_dropdown">
-                <a className="nav-link" href="#">
-                  Printing Services
-                </a>
-                <span className="drp_btn">
-                  <i className="icofont-rounded-down"></i>
-                </span>
-                <div className="sub_menu">
-                  <ul>
-                    <li>
-                      <Link to="#" onClick={closeMenu}>
-                        Draft Printing
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#" onClick={closeMenu}>
-                        E-Stamp Printing
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </li>
+
               <li className="nav-item has_dropdown">
                 <a className="nav-link" href="#">
                   E-Stamp
@@ -238,30 +225,11 @@ const Header = () => {
                         Buy E-Stamp Paper
                       </Link>
                     </li>
-                    <li>
-                      <Link to="#" onClick={closeMenu}>
-                        E-Stamp Printing
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#" onClick={closeMenu}>
-                        E-Stamp Drafting Services
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#" onClick={closeMenu}>
-                        Other E-Stamp Services
-                      </Link>
-                    </li>
                   </ul>
                 </div>
               </li>
               <li className="nav-item">
-                <Link
-                  className="nav-link dark_btn"
-                  to="#"
-                  onClick={closeMenu}
-                >
+                <Link className="nav-link dark_btn" to="#" onClick={closeMenu}>
                   Contact Us <i className="icofont-arrow-right"></i>
                 </Link>
               </li>
