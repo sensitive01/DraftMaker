@@ -17,13 +17,34 @@ export default function CommercialAggrement() {
   console.log("Type", type);
   const [formData, setFormData] = useState({
     agreementDate: "",
-    lessorName: "",
+    lessors: [
+      {
+        name: "",
+        addressLine1: "",
+        addressLine2: "",
+        city: "",
+        state: "",
+        pinCode: "",
+      },
+    ],
+    lessees: [
+      {
+        name: "",
+        aadhaar: "",
+        permanentAddressLine1: "",
+        permanentAddressLine2: "",
+        permanentCity: "",
+        permanentState: "",
+        permanentPinCode: "",
+      },
+    ],
+
     lessorAddressLine1: "",
     lessorAddressLine2: "",
     lessorCity: "",
     lessorState: "",
     lessorPinCode: "",
-    lesseeName: "",
+
     lesseeAadhaar: "",
     lesseePermanentAddressLine1: "",
     lesseePermanentAddressLine2: "",
@@ -48,9 +69,9 @@ export default function CommercialAggrement() {
     hallCount: "",
     kitchenCount: "",
     toiletCount: "",
-    commercialType:"",
-    squareFeet:"",
-    additionaldetails:"",
+    commercialType: "",
+    squareFeet: "",
+    additionaldetails: "",
     fixtures: [{ item: "", quantity: "" }],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -83,6 +104,74 @@ export default function CommercialAggrement() {
     }));
   };
 
+  const addLessor = () => {
+    setFormData((prev) => ({
+      ...prev,
+      lessors: [
+        ...prev.lessors,
+        {
+          name: "",
+          addressLine1: "",
+          addressLine2: "",
+          city: "",
+          state: "",
+          pinCode: "",
+        },
+      ],
+    }));
+  };
+  const removeLessor = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      lessors: prev.lessors.filter((_, i) => i !== index),
+    }));
+  };
+
+  const addLessee = () => {
+    setFormData((prev) => ({
+      ...prev,
+      lessees: [
+        ...prev.lessees,
+        {
+          name: "",
+          aadhaar: "",
+          permanentAddressLine1: "",
+          permanentAddressLine2: "",
+          permanentCity: "",
+          permanentState: "",
+          permanentPinCode: "",
+        },
+      ],
+    }));
+  };
+
+  const removeLessee = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      lessees: prev.lessees.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleLessorChange = (index, e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      lessors: prev.lessors.map((lessor, i) =>
+        i === index ? { ...lessor, [name]: value } : lessor
+      ),
+    }));
+  };
+
+  const handleLesseeChange = (index, e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      lessees: prev.lessees.map((lessee, i) =>
+        i === index ? { ...lessee, [name]: value } : lessee
+      ),
+    }));
+  };
+
   const handleFixtureChange = (index, field, value) => {
     // Clear error notification when user modifies fixtures
     if (showErrorNotification) {
@@ -101,70 +190,70 @@ export default function CommercialAggrement() {
   // Add form validation function
   const validateForm = () => {
     // Lessor details validation
-    if (!formData.lessorName.trim()) {
-      setValidationError("Please enter lessor's name");
-      return false;
-    }
+    // if (!formData.lessorName.trim()) {
+    //   setValidationError("Please enter lessor's name");
+    //   return false;
+    // }
 
-    if (!formData.lessorAddressLine1.trim()) {
-      setValidationError("Please enter lessor's address");
-      return false;
-    }
+    // if (!formData.lessorAddressLine1.trim()) {
+    //   setValidationError("Please enter lessor's address");
+    //   return false;
+    // }
 
-    if (!formData.lessorCity.trim()) {
-      setValidationError("Please enter lessor's city");
-      return false;
-    }
+    // if (!formData.lessorCity.trim()) {
+    //   setValidationError("Please enter lessor's city");
+    //   return false;
+    // }
 
-    if (!formData.lessorState.trim()) {
-      setValidationError("Please enter lessor's state");
-      return false;
-    }
+    // if (!formData.lessorState.trim()) {
+    //   setValidationError("Please enter lessor's state");
+    //   return false;
+    // }
 
-    if (!formData.lessorPinCode.trim()) {
-      setValidationError("Please enter lessor's PIN code");
-      return false;
-    } else if (!/^\d{6}$/.test(formData.lessorPinCode)) {
-      setValidationError("Lessor's PIN code must be 6 digits");
-      return false;
-    }
+    // if (!formData.lessorPinCode.trim()) {
+    //   setValidationError("Please enter lessor's PIN code");
+    //   return false;
+    // } else if (!/^\d{6}$/.test(formData.lessorPinCode)) {
+    //   setValidationError("Lessor's PIN code must be 6 digits");
+    //   return false;
+    // }
 
     // Lessee details validation
-    if (!formData.lesseeName.trim()) {
-      setValidationError("Please enter lessee's name");
-      return false;
-    }
+    // if (!formData.lesseeName.trim()) {
+    //   setValidationError("Please enter lessee's name");
+    //   return false;
+    // }
 
-    if (!formData.lesseeAadhaar.trim()) {
-      setValidationError("Please enter lessee's Aadhaar number");
-      return false;
-    } else if (!/^\d{12}$/.test(formData.lesseeAadhaar)) {
-      setValidationError("Lessee's Aadhaar number must be 12 digits");
-      return false;
-    }
+    // if (!formData.lesseeAadhaar.trim()) {
+    //   setValidationError("Please enter lessee's Aadhaar number");
+    //   return false;
+    // } else if (!/^\d{12}$/.test(formData.lesseeAadhaar)) {
+    //   setValidationError("Lessee's Aadhaar number must be 12 digits");
+    //   return false;
+    // }
 
-    if (!formData.lesseePermanentAddressLine1.trim()) {
-      setValidationError("Please enter lessee's permanent address");
-      return false;
-    }
+    // if (!formData.lesseePermanentAddressLine1.trim()) {
+    //   setValidationError("Please enter lessee's permanent address");
+    //   return false;
+    // }
 
-    if (!formData.lesseePermanentCity.trim()) {
-      setValidationError("Please enter lessee's city");
-      return false;
-    }
+    // if (!formData.lesseePermanentCity.trim()) {
+    //   setValidationError("Please enter lessee's city");
+    //   return false;
+    // }
 
-    if (!formData.lesseePermanentState.trim()) {
-      setValidationError("Please enter lessee's state");
-      return false;
-    }
+    // if (!formData.lesseePermanentState.trim()) {
+    //   setValidationError("Please enter lessee's state");
+    //   return false;
+    // }
 
-    if (!formData.lesseePermanentPinCode.trim()) {
-      setValidationError("Please enter lessee's PIN code");
-      return false;
-    } else if (!/^\d{6}$/.test(formData.lesseePermanentPinCode)) {
-      setValidationError("Lessee's PIN code must be 6 digits");
-      return false;
-    }
+    // if (!formData.lesseePermanentPinCode.trim()) {
+    //   setValidationError("Please enter lessee's PIN code");
+    //   return false;
+    // } else if (!/^\d{6}$/.test(formData.lesseePermanentPinCode)) {
+    //   setValidationError("Lessee's PIN code must be 6 digits");
+    //   return false;
+    // }
 
     // Agreement details validation
     if (!formData.rentAmount.trim()) {
@@ -198,8 +287,6 @@ export default function CommercialAggrement() {
       setValidationError("Please enter deposit amount in words");
       return false;
     }
-
-
 
     if (!formData.agreementDate.trim()) {
       setValidationError("Please enter agreement date");
@@ -298,7 +385,7 @@ export default function CommercialAggrement() {
           documentDetails: responseData.documentDetails,
           mobileNumber,
           userName,
-          formId: "DM-CFD-17"
+          formId: "DM-CFD-17",
         },
       });
 
@@ -518,6 +605,12 @@ export default function CommercialAggrement() {
             handleFixtureChange={handleFixtureChange}
             addFixture={addFixture}
             removeFixture={removeFixture}
+            addLessor={addLessor}
+            removeLessor={removeLessor}
+            addLessee={addLessee}
+            removeLessee={removeLessee}
+            handleLessorChange={handleLessorChange}
+            handleLesseeChange={handleLesseeChange}
           />
           {submissionError && (
             <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">

@@ -52,7 +52,16 @@ const commercialAgreementSchema = new mongoose.Schema(
     agreementDate: { type: String },
 
     // Lessor
-    lessorName: { type: String },
+    lessors: [
+      {
+        name: { type: String },
+        addressLine1: { type: String },
+        addressLine2: { type: String },
+        city: { type: String },
+        state: { type: String },
+        pinCode: { type: String },
+      },
+    ],
     lessorAddressLine1: { type: String },
     lessorAddressLine2: { type: String },
     lessorCity: { type: String },
@@ -60,7 +69,17 @@ const commercialAgreementSchema = new mongoose.Schema(
     lessorPinCode: { type: String },
 
     // Lessee
-    lesseeName: { type: String },
+    lessees: [
+      {
+        name: { type: String },
+        aadhaar: { type: String },
+        permanentAddressLine1: { type: String },
+        permanentAddressLine2: { type: String },
+        permanentCity: { type: String },
+        permanentState: { type: String },
+        permanentPinCode: { type: String },
+      },
+    ],
     lesseeAadhaar: { type: String },
     lesseePermanentAddressLine1: { type: String },
     lesseePermanentAddressLine2: { type: String },
@@ -132,6 +151,14 @@ const commercialAgreementSchema = new mongoose.Schema(
     commercialType: { type: String },
     squareFeet: { type: String },
     additionaldetails: { type: String },
+    deliveryAddress: {
+      addressLine1: { type: String },
+      addressLine2: { type: String },
+      city: { type: String },
+      state: { type: String },
+      pincode: { type: String },
+      landmark: { type: String },
+    },
   },
   {
     timestamps: true,

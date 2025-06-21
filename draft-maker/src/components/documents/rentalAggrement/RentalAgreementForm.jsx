@@ -18,13 +18,32 @@ export default function RentalAgreementForm() {
   const [formData, setFormData] = useState({
     formId: "DM-RFD-18",
     agreementDate: "",
-    lessorName: "",
+    lessors: [
+      {
+        name: "",
+        addressLine1: "",
+        addressLine2: "",
+        city: "",
+        state: "",
+        pinCode: "",
+      },
+    ],
+    lessees: [
+      {
+        name: "",
+        aadhaar: "",
+        permanentAddressLine1: "",
+        permanentAddressLine2: "",
+        permanentCity: "",
+        permanentState: "",
+        permanentPinCode: "",
+      },
+    ],
     lessorAddressLine1: "",
     lessorAddressLine2: "",
     lessorCity: "",
     lessorState: "",
     lessorPinCode: "",
-    lesseeName: "",
     lesseeAadhaar: "",
     lesseePermanentAddressLine1: "",
     lesseePermanentAddressLine2: "",
@@ -48,7 +67,7 @@ export default function RentalAgreementForm() {
     hallCount: "",
     kitchenCount: "",
     toiletCount: "",
-    additionaldetails:"",
+    additionaldetails: "",
     fixtures: [{ item: "", quantity: "" }],
   });
 
@@ -78,6 +97,75 @@ export default function RentalAgreementForm() {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const addLessor = () => {
+    setFormData((prev) => ({
+      ...prev,
+      lessors: [
+        ...prev.lessors,
+        {
+          name: "",
+          addressLine1: "",
+          addressLine2: "",
+          city: "",
+          state: "",
+          pinCode: "",
+        },
+      ],
+    }));
+  };
+
+  const removeLessor = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      lessors: prev.lessors.filter((_, i) => i !== index),
+    }));
+  };
+
+  const addLessee = () => {
+    setFormData((prev) => ({
+      ...prev,
+      lessees: [
+        ...prev.lessees,
+        {
+          name: "",
+          aadhaar: "",
+          permanentAddressLine1: "",
+          permanentAddressLine2: "",
+          permanentCity: "",
+          permanentState: "",
+          permanentPinCode: "",
+        },
+      ],
+    }));
+  };
+
+  const removeLessee = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      lessees: prev.lessees.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleLessorChange = (index, e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      lessors: prev.lessors.map((lessor, i) =>
+        i === index ? { ...lessor, [name]: value } : lessor
+      ),
+    }));
+  };
+
+  const handleLesseeChange = (index, e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      lessees: prev.lessees.map((lessee, i) =>
+        i === index ? { ...lessee, [name]: value } : lessee
+      ),
     }));
   };
 
@@ -117,69 +205,62 @@ export default function RentalAgreementForm() {
       return false;
     }
 
-    if (!formData.lessorName.trim()) {
-      setValidationError("Please enter lessor's name");
-      return false;
-    }
 
-    if (!formData.lessorAddressLine1.trim()) {
-      setValidationError("Please enter lessor's address line 1");
-      return false;
-    }
+    // if (!formData.lessorAddressLine1.trim()) {
+    //   setValidationError("Please enter lessor's address line 1");
+    //   return false;
+    // }
 
-    if (!formData.lessorCity.trim()) {
-      setValidationError("Please enter lessor's city");
-      return false;
-    }
+    // if (!formData.lessorCity.trim()) {
+    //   setValidationError("Please enter lessor's city");
+    //   return false;
+    // }
 
-    if (!formData.lessorState.trim()) {
-      setValidationError("Please enter lessor's state");
-      return false;
-    }
+    // if (!formData.lessorState.trim()) {
+    //   setValidationError("Please enter lessor's state");
+    //   return false;
+    // }
 
-    if (!formData.lessorPinCode.trim()) {
-      setValidationError("Please enter lessor's PIN code");
-      return false;
-    } else if (!/^\d{6}$/.test(formData.lessorPinCode)) {
-      setValidationError("Lessor's PIN code must be 6 digits");
-      return false;
-    }
+    // if (!formData.lessorPinCode.trim()) {
+    //   setValidationError("Please enter lessor's PIN code");
+    //   return false;
+    // } else if (!/^\d{6}$/.test(formData.lessorPinCode)) {
+    //   setValidationError("Lessor's PIN code must be 6 digits");
+    //   return false;
+    // }
 
-    if (!formData.lesseeName.trim()) {
-      setValidationError("Please enter lessee's name");
-      return false;
-    }
 
-    if (!formData.lesseeAadhaar.trim()) {
-      setValidationError("Please enter lessee's Aadhaar number");
-      return false;
-    } else if (!/^\d{12}$/.test(formData.lesseeAadhaar)) {
-      setValidationError("Aadhaar number must be 12 digits");
-      return false;
-    }
 
-    if (!formData.lesseePermanentAddressLine1.trim()) {
-      setValidationError("Please enter lessee's permanent address line 1");
-      return false;
-    }
+    // if (!formData.lesseeAadhaar.trim()) {
+    //   setValidationError("Please enter lessee's Aadhaar number");
+    //   return false;
+    // } else if (!/^\d{12}$/.test(formData.lesseeAadhaar)) {
+    //   setValidationError("Aadhaar number must be 12 digits");
+    //   return false;
+    // }
 
-    if (!formData.lesseePermanentCity.trim()) {
-      setValidationError("Please enter lessee's permanent city");
-      return false;
-    }
+    // if (!formData.lesseePermanentAddressLine1.trim()) {
+    //   setValidationError("Please enter lessee's permanent address line 1");
+    //   return false;
+    // }
 
-    if (!formData.lesseePermanentState.trim()) {
-      setValidationError("Please enter lessee's permanent state");
-      return false;
-    }
+    // if (!formData.lesseePermanentCity.trim()) {
+    //   setValidationError("Please enter lessee's permanent city");
+    //   return false;
+    // }
 
-    if (!formData.lesseePermanentPinCode.trim()) {
-      setValidationError("Please enter lessee's permanent PIN code");
-      return false;
-    } else if (!/^\d{6}$/.test(formData.lesseePermanentPinCode)) {
-      setValidationError("Lessee's permanent PIN code must be 6 digits");
-      return false;
-    }
+    // if (!formData.lesseePermanentState.trim()) {
+    //   setValidationError("Please enter lessee's permanent state");
+    //   return false;
+    // }
+
+    // if (!formData.lesseePermanentPinCode.trim()) {
+    //   setValidationError("Please enter lessee's permanent PIN code");
+    //   return false;
+    // } else if (!/^\d{6}$/.test(formData.lesseePermanentPinCode)) {
+    //   setValidationError("Lessee's permanent PIN code must be 6 digits");
+    //   return false;
+    // }
 
     if (!formData.rentAmount.trim()) {
       setValidationError("Please enter rent amount");
@@ -531,6 +612,12 @@ export default function RentalAgreementForm() {
             handleFixtureChange={handleFixtureChange}
             addFixture={addFixture}
             removeFixture={removeFixture}
+            addLessor={addLessor}
+            removeLessor={removeLessor}
+            addLessee={addLessee}
+            removeLessee={removeLessee}
+            handleLessorChange={handleLessorChange}
+            handleLesseeChange={handleLesseeChange}
           />
           {submissionError && (
             <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">

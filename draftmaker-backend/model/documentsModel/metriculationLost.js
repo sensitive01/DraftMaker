@@ -101,6 +101,14 @@ const documentVerificationSchema = new mongoose.Schema(
       type: serviceDetailsSchema,
       default: null,
     },
+    deliveryAddress: {
+      addressLine1: { type: String },
+      addressLine2: { type: String },
+      city: { type: String },
+      state: { type: String },
+      pincode: { type: String },
+      landmark: { type: String },
+    },
   },
   {
     timestamps: true,

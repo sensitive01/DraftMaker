@@ -1,33 +1,42 @@
 const mongoose = require("mongoose");
 
 // Stamp duty subschema
-const stampDutySchema = new mongoose.Schema({
-  documentType: String,
-  articleNo: String,
-  calculationType: String,
-  fixedAmount: Number,
-  percentage: Number,
-  minAmount: Number,
-  maxAmount: Number,
-}, { _id: false });
+const stampDutySchema = new mongoose.Schema(
+  {
+    documentType: String,
+    articleNo: String,
+    calculationType: String,
+    fixedAmount: Number,
+    percentage: Number,
+    minAmount: Number,
+    maxAmount: Number,
+  },
+  { _id: false }
+);
 
 // Delivery charge subschema
-const deliveryChargeSchema = new mongoose.Schema({
-  serviceName: String,
-  description: String,
-  charge: Number,
-  serviceType: String,
-}, { _id: false });
+const deliveryChargeSchema = new mongoose.Schema(
+  {
+    serviceName: String,
+    description: String,
+    charge: Number,
+    serviceType: String,
+  },
+  { _id: false }
+);
 
 // Service details subschema
-const serviceDetailsSchema = new mongoose.Schema({
-  basePrice: Number,
-  notaryCharge: Number,
-  stampDutyAmount: Number,
-  deliveryCharge: Number,
-  requiresStamp: Boolean,
-  requiresDelivery: Boolean,
-}, { _id: false });
+const serviceDetailsSchema = new mongoose.Schema(
+  {
+    basePrice: Number,
+    notaryCharge: Number,
+    stampDutyAmount: Number,
+    deliveryCharge: Number,
+    requiresStamp: Boolean,
+    requiresDelivery: Boolean,
+  },
+  { _id: false }
+);
 
 const dualApplicantSchema = new mongoose.Schema(
   {
@@ -94,6 +103,14 @@ const dualApplicantSchema = new mongoose.Schema(
     serviceDetails: {
       type: serviceDetailsSchema,
       default: null,
+    },
+    deliveryAddress: {
+      addressLine1: { type: String },
+      addressLine2: { type: String },
+      city: { type: String },
+      state: { type: String },
+      pincode: { type: String },
+      landmark: { type: String },
     },
   },
   {

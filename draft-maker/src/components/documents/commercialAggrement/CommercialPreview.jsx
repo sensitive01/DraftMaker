@@ -13,6 +13,141 @@ const CommercialPreview = ({ formData }) => {
     });
   };
 
+  const renderLessors = () => {
+    const lessors = formData.lessors || [
+      {
+        name: "",
+        addressLine1: "",
+        addressLine2: "",
+        city: "",
+        state: "",
+        pinCode: "",
+      },
+    ];
+
+    return lessors.map((lessor, index) => (
+      <div key={index} className="mb-5 text-justify leading-relaxed">
+        <span className="font-semibold">
+          {lessor.name || `LESSOR ${index + 1} NAME`}
+        </span>
+        {index < lessors.length - 1 ? "," : ""}
+        <br />
+        Address:{" "}
+        <span>
+          {lessor.addressLine1 || `LESSOR ${index + 1} Address Line 1`}
+          {lessor.addressLine2 ? ", " + lessor.addressLine2 : ""}
+          {lessor.city ? ", " + lessor.city : ""}
+          {lessor.state ? ", " + lessor.state : ""}
+          {lessor.pinCode ? " - " + lessor.pinCode : ""}
+        </span>
+      </div>
+    ));
+  };
+
+  const renderLessees = () => {
+    const lessees = formData.lessees || [
+      {
+        name: "",
+        aadhaar: "",
+        permanentAddressLine1: "",
+        permanentAddressLine2: "",
+        permanentCity: "",
+        permanentState: "",
+        permanentPinCode: "",
+      },
+    ];
+
+    return lessees.map((lessee, index) => (
+      <div key={index} className="mb-5 text-justify leading-relaxed">
+        <span className="font-semibold">
+          {lessee.name || `LESSEE ${index + 1} NAME`}
+        </span>
+        {index < lessees.length - 1 ? "," : ""}
+        <br />
+        Aadhaar No: <span>{lessee.aadhaar || "0000 0000 0000"}</span>
+        <br />
+        Permanent Address:{" "}
+        <span>
+          {lessee.permanentAddressLine1 || `LESSEE ${index + 1} Address Line 1`}
+          {lessee.permanentAddressLine2
+            ? ", " + lessee.permanentAddressLine2
+            : ""}
+          {lessee.permanentCity ? ", " + lessee.permanentCity : ""}
+          {lessee.permanentState ? ", " + lessee.permanentState : ""}
+          {lessee.permanentPinCode ? " - " + lessee.permanentPinCode : ""}
+        </span>
+      </div>
+    ));
+  };
+
+  const getPropertyAddress = () => {
+    const lessor = formData.lessors?.[0] || {};
+    return (
+      <>
+        {lessor.addressLine1 || "LESSOR Address Line 1"}
+        {lessor.addressLine2 ? ", " + lessor.addressLine2 : ""}
+        {lessor.city ? ", " + lessor.city : ""}
+        {lessor.state ? ", " + lessor.state : ""}
+        {lessor.pinCode ? " - " + lessor.pinCode : ""}
+      </>
+    );
+  };
+
+  const renderWitnessSections = () => {
+    const lessors = formData.lessors || [
+      {
+        name: "",
+        addressLine1: "",
+        addressLine2: "",
+        city: "",
+        state: "",
+        pinCode: "",
+      },
+    ];
+
+    const lessees = formData.lessees || [
+      {
+        name: "",
+        aadhaar: "",
+        permanentAddressLine1: "",
+        permanentAddressLine2: "",
+        permanentCity: "",
+        permanentState: "",
+        permanentPinCode: "",
+      },
+    ];
+
+    return (
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <div className="font-semibold mb-2">WITNESSES:</div>
+          <div className="mb-2">1. ________________________</div>
+          <div className="mt-16">
+            <div className="font-bold mb-1">LESSOR</div>
+            {lessors.map((lessor, index) => (
+              <div key={index} className="font-semibold mb-1">
+                {lessor.name || `LESSOR ${index + 1} NAME`}
+              </div>
+            ))}
+            <div>(Signature)</div>
+          </div>
+        </div>
+        <div>
+          <div className="mb-2">2. ________________________</div>
+          <div className="mt-16">
+            <div className="font-bold mb-1">LESSEE</div>
+            {lessees.map((lessee, index) => (
+              <div key={index} className="font-semibold mb-1">
+                {lessee.name || `LESSEE ${index + 1} NAME`}
+              </div>
+            ))}
+            <div>(Signature)</div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="max-w-full overflow-x-auto py-4">
@@ -40,23 +175,7 @@ const CommercialPreview = ({ formData }) => {
                 , by & between:
               </p>
 
-              <p className="mb-5 text-justify leading-relaxed">
-                <span className="font-semibold">
-                  {formData.lessorName || "LESSOR NAME"}
-                </span>
-                ,
-                <br />
-                Address:{" "}
-                <span>
-                  {formData.lessorAddressLine1 || "LESSOR Address Line 1"}
-                  {formData.lessorAddressLine2
-                    ? ", " + formData.lessorAddressLine2
-                    : ""}
-                  {formData.lessorCity ? ", " + formData.lessorCity : ""}
-                  {formData.lessorState ? ", " + formData.lessorState : ""}
-                  {formData.lessorPinCode ? " - " + formData.lessorPinCode : ""}
-                </span>
-              </p>
+              {renderLessors()}
 
               <p className="mb-5 text-justify leading-relaxed">
                 Hereinafter referred to as the{" "}
@@ -64,34 +183,7 @@ const CommercialPreview = ({ formData }) => {
               </p>
 
               <p className="mb-5 font-bold text-center">AND</p>
-
-              <p className="mb-5 text-justify leading-relaxed">
-                <span className="font-semibold">
-                  {formData.lesseeName || "LESSEE NAME"}
-                </span>
-                ,
-                <br />
-                Aadhaar No:{" "}
-                <span>{formData.lesseeAadhaar || "0000 0000 0000"}</span>
-                <br />
-                Permanent Address:{" "}
-                <span>
-                  {formData.lesseePermanentAddressLine1 ||
-                    "LESSEE Address Line 1"}
-                  {formData.lesseePermanentAddressLine2
-                    ? ", " + formData.lesseePermanentAddressLine2
-                    : ""}
-                  {formData.lesseePermanentCity
-                    ? ", " + formData.lesseePermanentCity
-                    : ""}
-                  {formData.lesseePermanentState
-                    ? ", " + formData.lesseePermanentState
-                    : ""}
-                  {formData.lesseePermanentPinCode
-                    ? " - " + formData.lesseePermanentPinCode
-                    : ""}
-                </span>
-              </p>
+              {renderLessees()}
 
               <p className="mb-5 text-justify leading-relaxed">
                 In consideration of the rent hereinafter called as{" "}
@@ -307,7 +399,9 @@ const CommercialPreview = ({ formData }) => {
                     <span className="font-semibold mr-3 flex-shrink-0">
                       13.
                     </span>
-                    <div className="font-semibold">{formData.additionaldetails}</div>
+                    <div className="font-semibold">
+                      {formData.additionaldetails}
+                    </div>
                   </div>
                 )}
               </div>
@@ -318,18 +412,7 @@ const CommercialPreview = ({ formData }) => {
                 </div>
                 <p className="text-justify leading-relaxed">
                   All the piece and parcel of the premises at{" "}
-                  <span>
-                    {formData.lessorAddressLine1 ||
-                      "LESSOR Address Line 1, Address Line 2, City, State, Pin Code"}
-                    {formData.lessorAddressLine2
-                      ? ", " + formData.lessorAddressLine2
-                      : ""}
-                    {formData.lessorCity ? ", " + formData.lessorCity : ""}
-                    {formData.lessorState ? ", " + formData.lessorState : ""}
-                    {formData.lessorPinCode
-                      ? " - " + formData.lessorPinCode
-                      : ""}
-                  </span>{" "}
+                  <span>{getPropertyAddress()}</span>
                   and consisting of{" "}
                   <span className="font-semibold">
                     {formData.commercialType
@@ -346,29 +429,7 @@ const CommercialPreview = ({ formData }) => {
                 unto this agreement the day, month and year first above written.
               </p>
 
-              <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <div className="font-semibold mb-2">WITNESSES:</div>
-                  <div className="mb-2">1. ________________________</div>
-                  <div className="mt-16">
-                    <div className="font-bold mb-1">LESSOR</div>
-                    <div className="font-semibold mb-1">
-                      {formData.lessorName || "LESSOR NAME"}
-                    </div>
-                    <div>(Signature)</div>
-                  </div>
-                </div>
-                <div>
-                  <div className="mb-2">2. ________________________</div>
-                  <div className="mt-16">
-                    <div className="font-bold mb-1">LESSEE</div>
-                    <div className="font-semibold mb-1">
-                      {formData.lesseeName || "LESSEE NAME"}
-                    </div>
-                    <div>(Signature)</div>
-                  </div>
-                </div>
-              </div>
+              {renderWitnessSections()}
 
               <div className="absolute bottom-3 right-3 text-xs text-gray-500">
                 Page 2 of 3

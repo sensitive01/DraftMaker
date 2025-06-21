@@ -1,11 +1,9 @@
 import React, { useRef } from "react";
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
+
 
 const RentalPreview = ({ formData }) => {
   const previewRef = useRef(null);
 
-  // Format date function
   const formatDate = (dateString) => {
     if (!dateString) return "Date, Month, Year";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -15,75 +13,148 @@ const RentalPreview = ({ formData }) => {
     });
   };
 
-  // Function to generate PDF
-  const generatePDF = async () => {
-    const input = previewRef.current;
-    if (!input) return;
 
-    try {
-      // Show loading indicator
-      const loadingElement = document.createElement("div");
-      loadingElement.innerText = "Generating PDF...";
-      loadingElement.style.position = "fixed";
-      loadingElement.style.top = "50%";
-      loadingElement.style.left = "50%";
-      loadingElement.style.transform = "translate(-50%, -50%)";
-      loadingElement.style.padding = "20px";
-      loadingElement.style.background = "rgba(0,0,0,0.7)";
-      loadingElement.style.color = "white";
-      loadingElement.style.borderRadius = "8px";
-      loadingElement.style.zIndex = "9999";
-      document.body.appendChild(loadingElement);
 
-      // Get all pages
-      const pages = input.querySelectorAll(".page");
-      const pdf = new jsPDF("p", "mm", "a4");
+  const renderLessors = () => {
+    const lessors = formData.lessors || [
+      {
+        name: "",
+        addressLine1: "",
+        addressLine2: "",
+        city: "",
+        state: "",
+        pinCode: "",
+      },
+    ];
 
-      // Add custom font if needed
-      // pdf.addFont('Times-Roman', 'Times', 'normal');
-      // pdf.setFont('Times');
-
-      // For each page
-      for (let i = 0; i < pages.length; i++) {
-        const page = pages[i];
-        const canvas = await html2canvas(page, {
-          scale: 2, // Higher scale for better quality
-          useCORS: true,
-          logging: false,
-          allowTaint: true,
-        });
-
-        // A4 size in mm: 210 x 297
-        const imgData = canvas.toDataURL("image/png");
-
-        // Add new page if not first page
-        if (i > 0) {
-          pdf.addPage();
-        }
-
-        // Add image to PDF (fit to A4)
-        pdf.addImage(imgData, "PNG", 0, 0, 210, 297);
-      }
-
-      // Remove loading indicator
-      document.body.removeChild(loadingElement);
-
-      // Save PDF
-      pdf.save("Rental_Agreement.pdf");
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      alert("Failed to generate PDF. Please try again.");
-    }
+    return lessors.map((lessor, index) => (
+      <div key={index} className="mb-5 text-justify leading-relaxed">
+        <span className="font-semibold">
+          {lessor.name || `LESSOR ${index + 1} NAME`}
+        </span>
+        {index < lessors.length - 1 ? "," : ""}
+        <br />
+        Address:{" "}
+        <span>
+          {lessor.addressLine1 || `LESSOR ${index + 1} Address Line 1`}
+          {lessor.addressLine2 ? ", " + lessor.addressLine2 : ""}
+          {lessor.city ? ", " + lessor.city : ""}
+          {lessor.state ? ", " + lessor.state : ""}
+          {lessor.pinCode ? " - " + lessor.pinCode : ""}
+        </span>
+      </div>
+    ));
   };
 
-  // Function to print
-  const handlePrint = () => {
-    window.print();
+  const renderLessees = () => {
+    const lessees = formData.lessees || [
+      {
+        name: "",
+        aadhaar: "",
+        permanentAddressLine1: "",
+        permanentAddressLine2: "",
+        permanentCity: "",
+        permanentState: "",
+        permanentPinCode: "",
+      },
+    ];
+
+    return lessees.map((lessee, index) => (
+      <div key={index} className="mb-5 text-justify leading-relaxed">
+        <span className="font-semibold">
+          {lessee.name || `LESSEE ${index + 1} NAME`}
+        </span>
+        {index < lessees.length - 1 ? "," : ""}
+        <br />
+        Aadhaar No: <span>{lessee.aadhaar || "0000 0000 0000"}</span>
+        <br />
+        Permanent Address:{" "}
+        <span>
+          {lessee.permanentAddressLine1 || `LESSEE ${index + 1} Address Line 1`}
+          {lessee.permanentAddressLine2
+            ? ", " + lessee.permanentAddressLine2
+            : ""}
+          {lessee.permanentCity ? ", " + lessee.permanentCity : ""}
+          {lessee.permanentState ? ", " + lessee.permanentState : ""}
+          {lessee.permanentPinCode ? " - " + lessee.permanentPinCode : ""}
+        </span>
+      </div>
+    ));
+  };
+
+  const renderWitnessSections = () => {
+    const lessors = formData.lessors || [
+      {
+        name: "",
+        addressLine1: "",
+        addressLine2: "",
+        city: "",
+        state: "",
+        pinCode: "",
+      },
+    ];
+
+    const lessees = formData.lessees || [
+      {
+        name: "",
+        aadhaar: "",
+        permanentAddressLine1: "",
+        permanentAddressLine2: "",
+        permanentCity: "",
+        permanentState: "",
+        permanentPinCode: "",
+      },
+    ];
+
+    return (
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <div className="font-semibold mb-2">WITNESSES:</div>
+          <div className="mb-2">1. ________________________</div>
+          <div className="mt-16">
+            <div className="font-bold mb-1">LESSOR</div>
+            {lessors.map((lessor, index) => (
+              <div key={index} className="font-semibold mb-1">
+                {lessor.name || `LESSOR ${index + 1} NAME`}
+              </div>
+            ))}
+            <div>(Signature)</div>
+          </div>
+        </div>
+        <div>
+          <div className="mb-2">2. ________________________</div>
+          <div className="mt-16">
+            <div className="font-bold mb-1">LESSEE</div>
+            {lessees.map((lessee, index) => (
+              <div key={index} className="font-semibold mb-1">
+                {lessee.name || `LESSEE ${index + 1} NAME`}
+              </div>
+            ))}
+            <div>(Signature)</div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const getPropertyAddress = () => {
+    const lessor = formData.lessors?.[0] || {};
+    return (
+      <>
+        {lessor.addressLine1 || "LESSOR Address Line 1"}
+        {lessor.addressLine2 ? ", " + lessor.addressLine2 : ""}
+        {lessor.city ? ", " + lessor.city : ""}
+        {lessor.state ? ", " + lessor.state : ""}
+        {lessor.pinCode ? " - " + lessor.pinCode : ""}
+      </>
+    );
   };
 
   return (
     <>
       <div className="max-w-full overflow-x-auto py-4">
+   
+
         <div ref={previewRef} className="print-container">
           {/* Page 1 */}
           <div className="page relative bg-white shadow-md mx-auto mb-8">
@@ -108,23 +179,7 @@ const RentalPreview = ({ formData }) => {
                 , by & between:
               </p>
 
-              <p className="mb-5 text-justify leading-relaxed">
-                <span className="font-semibold">
-                  {formData.lessorName || "LESSOR NAME"}
-                </span>
-                ,
-                <br />
-                Address:{" "}
-                <span>
-                  {formData.lessorAddressLine1 || "LESSOR Address Line 1"}
-                  {formData.lessorAddressLine2
-                    ? ", " + formData.lessorAddressLine2
-                    : ""}
-                  {formData.lessorCity ? ", " + formData.lessorCity : ""}
-                  {formData.lessorState ? ", " + formData.lessorState : ""}
-                  {formData.lessorPinCode ? " - " + formData.lessorPinCode : ""}
-                </span>
-              </p>
+              {renderLessors()}
 
               <p className="mb-5 text-justify leading-relaxed">
                 Hereinafter referred to as the{" "}
@@ -133,33 +188,8 @@ const RentalPreview = ({ formData }) => {
 
               <p className="mb-5 font-bold text-center">AND</p>
 
-              <p className="mb-5 text-justify leading-relaxed">
-                <span className="font-semibold">
-                  {formData.lesseeName || "LESSEE NAME"}
-                </span>
-                ,
-                <br />
-                Aadhaar No:{" "}
-                <span>{formData.lesseeAadhaar || "0000 0000 0000"}</span>
-                <br />
-                Permanent Address:{" "}
-                <span>
-                  {formData.lesseePermanentAddressLine1 ||
-                    "LESSEE Address Line 1"}
-                  {formData.lesseePermanentAddressLine2
-                    ? ", " + formData.lesseePermanentAddressLine2
-                    : ""}
-                  {formData.lesseePermanentCity
-                    ? ", " + formData.lesseePermanentCity
-                    : ""}
-                  {formData.lesseePermanentState
-                    ? ", " + formData.lesseePermanentState
-                    : ""}
-                  {formData.lesseePermanentPinCode
-                    ? " - " + formData.lesseePermanentPinCode
-                    : ""}
-                </span>
-              </p>
+              {/* Display multiple lessees */}
+              {renderLessees()}
 
               <p className="mb-5 text-justify leading-relaxed">
                 In consideration of the rent hereinafter called as{" "}
@@ -388,19 +418,7 @@ const RentalPreview = ({ formData }) => {
                 </div>
                 <p className="text-justify leading-relaxed">
                   All the piece and parcel of the premises at{" "}
-                  <span>
-                    {formData.lessorAddressLine1 ||
-                      "LESSOR Address Line 1, Address Line 2, City, State, Pin Code"}
-                    {formData.lessorAddressLine2
-                      ? ", " + formData.lessorAddressLine2
-                      : ""}
-                    {formData.lessorCity ? ", " + formData.lessorCity : ""}
-                    {formData.lessorState ? ", " + formData.lessorState : ""}
-                    {formData.lessorPinCode
-                      ? " - " + formData.lessorPinCode
-                      : ""}
-                  </span>{" "}
-                  and consisting of{" "}
+                  <span>{getPropertyAddress()}</span> and consisting of{" "}
                   <span className="font-semibold">
                     {formData.bhkConfig || "XBHK"},{" "}
                     {formData.bedroomCount || "X"} bedroom,{" "}
@@ -417,29 +435,7 @@ const RentalPreview = ({ formData }) => {
                 unto this agreement the day, month and year first above written.
               </p>
 
-              <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <div className="font-semibold mb-2">WITNESSES:</div>
-                  <div className="mb-2">1. ________________________</div>
-                  <div className="mt-16">
-                    <div className="font-bold mb-1">LESSOR</div>
-                    <div className="font-semibold mb-1">
-                      {formData.lessorName || "LESSOR NAME"}
-                    </div>
-                    <div>(Signature)</div>
-                  </div>
-                </div>
-                <div>
-                  <div className="mb-2">2. ________________________</div>
-                  <div className="mt-16">
-                    <div className="font-bold mb-1">LESSEE</div>
-                    <div className="font-semibold mb-1">
-                      {formData.lesseeName || "LESSEE NAME"}
-                    </div>
-                    <div>(Signature)</div>
-                  </div>
-                </div>
-              </div>
+              {renderWitnessSections()}
 
               <div className="absolute bottom-3 right-3 text-xs text-gray-500">
                 Page 2 of 3
