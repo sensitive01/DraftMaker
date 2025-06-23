@@ -13,6 +13,15 @@ const Header = () => {
     setIsMenuOpen(false);
   };
 
+  // Function to scroll to bottom of page
+  const scrollToBottom = () => {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'smooth'
+    });
+    closeMenu(); // Close mobile menu if open
+  };
+
   return (
     <header className="fixed">
       <div className="container">
@@ -87,7 +96,7 @@ const Header = () => {
                         to="/documents/address/addressaffadavit"
                         onClick={closeMenu}
                       >
-                        Adress Affadavit
+                        Address Affidavit
                       </Link>
                     </li>
                     <li>
@@ -95,15 +104,15 @@ const Header = () => {
                         to="/documents/dual-name/dual-name-correction"
                         onClick={closeMenu}
                       >
-                        Dual Name One and The Same
+                        Dual Name One and the Same
                       </Link>
                     </li>
                     <li>
                       <Link
-                        to="/documents/name/name-corrections"
+                        to="/documents/name/name-correction"
                         onClick={closeMenu}
                       >
-                        Name change
+                        Name Change
                       </Link>
                     </li>
                     <li>
@@ -111,7 +120,7 @@ const Header = () => {
                         to="/documents/dob/dob-correction"
                         onClick={closeMenu}
                       >
-                        DOB MISMATCH
+                        DOB Mismatch
                       </Link>
                     </li>
                     <li>
@@ -119,12 +128,12 @@ const Header = () => {
                         to="/documents/gas/gas-document"
                         onClick={closeMenu}
                       >
-                        GAS VOUCHER LOST
+                        Gas Voucher Lost
                       </Link>
                     </li>
                     <li>
-                      <Link to="" onClick={closeMenu}>
-                        DOCUMENT LOST DECLARATION
+                      <Link to="/documents/document-lost/document-lost-correction" onClick={closeMenu}>
+                        Document Lost Declaration
                       </Link>
                     </li>
                     <li>
@@ -132,7 +141,7 @@ const Header = () => {
                         to="/documents/birth-certificate-parent/birth-certificate-parent-name-correction"
                         onClick={closeMenu}
                       >
-                        BIRTH CERTIFICATE PARENTS NAME CORRECTION
+                        Birth Certificate Parent's Name Correction
                       </Link>
                     </li>
                     <li>
@@ -140,7 +149,7 @@ const Header = () => {
                         to="/documents/birth-certificate/birth-certificate-correction"
                         onClick={closeMenu}
                       >
-                        BIRTH CERTIFICATE NAME CHANGE
+                        Birth Certificate Name Change
                       </Link>
                     </li>
                     <li>
@@ -148,7 +157,7 @@ const Header = () => {
                         to="/documents/gst/gst-document"
                         onClick={closeMenu}
                       >
-                        GST NOC PREMISES BY OWNER
+                        GST NOC Premises by Owner
                       </Link>
                     </li>
                     <li>
@@ -156,7 +165,7 @@ const Header = () => {
                         to="/documents/metriculation/metriculation-document"
                         onClick={closeMenu}
                       >
-                        Matriculation certificate lost
+                        Matriculation Certificate Lost
                       </Link>
                     </li>
                     <li>
@@ -172,7 +181,7 @@ const Header = () => {
                         to="/documents/vehicle-insurance/vehicle-insurance-claiming"
                         onClick={closeMenu}
                       >
-                        Vehicle insurance claiming
+                        Vehicle Insurance Claiming
                       </Link>
                     </li>
                     <li>
@@ -180,7 +189,7 @@ const Header = () => {
                         to="/documents/huf/huf-aggrement"
                         onClick={closeMenu}
                       >
-                        HUF
+                        HUF Agreement
                       </Link>
                     </li>
                     <li>
@@ -188,7 +197,7 @@ const Header = () => {
                         to="/documents/gap-period/gap-period"
                         onClick={closeMenu}
                       >
-                        GAP PERIOD TATA
+                        Gap Period Tata
                       </Link>
                     </li>
                     <li>
@@ -204,7 +213,7 @@ const Header = () => {
                         to="/documents/passport-name/passport-name-change"
                         onClick={closeMenu}
                       >
-                        Passport name change
+                        Passport Name Change
                       </Link>
                     </li>
                   </ul>
@@ -229,14 +238,18 @@ const Header = () => {
                 </div>
               </li>
               <li className="nav-item">
-                <Link className="nav-link dark_btn" to="/documents/track-my-documents" onClick={closeMenu}>
+                <Link
+                  className="nav-link dark_btn"
+                  to="/documents/track-my-documents"
+                  onClick={closeMenu}
+                >
                   Track <i className="icofont-arrow-right"></i>
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link dark_btn" to="#" onClick={closeMenu}>
+                <button className="nav-link dark_btn" onClick={scrollToBottom}>
                   Contact Us <i className="icofont-arrow-right"></i>
-                </Link>
+                </button>
               </li>
             </ul>
           </div>

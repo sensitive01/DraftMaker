@@ -2,11 +2,18 @@ import React from "react";
 import { getDayWithSuffix } from "../../../utils/dateFormat";
 
 const VehicleInsuranceClaimingPreview = ({ formData }) => {
-  // Helper function to determine if a field needs highlighting
-  const highlightIfEmpty = (value) => {
-    return !value
-      ? "bg-yellow-100 px-2 py-1 border-b border-dashed border-yellow-400"
-      : "";
+  // Format dates properly
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    try {
+      return new Date(dateString).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    } catch (e) {
+      return "";
+    }
   };
 
   // Check if all form data exists
@@ -14,8 +21,8 @@ const VehicleInsuranceClaimingPreview = ({ formData }) => {
 
   if (isFormDataEmpty) {
     return (
-      <div className="bg-gray-50 p-8 rounded-lg text-center border border-gray-200 shadow-md h-full flex items-center justify-center">
-        <div>
+      <div className="bg-gray-50 p-10 rounded-lg shadow-lg max-w-5xl mx-auto min-h-[800px] flex items-center justify-center">
+        <div className="text-center">
           <svg
             className="w-16 h-16 mx-auto text-gray-400"
             fill="none"
@@ -38,237 +45,180 @@ const VehicleInsuranceClaimingPreview = ({ formData }) => {
     );
   }
 
-  // Format dates properly
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    try {
-      return new Date(dateString).toLocaleDateString("en-US", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
-    } catch (e) {
-      return "";
-    }
-  };
-
   return (
-    <div className="bg-white p-10 rounded-lg border-2 border-gray-300 shadow-lg">
-      <div className="max-w-3xl mx-auto">
-        {/* Official Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold uppercase tracking-wider mb-3">
-            AFFIDAVIT
-          </h1>
-          <div className="border-b-2 border-black w-48 mx-auto mb-2"></div>
-          <div className="border-b-2 border-black w-32 mx-auto"></div>
+    <div className="bg-gray-50 p-3 rounded-lg shadow-lg max-w-5xl mx-auto min-h-[800px]">
+      <div className="bg-white p-7 rounded-lg shadow-sm border border-gray-200 relative overflow-hidden min-h-[700px] font-serif">
+        {/* Watermark */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="text-gray-300 text-4xl font-bold transform rotate-45 select-none font-sans">
+            INTERNAL PURPOSE ONLY
+          </div>
         </div>
 
-        {/* Official Note */}
-        <div className="text-sm text-gray-500 mb-10 text-center italic">
-          [To be printed on a stamp paper of appropriate value as per State
-          stamp duty laws]
-        </div>
+        {/* Document Content */}
+        <div className="relative z-10">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2 text-center">
+            Vehicle Insurance Claim Affidavit
+          </h2>
 
-        <div className="space-y-7 text-gray-800 leading-relaxed text-lg">
-          <p className="mb-6">
-            I,{" "}
-            {formData.title ? (
-              formData.title
-            ) : (
-              <span className={highlightIfEmpty(formData.title)}>___</span>
-            )}{" "}
-            {formData.name ? (
-              <span className="font-medium">{formData.name}</span>
-            ) : (
-              <span className={highlightIfEmpty(formData.name)}>
-                _______________
+          <div className="mb-12 leading-loose text-base">
+            <p className="mb-6">
+              I,{" "}
+              <span className="font-bold">
+                {formData.title || "______"}{" "}
+                {formData.name || "_________________"}
               </span>
-            )}{" "}
-            {formData.relation ? (
-              `${formData.relation}`
-            ) : (
-              <span className={highlightIfEmpty(formData.relation)}>
-                ______
+              , {formData.relation || "______"} of{" "}
+              <span className="font-bold">
+                {formData.guardianName || "_________________"}
               </span>
-            )}
-            , Aged:{" "}
-            <span className={highlightIfEmpty(formData.age)}>
-              {formData.age || "___"}
-            </span>{" "}
-            Years,
-          </p>
+              , Aged: <span className="font-bold">{formData.age || "___"}</span>{" "}
+              Years,
+            </p>
 
-          <p className="mb-6">
-            Permanent Address:{" "}
-            <span className={highlightIfEmpty(formData.address)}>
-              {formData.address || "_________________"}
-            </span>
-          </p>
-
-          <p className="mb-8">
-            My Aadhaar No:{" "}
-            <span className={highlightIfEmpty(formData.aadhaar)}>
-              {formData.aadhaar || "__ ____ ____"}
-            </span>
-          </p>
-
-          <p className="font-medium text-xl mb-6">
-            Do hereby solemnly affirm and declare as under:
-          </p>
-
-          <ol className="list-decimal ml-6 space-y-10">
-            <li>
-              I am the owner of the Vehicle No-{" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(
-                  formData.vehicleNo
-                )}`}
-              >
-                {formData.vehicleNo || "________"}
+            <p className="mb-6">
+              Permanent Address:{" "}
+              <span className="font-bold">
+                {formData.address ||
+                  "__________________________________"}
               </span>
-              , VEHICLE MODEL:{" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(
-                  formData.vehicleModel
-                )}`}
-              >
-                {formData.vehicleModel || "________"}
-              </span>
-              , Engine No-{" "}
-              <span className={highlightIfEmpty(formData.engineNo)}>
-                {formData.engineNo || "________"}
-              </span>
-              , Chassis No:{" "}
-              <span className={highlightIfEmpty(formData.chassisNo)}>
-                {formData.chassisNo || "________"}
-              </span>{" "}
-              Insured with{" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(formData.insurer)}`}
-              >
-                {formData.insurer || "________"}
-              </span>{" "}
-              Under Policy No:{" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(formData.policyNo)}`}
-              >
-                {formData.policyNo || "________"}
-              </span>{" "}
-              for the period{" "}
-              <span className={highlightIfEmpty(formData.policyStart)}>
-                {formatDate(formData.policyStart) || "________"}
-              </span>{" "}
-              to{" "}
-              <span className={highlightIfEmpty(formData.policyEnd)}>
-                {formatDate(formData.policyEnd) || "________"}
-              </span>
-              .
-            </li>
+            </p>
 
-            <li>
-              Vehicle was Driven by{" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(
-                  formData.driverName
-                )}`}
-              >
-                {formData.driverName || "________"}
-              </span>{" "}
-              and the Vehicle met with an accident as follows:
-              <div className="bg-gray-50 p-6 mt-4 rounded-md border-l-4 border-blue-600">
-                <p className="font-bold text-gray-700 mb-4">
-                  DETAILS OF INCIDENT:
-                </p>
-                <p
-                  className={`italic text-gray-700 leading-relaxed ${highlightIfEmpty(
-                    formData.accidentDetails
-                  )}`}
-                >
-                  {formData.accidentDetails ||
-                    "Please provide detailed information about the accident including date, time, location, and circumstances"}
-                </p>
+            <p className="mb-6">
+              My Aadhaar No:{" "}
+              <span className="font-bold">
+                {formData.aadhaar || "____ ____ ____"}
+              </span>
+            </p>
+
+            <p className="mb-5 font-semibold text-center">
+              Do hereby solemnly affirm and declare as under:
+            </p>
+          </div>
+
+          <div className="mb-8 leading-loose text-base">
+            <div className="space-y-8">
+              <div className="flex text-justify">
+                <span className="font-bold text-lg mr-4 flex-shrink-0">1.</span>
+                <span>
+                  I am the owner of the Vehicle No:{" "}
+                  <span className="font-bold">
+                    {formData.vehicleNo || "________"}
+                  </span>
+                  , VEHICLE MODEL:{" "}
+                  <span className="font-bold">
+                    {formData.vehicleModel || "________"}
+                  </span>
+                  , Engine No:{" "}
+                  <span className="font-bold">
+                    {formData.engineNo || "________"}
+                  </span>
+                  , Chassis No:{" "}
+                  <span className="font-bold">
+                    {formData.chassisNo || "________"}
+                  </span>{" "}
+                  Insured with{" "}
+                  <span className="font-bold">
+                    {formData.insurer || "________"}
+                  </span>{" "}
+                  Under Policy No:{" "}
+                  <span className="font-bold">
+                    {formData.policyNo || "________"}
+                  </span>{" "}
+                  for the period{" "}
+                  <span className="font-bold">
+                    {formatDate(formData.policyStart) || "________"}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-bold">
+                    {formatDate(formData.policyEnd) || "________"}
+                  </span>
+                  .
+                </span>
               </div>
-            </li>
 
-            <li>
-              The above accident was reported to the Police Station and the
-              respective police acknowledgement has been submitted alongside
-              other claim documents.
-            </li>
+              <div className="flex text-justify">
+                <span className="font-bold text-lg mr-4 flex-shrink-0">2.</span>
+                <span>
+                  Vehicle was Driven by{" "}
+                  <span className="font-bold">
+                    {formData.driverName || "________"}
+                  </span>{" "}
+                  and the Vehicle met with an accident as follows:
+                  <div className="bg-gray-50 p-4 mt-2 rounded">
+                    <p className="font-medium mb-2">DETAILS OF INCIDENT:</p>
+                    <p>
+                      {formData.accidentDetails ||
+                        "_______________________________"}
+                    </p>
+                  </div>
+                </span>
+              </div>
 
-            <li>
-              I hereby confirm that no third-party injury / death / property
-              damage is involved in this accident and there will not be any
-              claim from any third party. In the event of any claim from any
-              third party on account of the above accident, it shall be my
-              responsibility to take such claims and the insurer is fully
-              discharged of the liability under the policy by virtue of
-              settlement of my claim for Damage to the Vehicle.
-            </li>
+              <div className="flex text-justify">
+                <span className="font-bold text-lg mr-4 flex-shrink-0">3.</span>
+                <span>
+                  The above accident was reported to the Police Station and the
+                  respective police acknowledgement has been submitted alongside
+                  other claim documents.
+                </span>
+              </div>
 
-            <li>
-              I understand that providing false information in this affidavit
-              may result in rejection of my claim and could have legal
-              consequences under applicable laws.
-            </li>
-          </ol>
+              <div className="flex text-justify">
+                <span className="font-bold text-lg mr-4 flex-shrink-0">4.</span>
+                <span>
+                  I hereby confirm that no third-party injury / death / property
+                  damage is involved in this accident and there will not be any
+                  claim from any third party. In the event of any claim from any
+                  third party on account of the above accident, it shall be my
+                  responsibility to take such claims and the insurer is fully
+                  discharged of the liability under the policy by virtue of
+                  settlement of my claim for Damage to the Vehicle.
+                </span>
+              </div>
 
-          <div className="mt-8 pt-4">
-            <p>
+              <div className="flex text-justify">
+                <span className="font-bold text-lg mr-4 flex-shrink-0">5.</span>
+                <span>
+                  I understand that providing false information in this
+                  affidavit may result in rejection of my claim and could have
+                  legal consequences under applicable laws.
+                </span>
+              </div>
+            </div>
+
+            <p className="mt-8 text-justify">
               I hereby solemnly declare that the above statement is true to the
               best of my knowledge and belief and that I have not withheld or
               misrepresented any material facts.
             </p>
           </div>
 
-          <div className="mt-8 pt-4">
-            <p>
+          {/* Verification and Signature */}
+          <div className="mt-8">
+            <p className="mb-6">
               Verified at{" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(formData.place)}`}
-              >
-                {formData.place || "________"}
-              </span>{" "}
+              <span className="font-bold">{formData.place || "________"}</span>{" "}
               on this{" "}
-              <span className={highlightIfEmpty(formData.day)}>
+              <span className="font-bold">
                 {getDayWithSuffix(formData.day) || "__"}
               </span>{" "}
-             {" "}
-              <span
-                className={`font-medium ${highlightIfEmpty(formData.month)}`}
-              >
-                {formData.month || "________"}
-              </span>
-              ,{" "}
-              <span className={highlightIfEmpty(formData.year)}>
-                {formData.year || "____"}
-              </span>{" "}
-              that the contents of the above said affidavit are true and correct
-              to the best of my knowledge and belief.
+              day of{" "}
+              <span className="font-bold">{formData.month || "________"}</span>,{" "}
+              <span className="font-bold">{formData.year || "____"}</span> that
+              the contents of the above said affidavit are true and correct to
+              the best of my knowledge and belief.
             </p>
-          </div>
 
-          {/* Signature Block */}
-          <div className="grid grid-cols-2 gap-8 mt-24 mb-8">
-            <div className="text-left">
-              <p className="font-medium">Signature of Notary Public</p>
-              <p className="text-sm text-gray-600">With Seal</p>
-            </div>
+            <div className="flex justify-between mt-8">
+              <div></div>
 
-            <div className="text-right">
-              <p className="font-medium">Signature of the Deponent</p>
-              <p className="text-sm text-gray-600">
-                {formData.title ? formData.title : ""}{" "}
-                {formData.name ? formData.name : ""}
-              </p>
-            </div>
-          </div>
-
-          {/* Stamp/Seal Placeholder */}
-          <div className="mt-16 mb-6 text-center">
-            <div className="border-2 border-dashed border-gray-300 rounded-full h-40 w-40 mx-auto flex items-center justify-center text-gray-400">
-              <p className="text-sm">Notary Seal</p>
+              <div className="text-right">
+                <div className="mt-24 border-t-2 border-black pt-2 w-56 text-center ml-auto">
+                  <p className="font-medium">(Signature of the Applicant)</p>
+                  <p className="font-bold mt-2">Deponent</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

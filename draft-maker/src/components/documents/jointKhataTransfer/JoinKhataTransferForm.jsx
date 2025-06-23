@@ -1,16 +1,16 @@
 const JoinKhataTransferForm = ({ formData, handleChange }) => {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-6 pb-2 border-b border-gray-200">
+    <div className="bg-white p-4 rounded-lg shadow-md">
+      <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-gray-200">
         Enter Details
       </h2>
 
       {/* First Applicant */}
-      <div className="mb-8">
-        <h3 className="text-lg font-medium mb-4 text-indigo-700">
+      <div className="mb-6">
+        <h3 className="text-lg font-medium mb-3 text-indigo-700">
           First Applicant
         </h3>
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium text-red-600 mb-1">
               Full Name
@@ -84,11 +84,11 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
       </div>
 
       {/* Second Applicant */}
-      <div className="mb-8">
-        <h3 className="text-lg font-medium mb-4 text-indigo-700">
+      <div className="mb-6">
+        <h3 className="text-lg font-medium mb-3 text-indigo-700">
           Second Applicant
         </h3>
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium text-red-600 mb-1">
               Full Name
@@ -162,11 +162,11 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
       </div>
 
       {/* Property Details */}
-      <div className="mb-8">
-        <h3 className="text-lg font-medium mb-4 text-indigo-700">
+      <div className="mb-6">
+        <h3 className="text-lg font-medium mb-3 text-indigo-700">
           Property Details
         </h3>
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium text-red-600 mb-1">
               Property Address
@@ -181,7 +181,7 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
             ></textarea>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-red-600 mb-1">
                 Ward Number
@@ -211,7 +211,7 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-red-600 mb-1">
                 Khata Number
@@ -244,8 +244,8 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
       </div>
 
       {/* Authorization */}
-      <div className="mb-8">
-        <h3 className="text-lg font-medium mb-4 text-indigo-700">
+      <div className="mb-6">
+        <h3 className="text-lg font-medium mb-3 text-indigo-700">
           Authorization
         </h3>
         <div>
@@ -265,10 +265,10 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
 
       {/* Verification Details */}
       <div className="mb-4">
-        <h3 className="text-lg font-medium mb-4 text-indigo-700">
+        <h3 className="text-lg font-medium mb-3 text-indigo-700">
           Verification Details
         </h3>
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium text-red-600 mb-1">
               Place
@@ -283,7 +283,7 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-sm font-medium text-red-600 mb-1">
                 Day

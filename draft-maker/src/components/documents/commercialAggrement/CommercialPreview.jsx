@@ -154,6 +154,8 @@ const CommercialPreview = ({ formData }) => {
         <div ref={previewRef} className="print-container">
           {/* Page 1 */}
           <div className="page relative bg-white shadow-md mx-auto mb-8">
+            <div className="watermark">INTERNAL PURPOSE ONLY</div>
+
             {/* Corner decorations */}
             <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-gray-500"></div>
             <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-gray-500"></div>
@@ -297,6 +299,8 @@ const CommercialPreview = ({ formData }) => {
 
           {/* Page 2 */}
           <div className="page relative bg-white shadow-md mx-auto mb-8">
+            <div className="watermark">INTERNAL PURPOSE ONLY</div>
+
             <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-gray-500"></div>
             <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-gray-500"></div>
             <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-gray-500"></div>
@@ -439,6 +443,8 @@ const CommercialPreview = ({ formData }) => {
 
           {/* Page 3 */}
           <div className="page relative bg-white shadow-md mx-auto mb-8">
+            <div className="watermark">INTERNAL PURPOSE ONLY</div>
+
             <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-gray-500"></div>
             <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-gray-500"></div>
             <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-gray-500"></div>
@@ -541,6 +547,29 @@ const CommercialPreview = ({ formData }) => {
             max-width: 210mm;
             min-height: 297mm;
             margin-bottom: 2rem;
+          }
+        }
+
+        .watermark {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) rotate(-45deg);
+          font-size: 3rem;
+          font-weight: bold;
+          color: rgba(0, 0, 0, 0.1);
+          font-family: Arial, sans-serif;
+          letter-spacing: 0.2em;
+          pointer-events: none;
+          z-index: 1;
+          white-space: nowrap;
+          user-select: none;
+        }
+
+        @media print {
+          .watermark {
+            font-size: 4rem;
+            color: rgba(0, 0, 0, 0.08);
           }
         }
 

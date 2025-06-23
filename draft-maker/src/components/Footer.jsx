@@ -1,10 +1,23 @@
 import { Link } from "react-router-dom";
-import animaeIng from "../assets/images/anim_line_2.png"
-import contactImg from "../assets/images/new/contact_01.png"
-import logoImg from "../assets/images/logo.png" 
-
+import animaeIng from "../assets/images/anim_line_2.png";
+import contactImg from "../assets/images/new/contact_01.png";
+import phoneImg from "../assets/images/new/contact_02.png";
+import emailImg from "../assets/images/new/contact_03.png";
+import logoImg from "../assets/images/logo.png";
 
 const Footer = () => {
+  // Function to handle map click - opens Google Maps in new tab
+  const handleMapClick = () => {
+    const mapUrl = "https://www.google.com/maps/place/Rental+Agreement+E+stamp+Notary+Pan+Card+Passport+Jeevan+Pramaan+Aadhaar+Pan+Linking/@12.9383209,77.6989027,243m/data=!3m1!1e3!4m6!3m5!1s0x3bae13287dc4a509:0x3487ef268a483d31!8m2!3d12.9383209!4d77.6989027!16s%2Fg%2F11q2p6y8qr";
+    window.open(mapUrl, '_blank');
+  };
+
+  // Function to get directions
+  const handleGetDirections = () => {
+    const directionsUrl = "https://www.google.com/maps/dir//Shop+No+5,+1st+Floor,+New+No+200,+Panathur+Main+Rd,+Munireddy+Layout,+Mariyappa+Layout,+Kadubeesanahalli,+Panathur,+Bengaluru,+Karnataka+560103";
+    window.open(directionsUrl, '_blank');
+  };
+
   return (
     <footer>
       <div className="top_footer" id="contact">
@@ -126,23 +139,27 @@ const Footer = () => {
                     </span>
                     <div className="text">
                       <p>
-                        Reach us <br /> 599, Vilium Crossing, NJ
+                        Visit us <br />
+                        Shop No 5, 1st Floor, New No 200, <br />
+                        Panathur Main Rd, Munireddy Layout, <br />
+                        Mariyappa Layout, Kadubeesanahalli, <br />
+                        Panathur, Bengaluru, Karnataka 560103
                       </p>
                     </div>
                   </li>
                   <li>
                     <span className="icon">
-                      <img src={contactImg} alt="image" />
+                      <img src={phoneImg} alt="image" />
                     </span>
                     <div className="text">
                       <p>
-                        Call us <a href="tel:+1-900-1234567">+1-900-123 4567</a>
+                        Call us <a href="tel:+91 9008774711">+91 9008774711</a>
                       </p>
                     </div>
                   </li>
                   <li>
                     <span className="icon">
-                      <img src={contactImg} alt="image" />
+                      <img src={emailImg} alt="image" />
                     </span>
                     <div className="text">
                       <p>
@@ -160,6 +177,159 @@ const Footer = () => {
           {/* row end */}
         </div>
         {/* container end */}
+
+        {/* Full Width Google Maps Section - Matching Original Style */}
+        <div
+          className="full_width_map"
+          style={{
+            width: "100%",
+            marginTop: "50px",
+            background: "linear-gradient(135deg, #8B0000 0%, #8B0000 100%)",
+            padding: "40px 0",
+            borderTop: "3px solid #FFD700",
+          }}
+        >
+          <div className="container">
+            <div className="row">
+              <div className="col-12 text-center">
+                <h3
+                  style={{
+                    marginBottom: "30px",
+                    color: "#fff",
+                    fontSize: "2.2rem",
+                    fontWeight: "bold",
+                    textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
+                  }}
+                >
+                  Find us on Map
+                </h3>
+              </div>
+            </div>
+          </div>
+          <div className="container">
+            {/* Action buttons - simplified and matching theme */}
+            <div className="row mb-3">
+              <div className="col-12 text-center">
+                <button
+                  onClick={handleMapClick}
+                  style={{
+                    backgroundColor: "#FFD700",
+                    color: "#8B0000",
+                    border: "none",
+                    padding: "10px 25px",
+                    borderRadius: "5px",
+                    fontWeight: "bold",
+                    fontSize: "0.9rem",
+                    marginRight: "10px",
+                    marginBottom: "15px",
+                    cursor: "pointer",
+                    boxShadow: "0 3px 10px rgba(0,0,0,0.3)",
+                    transition: "all 0.3s ease"
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = "#FFA500";
+                    e.target.style.transform = "translateY(-1px)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = "#FFD700";
+                    e.target.style.transform = "translateY(0px)";
+                  }}
+                >
+                  View on Google Maps
+                </button>
+                
+                <button
+                  onClick={handleGetDirections}
+                  style={{
+                    backgroundColor: "transparent",
+                    color: "#FFD700",
+                    border: "2px solid #FFD700",
+                    padding: "8px 23px",
+                    borderRadius: "5px",
+                    fontWeight: "bold",
+                    fontSize: "0.9rem",
+                    marginBottom: "15px",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease"
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = "#FFD700";
+                    e.target.style.color = "#8B0000";
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = "transparent";
+                    e.target.style.color = "#FFD700";
+                  }}
+                >
+                  Get Directions
+                </button>
+              </div>
+            </div>
+
+            <div
+              className="map_container"
+              style={{
+                width: "100%",
+                height: "400px",
+                border: "3px solid #FFD700",
+                borderRadius: "15px",
+                overflow: "hidden",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+                position: "relative",
+                cursor: "pointer"
+              }}
+              onClick={handleMapClick}
+            >
+              {/* Subtle click overlay */}
+              <div style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(255, 215, 0, 0.05)",
+                zIndex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                opacity: 0,
+                transition: "opacity 0.3s ease",
+                borderRadius: "12px"
+              }}
+              onMouseOver={(e) => e.target.style.opacity = "1"}
+              onMouseOut={(e) => e.target.style.opacity = "0"}
+              >
+                <div style={{
+                  backgroundColor: "rgba(139, 0, 0, 0.9)",
+                  color: "#FFD700",
+                  padding: "12px 20px",
+                  borderRadius: "8px",
+                  fontWeight: "bold",
+                  fontSize: "1rem",
+                  textAlign: "center",
+                  border: "2px solid #FFD700",
+                  textShadow: "1px 1px 2px rgba(0,0,0,0.5)"
+                }}>
+                  Click to Open in Google Maps
+                </div>
+              </div>
+
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d243.3174687726!2d77.69890269999999!3d12.9383209!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae13287dc4a509%3A0x3487ef268a483d31!2sRental%20Agreement%20E%20stamp%20Notary%20Pan%20Card%20Passport%20Jeevan%20Pramaan%20Aadhaar%20Pan%20Linking!5e0!3m2!1sen!2sin!4v1719155200000!5m2!1sen!2sin"
+                width="100%"
+                height="400"
+                style={{ 
+                  border: 0, 
+                  borderRadius: "12px"
+                }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Draft Maker Location"
+              ></iframe>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* last footer */}

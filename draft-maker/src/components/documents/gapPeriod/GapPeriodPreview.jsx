@@ -34,7 +34,10 @@ export default function AffidavitDisplay({ data, onEdit }) {
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md">
       {/* Affidavit content */}
-      <div className="print-container p-8 border border-gray-300 rounded-lg">
+      <div className="print-container p-8 border border-gray-300 rounded-lg relative">
+        {/* Watermark */}
+        <div className="watermark">INTERNAL PURPOSE ONLY</div>
+
         <h2 className="text-2xl font-bold text-center mb-6 underline font-serif tracking-wide">
           AFFIDAVIT
         </h2>
@@ -158,7 +161,10 @@ export default function AffidavitDisplay({ data, onEdit }) {
         <p className="mb-10 font-serif text-base leading-relaxed">
           Verified at{" "}
           <HighlightedField value={data.place} placeholder="PLACE" /> on this{" "}
-          <HighlightedField value={getDayWithSuffix(data.day)} placeholder="XX" />{" "}
+          <HighlightedField
+            value={getDayWithSuffix(data.day)}
+            placeholder="XX"
+          />{" "}
           <HighlightedField value={data.month} placeholder="XXXX" />,{" "}
           <HighlightedField value={data.year} placeholder="XXXX" /> that the
           contents of the above said affidavit are true and correct to the best
@@ -170,10 +176,24 @@ export default function AffidavitDisplay({ data, onEdit }) {
         </div>
       </div>
 
- 
-
       {/* Print-specific styles */}
       <style jsx global>{`
+        .watermark {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) rotate(-45deg);
+          font-size: 3rem;
+          font-weight: bold;
+          color: rgba(0, 0, 0, 0.1);
+          font-family: Arial, sans-serif;
+          letter-spacing: 0.2em;
+          pointer-events: none;
+          z-index: 1;
+          white-space: nowrap;
+          user-select: none;
+        }
+
         @media print {
           @page {
             size: A4;
@@ -208,6 +228,10 @@ export default function AffidavitDisplay({ data, onEdit }) {
           }
           tfoot {
             display: table-footer-group;
+          }
+          .watermark {
+            font-size: 4rem;
+            color: rgba(0, 0, 0, 0.08);
           }
         }
       `}</style>

@@ -180,7 +180,7 @@ export default function GstPage() {
           documentDetails: responseData.documentDetails,
           mobileNumber,
           userName,
-          formId: "DM-GST-8"
+          formId: "DM-GST-8",
         },
       });
 
@@ -392,10 +392,6 @@ export default function GstPage() {
           setShowErrorNotification={setShowErrorNotification}
         />
       )}
-
-      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
-        GST No Objection Certificate
-      </h1>
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Left column: Form */}

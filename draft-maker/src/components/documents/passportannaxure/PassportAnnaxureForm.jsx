@@ -1,4 +1,3 @@
-// Improved Annexure F Form with better layout and red labels
 export default function PassportAnnaxureForm({
   formData,
   handleChange,
@@ -17,14 +16,14 @@ export default function PassportAnnaxureForm({
       </div>
 
       {/* Improved Personal Information Section */}
-      <div className="bg-gray-50 p-6 rounded-md mb-8">
-        <h3 className="text-lg font-medium mb-5 border-b pb-3">
+      <div className="bg-gray-50 p-5 rounded-lg shadow-sm mb-6">
+        <h3 className="text-lg font-semibold mb-4 text-gray-800 border-l-4 border-red-500 pl-3">
           Personal Information
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="form-group">
-            <label className="block text-sm font-medium text-red-600 mb-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-red-600 mb-1">
               Full Name
             </label>
             <input
@@ -32,21 +31,21 @@ export default function PassportAnnaxureForm({
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none"
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
               placeholder="Enter your full name"
             />
           </div>
 
-          <div className="grid grid-cols-5 gap-3">
-            <div className="form-group col-span-2">
-              <label className="block text-sm font-medium text-red-600 mb-2">
+          <div className="grid grid-cols-5 gap-2">
+            <div className="col-span-2">
+              <label className="block text-xs font-medium text-red-600 mb-1">
                 Relation Type
               </label>
               <select
                 name="relationType"
                 value={formData.relationType}
                 onChange={handleChange}
-                className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none"
+                className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
               >
                 <option value="">Select</option>
                 <option value="S/o">S/o (Son of)</option>
@@ -56,23 +55,23 @@ export default function PassportAnnaxureForm({
               </select>
             </div>
 
-            <div className="form-group col-span-3">
-              <label className="block text-sm font-medium text-red-600 mb-2">
-                 Name
+            <div className="col-span-3">
+              <label className="block text-xs font-medium text-red-600 mb-1">
+                Name
               </label>
               <input
                 type="text"
                 name="guardianName"
                 value={formData.guardianName}
                 onChange={handleChange}
-                className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none"
+                className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
                 placeholder="Enter  name"
               />
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="block text-sm font-medium text-red-600 mb-2">
+          <div>
+            <label className="block text-xs font-medium text-red-600 mb-1">
               Age (Years)
             </label>
             <input
@@ -80,13 +79,13 @@ export default function PassportAnnaxureForm({
               name="age"
               value={formData.age}
               onChange={handleChange}
-              className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none"
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
               placeholder="Enter your age"
             />
           </div>
 
-          <div className="form-group">
-            <label className="block text-sm font-medium text-red-600 mb-2">
+          <div>
+            <label className="block text-xs font-medium text-red-600 mb-1">
               Aadhaar Number
             </label>
             <input
@@ -94,13 +93,13 @@ export default function PassportAnnaxureForm({
               name="aadhaarNo"
               value={formData.aadhaarNo}
               onChange={handleChange}
-              className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none"
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
               placeholder="Enter your Aadhaar number"
             />
           </div>
 
-          <div className="form-group">
-            <label className="block text-sm font-medium text-red-600 mb-2">
+          <div>
+            <label className="block text-xs font-medium text-red-600 mb-1">
               Passport Number
             </label>
             <input
@@ -108,13 +107,13 @@ export default function PassportAnnaxureForm({
               name="passportNo"
               value={formData.passportNo}
               onChange={handleChange}
-              className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none"
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
               placeholder="Enter your passport number"
             />
           </div>
 
-          <div className="form-group">
-            <label className="block text-sm font-medium text-red-600 mb-2">
+          <div>
+            <label className="block text-xs font-medium text-red-600 mb-1">
               Date
             </label>
             <input
@@ -122,12 +121,12 @@ export default function PassportAnnaxureForm({
               name="date"
               value={formData.date}
               onChange={handleChange}
-              className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none"
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
             />
           </div>
 
-          <div className="form-group">
-            <label className="block text-sm font-medium text-red-600 mb-2">
+          <div>
+            <label className="block text-xs font-medium text-red-600 mb-1">
               Place
             </label>
             <input
@@ -135,7 +134,7 @@ export default function PassportAnnaxureForm({
               name="place"
               value={formData.place}
               onChange={handleChange}
-              className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none"
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
               placeholder="Enter place"
             />
           </div>
@@ -143,34 +142,34 @@ export default function PassportAnnaxureForm({
       </div>
 
       {/* Address Information */}
-      <div className="bg-gray-50 p-6 rounded-md mb-8">
-        <h3 className="text-lg font-medium mb-5 border-b pb-3">
+      <div className="bg-gray-50 p-6 rounded-lg shadow-sm mb-6">
+        <h3 className="text-lg font-semibold mb-4 text-gray-800 border-l-4 border-red-500 pl-3">
           Address Information
         </h3>
 
-        <div className="space-y-5">
-          <div className="form-group">
-            <label className="block text-sm font-medium text-red-600 mb-2">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-red-600 mb-1">
               Permanent Address
             </label>
             <textarea
               name="permanentAddress"
               value={formData.permanentAddress}
               onChange={handleChange}
-              className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none min-h-20"
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400 min-h-20"
               placeholder="Enter your permanent address"
             ></textarea>
           </div>
 
-          <div className="form-group">
-            <label className="block text-sm font-medium text-red-600 mb-2">
+          <div>
+            <label className="block text-xs font-medium text-red-600 mb-1">
               Present Address
             </label>
             <textarea
               name="presentAddress"
               value={formData.presentAddress}
               onChange={handleChange}
-              className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none min-h-20"
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400 min-h-20"
               placeholder="Enter your present address"
             ></textarea>
           </div>
@@ -178,12 +177,12 @@ export default function PassportAnnaxureForm({
       </div>
 
       {/* Declaration Details */}
-      <div className="space-y-8">
-        <div className="bg-gray-50 p-6 rounded-md">
-          <h3 className="text-lg font-medium mb-3">
+      <div className="space-y-6">
+        <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-3 text-gray-800 border-l-4 border-red-500 pl-3">
             1. Details of Lost/Damaged Passport
           </h3>
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-xs text-gray-600 mb-2">
             State how and when the passport was lost/damaged and when FIR was
             lodged
           </p>
@@ -191,19 +190,19 @@ export default function PassportAnnaxureForm({
             name="incidentDetails"
             value={formData.incidentDetails}
             onChange={handleChange}
-            className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none min-h-24"
+            className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400 min-h-24"
             placeholder="Provide details of the incident"
           ></textarea>
         </div>
 
-        <div className="bg-gray-50 p-6 rounded-md">
-          <h3 className="text-lg font-medium mb-3">
+        <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-3 text-gray-800 border-l-4 border-red-500 pl-3">
             2. Travel on Lost/Damaged Passport
           </h3>
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-xs text-gray-600 mb-2">
             Did you travel on the lost/damaged passport?
           </p>
-          <div className="flex items-center space-x-6 mb-3">
+          <div className="flex items-center space-x-4 mb-2">
             <div className="flex items-center">
               <input
                 type="radio"
@@ -214,7 +213,7 @@ export default function PassportAnnaxureForm({
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="travelNo" className="text-red-600">
+              <label htmlFor="travelNo" className="text-xs text-red-600">
                 No
               </label>
             </div>
@@ -228,7 +227,7 @@ export default function PassportAnnaxureForm({
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="travelYes" className="text-red-600">
+              <label htmlFor="travelYes" className="text-xs text-red-600">
                 Yes
               </label>
             </div>
@@ -241,19 +240,19 @@ export default function PassportAnnaxureForm({
                 handleDetailChange("travelDetails", e.target.value)
               }
               placeholder="Flight number, date and port of entry"
-              className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none"
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
             />
           )}
         </div>
 
-        <div className="bg-gray-50 p-6 rounded-md">
-          <h3 className="text-lg font-medium mb-3">
+        <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-3 text-gray-800 border-l-4 border-red-500 pl-3">
             3. TR Concessions/FTs Allowance
           </h3>
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-xs text-gray-600 mb-2">
             Did you avail of any TR concessions/FTs allowance?
           </p>
-          <div className="flex items-center space-x-6 mb-3">
+          <div className="flex items-center space-x-4 mb-2">
             <div className="flex items-center">
               <input
                 type="radio"
@@ -264,7 +263,7 @@ export default function PassportAnnaxureForm({
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="concessionNo" className="text-red-600">
+              <label htmlFor="concessionNo" className="text-xs text-red-600">
                 No
               </label>
             </div>
@@ -278,7 +277,7 @@ export default function PassportAnnaxureForm({
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="concessionYes" className="text-red-600">
+              <label htmlFor="concessionYes" className="text-xs text-red-600">
                 Yes
               </label>
             </div>
@@ -291,19 +290,19 @@ export default function PassportAnnaxureForm({
                 handleDetailChange("concessionDetails", e.target.value)
               }
               placeholder="Details of TR concessions/FTs allowance"
-              className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none"
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
             />
           )}
         </div>
 
-        <div className="bg-gray-50 p-6 rounded-md">
-          <h3 className="text-lg font-medium mb-3">
+        <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-3 text-gray-800 border-l-4 border-red-500 pl-3">
             4. Non-Resident Indian Status
           </h3>
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-xs text-gray-600 mb-2">
             Are you a non-resident Indian?
           </p>
-          <div className="flex items-center space-x-6 mb-3">
+          <div className="flex items-center space-x-4 mb-2">
             <div className="flex items-center">
               <input
                 type="radio"
@@ -314,7 +313,7 @@ export default function PassportAnnaxureForm({
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="nriNo" className="text-red-600">
+              <label htmlFor="nriNo" className="text-xs text-red-600">
                 No
               </label>
             </div>
@@ -328,27 +327,29 @@ export default function PassportAnnaxureForm({
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="nriYes" className="text-red-600">
+              <label htmlFor="nriYes" className="text-xs text-red-600">
                 Yes
               </label>
             </div>
           </div>
           {formData.nonResidentIndian === "YES" && (
-            <div className="overflow-x-auto mt-4">
+            <div className="overflow-x-auto mt-3">
               <table className="w-full border border-gray-300">
                 <thead className="bg-gray-100">
                   <tr>
-                    <th className="border p-3 text-sm">S. No.</th>
-                    <th className="border p-3 text-sm">Country</th>
-                    <th className="border p-3 text-sm">Period of Residence</th>
-                    <th className="border p-3 text-sm">Passport Page Nos.</th>
+                    <th className="border p-2 text-xs">S. No.</th>
+                    <th className="border p-2 text-xs">Country</th>
+                    <th className="border p-2 text-xs">Period of Residence</th>
+                    <th className="border p-2 text-xs">Passport Page Nos.</th>
                   </tr>
                 </thead>
                 <tbody>
                   {formData.residences.map((residence, index) => (
                     <tr key={index}>
-                      <td className="border p-3 text-center">{index + 1}</td>
-                      <td className="border p-3">
+                      <td className="border p-2 text-center text-xs">
+                        {index + 1}
+                      </td>
+                      <td className="border p-2">
                         <input
                           type="text"
                           value={residence.country}
@@ -359,12 +360,12 @@ export default function PassportAnnaxureForm({
                               e.target.value
                             )
                           }
-                          className="w-full p-2 border rounded"
+                          className="w-full p-1 text-xs border border-gray-300 rounded"
                           placeholder="Country name"
                         />
                       </td>
-                      <td className="border p-3">
-                        <div className="flex gap-3 items-center">
+                      <td className="border p-2">
+                        <div className="flex gap-2 items-center">
                           <input
                             type="text"
                             value={residence.periodFrom}
@@ -375,10 +376,10 @@ export default function PassportAnnaxureForm({
                                 e.target.value
                               )
                             }
-                            className="flex-1 p-2 border rounded"
+                            className="flex-1 p-1 text-xs border border-gray-300 rounded"
                             placeholder="From"
                           />
-                          <span>to</span>
+                          <span className="text-xs">to</span>
                           <input
                             type="text"
                             value={residence.periodTo}
@@ -389,12 +390,12 @@ export default function PassportAnnaxureForm({
                                 e.target.value
                               )
                             }
-                            className="flex-1 p-2 border rounded"
+                            className="flex-1 p-1 text-xs border border-gray-300 rounded"
                             placeholder="To"
                           />
                         </div>
                       </td>
-                      <td className="border p-3">
+                      <td className="border p-2">
                         <input
                           type="text"
                           value={residence.pageNos}
@@ -405,7 +406,7 @@ export default function PassportAnnaxureForm({
                               e.target.value
                             )
                           }
-                          className="w-full p-2 border rounded"
+                          className="w-full p-1 text-xs border border-gray-300 rounded"
                           placeholder="Page numbers"
                         />
                       </td>
@@ -417,12 +418,14 @@ export default function PassportAnnaxureForm({
           )}
         </div>
 
-        <div className="bg-gray-50 p-6 rounded-md">
-          <h3 className="text-lg font-medium mb-3">5. Passport Objection</h3>
-          <p className="text-sm text-gray-600 mb-3">
+        <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-3 text-gray-800 border-l-4 border-red-500 pl-3">
+            5. Passport Objection
+          </h3>
+          <p className="text-xs text-gray-600 mb-2">
             Did the Passport have any objection by the PIA?
           </p>
-          <div className="flex items-center space-x-6 mb-3">
+          <div className="flex items-center space-x-4 mb-2">
             <div className="flex items-center">
               <input
                 type="radio"
@@ -433,7 +436,7 @@ export default function PassportAnnaxureForm({
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="objectionNo" className="text-red-600">
+              <label htmlFor="objectionNo" className="text-xs text-red-600">
                 No
               </label>
             </div>
@@ -447,7 +450,7 @@ export default function PassportAnnaxureForm({
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="objectionYes" className="text-red-600">
+              <label htmlFor="objectionYes" className="text-xs text-red-600">
                 Yes
               </label>
             </div>
@@ -460,17 +463,19 @@ export default function PassportAnnaxureForm({
                 handleDetailChange("objectionDetails", e.target.value)
               }
               placeholder="Details of objection"
-              className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none"
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
             />
           )}
         </div>
 
-        <div className="bg-gray-50 p-6 rounded-md">
-          <h3 className="text-lg font-medium mb-3">6. Deportation Status</h3>
-          <p className="text-sm text-gray-600 mb-3">
+        <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-3 text-gray-800 border-l-4 border-red-500 pl-3">
+            6. Deportation Status
+          </h3>
+          <p className="text-xs text-gray-600 mb-2">
             Were you deported at any time at the expenses of the Government?
           </p>
-          <div className="flex items-center space-x-6 mb-3">
+          <div className="flex items-center space-x-4 mb-2">
             <div className="flex items-center">
               <input
                 type="radio"
@@ -481,7 +486,7 @@ export default function PassportAnnaxureForm({
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="deportedNo" className="text-red-600">
+              <label htmlFor="deportedNo" className="text-xs text-red-600">
                 No
               </label>
             </div>
@@ -495,7 +500,7 @@ export default function PassportAnnaxureForm({
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="deportedYes" className="text-red-600">
+              <label htmlFor="deportedYes" className="text-xs text-red-600">
                 Yes
               </label>
             </div>
@@ -508,32 +513,32 @@ export default function PassportAnnaxureForm({
                 handleDetailChange("deportationDetails", e.target.value)
               }
               placeholder="Details of deportation and reimbursement"
-              className="w-full p-3 border rounded focus:ring focus:ring-blue-300 focus:outline-none"
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
             />
           )}
         </div>
       </div>
 
-      <div className="mt-8 p-6 bg-gray-50 rounded-md">
-        <p className="text-sm mb-5">
+      <div className="mt-6 p-6 bg-gray-50 rounded-lg shadow-sm">
+        <p className="text-xs mb-4">
           I further affirm that I will take utmost care of my passport if issued
           and the Government will be at liberty to take any legal action under
           the Passports Act, 1967, if the lapse is repeated.
         </p>
 
         {/* Add signature checkbox */}
-        <div className="form-group mt-5">
+        <div className="mt-4">
           <div className="flex items-center">
             <input
               type="checkbox"
               id="useNameAsSignature"
               checked={formData.useNameAsSignature}
               onChange={handleSignatureCheck}
-              className="mr-3"
+              className="mr-2"
             />
             <label
               htmlFor="useNameAsSignature"
-              className="text-sm text-red-600"
+              className="text-xs text-red-600"
             >
               Use my full name as signature in the declaration
             </label>

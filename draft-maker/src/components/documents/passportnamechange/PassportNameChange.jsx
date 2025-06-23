@@ -1,14 +1,9 @@
 import React, { useState } from "react";
 import PassportNameChangeForm from "./PassportNameChangeForm";
 import PassportNameChangePreview from "./PassportNameChangePreview";
-import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
-import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
 import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
-import {
-  createPassportnameChangePaymentData,
-  sendPassportNameChangeData,
-} from "../../../api/service/axiosService";
+import { sendPassportNameChangeData } from "../../../api/service/axiosService";
 import { useNavigate } from "react-router-dom";
 
 const PassportNameChange = () => {
@@ -47,12 +42,6 @@ const PassportNameChange = () => {
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
-  const [showServiceOptionsModal, setShowServiceOptionsModal] = useState(false);
-  const [bookingId, setBookingId] = useState("");
-  const [selectedService, setSelectedService] = useState("");
-  const [documentDetails, setDocumentDetails] = useState(null);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [paymentDetails, setPaymentDetails] = useState(null);
   const [userName, setUserName] = useState();
   const [validationError, setValidationError] = useState(""); // Add validation error state
   const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
@@ -247,8 +236,6 @@ const PassportNameChange = () => {
       console.log("responsein", response);
 
       const responseData = response.data;
-      setBookingId(responseData.bookingId || "");
-      setDocumentDetails(responseData.documentDetails || null);
       navigate("/documents/payment-page", {
         state: {
           bookingId: responseData.bookingId,
@@ -258,9 +245,6 @@ const PassportNameChange = () => {
           formId: "DM-PNC-15",
         },
       });
-
-      // setShowServiceOptionsModal(true);
-      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -270,200 +254,8 @@ const PassportNameChange = () => {
     }
   };
 
-  const getServiceOptions = () => {
-    if (!documentDetails) return [];
-
-    const options = [];
-
-    options.push({
-      id: "draft",
-      name: "Draft Only",
-      price: documentDetails.draftCharge || 0,
-      hasNotary: documentDetails.hasDraftNotaryCharge,
-      notaryCharge: documentDetails.draftNotaryCharge || 0,
-      description: "Digital document sent to your email",
-    });
-
-    options.push({
-      id: "draft_estamp",
-      name: "Draft + E-stamp",
-      price: documentDetails.pdfCharge || 0,
-      hasNotary: documentDetails.hasPdfNotaryCharge,
-      notaryCharge: documentDetails.pdfNotaryCharge || 0,
-      description: "Digital document with legal e-stamp",
-    });
-
-    options.push({
-      id: "draft_estamp_delivery",
-      name: "Draft + E-stamp + Delivery",
-      price: documentDetails.homeDropCharge || 0,
-
-      hasNotary: documentDetails.hasHomeDropNotaryCharge,
-      notaryCharge: documentDetails.homeDropNotaryCharge || 0,
-      description: "Physical copy delivered to your address",
-    });
-
-    return options;
-  };
-
-  const handleServiceSelection = (service) => {
-    setSelectedService(service);
-    handlePayment(service);
-  };
-
-  const handlePayment = async (service) => {
-    try {
-      const totalPrice = service.hasNotary
-        ? service.price + service.notaryCharge
-        : service.price;
-
-      setShowServiceOptionsModal(false);
-
-      if (!window.Razorpay) {
-        const script = document.createElement("script");
-        script.src = "https://checkout.razorpay.com/v1/checkout.js";
-
-        script.onload = () => {
-          initializeRazorpay(service, totalPrice);
-        };
-
-        script.onerror = () => {
-          console.error("Razorpay SDK failed to load");
-          alert("Payment gateway failed to load. Please try again later.");
-        };
-
-        document.body.appendChild(script);
-      } else {
-        initializeRazorpay(service, totalPrice);
-      }
-    } catch (error) {
-      console.error("Error initializing payment:", error);
-      alert("Payment initialization failed. Please try again.");
-    }
-  };
-
-  const initializeRazorpay = async (service, totalPrice) => {
-    try {
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: totalPrice * 100,
-        currency: "INR",
-        name: "Draft Maker",
-        description: `${documentDetails.documentType}  - ${service.name}`,
-        handler: function (response) {
-          console.log("razorpay response", response);
-          handlePaymentSuccess({
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-            bookingId: bookingId,
-            mobileNumber: mobileNumber,
-            documentType: documentDetails.documentType,
-            fullName: formData.fullName,
-            serviceType: service.id,
-            serviceName: service.name,
-            amount: totalPrice,
-            includesNotary: service.hasNotary,
-            userName: userName,
-          });
-        },
-        prefill: {
-          name: userName,
-          contact: mobileNumber,
-        },
-        notes: {
-          bookingId: bookingId,
-          serviceType: service.id,
-        },
-        theme: {
-          color: "#dc2626",
-        },
-        modal: {
-          ondismiss: function () {
-            console.log("Checkout form closed");
-          },
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-
-      razorpay.on("payment.failed", function (response) {
-        fetch("/api/payment-failed", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            error: response.error,
-            bookingId: bookingId,
-            mobileNumber: mobileNumber,
-            serviceType: service.id,
-            status: "failed",
-            userName: userName,
-          }),
-        }).catch((error) => {
-          console.error("Error logging payment failure:", error);
-        });
-
-        console.error("Payment failed:", response.error);
-        alert(`Payment failed: ${response.error.description}`);
-      });
-    } catch (error) {
-      console.error("Error in Razorpay initialization:", error);
-      alert("Payment initialization failed. Please try again.");
-    }
-  };
-
-  const handlePaymentSuccess = async (paymentData) => {
-    try {
-      setPaymentSuccess(true);
-      setPaymentDetails(paymentData);
-
-      const paymentConfirmationData = {
-        paymentId: paymentData.razorpay_payment_id,
-        orderId: paymentData.razorpay_order_id,
-        signature: paymentData.razorpay_signature,
-        bookingId: paymentData.bookingId,
-        mobileNumber: paymentData.mobileNumber,
-        documentType: documentDetails.documentType,
-        fullName: formData.fullName,
-        serviceType: paymentData.serviceType,
-        serviceName: paymentData.serviceName,
-        amount: paymentData.amount,
-        includesNotary: paymentData.includesNotary,
-        status: "success",
-        userName: userName,
-      };
-
-      const confirmationResponse = await createPassportnameChangePaymentData(
-        paymentConfirmationData
-      );
-      if (confirmationResponse.status === 200) {
-        const confirmationData = confirmationResponse.data.data;
-        console.log("Payment confirmation successful:", confirmationData);
-
-        setTimeout(() => {
-          window.location.href = `/documents/name/name-correction`;
-        }, 3000);
-      } else {
-        const errorData = confirmationResponse.data.data;
-        throw new Error(errorData.message || "Failed to confirm payment");
-      }
-    } catch (error) {
-      console.error("Error confirming payment:", error);
-      alert(
-        "Payment was processed but we couldn't update your booking. Our team will contact you shortly."
-      );
-    }
-  };
-
   return (
     <div className="container-fluid mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-center">
-        Passport Name Change Affidavit Generator
-      </h1>
-
       {/* Add Error Notification Component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
@@ -534,23 +326,6 @@ const PassportNameChange = () => {
         username={userName}
         setUsername={setUserName}
       />
-      {showServiceOptionsModal && (
-        <ServicePackageNotification
-          setShowServiceOptionsModal={setShowServiceOptionsModal}
-          bookingId={bookingId}
-          mobileNumber={mobileNumber}
-          documentName={documentDetails.documentType}
-          getServiceOptions={getServiceOptions}
-          handleServiceSelection={handleServiceSelection}
-        />
-      )}
-      {paymentSuccess && paymentDetails && (
-        <PaymentConfirmation
-          paymentSuccess={paymentSuccess}
-          paymentDetails={paymentDetails}
-          bookingId={bookingId}
-        />
-      )}
 
       <style jsx>{`
         @media print {

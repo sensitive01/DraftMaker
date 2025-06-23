@@ -9,11 +9,11 @@ const NeedSupport = () => {
             <div className="need_text">
               <div className="section_title">
                 <h2>Need support ? contact our team</h2>
-                <p><i className="icofont-clock-time"></i> Mon - Fri: 9 am to 5 am</p>
+                <p><i className="icofont-clock-time"></i> Mon - Fri: 10.30 am to 6 pm</p>
               </div>
             </div>
             <div className="need_action">
-              <a href="tel:1234567899" className="btn"><i className="icofont-phone-circle"></i> +1 123 456 7890</a>
+              <a href="tel:1234567899" className="btn"><i className="icofont-phone-circle"></i> +91 9008774711</a>
               <a href="#faqBlock" className="faq_btn">Read The FAQ </a>
             </div>
           </div>

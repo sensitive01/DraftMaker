@@ -470,10 +470,6 @@ const JointKhataTransfer = () => {
         />
       )}
 
-      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
-        Joint Khata Transfer Application
-      </h1>
-
       <div className="grid md:grid-cols-2 gap-8">
         {/* Left column: Form */}
         <div className="print:hidden">
