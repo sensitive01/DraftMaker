@@ -229,9 +229,7 @@ export default function PasswordAnnaxure() {
 
   return (
     <div className="container-fluid mx-auto p-4">
-      <h1 className="text-3xl font-bold text-center mb-6">
-        Annexure F - Passport Declaration Form
-      </h1>
+  
 
       {/* Add Error Notification Component */}
       {showErrorNotification && validationError && (

@@ -426,9 +426,7 @@ export default function DocumentLostPage() {
         />
       )}
 
-      <h1 className="text-2xl font-bold text-center mb-6">
-        Document Loss Affidavit
-      </h1>
+
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Left column: Form */}

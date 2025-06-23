@@ -592,9 +592,7 @@ export default function RentalAgreementForm() {
 
   return (
     <div className="container-fluid mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-8 text-center">
-        Rental Agreement Generator
-      </h1>
+
 
       {/* Add Error Notification Component */}
       {showErrorNotification && validationError && (

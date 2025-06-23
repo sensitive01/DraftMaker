@@ -433,9 +433,7 @@ const MatriculationPage = () => {
         />
       )}
 
-      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
-        Matriculation Certificate Lost Affidavit
-      </h1>
+
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Left column: Form */}
