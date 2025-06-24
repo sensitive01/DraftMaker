@@ -367,7 +367,7 @@ const Footer = () => {
             <div className="col-md-4">
               <p className="developer_text">
                 Design & developed by{" "}
-                <a href="" target="blank">
+                <a href="https://sensitive.co.in" target="blank">
                   Sensitive Technologies
                 </a>
               </p>
