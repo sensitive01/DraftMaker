@@ -8,6 +8,7 @@ const adminSignUp = require("./routes/adminSignUpRoute");
 const adminLogin = require("./routes/adminAuthRoute");
 const documentPrice = require("./routes/documentPriceRoute");
 const documentRouter = require("./routes/documentsRoutes");
+const messageRouter = require("./routes/messageRoutes");
 
 // ✅ Allowed frontend origins
 const allowedOrigins = [
@@ -43,6 +44,8 @@ app.use("/", adminSignUp);
 app.use("/admin", adminLogin);
 app.use("/document-price", documentPrice);
 app.use("/documents", documentRouter);
+app.use("/message", messageRouter);
+
 
 
 

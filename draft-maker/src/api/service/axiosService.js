@@ -541,17 +541,17 @@ export const getAggrementFormData = async (bookingId) => {
   }
 };
 
-export const updateBookingStatus = async (bookingId,status) => {
+export const updateBookingStatus = async (bookingId, status) => {
   try {
     const response = await axiosInstance.put(
-      `/documents/update-booking-status/${bookingId}`,{status}
+      `/documents/update-booking-status/${bookingId}`,
+      { status }
     );
     return response;
   } catch (err) {
     return err;
   }
 };
-
 
 export const getDashboardStatistics = async () => {
   try {
@@ -567,7 +567,8 @@ export const getDashboardStatistics = async () => {
 export const createStampDuty = async (document) => {
   try {
     const response = await axiosInstance.post(
-      `/document-price/create-stamp-duty-price`,{document}
+      `/document-price/create-stamp-duty-price`,
+      { document }
     );
     return response;
   } catch (err) {
@@ -585,10 +586,11 @@ export const getStamDocumentData = async () => {
   }
 };
 
-export const updateStampDutyData = async (documentData,documentId) => {
+export const updateStampDutyData = async (documentData, documentId) => {
   try {
     const response = await axiosInstance.put(
-      `/document-price/update-stamp-duty-price/${documentId}`,{documentData}
+      `/document-price/update-stamp-duty-price/${documentId}`,
+      { documentData }
     );
     return response;
   } catch (err) {
@@ -598,7 +600,8 @@ export const updateStampDutyData = async (documentData,documentId) => {
 export const updateStampStatus = async (documentId, currentStatus) => {
   try {
     const response = await axiosInstance.put(
-      `/document-price/update-stamp-duty-status/${documentId}`,{currentStatus}
+      `/document-price/update-stamp-duty-status/${documentId}`,
+      { currentStatus }
     );
     return response;
   } catch (err) {
@@ -620,7 +623,8 @@ export const getDeliveryChargeData = async () => {
 export const createDelivaryCharge = async (document) => {
   try {
     const response = await axiosInstance.post(
-      `/document-price/create-delivery-charge-price`,{document}
+      `/document-price/create-delivery-charge-price`,
+      { document }
     );
     return response;
   } catch (err) {
@@ -628,29 +632,29 @@ export const createDelivaryCharge = async (document) => {
   }
 };
 
-
-export const updateDelivaryCharge = async (documentData,documentId) => {
+export const updateDelivaryCharge = async (documentData, documentId) => {
   try {
     const response = await axiosInstance.put(
-      `/document-price/update-delivery-charge-price/${documentId}`,{documentData}
+      `/document-price/update-delivery-charge-price/${documentId}`,
+      { documentData }
     );
     return response;
   } catch (err) {
     return err;
   }
-}
+};
 
 export const updateDeliveryPriceStatus = async (documentId, currentStatus) => {
   try {
     const response = await axiosInstance.put(
-      `/document-price/update-delivery-charge-status/${documentId}`,{currentStatus}
+      `/document-price/update-delivery-charge-status/${documentId}`,
+      { currentStatus }
     );
     return response;
   } catch (err) {
     return err;
   }
 };
-
 
 export const getStampAndDeliveryCharges = async () => {
   try {
@@ -666,14 +670,14 @@ export const getStampAndDeliveryCharges = async () => {
 export const sendTheEstampData = async (orderData) => {
   try {
     const response = await axiosInstance.post(
-      `/document-price/save-estamp-data`,{orderData}
+      `/document-price/save-estamp-data`,
+      { orderData }
     );
     return response;
   } catch (err) {
     return err;
   }
 };
-
 
 export const getBookedEstampData = async () => {
   try {
@@ -696,10 +700,11 @@ export const getEstampBookingData = async (estampId) => {
   }
 };
 
-export const updateEstampBookingStatus = async (estampId,status) => {
+export const updateEstampBookingStatus = async (estampId, status) => {
   try {
     const response = await axiosInstance.put(
-      `/document-price/update-individial-e-stamp-booking-data/${estampId}`,{status}
+      `/document-price/update-individial-e-stamp-booking-data/${estampId}`,
+      { status }
     );
     return response;
   } catch (err) {
@@ -710,10 +715,75 @@ export const updateEstampBookingStatus = async (estampId,status) => {
 export const trackMyDocumentStatus = async (mobile) => {
   try {
     const response = await axiosInstance.post(
-      `/documents/track-my-document-status`,{mobile}
+      `/documents/track-my-document-status`,
+      { mobile }
     );
     return response;
   } catch (err) {
     return err;
   }
 };
+
+export const sendMobileOtp = async (mobile) => {
+  try {
+    const response = await axiosInstance.post(`/message/get-otp`, { mobile });
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const verifyOtp = async (otp, mobile) => {
+  try {
+    const response = await axiosInstance.post(`/message/verify-otp`, {
+      otp,
+      mobile,
+    });
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const sendMessage = async (name, email, mobile, message) => {
+  try {
+    const response = await axiosInstance.post(`/message/send-message`, {
+      name,
+      email,
+      mobile,
+      message,
+    });
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getNotificationCount = async () => {
+  try {
+    const response = await axiosInstance.get(`/message/get-message-count`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getNotificationMessage = async () => {
+  try {
+    const response = await axiosInstance.get(`/message/get-all-message-data`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const markMessageAsSeen = async (messageId) => {
+  try {
+    const response = await axiosInstance.put(`/message/update-message-data/${messageId}`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+

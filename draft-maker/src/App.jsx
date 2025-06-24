@@ -64,6 +64,13 @@ import BuyEStampDocuments from "./components/buyStampDocuments/BuyEStampDocument
 import EstampBookingTable from "./components/admin/dashboard/statistics/EstampBookingTable";
 import EstampDetails from "./components/admin/dashboard/statistics/EstampDetails";
 import TrackMyDocuments from "./components/trackDocuments/TrackMyDocuments";
+import HomeContent from "./components/HomeContent";
+import AboutUs from "./components/AboutUs";
+import WhatWeDo from "./components/WhatWeDo";
+import AboutUsHome from "./components/AboutUsHome";
+import TestimonialComments from "./components/TestimonialComments";
+import ContactMePage from "./components/ContactMePage";
+import MesaageNotification from "./components/admin/dashboard/statistics/MesaageNotification";
 
 function MainLayout({ children }) {
   return (
@@ -145,6 +152,153 @@ function PaymentLayout({ children }) {
         {/* Adjust this value based on your header height */}
         {children}
       </div>
+
+      <NeedSupport />
+      <Footer />
+    </div>
+  );
+}
+
+function HomeLayout({ children }) {
+  return (
+    <div className="page_wrapper">
+      <div className="top_home_wraper white_option">
+        <div className="content-wrapper">
+          <div className="container">
+            <div className="anim_line dark_bg">
+              {[...Array(9)].map((_, index) => (
+                <span key={index}>
+                  <img src={animLogo} alt="anim_line" />
+                </span>
+              ))}
+            </div>
+          </div>
+          <Header />
+          <div className="container mx-auto text-center ">
+            <div
+              className="bread_crumb"
+              data-aos="fade-in"
+              data-aos-duration="2000"
+              data-aos-delay="100"
+            >
+              <div className="anim_line dark_bg">
+                {[...Array(9)].map((_, index) => (
+                  <span key={index}>
+                    <img src={animLogo} alt="anim_line" />
+                  </span>
+                ))}
+              </div>
+            </div>
+            <HomeContent />
+            {/* <DraftHeading /> */}
+          </div>
+        </div>
+      </div>
+
+      <div className="container">
+        <div
+          className="document-services-wrapper"
+          style={{
+            marginTop: "-100px",
+            marginBottom: "50px",
+            position: "relative",
+            zIndex: "10",
+          }}
+        >
+          {/* <DocumentServices /> */}
+          <WhatWeDo />
+          <AboutUsHome />
+        </div>
+      </div>
+
+      {children}
+      <TestimonialComments />
+
+      <NeedSupport />
+      <Footer />
+    </div>
+  );
+}
+
+function AboutUsPage({ children }) {
+  return (
+    <div className="page_wrapper">
+      <div className="top_home_wraper white_option">
+        <div className="content-wrapper">
+          <div className="container">
+            <div className="anim_line dark_bg">
+              {[...Array(9)].map((_, index) => (
+                <span key={index}>
+                  <img src={animLogo} alt="anim_line" />
+                </span>
+              ))}
+            </div>
+          </div>
+          <Header />
+          <div className="container mx-auto text-center ">
+            <div
+              className="bread_crumb"
+              data-aos="fade-in"
+              data-aos-duration="2000"
+              data-aos-delay="100"
+            >
+              <div className="anim_line dark_bg">
+                {[...Array(9)].map((_, index) => (
+                  <span key={index}>
+                    <img src={animLogo} alt="anim_line" />
+                  </span>
+                ))}
+              </div>
+            </div>
+            <AboutUs />
+          </div>
+        </div>
+      </div>
+
+      {children}
+
+      <NeedSupport />
+      <Footer />
+    </div>
+  );
+}
+
+function ContactUsPage({ children }) {
+  return (
+    <div className="page_wrapper">
+      <div className="top_home_wraper white_option">
+        <div className="content-wrapper">
+          <div className="container">
+            <div className="anim_line dark_bg">
+              {[...Array(9)].map((_, index) => (
+                <span key={index}>
+                  <img src={animLogo} alt="anim_line" />
+                </span>
+              ))}
+            </div>
+          </div>
+          <Header />
+          <div className="container mx-auto text-center ">
+            <div
+              className="bread_crumb"
+              data-aos="fade-in"
+              data-aos-duration="2000"
+              data-aos-delay="100"
+            >
+              <div className="anim_line dark_bg">
+                {[...Array(9)].map((_, index) => (
+                  <span key={index}>
+                    <img src={animLogo} alt="anim_line" />
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ContactMePage />
+      {children}
 
       <NeedSupport />
       <Footer />
@@ -234,6 +388,16 @@ function App() {
               </ProtectedAdminRoute>
             }
           />
+
+          <Route
+            path="/admin/draft-notification"
+            element={
+              <ProtectedAdminRoute>
+                <MesaageNotification />
+              </ProtectedAdminRoute>
+            }
+          />
+
           <Route
             path="/admin/estamp-booking-details/:estampId"
             element={
@@ -398,12 +562,11 @@ function App() {
 
         {/* Existing Document Routes */}
         <Routes>
-          <Route
-            path="/"
-            element={
-              <Navigate to="/documents/commercial/commercial-lease" replace />
-            }
-          />
+          <Route path="/" element={<Navigate to="/documents/home" replace />} />
+
+          <Route path="/documents/home" element={<HomeLayout />} />
+          <Route path="/home/about-us" element={<AboutUsPage />} />
+          <Route path="/home/contact-us" element={<ContactUsPage />} />
 
           <Route
             path="/documents/rental/:type"

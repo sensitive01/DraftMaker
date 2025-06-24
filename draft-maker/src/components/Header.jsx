@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import draftMakerLogo from "../assets/images/logo.png";
 
 const Header = () => {
+  const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -13,14 +14,7 @@ const Header = () => {
     setIsMenuOpen(false);
   };
 
-  // Function to scroll to bottom of page
-  const scrollToBottom = () => {
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth'
-    });
-    closeMenu(); // Close mobile menu if open
-  };
+
 
   return (
     <header className="fixed">
@@ -247,7 +241,7 @@ const Header = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <button className="nav-link dark_btn" onClick={scrollToBottom}>
+                <button className="nav-link dark_btn" onClick={()=>navigate("/home/contact-us")}>
                   Contact Us <i className="icofont-arrow-right"></i>
                 </button>
               </li>

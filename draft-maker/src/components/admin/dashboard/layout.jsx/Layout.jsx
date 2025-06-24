@@ -14,17 +14,41 @@ import {
   Files,
   ChevronDown,
   ChevronRight,
+  MessageCircle,
 } from "lucide-react";
+import { getNotificationCount } from "../../../../api/service/axiosService";
 
 const Layout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [expandedMenus, setExpandedMenus] = useState({});
+  const [notificationCount, setNotificationCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
-  const adminInfo = localStorage.getItem("admin");
-  console.log("adminInfo", adminInfo);
+
+  useEffect(() => {
+    const fetchNotificationCount = async () => {
+      try {
+        const response = await getNotificationCount();
+        if (response.status === 200) {
+          const count = response.data.count || 0;
+          setNotificationCount(count);
+          console.log("Notification count:", count);
+        }
+      } catch (error) {
+        console.error("Error fetching notification count:", error);
+        setNotificationCount(0);
+      }
+    };
+
+    fetchNotificationCount();
+
+    // Optional: Set up interval to refresh count periodically
+    const interval = setInterval(fetchNotificationCount, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -113,6 +137,13 @@ const Layout = ({ children }) => {
         label: "E-Stamp Bookings",
         path: "/admin/e-stamp-booking-table",
         isActive: location.pathname === "/admin/e-stamp-booking-table",
+      },
+      {
+        icon: MessageCircle,
+        label: "Notifications",
+        path: "/admin/draft-notification",
+        isActive: location.pathname === "/admin/draft-notification",
+        notificationCount: notificationCount, // Add count to notifications menu item
       },
     ];
 
@@ -219,7 +250,7 @@ const Layout = ({ children }) => {
             <Link
               to={item.path}
               className={`
-                flex items-center p-3 rounded-lg transition-all duration-300 group
+                flex items-center p-3 rounded-lg transition-all duration-300 group relative
                 ${
                   item.isActive
                     ? "bg-red-600 text-white shadow-md"
@@ -227,28 +258,72 @@ const Layout = ({ children }) => {
                 }
                 ${
                   isSidebarOpen && !isMobile
-                    ? "justify-start"
+                    ? "justify-between"
                     : "justify-center"
                 }
               `}
             >
-              <item.icon
-                size={22}
-                className={`
-                  ${isSidebarOpen && !isMobile ? "mr-3" : ""}
-                  ${item.isActive ? "text-current" : "text-red-600"}
-                `}
-              />
-              <span
-                className={`
-                  font-medium
-                  ${!isSidebarOpen && !isMobile ? "hidden" : ""}
-                  ${isMobile && !isSidebarOpen ? "hidden" : ""}
-                  ${isSidebarOpen ? "ml-3" : ""}
-                `}
-              >
-                {item.label}
-              </span>
+              <div className="flex items-center">
+                <div className="relative">
+                  <item.icon
+                    size={22}
+                    className={`
+                      ${isSidebarOpen && !isMobile ? "mr-3" : ""}
+                      ${item.isActive ? "text-current" : "text-red-600"}
+                    `}
+                  />
+                  {/* Notification Badge for Collapsed Sidebar - FIXED STYLING */}
+                  {item.notificationCount > 0 &&
+                    !isSidebarOpen &&
+                    !isMobile && (
+                      <span
+                        className={`
+                        absolute -top-2 -right-2 min-w-[20px] h-[20px] px-1
+                        text-xs font-bold rounded-full flex items-center justify-center
+                        border-2 border-white shadow-lg z-10
+                        ${item.isActive 
+                          ? "bg-white text-red-600" 
+                          : "bg-red-500 text-white"
+                        }
+                      `}
+                      >
+                        {item.notificationCount > 99
+                          ? "99+"
+                          : item.notificationCount}
+                      </span>
+                    )}
+                </div>
+                <span
+                  className={`
+                    font-medium
+                    ${!isSidebarOpen && !isMobile ? "hidden" : ""}
+                    ${isMobile && !isSidebarOpen ? "hidden" : ""}
+                  `}
+                >
+                  {item.label}
+                </span>
+              </div>
+
+              {/* Notification Badge for Expanded Sidebar - FIXED STYLING */}
+              {item.notificationCount > 0 && (isSidebarOpen || isMobile) && (
+                <div className="ml-auto">
+                  <span
+                    className={`
+                      min-w-[24px] h-[24px] px-2
+                      text-xs font-bold rounded-full flex items-center justify-center
+                      shadow-md
+                      ${item.isActive 
+                        ? "bg-white text-red-600 border border-white" 
+                        : "bg-red-500 text-white"
+                      }
+                    `}
+                  >
+                    {item.notificationCount > 99
+                      ? "99+"
+                      : item.notificationCount}
+                  </span>
+                </div>
+              )}
             </Link>
           )}
         </li>
@@ -389,7 +464,12 @@ const Layout = ({ children }) => {
                 size={20}
                 className="text-red-600 group-hover:text-red-800"
               />
-              <span className="absolute top-0 right-0 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></span>
+              {/* Header Notification Badge - FIXED STYLING */}
+              {notificationCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white shadow-lg z-10">
+                  {notificationCount > 99 ? "99+" : notificationCount}
+                </span>
+              )}
             </button>
 
             <div className="relative">
@@ -406,7 +486,7 @@ const Layout = ({ children }) => {
               </button>
 
               {isProfileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white border border-red-200 rounded-lg shadow-lg">
+                <div className="absolute right-0 mt-2 w-64 bg-white border border-red-200 rounded-lg shadow-lg z-50">
                   <div className="p-4 border-b border-red-100 bg-red-50 flex items-center">
                     <div className="w-12 h-12 bg-red-200 rounded-full mr-4 flex items-center justify-center">
                       <User size={24} className="text-red-700" />
