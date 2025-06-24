@@ -26,9 +26,9 @@ export default function HomeContent() {
               </h1>
 
               <p className="text-gray-600 text-lg lg:text-xl leading-relaxed font-medium max-w-2xl">
-                G SEVA is envisaged to be developed as a single platform to
+                Draft Maker is envisaged to be developed as a single platform to
                 deliver the G2C, B2C and Financial services at the doorsteps of
-                the citizens. G SEVA will be integrated with various service
+                the citizens. Draft Maker will be integrated with various service
                 delivery channels of the central, state government and public
                 utility services on one platform.
               </p>
