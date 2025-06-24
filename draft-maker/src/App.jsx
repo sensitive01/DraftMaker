@@ -190,8 +190,21 @@ function HomeLayout({ children }) {
               </div>
             </div>
             <HomeContent />
-            {/* <DraftHeading /> */}
+            <DraftHeading />
           </div>
+        </div>
+      </div>
+      <div className="container">
+        <div
+          className="document-services-wrapper"
+          style={{
+            marginTop: "-100px",
+            marginBottom: "50px",
+            position: "relative",
+            zIndex: "10",
+          }}
+        >
+          <DocumentServices />
         </div>
       </div>
 
