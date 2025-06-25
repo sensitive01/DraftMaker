@@ -3,8 +3,10 @@ import {
   getStampAndDeliveryCharges,
   sendTheEstampData,
 } from "../../api/service/axiosService";
+import { useNavigate } from "react-router-dom";
 
 const BuyEStampDocuments = () => {
+  const navigate = useNavigate()
   const [stampDutyData, setStampDutyData] = useState([]);
   const [deliveryCharges, setDeliveryCharges] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -344,6 +346,7 @@ const BuyEStampDocuments = () => {
                 state: deliveryAddress.state.trim(),
                 pincode: deliveryAddress.pincode.trim(),
                 landmark: deliveryAddress.landmark.trim(),
+                email: deliveryAddress.email.trim()
               }
             : null,
       };
@@ -379,6 +382,7 @@ const BuyEStampDocuments = () => {
               console.log("Order saved successfully:", result);
               alert("Payment successful! Order has been processed.");
               resetForm();
+              navigate("/documents/home")
             })
             .catch((error) => {
               console.error("Error saving order:", error);

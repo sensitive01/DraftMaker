@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 
 const estampPaymentSchema = new mongoose.Schema(
   {
+    bookingId: {
+      type: String,
+    },
     firstPartyName: {
       type: String,
     },
@@ -105,7 +108,7 @@ const estampPaymentSchema = new mongoose.Schema(
       type: String,
     },
     deliveryAddress: {
-      email:{ type: String },
+      email: { type: String },
       addressLine1: { type: String },
       addressLine2: { type: String },
       city: { type: String },

@@ -12,6 +12,12 @@ const getAllDocumentPrices = async (req, res) => {
   }
 };
 
+function generateBookingId() {
+  const prefix = "DMSD";
+  const randomNumber = Math.floor(1000000 + Math.random() * 9000000);
+  return `${prefix}${randomNumber}`;
+}
+
 const createDocumentPrice = async (req, res) => {
   try {
     console.log("Welcome to createDocumentPrice", req.body);
@@ -354,8 +360,10 @@ const saveTheEstampData = async (req, res) => {
   try {
     const { orderData } = req.body;
     console.log("OrderData", orderData);
+    const bookingId = generateBookingId();
 
     const newPayment = new EstampPayment(orderData); // Directly pass the whole object
+    newPayment.bookingId = bookingId;
     await newPayment.save();
 
     res.status(201).json({
@@ -393,8 +401,8 @@ const getEstampBookingData = async (req, res) => {
 };
 const getIndividualStampBookingData = async (req, res) => {
   try {
-    const {stampBookingId}=req.params
-    const eStampData = await EstampPayment.findOne({_id:stampBookingId})
+    const { stampBookingId } = req.params;
+    const eStampData = await EstampPayment.findOne({ _id: stampBookingId });
 
     res.status(200).json({
       success: true,
@@ -444,12 +452,6 @@ const updateIndividualStampBookingDataStatus = async (req, res) => {
     });
   }
 };
-
-
-
-
-
-
 
 module.exports = {
   updateIndividualStampBookingDataStatus,

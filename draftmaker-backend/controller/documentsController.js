@@ -18,6 +18,8 @@ const passportNameChange = require("../model/documentsModel/passportNameChange")
 const adressAffadavit = require("../model/documentsModel/adressAffadavit");
 const commercialSchema = require("../model/documentsModel/commercialData");
 const recidentialSchema = require("../model/documentsModel/recidentialData");
+const eStampPaymentData = require("../model/eStampPaymentSchema")
+
 
 const getDashboardStatistics = async (req, res) => {
   try {
@@ -109,6 +111,8 @@ const trackMyDocumentStatus = async (req, res) => {
 
     // Filter to use in every find query
     const filter = { mobileNumber: mobile,paymentStatus:"success" };
+
+    const eStambData = await eStampPaymentData.find({mobileNumber:mobile,paymentStatus:"completed"},{mobileNumber:1,documentStatus:1,bookingId:1,createdAt:1,documentType:1,requestorName:1,totalAmount:1})
 
     const dualNameData = await dualNameCorrection.find(filter, {
       paymentDetails: 1,
@@ -349,6 +353,7 @@ const trackMyDocumentStatus = async (req, res) => {
       ...adressAffadavitData,
       ...commercialData,
       ...recidentialData,
+      ...eStambData
     ];
 
     // Sort by createdAt descending
@@ -381,6 +386,7 @@ const trackMyDocumentStatus = async (req, res) => {
     res.status(200).json({
       message: "Documents data fetched successfully",
       data: formattedData,
+      eStambData
     });
   } catch (err) {
     console.error("Error in getting all Documents data:", err);

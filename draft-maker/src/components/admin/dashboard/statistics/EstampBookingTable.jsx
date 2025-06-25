@@ -37,7 +37,7 @@ const EstampBookingTable = () => {
         if (response.data && response.data.data) {
           const formattedBookings = response.data.data.map((booking) => ({
             _id: booking._id,
-            id: booking._id, // Using _id as the booking ID
+            id: booking.bookingId, // Using _id as the booking ID
             firstPartyName: booking.firstPartyName || "N/A",
             secondPartyName: booking.secondPartyName || "N/A",
             documentType: booking.documentType || "N/A",
@@ -230,19 +230,20 @@ const EstampBookingTable = () => {
 
   const getStatusBadgeColor = (status) => {
     switch ((status || "").toLowerCase()) {
-      case "Approved":
+      case "approved":
         return "bg-green-100 text-green-800";
-      case "Pending":
-        return "bg-yellow-900 text-yellow-800";
-      case "Cancelled":
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "cancelled":
         return "bg-red-100 text-red-800";
       case "processing":
         return "bg-blue-100 text-blue-800";
-      case "Processed":
-        return "bg-indigo-200 text-indigo-800";
-
-      case "Delivered":
-        return "bg-emerald-900 text-emerald-800";
+      case "processed":
+        return "bg-indigo-100 text-indigo-800";
+      case "delivered":
+        return "bg-emerald-100 text-emerald-800";
+      case "completed":
+        return "bg-purple-100 text-purple-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -375,38 +376,41 @@ const EstampBookingTable = () => {
       </div>
 
       <div className="bg-white rounded-lg border border-red-100 shadow-md overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        {/* Enhanced horizontal scroll container with custom scrollbar */}
+        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-red-300 scrollbar-track-red-50">
+          <table className="w-full min-w-[2000px]">
+            {" "}
+            {/* Set minimum width for horizontal scroll */}
             <thead className="bg-red-50 border-b border-red-100">
               <tr>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
-                  Sl. No.
+                <th className="p-2 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-64">
+                  SNo.
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th className="p-2 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-64">
                   Booking ID & Date
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th className="p-2 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-96">
                   Party Details
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th className="p-2 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-52">
                   Document & Service Type
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th className="p-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-32">
                   Document Status
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th className="p-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-32">
                   Payment Status
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th className="p-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-40">
                   Payment ID
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th className="p-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-32">
                   Total Amount
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th className="p-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-24">
                   Actions
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th className="p-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-32">
                   Update Status
                 </th>
               </tr>
@@ -418,67 +422,120 @@ const EstampBookingTable = () => {
                     key={booking.id}
                     className="hover:bg-red-50 transition-colors duration-200"
                   >
-                    <td className="p-3 whitespace-nowrap text-sm text-gray-600 font-medium">
+                    <td className="p-4 whitespace-nowrap text-sm text-gray-600 font-medium w-20">
                       {indexOfFirstItem + index + 1}
                     </td>
-                    <td className="p-3 whitespace-nowrap">
+                    <td className="p-4 w-64">
                       <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-red-900">
-                          {booking.id.substring(0, 8)}...
+                        <span
+                          className="text-sm font-semibold text-red-900 truncate"
+                          title={booking.id}
+                        >
+                          {booking.id
+                            ? booking.id
+                            : "N/A"}
                         </span>
                         <div className="flex items-center text-xs text-gray-500 mt-1">
-                          <Calendar size={12} className="mr-1" />
-                          {booking.orderDate}
+                          <Calendar size={12} className="mr-1 flex-shrink-0" />
+                          <span className="truncate">{booking.orderDate}</span>
                         </div>
                       </div>
                     </td>
-                    <td className="p-3">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-900">
-                          First: {booking.firstPartyName}
-                        </span>
-                        <span className="text-sm text-gray-600">
-                          Second: {booking.secondPartyName}
-                        </span>
+                    <td className="p-1 w-96">
+                      <div className="flex flex-col space-y-1">
+                        <div className="flex items-start">
+                          <span className="text-xs text-gray-500 mr-2 ">
+                            First:
+                          </span>
+                          <span
+                            className="text-sm font-medium text-gray-900"
+                            title={booking.firstPartyName}
+                          >
+                            {booking.firstPartyName}
+                          </span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="text-xs text-gray-500 mr-2 flex-shrink-0">
+                            Second:
+                          </span>
+                          <span
+                            className="text-sm text-gray-600 truncate"
+                            title={booking.secondPartyName}
+                          >
+                            {booking.secondPartyName}
+                          </span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="text-xs text-gray-500 mr-2 flex-shrink-0">
+                            Mobile:
+                          </span>
+                          <span
+                            className="text-sm text-gray-600 truncate"
+                            title={booking.mobileNumber}
+                          >
+                            {booking.mobileNumber}
+                          </span>
+                        </div>
                       </div>
                     </td>
-                    <td className="p-3">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-900">
+                    <td className="p-4 w-52">
+                      <div className="flex flex-col space-y-1">
+                        <span
+                          className="text-sm font-medium text-gray-900 truncate"
+                          title={booking.documentType}
+                        >
                           {booking.documentType}
                         </span>
-                        <span className="text-xs text-gray-500">
-                          {booking.deliveryServiceName || "N/A"}
+                        <span
+                          className="text-xs text-gray-500 truncate"
+                          title={booking.deliveryServiceName}
+                        >
+                          Service: {booking.deliveryServiceName || "N/A"}
+                        </span>
+                        <span
+                          className="text-xs text-gray-500 truncate"
+                          title={booking.deliveryType}
+                        >
+                          Type: {booking.deliveryType || "N/A"}
                         </span>
                       </div>
                     </td>
-                    <td className="p-3 whitespace-nowrap">
+                    <td className="p-4 whitespace-nowrap w-32">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(
                           booking.status
                         )}`}
+                        title={booking.status}
                       >
                         {booking.status || "N/A"}
                       </span>
                     </td>
-                    <td className="p-3 whitespace-nowrap">
+                    <td className="p-4 whitespace-nowrap w-32">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusBadgeColor(
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${getPaymentStatusBadgeColor(
                           booking.paymentStatus
                         )}`}
+                        title={booking.paymentStatus}
                       >
                         {booking.paymentStatus}
                       </span>
                     </td>
-                    <td className="p-3 whitespace-nowrap text-sm font-mono text-gray-700">
-                      {booking.paymentId.substring(0, 8)}...
+                    <td className="p-4 w-40">
+                      <span
+                        className="text-sm font-mono text-gray-700 truncate block"
+                        title={booking.paymentId}
+                      >
+                        {booking.paymentId !== "N/A"
+                          ? booking.paymentId.substring(0, 15) + "..."
+                          : "N/A"}
+                      </span>
                     </td>
-                    <td className="p-3 whitespace-nowrap text-sm font-semibold text-green-600">
+                    <td className="p-4 whitespace-nowrap text-sm font-semibold text-green-600 w-32">
                       {formatAmount(booking.totalAmount)}
                     </td>
-                    <td className="p-3 whitespace-nowrap">
+                    <td className="p-4 whitespace-nowrap w-24">
                       <button
-                        className="px-2 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center space-x-1"
+                        className="px-3 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center space-x-1"
                         onClick={() => handleViewDetails(booking)}
                         title="View Details"
                       >
@@ -486,9 +543,9 @@ const EstampBookingTable = () => {
                         <span className="text-xs font-medium">View</span>
                       </button>
                     </td>
-                    <td className="p-3 whitespace-nowrap">
+                    <td className="p-4 whitespace-nowrap w-32">
                       <button
-                        className="px-2 py-1 bg-purple-100 text-purple-600 rounded-md hover:bg-purple-200 transition-colors flex items-center space-x-1"
+                        className="px-3 py-2 bg-purple-100 text-purple-600 rounded-md hover:bg-purple-200 transition-colors flex items-center space-x-1"
                         onClick={() => handleOpenStatusModal(booking)}
                         title="Update Status"
                       >
@@ -545,7 +602,9 @@ const EstampBookingTable = () => {
                   Booking ID
                 </label>
                 <div className="bg-gray-50 p-2 rounded border border-gray-200 text-sm font-medium">
-                  {statusUpdateBooking.id.substring(0, 8)}...
+                  {statusUpdateBooking.id
+                    ? statusUpdateBooking.id.substring(0, 12) + "..."
+                    : "N/A"}
                 </div>
               </div>
 
@@ -621,6 +680,30 @@ const EstampBookingTable = () => {
           </div>
         </div>
       )}
+
+      {/* Add custom scrollbar styles */}
+      <style jsx>{`
+        .scrollbar-thin {
+          scrollbar-width: thin;
+        }
+        .scrollbar-thumb-red-300::-webkit-scrollbar-thumb {
+          background-color: #fca5a5;
+          border-radius: 6px;
+        }
+        .scrollbar-track-red-50::-webkit-scrollbar-track {
+          background-color: #fef2f2;
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+          height: 6px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background-color: #fca5a5;
+          border-radius: 6px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+          background-color: #fef2f2;
+        }
+      `}</style>
     </div>
   );
 };

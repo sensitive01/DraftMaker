@@ -13,6 +13,9 @@ import {
   AlertCircle,
   XCircle,
   ChevronDown,
+  Package,
+  FileCheck,
+  Truck,
 } from "lucide-react";
 import { trackMyDocumentStatus } from "../../api/service/axiosService";
 
@@ -61,11 +64,18 @@ const TrackMyDocuments = () => {
     if (!status) return "pending";
     const statusLower = status.toLowerCase();
     if (statusLower === "pending") return "pending";
+    if (statusLower === "processing") return "processing";
+    if (statusLower === "processed") return "processed";
+    if (statusLower === "approved") return "approved";
+    if (statusLower === "delivered") return "delivered";
     if (statusLower === "completed" || statusLower === "success")
       return "completed";
-    if (statusLower === "processing") return "processing";
-    if (statusLower === "rejected" || statusLower === "failed")
-      return "rejected";
+    if (
+      statusLower === "cancelled" ||
+      statusLower === "rejected" ||
+      statusLower === "failed"
+    )
+      return "cancelled";
     return "pending";
   };
 
@@ -80,6 +90,33 @@ const TrackMyDocuments = () => {
         icon: CheckCircle,
         cardBg: "bg-green-50",
         cardBorder: "border-green-200",
+      },
+      delivered: {
+        bg: "bg-emerald-50",
+        text: "text-emerald-700",
+        border: "border-emerald-200",
+        dot: "bg-emerald-500",
+        icon: Truck,
+        cardBg: "bg-emerald-50",
+        cardBorder: "border-emerald-200",
+      },
+      approved: {
+        bg: "bg-teal-50",
+        text: "text-teal-700",
+        border: "border-teal-200",
+        dot: "bg-teal-500",
+        icon: FileCheck,
+        cardBg: "bg-teal-50",
+        cardBorder: "border-teal-200",
+      },
+      processed: {
+        bg: "bg-cyan-50",
+        text: "text-cyan-700",
+        border: "border-cyan-200",
+        dot: "bg-cyan-500",
+        icon: Package,
+        cardBg: "bg-cyan-50",
+        cardBorder: "border-cyan-200",
       },
       processing: {
         bg: "bg-blue-50",
@@ -99,7 +136,7 @@ const TrackMyDocuments = () => {
         cardBg: "bg-orange-50",
         cardBorder: "border-orange-200",
       },
-      rejected: {
+      cancelled: {
         bg: "bg-red-100",
         text: "text-red-800",
         border: "border-red-300",
@@ -164,14 +201,23 @@ const TrackMyDocuments = () => {
       completed: documents.filter(
         (doc) => normalizeStatus(doc.doumentStatus) === "completed"
       ).length,
+      delivered: documents.filter(
+        (doc) => normalizeStatus(doc.doumentStatus) === "delivered"
+      ).length,
+      approved: documents.filter(
+        (doc) => normalizeStatus(doc.doumentStatus) === "approved"
+      ).length,
+      processed: documents.filter(
+        (doc) => normalizeStatus(doc.doumentStatus) === "processed"
+      ).length,
       processing: documents.filter(
         (doc) => normalizeStatus(doc.doumentStatus) === "processing"
       ).length,
       pending: documents.filter(
         (doc) => normalizeStatus(doc.doumentStatus) === "pending"
       ).length,
-      rejected: documents.filter(
-        (doc) => normalizeStatus(doc.doumentStatus) === "rejected"
+      cancelled: documents.filter(
+        (doc) => normalizeStatus(doc.doumentStatus) === "cancelled"
       ).length,
     };
   };
@@ -223,7 +269,6 @@ const TrackMyDocuments = () => {
                   placeholder="10-digit mobile number"
                   className="w-full px-4 py-4 pl-15 border-2 border-red-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-200 focus:border-red-500 transition-all text-lg font-medium"
                 />
-            
               </div>
               <button
                 onClick={handleSubmit}
@@ -250,45 +295,67 @@ const TrackMyDocuments = () => {
         {showResults && (
           <div className="space-y-10">
             {/* Summary Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-              <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-red-100 hover:shadow-2xl transition-all hover:border-red-200 transform hover:-translate-y-1">
-                <div className="text-3xl font-bold text-red-700 mb-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+              <div className="bg-white rounded-2xl p-4 shadow-xl border-2 border-red-100 hover:shadow-2xl transition-all hover:border-red-200 transform hover:-translate-y-1">
+                <div className="text-2xl font-bold text-red-700 mb-1">
                   {counts.total}
                 </div>
-                <div className="text-sm text-red-600 font-semibold">
-                  Total Documents
-                </div>
+                <div className="text-xs text-red-600 font-semibold">Total</div>
               </div>
-              <div className="bg-green-50 rounded-2xl p-6 shadow-xl border-2 border-green-200 hover:shadow-2xl transition-all hover:border-green-300 transform hover:-translate-y-1">
-                <div className="text-3xl font-bold text-green-700 mb-2">
+              <div className="bg-green-50 rounded-2xl p-4 shadow-xl border-2 border-green-200 hover:shadow-2xl transition-all hover:border-green-300 transform hover:-translate-y-1">
+                <div className="text-2xl font-bold text-green-700 mb-1">
                   {counts.completed}
                 </div>
-                <div className="text-sm text-green-600 font-semibold">
+                <div className="text-xs text-green-600 font-semibold">
                   Completed
                 </div>
               </div>
-              <div className="bg-blue-50 rounded-2xl p-6 shadow-xl border-2 border-blue-200 hover:shadow-2xl transition-all hover:border-blue-300 transform hover:-translate-y-1">
-                <div className="text-3xl font-bold text-blue-700 mb-2">
+              <div className="bg-emerald-50 rounded-2xl p-4 shadow-xl border-2 border-emerald-200 hover:shadow-2xl transition-all hover:border-emerald-300 transform hover:-translate-y-1">
+                <div className="text-2xl font-bold text-emerald-700 mb-1">
+                  {counts.delivered}
+                </div>
+                <div className="text-xs text-emerald-600 font-semibold">
+                  Delivered
+                </div>
+              </div>
+              <div className="bg-teal-50 rounded-2xl p-4 shadow-xl border-2 border-teal-200 hover:shadow-2xl transition-all hover:border-teal-300 transform hover:-translate-y-1">
+                <div className="text-2xl font-bold text-teal-700 mb-1">
+                  {counts.approved}
+                </div>
+                <div className="text-xs text-teal-600 font-semibold">
+                  Approved
+                </div>
+              </div>
+              <div className="bg-cyan-50 rounded-2xl p-4 shadow-xl border-2 border-cyan-200 hover:shadow-2xl transition-all hover:border-cyan-300 transform hover:-translate-y-1">
+                <div className="text-2xl font-bold text-cyan-700 mb-1">
+                  {counts.processed}
+                </div>
+                <div className="text-xs text-cyan-600 font-semibold">
+                  Processed
+                </div>
+              </div>
+              <div className="bg-blue-50 rounded-2xl p-4 shadow-xl border-2 border-blue-200 hover:shadow-2xl transition-all hover:border-blue-300 transform hover:-translate-y-1">
+                <div className="text-2xl font-bold text-blue-700 mb-1">
                   {counts.processing}
                 </div>
-                <div className="text-sm text-blue-600 font-semibold">
+                <div className="text-xs text-blue-600 font-semibold">
                   Processing
                 </div>
               </div>
-              <div className="bg-orange-50 rounded-2xl p-6 shadow-xl border-2 border-orange-200 hover:shadow-2xl transition-all hover:border-orange-300 transform hover:-translate-y-1">
-                <div className="text-3xl font-bold text-orange-700 mb-2">
+              <div className="bg-orange-50 rounded-2xl p-4 shadow-xl border-2 border-orange-200 hover:shadow-2xl transition-all hover:border-orange-300 transform hover:-translate-y-1">
+                <div className="text-2xl font-bold text-orange-700 mb-1">
                   {counts.pending}
                 </div>
-                <div className="text-sm text-orange-600 font-semibold">
+                <div className="text-xs text-orange-600 font-semibold">
                   Pending
                 </div>
               </div>
-              <div className="bg-red-100 rounded-2xl p-6 shadow-xl border-2 border-red-300 hover:shadow-2xl transition-all hover:border-red-400 transform hover:-translate-y-1">
-                <div className="text-3xl font-bold text-red-800 mb-2">
-                  {counts.rejected}
+              <div className="bg-red-100 rounded-2xl p-4 shadow-xl border-2 border-red-300 hover:shadow-2xl transition-all hover:border-red-400 transform hover:-translate-y-1">
+                <div className="text-2xl font-bold text-red-800 mb-1">
+                  {counts.cancelled}
                 </div>
-                <div className="text-sm text-red-700 font-semibold">
-                  Rejected
+                <div className="text-xs text-red-700 font-semibold">
+                  Cancelled
                 </div>
               </div>
             </div>
@@ -315,10 +382,13 @@ const TrackMyDocuments = () => {
                       className="w-full px-4 py-4 pl-12 pr-12 border-2 border-red-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-200 focus:border-red-500 transition-all appearance-none bg-white font-medium"
                     >
                       <option value="all">All Status</option>
-                      <option value="completed">Completed</option>
-                      <option value="processing">Processing</option>
                       <option value="pending">Pending</option>
-                      <option value="rejected">Rejected</option>
+                      <option value="processing">Processing</option>
+                      <option value="processed">Processed</option>
+                      <option value="approved">Approved</option>
+                      <option value="delivered">Delivered</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-400 w-5 h-5" />
                   </div>
@@ -395,7 +465,7 @@ const TrackMyDocuments = () => {
                                 Applicant
                               </p>
                               <p className="text-sm font-bold text-red-800">
-                                {doc.userName || "N/A"}
+                                {doc.userName ||doc.requestorName || "N/A"}
                               </p>
                             </div>
                           </div>
@@ -423,7 +493,7 @@ const TrackMyDocuments = () => {
                                 Amount Paid
                               </p>
                               <p className="text-lg font-bold text-red-800">
-                                ₹{doc.paymentDetails?.paidAmount || "0"}
+                                ₹{doc.paymentDetails?.paidAmount ||doc.totalAmount ||"0"}
                               </p>
                             </div>
                           </div>

@@ -10,6 +10,10 @@ import {
   IndianRupee,
   CheckCircle,
   Clock,
+  MapPin,
+  Mail,
+  Hash,
+  Building,
 } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { getEstampBookingData } from "../../../../api/service/axiosService";
@@ -25,7 +29,7 @@ const EstampDetails = () => {
       try {
         setLoading(true);
         const response = await getEstampBookingData(estampId);
-        if (response.status===200) {
+        if (response.status === 200) {
           setEstampData(response.data.data);
         } else {
           setError(response.message || "Failed to fetch data");
@@ -92,14 +96,33 @@ const EstampDetails = () => {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-3xl font-bold text-gray-900">E-Stamp Details</h1>
-          <div className="flex items-center space-x-2">
-            <CheckCircle className="h-6 w-6 text-green-600" />
-            <span className="text-green-600 font-semibold capitalize">
-              {estampData.paymentStatus}
-            </span>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-6 w-6 text-green-600" />
+              <span className="text-green-600 font-semibold capitalize">
+                {estampData.paymentStatus}
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <FileText className="h-5 w-5 text-blue-600" />
+              <span className="text-blue-600 font-semibold capitalize">
+                {estampData.documentStatus}
+              </span>
+            </div>
           </div>
         </div>
         <div className="h-1 bg-gradient-to-r from-red-600 to-red-400 rounded-full"></div>
+      </div>
+
+      {/* Booking ID Banner */}
+      <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-center justify-center space-x-2">
+          <Hash className="h-5 w-5 text-blue-600" />
+          <span className="text-blue-600 font-medium">Booking ID:</span>
+          <span className="text-blue-800 font-bold text-lg">
+            {estampData.bookingId}
+          </span>
+        </div>
       </div>
 
       {/* Main Content Grid */}
@@ -149,8 +172,16 @@ const EstampDetails = () => {
               <label className="text-sm font-medium text-gray-600">
                 Document Type
               </label>
-              <p className="text-gray-900 font-medium">
+              <p className="text-gray-900 font-medium text-sm">
                 {estampData.documentType}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                Document ID
+              </label>
+              <p className="text-gray-900 font-mono text-sm">
+                {estampData.selectedDocumentId}
               </p>
             </div>
             {estampData.considerationAmount && (
@@ -197,6 +228,16 @@ const EstampDetails = () => {
                 {estampData.mobileNumber}
               </p>
             </div>
+            {estampData.deliveryAddress?.email && (
+              <div>
+                <label className="text-sm font-medium text-gray-600">
+                  Email Address
+                </label>
+                <p className="text-gray-900 font-medium">
+                  {estampData.deliveryAddress.email}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -225,6 +266,14 @@ const EstampDetails = () => {
             </div>
             <div>
               <label className="text-sm font-medium text-gray-600">
+                Service ID
+              </label>
+              <p className="text-gray-900 font-mono text-sm">
+                {estampData.selectedDeliveryServiceId}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600">
                 Description
               </label>
               <p className="text-gray-900 text-sm">
@@ -242,6 +291,62 @@ const EstampDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Delivery Address */}
+      {estampData.deliveryAddress && (
+        <div className="mt-8 bg-blue-50 rounded-lg p-6 border border-blue-200">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <MapPin className="h-5 w-5 mr-2 text-blue-600" />
+            Delivery Address
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                Address Line 1
+              </label>
+              <p className="text-gray-900">
+                {estampData.deliveryAddress.addressLine1}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                Address Line 2
+              </label>
+              <p className="text-gray-900">
+                {estampData.deliveryAddress.addressLine2}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600">City</label>
+              <p className="text-gray-900">{estampData.deliveryAddress.city}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600">State</label>
+              <p className="text-gray-900">
+                {estampData.deliveryAddress.state}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                Pincode
+              </label>
+              <p className="text-gray-900">
+                {estampData.deliveryAddress.pincode}
+              </p>
+            </div>
+            {estampData.deliveryAddress.landmark && (
+              <div>
+                <label className="text-sm font-medium text-gray-600">
+                  Landmark
+                </label>
+                <p className="text-gray-900">
+                  {estampData.deliveryAddress.landmark}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Payment Information */}
       <div className="mt-8 bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-6 border border-red-200">
@@ -277,10 +382,30 @@ const EstampDetails = () => {
           {estampData.razorpayPaymentId && (
             <div>
               <label className="text-sm font-medium text-gray-600">
-                Payment ID
+                Razorpay Payment ID
               </label>
               <p className="text-gray-900 font-mono text-sm">
                 {estampData.razorpayPaymentId}
+              </p>
+            </div>
+          )}
+          {estampData.razorpayOrderId && (
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                Razorpay Order ID
+              </label>
+              <p className="text-gray-900 font-mono text-sm">
+                {estampData.razorpayOrderId}
+              </p>
+            </div>
+          )}
+          {estampData.razorpaySignature && (
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                Razorpay Signature
+              </label>
+              <p className="text-gray-900 font-mono text-sm break-all">
+                {estampData.razorpaySignature}
               </p>
             </div>
           )}
@@ -301,23 +426,9 @@ const EstampDetails = () => {
         </h2>
         <div className="space-y-4">
           <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-            <span className="text-gray-600">Order Date</span>
+            <span className="text-gray-600">Booking Date</span>
             <span className="text-gray-900 font-medium">
-              {formatDate(estampData.orderDate)}
-            </span>
-          </div>
-          {estampData.paymentCompletedAt && (
-            <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-              <span className="text-gray-600">Payment Completed</span>
-              <span className="text-gray-900 font-medium">
-                {formatDate(estampData.paymentCompletedAt)}
-              </span>
-            </div>
-          )}
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600">Last Updated</span>
-            <span className="text-gray-900 font-medium">
-              {formatDate(estampData.updatedAt)}
+              {formatDate(estampData.createdAt)}
             </span>
           </div>
         </div>
