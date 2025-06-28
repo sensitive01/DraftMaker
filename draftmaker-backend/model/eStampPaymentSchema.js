@@ -107,6 +107,10 @@ const estampPaymentSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    quantity: {
+      type: Number,
+      default: 1,
+    },
     deliveryAddress: {
       email: { type: String },
       addressLine1: { type: String },
