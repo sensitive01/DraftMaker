@@ -6,7 +6,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const BuyEStampDocuments = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [stampDutyData, setStampDutyData] = useState([]);
   const [deliveryCharges, setDeliveryCharges] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,6 +22,7 @@ const BuyEStampDocuments = () => {
   const [deliveryType, setDeliveryType] = useState("in-store");
   const [selectedDeliveryService, setSelectedDeliveryService] = useState("");
   const [isConsideration, setIsConsideration] = useState(false);
+  const [quantity,setQuantity] = useState(0)
 
   const [deliveryAddress, setDeliveryAddress] = useState({
     addressLine1: "",
@@ -346,7 +347,7 @@ const BuyEStampDocuments = () => {
                 state: deliveryAddress.state.trim(),
                 pincode: deliveryAddress.pincode.trim(),
                 landmark: deliveryAddress.landmark.trim(),
-                email: deliveryAddress.email.trim()
+                email: deliveryAddress.email.trim(),
               }
             : null,
       };
@@ -382,7 +383,7 @@ const BuyEStampDocuments = () => {
               console.log("Order saved successfully:", result);
               alert("Payment successful! Order has been processed.");
               resetForm();
-              navigate("/documents/home")
+              navigate("/documents/home");
             })
             .catch((error) => {
               console.error("Error saving order:", error);
@@ -442,7 +443,7 @@ const BuyEStampDocuments = () => {
     if (!selectedDocumentData) return null;
 
     if (selectedDocumentData.calculationType === "fixed") {
-      return `Fixed stamp duty of ₹${selectedDocumentData.fixedAmount}`;
+      return `₹${selectedDocumentData.fixedAmount}`;
     }
 
     if (
@@ -845,11 +846,12 @@ const BuyEStampDocuments = () => {
                   )}
                 </div>
               )}
+         
 
             {/* Show stamp duty calculation */}
             {selectedDocument && getCalculationExplanation() && (
-              <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                <div className="flex items-start">
+              <div className="mb-6  pt-3 bg-blue-50 border border-blue-200 rounded-md">
+                <div className="flex items-start ml-2">
                   <svg
                     className="w-4 h-4 text-blue-500 mt-0.5 mr-2 flex-shrink-0"
                     fill="none"
@@ -865,15 +867,40 @@ const BuyEStampDocuments = () => {
                   </svg>
                   <div className="text-sm">
                     <p className="font-medium text-blue-800">
-                      Stamp Duty Calculation:
-                    </p>
-                    <p className="text-blue-600 mt-1">
-                      {getCalculationExplanation()}
+                      Stamp Duty : {getCalculationExplanation()}
                     </p>
                   </div>
                 </div>
               </div>
             )}
+
+               <div className="mb-6">
+              <label
+                htmlFor="considerationAmount"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Quantity *
+              </label>
+              <input
+                type="number"
+                id="qunatity"
+                value={quantity}
+                onChange={(e) => setConsiderationAmount(e.target.value)}
+                placeholder="Enter consideration amount"
+                min="0"
+                step="0.01"
+                className={`w-full px-4 py-2.5 border ${
+                  formErrors.considerationAmount
+                    ? "border-red-300"
+                    : "border-gray-300"
+                } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+              />
+              {formErrors.considerationAmount && (
+                <p className="mt-1 text-sm text-red-600">
+                  {formErrors.considerationAmount}
+                </p>
+              )}
+            </div>
 
             {/* Description */}
             <div className="mb-6">

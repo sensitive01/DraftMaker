@@ -10,7 +10,7 @@ export default function HomeContent() {
   };
 
   return (
-    <div className="bg-white py-12">
+    <div className=" py-12">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-8 items-center">
           {/* Left Content Section */}

@@ -71,6 +71,9 @@ import AboutUsHome from "./components/AboutUsHome";
 import TestimonialComments from "./components/TestimonialComments";
 import ContactMePage from "./components/ContactMePage";
 import MesaageNotification from "./components/admin/dashboard/statistics/MesaageNotification";
+import Test from "./components/Test";
+import AboutUsContentPage from "./components/AboutUsContentPage";
+import FloatingContactButtons from "./FloatingContactButtons"; // Import the new component
 
 function MainLayout({ children }) {
   return (
@@ -264,6 +267,49 @@ function AboutUsPage({ children }) {
               </div>
             </div>
             <AboutUs />
+          </div>
+        </div>
+      </div>
+
+      {children}
+
+      <NeedSupport />
+      <Footer />
+    </div>
+  );
+}
+
+function AboutUsFullPage({ children }) {
+  return (
+    <div className="page_wrapper">
+      <div className="top_home_wraper white_option">
+        <div className="content-wrapper">
+          <div className="container">
+            <div className="anim_line dark_bg">
+              {[...Array(9)].map((_, index) => (
+                <span key={index}>
+                  <img src={animLogo} alt="anim_line" />
+                </span>
+              ))}
+            </div>
+          </div>
+          <Header />
+          <div className="container mx-auto text-center ">
+            <div
+              className="bread_crumb"
+              data-aos="fade-in"
+              data-aos-duration="2000"
+              data-aos-delay="100"
+            >
+              <div className="anim_line dark_bg">
+                {[...Array(9)].map((_, index) => (
+                  <span key={index}>
+                    <img src={animLogo} alt="anim_line" />
+                  </span>
+                ))}
+              </div>
+            </div>
+            <AboutUsContentPage />
           </div>
         </div>
       </div>
@@ -580,6 +626,7 @@ function App() {
           <Route path="/documents/home" element={<HomeLayout />} />
           <Route path="/home/about-us" element={<AboutUsPage />} />
           <Route path="/home/contact-us" element={<ContactUsPage />} />
+          <Route path="/home/all-about-us" element={<AboutUsFullPage />} />
 
           <Route
             path="/documents/rental/:type"
@@ -730,6 +777,9 @@ function App() {
             }
           />
         </Routes>
+        {!window.location.pathname.startsWith("/admin") && (
+          <FloatingContactButtons />
+        )}
 
         <GoTop />
         <VideoModal />
@@ -757,6 +807,14 @@ function App() {
           element={
             <PaymentLayout>
               <TrackMyDocuments />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/test"
+          element={
+            <PaymentLayout>
+              <Test />
             </PaymentLayout>
           }
         />

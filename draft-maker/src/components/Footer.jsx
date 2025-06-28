@@ -7,18 +7,6 @@ import logoImg from "../assets/images/logo.png";
 
 const Footer = () => {
   // Function to handle map click - opens Google Maps in new tab
-  const handleMapClick = () => {
-    const mapUrl =
-      "https://www.google.com/maps/place/Rental+Agreement+E+stamp+Notary+Pan+Card+Passport+Jeevan+Pramaan+Aadhaar+Pan+Linking/@12.9383209,77.6989027,243m/data=!3m1!1e3!4m6!3m5!1s0x3bae13287dc4a509:0x3487ef268a483d31!8m2!3d12.9383209!4d77.6989027!16s%2Fg%2F11q2p6y8qr";
-    window.open(mapUrl, "_blank");
-  };
-
-  // Function to get directions
-  const handleGetDirections = () => {
-    const directionsUrl =
-      "https://www.google.com/maps/dir//Shop+No+5,+1st+Floor,+New+No+200,+Panathur+Main+Rd,+Munireddy+Layout,+Mariyappa+Layout,+Kadubeesanahalli,+Panathur,+Bengaluru,+Karnataka+560103";
-    window.open(directionsUrl, "_blank");
-  };
 
   return (
     <footer>
@@ -77,22 +65,23 @@ const Footer = () => {
                     <Link to="/">Home</Link>
                   </li>
                   <li>
-                    <Link to="/about-us">About us</Link>
+                    <Link to="/home/all-about-us">About us</Link>
                   </li>
                   <li>
-                    <Link to="/services">Services</Link>
+                    <Link to="/">Our Services</Link>
                   </li>
                   <li>
-                    <Link to="/drafting-services">Drafting Services</Link>
+                    <Link to="#">Terms & Conditions</Link>
                   </li>
                   <li>
-                    <Link to="/printing-services">Printing Services</Link>
+                    <Link to="#">Privacy Policy</Link>
+                  </li>
+
+                  <li>
+                    <Link to="/home/contact-us">Contact Us</Link>
                   </li>
                   <li>
-                    <Link to="/e-stamp-services">E-Stamp Services</Link>
-                  </li>
-                  <li>
-                    <Link to="/contact-us">Contact Us</Link>
+                    <Link to="/documents/track-my-documents">Track Your Order</Link>
                   </li>
                 </ul>
               </div>
@@ -101,29 +90,29 @@ const Footer = () => {
             {/* footer link 3 */}
             <div className="col-lg-3 col-md-6 col-12">
               <div className="links">
-                <h3>Draft Maker</h3>
+                <h3>Services</h3>
                 <hr />
                 <ul>
                   <li>
-                    <Link to="/rental-lease">Rental / Lease Agreement</Link>
+                    <Link to="/documents/buy-e-stamp">Buy E-Stamp</Link>
                   </li>
                   <li>
-                    <Link to="/affidavits">Affidavits</Link>
+                    <Link to="/documents/rental/residential-lease">Document Drafting</Link>
                   </li>
                   <li>
-                    <Link to="/buy-e-stamp">Buy E-Stamp</Link>
+                    <Link to="/documents/rental/residential-lease">Printing Services</Link>
                   </li>
                   <li>
-                    <Link to="/how-it-works">How it works</Link>
+                    <Link to="/documents/rental/residential-lease">Document Delivery</Link>
                   </li>
                   <li>
-                    <Link to="/terms">Terms & conditions</Link>
+                    <Link to="/documents/rental/residential-lease">Notary Services</Link>
                   </li>
                   <li>
-                    <Link to="/privacy">Privacy policy</Link>
+                    <Link to="/documents/rental/residential-lease">PAN & Passport Services</Link>
                   </li>
                   <li>
-                    <Link to="/sign-in">Sign In</Link>
+                    <Link to="#">Jeevan Pramaan </Link>
                   </li>
                 </ul>
               </div>
@@ -137,15 +126,18 @@ const Footer = () => {
                 <ul>
                   <li>
                     <span className="icon">
-                      <img src={contactImg} alt="image" />
+                      <img
+                        src={contactImg}
+                        alt="image"
+                        style={{ width: "150px" }}
+                      />
                     </span>
                     <div className="text">
                       <p>
-                        Visit us <br />
-                        Shop No 5, 1st Floor, New No 200, <br />
-                        Panathur Main Rd, Munireddy Layout, <br />
-                        Mariyappa Layout, Kadubeesanahalli, <br />
-                        Panathur, Bengaluru, Karnataka 560103
+                        <span style={{ color: "yellow" }}>Visit us</span>
+                        <br />
+                        No 5, 1st floor, Site no 200, Muniraju Complex, Panathur
+                        Main Road, Kadubisanahalli, Bengaluru, Karnataka-560103
                       </p>
                     </div>
                   </li>
@@ -155,7 +147,10 @@ const Footer = () => {
                     </span>
                     <div className="text">
                       <p>
-                        Call us <a href="tel:+91 9008774711">+91 9008774711</a>
+                        <span style={{ color: "yellow" }}>Call us </span>
+                        <a href="tel:+91 8088774711">
+                          <span className="mr-1">(+91)</span> 8088774711
+                        </a>
                       </p>
                     </div>
                   </li>
@@ -165,9 +160,10 @@ const Footer = () => {
                     </span>
                     <div className="text">
                       <p>
-                        Email us{" "}
-                        <a href="mailto:support@example.com">
-                          support@example.com
+                        <span style={{ color: "yellow" }}> Email us </span>
+
+                        <a href="mailto:info@draftmaker.in">
+                          info@draftmaker.in
                         </a>
                       </p>
                     </div>

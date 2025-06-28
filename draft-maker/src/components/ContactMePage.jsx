@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { MapPin, Mail, Phone } from "lucide-react";
+import {
+  MapPin,
+  Mail,
+  Phone,
+  Clock,
+  Facebook,
+  Twitter,
+  Instagram,
+  Youtube,
+} from "lucide-react";
 import { sendMessage } from "../api/service/axiosService";
 
 const ContactMePage = () => {
@@ -104,161 +113,206 @@ const ContactMePage = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-16">
-        {/* Contact Section Header */}
-        <div className="text-center mb-12">
-          <p
-            className="font-semibold text-sm uppercase tracking-wide mb-2"
-            style={{ color: "#770000" }}
-          >
-            CONTACT
-          </p>
-          <h2 className="text-3xl font-bold text-gray-800">
-            Get In <span style={{ color: "#770000" }}>Touch</span>
-          </h2>
-        </div>
+      {/* Main Content Section */}
+      <div className="py-16" style={{ background: "white" }}>
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            {/* Left Side - Contact Information */}
+            <div className="text-red">
+              {/* Header */}
+              <div className="flex items-center mb-6">
+                <Phone className="w-6 h-6 mr-3" style={{ color: "#770000" }} />
+                <h2 className="text-3xl font-bold" style={{ color: "#770000" }}>
+                  Get in Touch
+                </h2>
+              </div>
 
-        {/* Contact Info Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="text-center">
-            <div
-              className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-              style={{ background: "#770000" }}
-            >
-              <MapPin className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="font-semibold text-gray-800 mb-2">Draft Maker</h3>
-            <p className="text-gray-600">Kadubeesanahalli</p>
-          </div>
-
-          <div className="text-center">
-            <div
-              className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-              style={{ background: "#770000" }}
-            >
-              <Mail className="w-8 h-8 text-white" />
-            </div>
-            <p className="text-gray-600">info@draftmaker.in</p>
-          </div>
-
-          <div className="text-center">
-            <div
-              className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-              style={{ background: "#770000" }}
-            >
-              <Phone className="w-8 h-8 text-white" />
-            </div>
-            <p className="text-gray-600">+91 9008774711</p>
-          </div>
-        </div>
-
-        {/* Contact Form */}
-        <div className="max-w-2xl mx-auto mb-16">
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-              Send us a Message
-            </h3>
-
-            {/* Success Message */}
-            {showSuccess && (
-              <div
-                className="border text-white px-4 py-3 rounded mb-6"
-                style={{ background: "#770000", borderColor: "#550000" }}
+              {/* Main Heading */}
+              <h1
+                className="text-4xl lg:text-4xl font-bold mb-6 leading-tight"
+                style={{ color: "#770000" }}
               >
-                <p className="font-semibold">Success!</p>
-                <p>
-                  Your message has been sent successfully. We'll get back to you
-                  soon!
-                </p>
+                CONTACT US NOW!
+              </h1>
+
+              {/* Description */}
+              <p className="text-black mb-8 leading-relaxed">
+                Draft Maker is your trusted partner for all your drafting and
+                design needs. We provide professional services with excellent
+                quality. Get in touch with us for all your requirements — we're
+                here to help you with precision and creativity.
+              </p>
+
+              {/* Contact Details */}
+              <div className="space-y-8 mb-8">
+                {/* Office Location */}
+                <div>
+                  <h3
+                    className="text-xl font-bold mb-3"
+                    style={{ color: "#ffa500" }}
+                  >
+                    Draft Maker Office
+                  </h3>
+                  <p className="text-black leading-relaxed">
+                    No 5, 1st floor, Site no 200, Muniraju Complex, Panathur
+                    Main Road, Kadubisanahalli, Bengaluru, Karnataka-560103
+                  </p>
+                  <div className="flex items-center mt-2 text-black">
+                    <Clock className="w-4 h-4 mr-2" />
+                    <span>10.30 AM - 6 PM, Monday - Saturday</span>
+                  </div>
+                </div>
+
+                {/* Contact Info */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="flex items-center">
+                    <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center mr-4"
+                      style={{ background: "#770000" }}
+                    >
+                      <Mail className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p style={{ color: "red" }}>Email</p>
+                      <p style={{ color: "red" }}>info@draftmaker.in</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center">
+                    <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center mr-4"
+                      style={{ background: "#770000" }}
+                    >
+                      <Phone className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p style={{ color: "red" }}>Phone</p>
+                      <p style={{ color: "red" }}>
+                        <a href="tel:+91 8088774711" style={{color:"red"}} >(+91) 8088774711</a>
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
 
-            {/* Error Message */}
-            {showError && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-                <p className="font-semibold">Error!</p>
-                <p>{errorMessage}</p>
+              {/* Social Media Icons */}
+              <div className="flex space-x-4">
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors">
+                  <Facebook className="w-6 h-6 text-white" />
+                </div>
+                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-800 transition-colors">
+                  <Twitter className="w-6 h-6 text-white" />
+                </div>
+                <div className="w-12 h-12 bg-pink-600 rounded-lg flex items-center justify-center cursor-pointer hover:bg-pink-700 transition-colors">
+                  <Instagram className="w-6 h-6 text-white" />
+                </div>
+                <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center cursor-pointer hover:bg-red-700 transition-colors">
+                  <Youtube className="w-6 h-6 text-white" />
+                </div>
               </div>
-            )}
-
-            {/* Form Fields */}
-            <div className="space-y-4">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Your Name*"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none"
-                  style={{ "--tw-ring-color": "#770000" }}
-                  disabled={isLoading}
-                />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Mail Address*"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none"
-                  style={{ "--tw-ring-color": "#770000" }}
-                  disabled={isLoading}
-                />
-              </div>
-
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Phone*"
-                value={formData.phone}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none"
-                style={{ "--tw-ring-color": "#770000" }}
-                disabled={isLoading}
-              />
-
-              <textarea
-                placeholder="Your Message*"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows={5}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none resize-vertical"
-                style={{ "--tw-ring-color": "#770000" }}
-                disabled={isLoading}
-              ></textarea>
-
-              <button
-                onClick={handleSubmit}
-                disabled={isLoading}
-                className="w-full text-white py-3 rounded-lg font-semibold transition-colors disabled:bg-gray-400"
-                style={{ background: isLoading ? "#999999" : "#770000" }}
-                onMouseOver={(e) =>
-                  !isLoading && (e.target.style.background = "#550000")
-                }
-                onMouseOut={(e) =>
-                  !isLoading && (e.target.style.background = "#770000")
-                }
-              >
-                {isLoading ? "Submitting..." : "Submit Message"}
-              </button>
             </div>
-          </div>
-        </div>
 
-        {/* Map Section */}
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d243.3174687726!2d77.69890269999999!3d12.9383209!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae13287dc4a509%3A0x3487ef268a483d31!2sRental%20Agreement%20E%20stamp%20Notary%20Pan%20Card%20Passport%20Jeevan%20Pramaan%20Aadhaar%20Pan%20Linking!5e0!3m2!1sen!2sin!4v1719155200000!5m2!1sen!2sin"
-              width="100%"
-              height="400"
-              style={{ border: 0 }}
-              allowFullScreen=""
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Draft Maker Location"
-            ></iframe>
+            {/* Right Side - Contact Form */}
+            <div>
+              <div className="bg-white rounded-lg shadow-lg p-8">
+                <div className="text-center mb-6">
+                  <div
+                    className="w-16 h-16 mx-auto mb-4 rounded-lg flex items-center justify-center"
+                    style={{ background: "#770000" }}
+                  >
+                    <Mail className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800">
+                    Draft Maker
+                  </h3>
+                  <p className="text-gray-600">Send us your requirements</p>
+                </div>
+
+                {/* Success Message */}
+                {showSuccess && (
+                  <div
+                    className="border text-white px-4 py-3 rounded mb-6"
+                    style={{ background: "#770000", borderColor: "#550000" }}
+                  >
+                    <p className="font-semibold">Success!</p>
+                    <p>
+                      Your message has been sent successfully. We'll get back to
+                      you soon!
+                    </p>
+                  </div>
+                )}
+
+                {/* Error Message */}
+                {showError && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                    <p className="font-semibold">Error!</p>
+                    <p>{errorMessage}</p>
+                  </div>
+                )}
+
+                {/* Form Fields */}
+                <div className="space-y-4">
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Your Name*"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                      style={{ "--tw-ring-color": "#770000" }}
+                      disabled={isLoading}
+                    />
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Mail Address*"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                      style={{ "--tw-ring-color": "#770000" }}
+                      disabled={isLoading}
+                    />
+                  </div>
+
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Phone*"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ "--tw-ring-color": "#770000" }}
+                    disabled={isLoading}
+                  />
+
+                  <textarea
+                    placeholder="Your Requirements*"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    rows={5}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none resize-vertical"
+                    style={{ "--tw-ring-color": "#770000" }}
+                    disabled={isLoading}
+                  ></textarea>
+
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isLoading}
+                    className="w-full text-white py-4 rounded-lg font-bold text-lg transition-colors disabled:bg-gray-400"
+                    style={{ background: isLoading ? "#999999" : "#770000" }}
+                    onMouseOver={(e) =>
+                      !isLoading && (e.target.style.background = "#550000")
+                    }
+                    onMouseOut={(e) =>
+                      !isLoading && (e.target.style.background = "#770000")
+                    }
+                  >
+                    {isLoading ? "SENDING..." : "SEND MESSAGE"}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

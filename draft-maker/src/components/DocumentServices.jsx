@@ -270,7 +270,7 @@ export default function DocumentServices() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50 py-4">
+    <div className=" py-4">
       <div className="max-w-6xl mx-auto px-4">
         <div className="relative h-80">
           {/* Left Navigation Arrow with Slide Effect */}

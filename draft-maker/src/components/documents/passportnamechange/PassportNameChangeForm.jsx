@@ -14,7 +14,7 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-xs font-medium text-red-600 mb-1">
-              Full Name
+              Full Name (as per Aadhaar)
             </label>
             <input
               type="text"
@@ -267,7 +267,7 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-red-600 mb-1">
-                Current Given Name (as per Aadhaar)
+                Current Given Name (as per present passport)
               </label>
               <input
                 type="text"
@@ -280,7 +280,7 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
             </div>
             <div>
               <label className="block text-xs font-medium text-red-600 mb-1">
-                Current Surname (as per Aadhaar)
+                Current Surname (as per present passport)
               </label>
               <input
                 type="text"
@@ -296,7 +296,7 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-red-600 mb-1">
-                New Given Name
+                New Correct Given Name  (for passport)
               </label>
               <input
                 type="text"
@@ -309,7 +309,7 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
             </div>
             <div>
               <label className="block text-xs font-medium text-red-600 mb-1">
-                New Surname
+                New Correct Surname  (for passport)
               </label>
               <input
                 type="text"

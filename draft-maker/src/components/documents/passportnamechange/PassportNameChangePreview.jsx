@@ -60,8 +60,8 @@ const PassportNameChangePreview = ({ formData }) => {
       <div className="bg-white p-9 rounded-lg shadow-sm border border-gray-200 relative overflow-hidden min-h-[700px] font-serif">
         {/* Watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-gray-200 text-4xl font-bold transform rotate-45 select-none font-sans">
-            INTERNAL PURPOSE ONLY
+          <div className="text-gray-300 text-3xl font-bold transform rotate-45 select-none font-sans">
+            DRAFT MAKER (INTERNAL PURPOSE ONLY)
           </div>
         </div>
 
@@ -109,15 +109,15 @@ const PassportNameChangePreview = ({ formData }) => {
                 <span>
                   That as per My Aadhaar card my given name is{" "}
                   <span className="font-bold">
-                    {formData.currentGivenName || "NAME"}
+                    {formData.name || "NAME"}
                   </span>{" "}
                   and in my Expired Passport, my given name is{" "}
                   <span className="font-bold">
-                    {formData.newGivenName || "NAME"}
+                    {formData.currentGivenName|| "NAME"}
                   </span>
                   , surname is{" "}
                   <span className="font-bold">
-                    {formData.newSurname || "NAME"}
+                    {formData.currentSurname || "NAME"}
                   </span>
                   .
                 </span>

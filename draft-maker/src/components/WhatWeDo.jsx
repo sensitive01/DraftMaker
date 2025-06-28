@@ -92,7 +92,7 @@ const documentTypes = [
 
 const WhatWeDo = () => {
   return (
-    <div className="max-w-7xl mx-auto p-8 bg-gray-50 min-h-screen">
+    <div className="max-w-7xl mx-auto p-8 min-h-screen">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-gray-800 mb-2">
           What We <span style={{ color: "#770000" }}>Do</span>

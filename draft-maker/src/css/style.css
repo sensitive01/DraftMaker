@@ -321,12 +321,12 @@ header.fixed {
 .navbar {
   padding-left: 0;
   padding-right: 0;
-  padding-top: 35px;
+  padding-top: 15px;
   transition: 0.4s all;
 }
 
 header.fix_style .navbar {
-  padding: 20px 0;
+  padding: 5px 0;
 }
 
 .navbar-expand-lg .navbar-nav {
