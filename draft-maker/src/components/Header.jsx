@@ -5,13 +5,21 @@ import draftMakerLogo from "../assets/images/logo.png";
 const Header = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+    // Close all dropdowns when main menu is toggled
+    setActiveDropdown(null);
   };
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+    setActiveDropdown(null);
+  };
+
+  const toggleDropdown = (dropdownName) => {
+    setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
   };
 
   return (
@@ -58,14 +66,26 @@ const Header = () => {
                     <i className="icofont-home"></i>
                   </Link>
                 </li>
+                
+                {/* Document Drafting Dropdown */}
                 <li className="nav-item has_dropdown">
-                  <a className="nav-link" href="#">
+                  <a 
+                    className="nav-link dropdown-toggle-custom" 
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleDropdown('documents');
+                    }}
+                  >
                     Document Drafting
                   </a>
-                  <span className="drp_btn">
-                    <i className="icofont-rounded-down"></i>
+                  <span 
+                    className="drp_btn"
+                    onClick={() => toggleDropdown('documents')}
+                  >
+                    <i className={`icofont-rounded-down ${activeDropdown === 'documents' ? 'rotate-180' : ''}`}></i>
                   </span>
-                  <div className="sub_menu scrollable-submenu">
+                  <div className={`sub_menu scrollable-submenu ${activeDropdown === 'documents' ? 'show-dropdown' : ''}`}>
                     <div className="submenu-scroll-container">
                       <ul>
                         <li>
@@ -226,14 +246,26 @@ const Header = () => {
                     Buy E-Stamp
                   </Link>
                 </li>
+                
+                {/* Newspaper Ad Dropdown */}
                 <li className="nav-item has_dropdown">
-                  <a className="nav-link" href="#">
+                  <a 
+                    className="nav-link dropdown-toggle-custom" 
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleDropdown('newspaper');
+                    }}
+                  >
                     Newspaper Ad
                   </a>
-                  <span className="drp_btn">
-                    <i className="icofont-rounded-down"></i>
+                  <span 
+                    className="drp_btn"
+                    onClick={() => toggleDropdown('newspaper')}
+                  >
+                    <i className={`icofont-rounded-down ${activeDropdown === 'newspaper' ? 'rotate-180' : ''}`}></i>
                   </span>
-                  <div className="sub_menu">
+                  <div className={`sub_menu ${activeDropdown === 'newspaper' ? 'show-dropdown' : ''}`}>
                     <ul>
                       <li>
                         <Link
@@ -255,14 +287,25 @@ const Header = () => {
                   </div>
                 </li>
 
+                {/* In-Shop Services Dropdown */}
                 <li className="nav-item has_dropdown">
-                  <a className="nav-link" href="#">
+                  <a 
+                    className="nav-link dropdown-toggle-custom" 
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleDropdown('services');
+                    }}
+                  >
                     In-Shop Services
                   </a>
-                  <span className="drp_btn">
-                    <i className="icofont-rounded-down"></i>
+                  <span 
+                    className="drp_btn"
+                    onClick={() => toggleDropdown('services')}
+                  >
+                    <i className={`icofont-rounded-down ${activeDropdown === 'services' ? 'rotate-180' : ''}`}></i>
                   </span>
-                  <div className="sub_menu">
+                  <div className={`sub_menu ${activeDropdown === 'services' ? 'show-dropdown' : ''}`}>
                     <ul>
                       <li>
                         <Link
@@ -315,6 +358,7 @@ const Header = () => {
                     </ul>
                   </div>
                 </li>
+                
                 <li className="nav-item active">
                   <Link
                     className="nav-link dark_btn"
@@ -395,19 +439,25 @@ const Header = () => {
             }
           }
 
-          /* Responsive adjustments for running message */
-          @media (max-width: 768px) {
-            .running-message-banner {
-              height: 35px;
-            }
-            .message-text {
-              font-size: 12px;
-            }
-            .notification-icon {
-              font-size: 14px;
-            }
+          /* Dropdown Toggle Custom Styles */
+          .dropdown-toggle-custom {
+            cursor: pointer;
           }
 
+          .drp_btn {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+          }
+
+          .drp_btn i {
+            transition: transform 0.3s ease;
+          }
+
+          .rotate-180 {
+            transform: rotate(180deg);
+          }
+
+          /* Submenu Styles */
           .scrollable-submenu {
             position: relative;
           }
@@ -443,22 +493,82 @@ const Header = () => {
             scrollbar-color: #c1c1c1 #f1f1f1;
           }
 
+          /* Desktop Dropdown Behavior */
+          @media (min-width: 992px) {
+            .has_dropdown:hover .sub_menu {
+              display: block !important;
+              opacity: 1;
+              visibility: visible;
+            }
+          }
+
+          /* Mobile Dropdown Behavior */
+          @media (max-width: 991px) {
+            .sub_menu {
+              display: none;
+              position: static !important;
+              box-shadow: none !important;
+              background: #f8f9fa !important;
+              margin-top: 0;
+              border-radius: 0;
+              width: 100% !important;
+              left: 0 !important;
+              transform: none !important;
+            }
+
+            .sub_menu.show-dropdown {
+              display: block !important;
+              animation: slideDown 0.3s ease-in-out;
+            }
+
+            .submenu-scroll-container {
+              max-height: 300px;
+            }
+
+            .has_dropdown {
+              border-bottom: 1px solid #eee;
+            }
+
+            .drp_btn {
+              position: absolute;
+              right: 15px;
+              top: 50%;
+              transform: translateY(-50%);
+              padding: 5px;
+            }
+
+            .nav-link {
+              padding-right: 40px !important;
+            }
+          }
+
+          @keyframes slideDown {
+            from {
+              opacity: 0;
+              max-height: 0;
+            }
+            to {
+              opacity: 1;
+              max-height: 500px;
+            }
+          }
+
           /* Ensure submenu items have proper spacing */
-          .scrollable-submenu ul {
+          .sub_menu ul {
             margin: 0;
             padding: 0;
           }
 
-          .scrollable-submenu ul li {
+          .sub_menu ul li {
             list-style: none;
             border-bottom: 1px solid #eee;
           }
 
-          .scrollable-submenu ul li:last-child {
+          .sub_menu ul li:last-child {
             border-bottom: none;
           }
 
-          .scrollable-submenu ul li a {
+          .sub_menu ul li a {
             display: block;
             padding: 12px 16px;
             text-decoration: none;
@@ -466,15 +576,21 @@ const Header = () => {
             transition: background-color 0.3s ease;
           }
 
-          .scrollable-submenu ul li a:hover {
+          .sub_menu ul li a:hover {
             background-color: #f8f9fa;
             color: #007bff;
           }
 
-          /* Responsive adjustments */
+          /* Responsive adjustments for running message */
           @media (max-width: 768px) {
-            .submenu-scroll-container {
-              max-height: 300px;
+            .running-message-banner {
+              height: 35px;
+            }
+            .message-text {
+              font-size: 12px;
+            }
+            .notification-icon {
+              font-size: 14px;
             }
           }
         `}</style>
