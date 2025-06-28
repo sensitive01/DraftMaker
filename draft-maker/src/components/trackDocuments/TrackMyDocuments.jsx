@@ -158,10 +158,11 @@ const TrackMyDocuments = () => {
 
     return (
       <span
-        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${config.bg} ${config.text} ${config.border} border-2 shadow-sm`}
+        className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-semibold ${config.bg} ${config.text} ${config.border} border-2 shadow-sm`}
       >
-        <IconComponent className="w-4 h-4" />
-        {statusText}
+        <IconComponent className="w-3 h-3 sm:w-4 sm:h-4" />
+        <span className="hidden sm:inline">{statusText}</span>
+        <span className="sm:hidden">{statusText.substring(0, 4)}</span>
       </span>
     );
   };
@@ -184,7 +185,6 @@ const TrackMyDocuments = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    // Handle the format "21-06-2025 03:06:18 PM"
     const datePart = dateString.split(" ")[0];
     const [day, month, year] = datePart.split("-");
     const date = new Date(`${year}-${month}-${day}`);
@@ -233,31 +233,31 @@ const TrackMyDocuments = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-pink-50">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-12">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-3xl mb-8 shadow-xl">
-            <FileText className="w-10 h-10 text-white" />
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl sm:rounded-3xl mb-4 sm:mb-8 shadow-xl">
+            <FileText className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
           </div>
-          <h1 className="text-4xl font-bold text-red-700 mb-4 bg-gradient-to-r from-red-700 to-red-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-4xl font-bold text-red-700 mb-2 sm:mb-4 bg-gradient-to-r from-red-700 to-red-600 bg-clip-text text-transparent px-4">
             Legal Document Tracking
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed px-4">
             Track your legal document stamp applications with real-time status
             updates
           </p>
         </div>
 
         {/* Search Section */}
-        <div className="bg-white rounded-3xl shadow-2xl border border-red-100 p-10 mb-12 backdrop-blur-sm bg-opacity-90">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-red-100 p-4 sm:p-10 mb-8 sm:mb-12 backdrop-blur-sm bg-opacity-90">
           <div className="max-w-md mx-auto">
             <label
               htmlFor="mobileNumber"
-              className="block text-sm font-bold text-red-800 mb-6"
+              className="block text-sm font-bold text-red-800 mb-3 sm:mb-6"
             >
               Enter Mobile Number
             </label>
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="relative flex-1">
                 <input
                   type="tel"
@@ -267,18 +267,19 @@ const TrackMyDocuments = () => {
                     setMobileNumber(formatMobileNumber(e.target.value))
                   }
                   placeholder="10-digit mobile number"
-                  className="w-full px-4 py-4 pl-15 border-2 border-red-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-200 focus:border-red-500 transition-all text-lg font-medium"
+                  className="w-full px-4 py-3 sm:py-4 border-2 border-red-200 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-200 focus:border-red-500 transition-all text-base sm:text-lg font-medium"
                 />
               </div>
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-4 focus:ring-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-lg flex items-center gap-3 shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5"
+                className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl sm:rounded-2xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-4 focus:ring-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5"
               >
                 {loading ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Searching...
+                    <span className="hidden sm:inline">Searching...</span>
+                    <span className="sm:hidden">Loading...</span>
                   </>
                 ) : (
                   <>
@@ -293,93 +294,102 @@ const TrackMyDocuments = () => {
 
         {/* Results Section */}
         {showResults && (
-          <div className="space-y-10">
-            {/* Summary Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-              <div className="bg-white rounded-2xl p-4 shadow-xl border-2 border-red-100 hover:shadow-2xl transition-all hover:border-red-200 transform hover:-translate-y-1">
-                <div className="text-2xl font-bold text-red-700 mb-1">
+          <div className="space-y-6 sm:space-y-10">
+            {/* Summary Cards - Mobile Optimized */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-4">
+              <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-red-100 hover:shadow-2xl transition-all hover:border-red-200 transform hover:-translate-y-1">
+                <div className="text-lg sm:text-2xl font-bold text-red-700 mb-1">
                   {counts.total}
                 </div>
                 <div className="text-xs text-red-600 font-semibold">Total</div>
               </div>
-              <div className="bg-green-50 rounded-2xl p-4 shadow-xl border-2 border-green-200 hover:shadow-2xl transition-all hover:border-green-300 transform hover:-translate-y-1">
-                <div className="text-2xl font-bold text-green-700 mb-1">
+              <div className="bg-green-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-green-200 hover:shadow-2xl transition-all hover:border-green-300 transform hover:-translate-y-1">
+                <div className="text-lg sm:text-2xl font-bold text-green-700 mb-1">
                   {counts.completed}
                 </div>
                 <div className="text-xs text-green-600 font-semibold">
-                  Completed
+                  <span className="hidden sm:inline">Completed</span>
+                  <span className="sm:hidden">Done</span>
                 </div>
               </div>
-              <div className="bg-emerald-50 rounded-2xl p-4 shadow-xl border-2 border-emerald-200 hover:shadow-2xl transition-all hover:border-emerald-300 transform hover:-translate-y-1">
-                <div className="text-2xl font-bold text-emerald-700 mb-1">
+              <div className="bg-emerald-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-emerald-200 hover:shadow-2xl transition-all hover:border-emerald-300 transform hover:-translate-y-1">
+                <div className="text-lg sm:text-2xl font-bold text-emerald-700 mb-1">
                   {counts.delivered}
                 </div>
                 <div className="text-xs text-emerald-600 font-semibold">
-                  Delivered
+                  <span className="hidden sm:inline">Delivered</span>
+                  <span className="sm:hidden">Deliv</span>
                 </div>
               </div>
-              <div className="bg-teal-50 rounded-2xl p-4 shadow-xl border-2 border-teal-200 hover:shadow-2xl transition-all hover:border-teal-300 transform hover:-translate-y-1">
-                <div className="text-2xl font-bold text-teal-700 mb-1">
+              <div className="bg-teal-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-teal-200 hover:shadow-2xl transition-all hover:border-teal-300 transform hover:-translate-y-1">
+                <div className="text-lg sm:text-2xl font-bold text-teal-700 mb-1">
                   {counts.approved}
                 </div>
                 <div className="text-xs text-teal-600 font-semibold">
-                  Approved
+                  <span className="hidden sm:inline">Approved</span>
+                  <span className="sm:hidden">Appr</span>
                 </div>
               </div>
-              <div className="bg-cyan-50 rounded-2xl p-4 shadow-xl border-2 border-cyan-200 hover:shadow-2xl transition-all hover:border-cyan-300 transform hover:-translate-y-1">
-                <div className="text-2xl font-bold text-cyan-700 mb-1">
+              <div className="bg-cyan-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-cyan-200 hover:shadow-2xl transition-all hover:border-cyan-300 transform hover:-translate-y-1">
+                <div className="text-lg sm:text-2xl font-bold text-cyan-700 mb-1">
                   {counts.processed}
                 </div>
                 <div className="text-xs text-cyan-600 font-semibold">
-                  Processed
+                  <span className="hidden sm:inline">Processed</span>
+                  <span className="sm:hidden">Proc</span>
                 </div>
               </div>
-              <div className="bg-blue-50 rounded-2xl p-4 shadow-xl border-2 border-blue-200 hover:shadow-2xl transition-all hover:border-blue-300 transform hover:-translate-y-1">
-                <div className="text-2xl font-bold text-blue-700 mb-1">
+              <div className="bg-blue-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-blue-200 hover:shadow-2xl transition-all hover:border-blue-300 transform hover:-translate-y-1">
+                <div className="text-lg sm:text-2xl font-bold text-blue-700 mb-1">
                   {counts.processing}
                 </div>
                 <div className="text-xs text-blue-600 font-semibold">
-                  Processing
+                  <span className="hidden sm:inline">Processing</span>
+                  <span className="sm:hidden">Prog</span>
                 </div>
               </div>
-              <div className="bg-orange-50 rounded-2xl p-4 shadow-xl border-2 border-orange-200 hover:shadow-2xl transition-all hover:border-orange-300 transform hover:-translate-y-1">
-                <div className="text-2xl font-bold text-orange-700 mb-1">
+              <div className="bg-orange-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-orange-200 hover:shadow-2xl transition-all hover:border-orange-300 transform hover:-translate-y-1">
+                <div className="text-lg sm:text-2xl font-bold text-orange-700 mb-1">
                   {counts.pending}
                 </div>
                 <div className="text-xs text-orange-600 font-semibold">
-                  Pending
+                  <span className="hidden sm:inline">Pending</span>
+                  <span className="sm:hidden">Pend</span>
                 </div>
               </div>
-              <div className="bg-red-100 rounded-2xl p-4 shadow-xl border-2 border-red-300 hover:shadow-2xl transition-all hover:border-red-400 transform hover:-translate-y-1">
-                <div className="text-2xl font-bold text-red-800 mb-1">
+              <div className="bg-red-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-red-300 hover:shadow-2xl transition-all hover:border-red-400 transform hover:-translate-y-1">
+                <div className="text-lg sm:text-2xl font-bold text-red-800 mb-1">
                   {counts.cancelled}
                 </div>
                 <div className="text-xs text-red-700 font-semibold">
-                  Cancelled
+                  <span className="hidden sm:inline">Cancelled</span>
+                  <span className="sm:hidden">Canc</span>
                 </div>
               </div>
             </div>
 
-            {/* Filters */}
-            <div className="bg-white rounded-3xl shadow-2xl border border-red-100 p-8 backdrop-blur-sm bg-opacity-90">
-              <div className="flex flex-col lg:flex-row gap-6">
+            {/* Filters - Mobile Optimized */}
+            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-red-100 p-4 sm:p-8 backdrop-blur-sm bg-opacity-90">
+              <div className="flex flex-col gap-4 sm:gap-6">
                 <div className="flex-1">
                   <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-400 w-4 h-4 sm:w-5 sm:h-5" />
                     <input
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      placeholder="Search by document name, booking ID, or applicant name..."
-                      className="w-full px-4 py-4 pl-12 border-2 border-red-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-200 focus:border-red-500 transition-all font-medium"
+                      placeholder="Search documents..."
+                      className="w-full px-4 py-3 sm:py-4 pl-10 sm:pl-12 border-2 border-red-200 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-200 focus:border-red-500 transition-all font-medium text-sm sm:text-base"
                     />
                   </div>
                 </div>
-                <div className="lg:w-64">
+                <div>
                   <div className="relative">
+                    <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-400 w-4 h-4 sm:w-5 sm:h-5" />
                     <select
                       value={statusFilter}
                       onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full px-4 py-4 pl-12 pr-12 border-2 border-red-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-200 focus:border-red-500 transition-all appearance-none bg-white font-medium"
+                      className="w-full px-4 py-3 sm:py-4 pl-10 sm:pl-12 pr-10 sm:pr-12 border-2 border-red-200 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-200 focus:border-red-500 transition-all appearance-none bg-white font-medium text-sm sm:text-base"
                     >
                       <option value="all">All Status</option>
                       <option value="pending">Pending</option>
@@ -390,30 +400,30 @@ const TrackMyDocuments = () => {
                       <option value="completed">Completed</option>
                       <option value="cancelled">Cancelled</option>
                     </select>
-                    <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-400 w-5 h-5" />
+                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-400 w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                 </div>
               </div>
 
               {filteredDocuments.length !== documents.length && (
-                <div className="mt-6 text-sm text-red-600 font-semibold bg-red-50 px-4 py-3 rounded-xl border-2 border-red-200">
+                <div className="mt-4 sm:mt-6 text-xs sm:text-sm text-red-600 font-semibold bg-red-50 px-3 sm:px-4 py-2 sm:py-3 rounded-xl border-2 border-red-200">
                   Showing {filteredDocuments.length} of {documents.length}{" "}
                   documents
                 </div>
               )}
             </div>
 
-            {/* Documents Grid */}
-            <div className="space-y-8">
+            {/* Documents Grid - Mobile Optimized */}
+            <div className="space-y-4 sm:space-y-8">
               {filteredDocuments.length === 0 ? (
-                <div className="bg-white rounded-3xl shadow-2xl border border-red-100 p-16 text-center backdrop-blur-sm bg-opacity-90">
-                  <div className="text-red-300 mb-6">
-                    <FileText className="w-20 h-20 mx-auto" />
+                <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-red-100 p-8 sm:p-16 text-center backdrop-blur-sm bg-opacity-90">
+                  <div className="text-red-300 mb-4 sm:mb-6">
+                    <FileText className="w-12 h-12 sm:w-20 sm:h-20 mx-auto" />
                   </div>
-                  <h3 className="text-2xl font-bold text-red-800 mb-4">
+                  <h3 className="text-lg sm:text-2xl font-bold text-red-800 mb-2 sm:mb-4">
                     No documents found
                   </h3>
-                  <p className="text-red-600 text-lg">
+                  <p className="text-red-600 text-sm sm:text-lg">
                     {documents.length === 0
                       ? "No documents found for this mobile number."
                       : "Try adjusting your search criteria or filters."}
@@ -423,85 +433,89 @@ const TrackMyDocuments = () => {
                 filteredDocuments.map((doc) => (
                   <div
                     key={doc._id}
-                    className="bg-white rounded-3xl shadow-2xl border border-red-100 p-10 hover:shadow-3xl hover:border-red-200 transition-all transform hover:-translate-y-1 backdrop-blur-sm bg-opacity-90"
+                    className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-red-100 p-4 sm:p-10 hover:shadow-3xl hover:border-red-200 transition-all transform hover:-translate-y-1 backdrop-blur-sm bg-opacity-90"
                   >
-                    <div className="flex flex-col lg:flex-row lg:items-center gap-10">
-                      {/* Document Info */}
-                      <div className="flex-1 space-y-8">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className="text-2xl font-bold text-red-800 mb-3">
-                              {doc.documentType || "Document"}
-                            </h3>
-                            <p className="text-sm text-red-600 font-semibold bg-red-50 px-4 py-2 rounded-full inline-block border border-red-200">
-                              {doc.paymentDetails?.serviceName ||
-                                "Legal Document"}
-                            </p>
-                          </div>
+                    <div className="space-y-4 sm:space-y-6">
+                      {/* Document Header - Mobile Optimized */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                        <div className="flex-1">
+                          <h3 className="text-lg sm:text-2xl font-bold text-red-800 mb-2 sm:mb-3">
+                            {doc.documentType || "Document"}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-red-600 font-semibold bg-red-50 px-3 sm:px-4 py-1 sm:py-2 rounded-full inline-block border border-red-200">
+                            {doc.paymentDetails?.serviceName ||
+                              "Legal Document"}
+                          </p>
+                        </div>
+                        <div className="flex justify-start sm:justify-end">
                           {getStatusBadge(doc.doumentStatus)}
                         </div>
+                      </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                          <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center border-2 border-red-200">
-                              <Hash className="w-6 h-6 text-red-600" />
-                            </div>
-                            <div>
-                              <p className="text-xs text-red-500 font-bold uppercase tracking-wide mb-1">
-                                Booking ID
-                              </p>
-                              <p className="text-sm font-bold text-red-800">
-                                {doc.bookingId || "N/A"}
-                              </p>
-                            </div>
+                      {/* Document Details - Mobile Optimized */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <div className="w-10 h-10 sm:w-14 sm:h-14 bg-red-50 rounded-xl sm:rounded-2xl flex items-center justify-center border-2 border-red-200 flex-shrink-0">
+                            <Hash className="w-4 h-4 sm:w-6 sm:h-6 text-red-600" />
                           </div>
-
-                          <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center border-2 border-red-200">
-                              <User className="w-6 h-6 text-red-600" />
-                            </div>
-                            <div>
-                              <p className="text-xs text-red-500 font-bold uppercase tracking-wide mb-1">
-                                Applicant
-                              </p>
-                              <p className="text-sm font-bold text-red-800">
-                                {doc.userName ||doc.requestorName || "N/A"}
-                              </p>
-                            </div>
+                          <div className="min-w-0">
+                            <p className="text-xs text-red-500 font-bold uppercase tracking-wide mb-1">
+                              Booking ID
+                            </p>
+                            <p className="text-sm font-bold text-red-800 truncate">
+                              {doc.bookingId || "N/A"}
+                            </p>
                           </div>
+                        </div>
 
-                          <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center border-2 border-red-200">
-                              <Calendar className="w-6 h-6 text-red-600" />
-                            </div>
-                            <div>
-                              <p className="text-xs text-red-500 font-bold uppercase tracking-wide mb-1">
-                                Submitted
-                              </p>
-                              <p className="text-sm font-bold text-red-800">
-                                {formatDate(doc.createdAt)}
-                              </p>
-                            </div>
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <div className="w-10 h-10 sm:w-14 sm:h-14 bg-red-50 rounded-xl sm:rounded-2xl flex items-center justify-center border-2 border-red-200 flex-shrink-0">
+                            <User className="w-4 h-4 sm:w-6 sm:h-6 text-red-600" />
                           </div>
+                          <div className="min-w-0">
+                            <p className="text-xs text-red-500 font-bold uppercase tracking-wide mb-1">
+                              Applicant
+                            </p>
+                            <p className="text-sm font-bold text-red-800 truncate">
+                              {doc.userName || doc.requestorName || "N/A"}
+                            </p>
+                          </div>
+                        </div>
 
-                          <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center border-2 border-red-200">
-                              <IndianRupee className="w-6 h-6 text-red-600" />
-                            </div>
-                            <div>
-                              <p className="text-xs text-red-500 font-bold uppercase tracking-wide mb-1">
-                                Amount Paid
-                              </p>
-                              <p className="text-lg font-bold text-red-800">
-                                ₹{doc.paymentDetails?.paidAmount ||doc.totalAmount ||"0"}
-                              </p>
-                            </div>
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <div className="w-10 h-10 sm:w-14 sm:h-14 bg-red-50 rounded-xl sm:rounded-2xl flex items-center justify-center border-2 border-red-200 flex-shrink-0">
+                            <Calendar className="w-4 h-4 sm:w-6 sm:h-6 text-red-600" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs text-red-500 font-bold uppercase tracking-wide mb-1">
+                              Submitted
+                            </p>
+                            <p className="text-sm font-bold text-red-800">
+                              {formatDate(doc.createdAt)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <div className="w-10 h-10 sm:w-14 sm:h-14 bg-red-50 rounded-xl sm:rounded-2xl flex items-center justify-center border-2 border-red-200 flex-shrink-0">
+                            <IndianRupee className="w-4 h-4 sm:w-6 sm:h-6 text-red-600" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs text-red-500 font-bold uppercase tracking-wide mb-1">
+                              Amount Paid
+                            </p>
+                            <p className="text-base sm:text-lg font-bold text-red-800">
+                              ₹
+                              {doc.paymentDetails?.paidAmount ||
+                                doc.totalAmount ||
+                                "0"}
+                            </p>
                           </div>
                         </div>
                       </div>
 
-                      {/* WhatsApp Action */}
-                      <div className="flex justify-center">
+                      {/* WhatsApp Action - Mobile Optimized */}
+                      <div className="flex justify-center sm:justify-end pt-2 sm:pt-0">
                         <button
                           onClick={() =>
                             handleWhatsAppMessage(
@@ -509,10 +523,10 @@ const TrackMyDocuments = () => {
                               doc.mobileNumber
                             )
                           }
-                          className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl hover:from-green-600 hover:to-green-700 transition-all font-bold shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-green-200"
+                          className="flex items-center gap-2 sm:gap-3 px-4 sm:px-8 py-2 sm:py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl sm:rounded-2xl hover:from-green-600 hover:to-green-700 transition-all font-bold shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-green-200 text-sm sm:text-base w-full sm:w-auto justify-center"
                         >
-                          <MessageCircle className="w-5 h-5" />
-                          WhatsApp
+                          <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                          WhatsApp Support
                         </button>
                       </div>
                     </div>
