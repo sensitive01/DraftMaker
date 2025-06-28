@@ -801,9 +801,7 @@ const BuyEStampDocuments = () => {
                 type="number"
                 id="quantity"
                 value={quantity}
-                onChange={(e) =>
-                  setQuantity(Math.max(1, parseInt(e.target.value) || 1))
-                }
+                onChange={(e) => setQuantity(e.target.value)}
                 placeholder="Enter quantity"
                 min="1"
                 className={`w-full px-4 py-2.5 border ${
