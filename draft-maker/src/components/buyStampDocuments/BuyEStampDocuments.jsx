@@ -21,8 +21,7 @@ const BuyEStampDocuments = () => {
   const [description, setDescription] = useState("");
   const [deliveryType, setDeliveryType] = useState("in-store");
   const [selectedDeliveryService, setSelectedDeliveryService] = useState("");
-  const [isConsideration, setIsConsideration] = useState(false);
-  const [quantity,setQuantity] = useState(0)
+  const [quantity, setQuantity] = useState(1);
 
   const [deliveryAddress, setDeliveryAddress] = useState({
     addressLine1: "",
@@ -68,9 +67,10 @@ const BuyEStampDocuments = () => {
   const calculateProgress = () => {
     const selectedDocumentData = getSelectedDocumentData();
     const isFixedType = selectedDocumentData?.calculationType === "fixed";
+    const isSpecialDocument = selectedDocument === "684143fdb333b68bfef00574";
 
     let completedSteps = 0;
-    let totalSteps = isFixedType ? 5 : 6; // Base steps
+    let totalSteps = isFixedType && !isSpecialDocument ? 5 : 6; // Base steps
 
     // Add delivery address steps if delivery is selected
     if (deliveryType === "delivery") {
@@ -84,8 +84,12 @@ const BuyEStampDocuments = () => {
     if (selectedDocument) completedSteps++;
     if (description.trim()) completedSteps++;
 
-    // Only count consideration amount for percentage type
-    if (!isFixedType && considerationAmount.trim()) completedSteps++;
+    // Count consideration amount for percentage type or special document
+    if ((!isFixedType || isSpecialDocument) && considerationAmount.trim())
+      completedSteps++;
+
+    // Count quantity field
+    if (quantity > 0) completedSteps++;
 
     // Count delivery address steps if applicable
     if (deliveryType === "delivery") {
@@ -102,6 +106,7 @@ const BuyEStampDocuments = () => {
     const errors = {};
     const selectedDocumentData = getSelectedDocumentData();
     const isFixedType = selectedDocumentData?.calculationType === "fixed";
+    const isSpecialDocument = selectedDocument === "684143fdb333b68bfef00574";
 
     if (!firstPartyName.trim()) {
       errors.firstPartyName = "First party name is required";
@@ -117,6 +122,10 @@ const BuyEStampDocuments = () => {
 
     if (!selectedDocument) {
       errors.selectedDocument = "Please select a document type";
+    }
+
+    if (quantity <= 0) {
+      errors.quantity = "Quantity must be at least 1";
     }
 
     if (deliveryType === "delivery") {
@@ -140,8 +149,8 @@ const BuyEStampDocuments = () => {
       }
     }
 
-    // Only validate consideration amount for percentage type
-    if (!isFixedType) {
+    // Validate consideration amount for percentage type or special document
+    if (!isFixedType || isSpecialDocument) {
       if (!considerationAmount.trim()) {
         errors.considerationAmount = "Consideration amount is required";
       } else if (
@@ -150,10 +159,6 @@ const BuyEStampDocuments = () => {
       ) {
         errors.considerationAmount = "Please enter a valid amount";
       }
-    }
-
-    if (deliveryType === "delivery" && !selectedDeliveryService) {
-      errors.selectedDeliveryService = "Please select a delivery service";
     }
 
     setFormErrors(errors);
@@ -192,10 +197,13 @@ const BuyEStampDocuments = () => {
     if (!selectedDocumentData) return 0;
 
     if (selectedDocumentData.calculationType === "fixed") {
-      return selectedDocumentData.fixedAmount;
+      return selectedDocumentData.fixedAmount * quantity;
     }
 
-    if (selectedDocumentData.calculationType === "percentage") {
+    if (
+      selectedDocumentData.calculationType === "percentage" ||
+      selectedDocument === "684143fdb333b68bfef00574"
+    ) {
       if (!considerationAmount || isNaN(considerationAmount)) return 0;
 
       const amount = parseFloat(considerationAmount);
@@ -236,7 +244,7 @@ const BuyEStampDocuments = () => {
         }
       }
 
-      return Math.round(stampDuty);
+      return Math.round(stampDuty) * quantity;
     }
 
     return 0;
@@ -268,6 +276,7 @@ const BuyEStampDocuments = () => {
     setSelectedDeliveryService("");
     setRequestorName("");
     setMobileNumber("");
+    setQuantity(1);
     setFormErrors({});
     setPaymentErrors({});
     setDeliveryAddress({
@@ -307,10 +316,12 @@ const BuyEStampDocuments = () => {
         documentType: selectedDocumentData?.documentType,
         calculationType: selectedDocumentData?.calculationType,
         considerationAmount:
-          selectedDocumentData?.calculationType === "percentage"
+          selectedDocumentData?.calculationType === "percentage" ||
+          selectedDocument === "684143fdb333b68bfef00574"
             ? parseFloat(considerationAmount)
             : null,
         description: description.trim(),
+        quantity: quantity,
 
         // Calculated Amounts
         stampDutyAmount: calculateStampAmount(),
@@ -443,11 +454,14 @@ const BuyEStampDocuments = () => {
     if (!selectedDocumentData) return null;
 
     if (selectedDocumentData.calculationType === "fixed") {
-      return `₹${selectedDocumentData.fixedAmount}`;
+      return `₹${
+        selectedDocumentData.fixedAmount
+      } × ${quantity} = ₹${calculateStampAmount()}`;
     }
 
     if (
-      selectedDocumentData.calculationType === "percentage" &&
+      (selectedDocumentData.calculationType === "percentage" ||
+        selectedDocument === "684143fdb333b68bfef00574") &&
       considerationAmount &&
       !isNaN(considerationAmount)
     ) {
@@ -460,27 +474,45 @@ const BuyEStampDocuments = () => {
 
       if (minAmount === 0 && maxAmount === 0) {
         return amount <= 100000
-          ? `${percentage}% of ₹${amount.toLocaleString(
+          ? `${percentage}% of ₹${amount.toLocaleString("en-IN")} = ₹${(
+              (amount * percentage) /
+              100
+            ).toLocaleString(
               "en-IN"
-            )} = ₹${calculateStampAmount()} (Minimum: ₹100)`
-          : `${percentage}%of ₹${amount.toLocaleString(
+            )} × ${quantity} = ₹${calculateStampAmount().toLocaleString(
               "en-IN"
-            )} = ₹${calculateStampAmount()}`;
+            )} (Minimum: ₹100)`
+          : `${percentage}% of ₹${amount.toLocaleString("en-IN")} = ₹${(
+              (amount * percentage) /
+              100
+            ).toLocaleString(
+              "en-IN"
+            )} × ${quantity} = ₹${calculateStampAmount().toLocaleString(
+              "en-IN"
+            )}`;
       } else {
         if (amount <= 100000) {
-          return `${percentage}% of ₹${amount.toLocaleString(
+          return `${percentage}% of ₹${amount.toLocaleString("en-IN")} = ₹${(
+            (amount * percentage) /
+            100
+          ).toLocaleString(
             "en-IN"
-          )} = ₹${calculateStampAmount()}${
-            minAmount > 0 ? ` (Minimum: ₹${minAmount})` : ""
-          }`;
+          )} × ${quantity} = ₹${calculateStampAmount().toLocaleString(
+            "en-IN"
+          )}${minAmount > 0 ? ` (Minimum: ₹${minAmount})` : ""}`;
         } else {
           return maxAmount >= 0
-            ? `Fixed amount of ₹${maxAmount} for amounts above ₹1,00,000`
-            : `${percentage}% of ₹${amount.toLocaleString(
+            ? `Fixed amount of ₹${maxAmount} × ${quantity} = ₹${calculateStampAmount().toLocaleString(
                 "en-IN"
-              )} = ₹${calculateStampAmount()}${
-                minAmount > 0 ? ` (Minimum: ₹${minAmount})` : ""
-              }`;
+              )} for amounts above ₹1,00,000`
+            : `${percentage}% of ₹${amount.toLocaleString("en-IN")} = ₹${(
+                (amount * percentage) /
+                100
+              ).toLocaleString(
+                "en-IN"
+              )} × ${quantity} = ₹${calculateStampAmount().toLocaleString(
+                "en-IN"
+              )}${minAmount > 0 ? ` (Minimum: ₹${minAmount})` : ""}`;
         }
       }
     }
@@ -723,101 +755,11 @@ const BuyEStampDocuments = () => {
                 </p>
               )}
             </div>
-            <div className="mb-6">
-              {/* Toggle Switch with Clear State Indicators */}
-              <div className="flex items-center">
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isConsideration}
-                    onChange={() => setIsConsideration(!isConsideration)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-red-600 transition-colors duration-200">
-                    {/* Knob with check/x indicator */}
-                    <div
-                      className={`absolute top-0.5 left-0.5 flex items-center justify-center w-5 h-5 bg-white rounded-full transition-transform duration-200 ${
-                        isConsideration ? "transform translate-x-5" : ""
-                      }`}
-                    >
-                      {isConsideration ? (
-                        <svg
-                          className="w-3 h-3 text-red-600"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      ) : (
-                        <svg
-                          className="w-3 h-3 text-gray-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      )}
-                    </div>
-                  </div>
-                  <span className="ml-3 text-sm font-medium text-gray-700">
-                    {isConsideration ? (
-                      <span className="text-red-600">
-                        Consideration Amount Enabled
-                      </span>
-                    ) : (
-                      "Add Consideration Amount"
-                    )}
-                  </span>
-                </label>
-              </div>
 
-              {/* Input Box - Only shown when toggle is ON */}
-              {isConsideration && (
-                <div className="mt-4 animate-fadeIn">
-                  <label
-                    htmlFor="considerationAmount"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Consideration Amount (₹) *
-                  </label>
-                  <input
-                    type="number"
-                    id="considerationAmount"
-                    value={considerationAmount}
-                    onChange={(e) => setConsiderationAmount(e.target.value)}
-                    placeholder="Enter consideration amount"
-                    min="0"
-                    step="0.01"
-                    className={`w-full px-4 py-2.5 border ${
-                      formErrors.considerationAmount
-                        ? "border-red-300"
-                        : "border-gray-300"
-                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-                  />
-                  {formErrors.considerationAmount && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {formErrors.considerationAmount}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Consideration Amount - Only show for percentage calculation type */}
+            {/* Consideration Amount - Show for percentage calculation type or special document */}
             {selectedDocument &&
-              getSelectedDocumentData()?.calculationType === "percentage" && (
+              (getSelectedDocumentData()?.calculationType === "percentage" ||
+                selectedDocument === "684143fdb333b68bfef00574") && (
                 <div className="mb-6">
                   <label
                     htmlFor="considerationAmount"
@@ -846,11 +788,38 @@ const BuyEStampDocuments = () => {
                   )}
                 </div>
               )}
-         
+
+            {/* Quantity Field */}
+            <div className="mb-6">
+              <label
+                htmlFor="quantity"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Quantity *
+              </label>
+              <input
+                type="number"
+                id="quantity"
+                value={quantity}
+                onChange={(e) =>
+                  setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+                }
+                placeholder="Enter quantity"
+                min="1"
+                className={`w-full px-4 py-2.5 border ${
+                  formErrors.quantity ? "border-red-300" : "border-gray-300"
+                } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+              />
+              {formErrors.quantity && (
+                <p className="mt-1 text-sm text-red-600">
+                  {formErrors.quantity}
+                </p>
+              )}
+            </div>
 
             {/* Show stamp duty calculation */}
             {selectedDocument && getCalculationExplanation() && (
-              <div className="mb-6  pt-3 bg-blue-50 border border-blue-200 rounded-md">
+              <div className="mb-6 pt-3 bg-blue-50 border border-blue-200 rounded-md">
                 <div className="flex items-start ml-2">
                   <svg
                     className="w-4 h-4 text-blue-500 mt-0.5 mr-2 flex-shrink-0"
@@ -867,40 +836,12 @@ const BuyEStampDocuments = () => {
                   </svg>
                   <div className="text-sm">
                     <p className="font-medium text-blue-800">
-                      Stamp Duty : {getCalculationExplanation()}
+                      Stamp Duty Calculation: {getCalculationExplanation()}
                     </p>
                   </div>
                 </div>
               </div>
             )}
-
-               <div className="mb-6">
-              <label
-                htmlFor="considerationAmount"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Quantity *
-              </label>
-              <input
-                type="number"
-                id="qunatity"
-                value={quantity}
-                onChange={(e) => setConsiderationAmount(e.target.value)}
-                placeholder="Enter consideration amount"
-                min="0"
-                step="0.01"
-                className={`w-full px-4 py-2.5 border ${
-                  formErrors.considerationAmount
-                    ? "border-red-300"
-                    : "border-gray-300"
-                } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-              />
-              {formErrors.considerationAmount && (
-                <p className="mt-1 text-sm text-red-600">
-                  {formErrors.considerationAmount}
-                </p>
-              )}
-            </div>
 
             {/* Description */}
             <div className="mb-6">
@@ -1057,7 +998,6 @@ const BuyEStampDocuments = () => {
                       </option>
                     ))}
                   </select>
-                  {/* Custom dropdown arrow */}
                   <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                     <svg
                       className="w-4 h-4 text-gray-400"
@@ -1560,7 +1500,6 @@ const BuyEStampDocuments = () => {
               )}
             </div>
 
-            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3">
               <button
                 onClick={() => setShowPaymentModal(false)}
