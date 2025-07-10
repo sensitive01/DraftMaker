@@ -42,8 +42,8 @@ const BuyEStampDocuments = () => {
   const [formErrors, setFormErrors] = useState({});
   const [paymentErrors, setPaymentErrors] = useState({});
 
-  // Service charge including GST (fixed for all documents)
-  const SERVICE_CHARGE = 210;
+  // Service charge including GST (fixed per document)
+  const SERVICE_CHARGE_PER_DOCUMENT = 210;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -250,13 +250,19 @@ const BuyEStampDocuments = () => {
     return 0;
   };
 
+  // Calculate total service charge based on quantity
+  const calculateServiceCharge = () => {
+    return SERVICE_CHARGE_PER_DOCUMENT * quantity;
+  };
+
   const getTotalAmount = () => {
     const deliveryData = getSelectedDeliveryData();
     const stampAmount = calculateStampAmount();
+    const serviceCharge = calculateServiceCharge();
     const deliveryAmount =
       deliveryType === "delivery" && deliveryData ? deliveryData.charge : 0;
 
-    return stampAmount + SERVICE_CHARGE + deliveryAmount;
+    return stampAmount + serviceCharge + deliveryAmount;
   };
 
   const handleProceedToPayment = () => {
@@ -325,7 +331,7 @@ const BuyEStampDocuments = () => {
 
         // Calculated Amounts
         stampDutyAmount: calculateStampAmount(),
-        serviceCharge: SERVICE_CHARGE,
+        serviceCharge: calculateServiceCharge(),
 
         // Delivery Information
         deliveryType: deliveryType,
@@ -1353,7 +1359,8 @@ const BuyEStampDocuments = () => {
                       Service Charge (Inc. GST):
                     </span>
                     <span className="font-medium text-gray-900">
-                      ₹{SERVICE_CHARGE}
+                      ₹{SERVICE_CHARGE_PER_DOCUMENT} × {quantity} = ₹
+                      {calculateServiceCharge()}
                     </span>
                   </div>
                   {deliveryType === "delivery" && selectedDeliveryService && (
