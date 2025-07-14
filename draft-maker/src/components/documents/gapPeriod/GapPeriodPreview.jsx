@@ -32,9 +32,9 @@ export default function AffidavitDisplay({ data, onEdit }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md">
+<div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
       {/* Affidavit content */}
-      <div className="print-container p-4 sm:p-6 md:p-8 border border-gray-300 rounded-lg relative">
+      <div className="print-container p-2 sm:p-4 md:p-6 lg:p-8 border border-gray-300 rounded-lg relative">
         {/* Watermark */}
         <div className="watermark">INTERNAL PURPOSE ONLY</div>
 
@@ -126,9 +126,7 @@ export default function AffidavitDisplay({ data, onEdit }) {
                       </td>
                       <td className="border border-gray-400 px-1 sm:px-3 py-2">
                         {period.reason ? (
-                          <span className="block break-words">
-                            {period.reason}
-                          </span>
+                          <span className="block break-words">{period.reason}</span>
                         ) : (
                           <span className="bg-yellow-100 px-1 block text-center">
                             ________
@@ -206,29 +204,32 @@ export default function AffidavitDisplay({ data, onEdit }) {
 
         @media (max-width: 639px) {
           .max-w-4xl {
-            margin: 0.5rem;
+            margin: 0;
+            max-width: 100%;
           }
-
+          
           .rounded-lg {
-            border-radius: 0.5rem;
+            border-radius: 0.25rem;
           }
-
+          
           .shadow-md {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
           }
-
+          
           table {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
           }
-
-          th,
-          td {
-            padding: 0.25rem 0.5rem;
+          
+          th, td {
+            padding: 0.25rem 0.25rem;
           }
-
+          
           .watermark {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
+          }
+          
+          .print-container {
+            padding: 0.5rem;
           }
         }
 

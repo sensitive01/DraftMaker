@@ -436,7 +436,7 @@ export default function GapPeriod() {
   };
 
   return (
-    <div className="container-fluid mx-auto py-4 sm:py-6 md:py-8 px-2 sm:px-4 md:px-6">
+    <div className="container-fluid mx-auto py-2 sm:py-4 md:py-6 lg:py-8 px-1 sm:px-2 md:px-4 lg:px-6">
       {/* Add Error Notification Component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
@@ -445,7 +445,7 @@ export default function GapPeriod() {
         />
       )}
 
-      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-2 sm:gap-4 md:gap-6 lg:gap-8">
         {/* Left column: Form */}
         <div className="print:hidden w-full">
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 md:p-8 mb-4 lg:mb-0">
@@ -466,11 +466,11 @@ export default function GapPeriod() {
 
         {/* Right column: Preview */}
         <div className="w-full">
-          <div className="bg-gray-50 rounded-lg  sm:p-4 md:p-2">
-            <h3 className="text-lg sm:text-xl font-semibold mb-4 text-center text-gray-800 lg:hidden">
+          <div className="bg-gray-50 rounded-lg p-1 sm:p-2 md:p-4 lg:p-6">
+            <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4 text-center text-gray-800 lg:hidden">
               Preview
             </h3>
-            <div className="transform scale-75 sm:scale-90 md:scale-100 origin-top">
+            <div className="transform scale-90 sm:scale-95 md:scale-100 origin-top -mx-2 sm:mx-0">
               <AffidavitDisplay data={formData} />
             </div>
           </div>
