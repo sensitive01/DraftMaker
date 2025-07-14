@@ -21,6 +21,7 @@ import {
   createGassAffadavitPaymentData,
   createVehicleInsurencePaymentData,
 } from "../../api/service/axiosService";
+import DocumentDelivaryAddress from "./DocumentDelivaryAddress";
 
 const DocumentPaymentPage = () => {
   const location = useLocation();
@@ -41,8 +42,6 @@ const DocumentPaymentPage = () => {
   const [deliveryChargeOptions, setDeliveryChargeOptions] = useState([]);
   const [selectedStampDuty, setSelectedStampDuty] = useState(null);
   const [selectedDeliveryCharge, setSelectedDeliveryCharge] = useState(null);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [paymentDetails, setPaymentDetails] = useState(null);
   const [deliveryAddress, setDeliveryAddress] = useState({
     addressLine1: "",
     addressLine2: "",
@@ -50,6 +49,11 @@ const DocumentPaymentPage = () => {
     state: "",
     pincode: "",
   });
+
+  // New state variables for e-stamp logic
+  const [considerationAmount, setConsiderationAmount] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const SERVICE_CHARGE_PER_DOCUMENT = 210;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,6 +67,24 @@ const DocumentPaymentPage = () => {
     };
     fetchData();
   }, []);
+
+  // Auto-select stamp duty based on formId
+  useEffect(() => {
+    if (stampDutyOptions.length > 0 && formId) {
+      let stampDutyId;
+      
+      if (formId === "DM-CFD-17") {
+        stampDutyId = "684145ffb333b68bfef00580";
+      } else if (formId === "DM-RFD-18") {
+        stampDutyId = "6841457bb333b68bfef0057c";
+      } else {
+        stampDutyId = "68414437b333b68bfef00576";
+      }
+      
+      const selectedStamp = stampDutyOptions.find(sd => sd._id === stampDutyId);
+      setSelectedStampDuty(selectedStamp || null);
+    }
+  }, [stampDutyOptions, formId]);
 
   const getServiceOptions = () => [
     {
@@ -98,6 +120,7 @@ const DocumentPaymentPage = () => {
   ];
 
   const handlePackageSelect = (service) => {
+    console.log("Selected Service:", service);
     setSelectedService(service);
     if (!service.requiresStamp) {
       setSelectedStampDuty(null);
@@ -106,6 +129,7 @@ const DocumentPaymentPage = () => {
       setSelectedDeliveryCharge(null);
     }
   };
+
   const handleAddressChange = (field, value) => {
     setDeliveryAddress((prev) => ({
       ...prev,
@@ -113,32 +137,24 @@ const DocumentPaymentPage = () => {
     }));
   };
 
-  const handleStampDutySelect = (e) => {
-    const selectedId = e.target.value;
-    const stampDuty = stampDutyOptions.find((sd) => sd._id === selectedId);
-    setSelectedStampDuty(stampDuty || null);
-  };
-
-  const handleDeliveryChargeSelect = (e) => {
-    const selectedId = e.target.value;
-    const deliveryCharge = deliveryChargeOptions.find(
-      (dc) => dc._id === selectedId
-    );
-    setSelectedDeliveryCharge(deliveryCharge || null);
-  };
-
   const calculateStampDutyAmount = (stampDuty, baseAmount = 1000) => {
+    if (!stampDuty) return 0;
+    
     if (stampDuty.calculationType === "fixed") {
-      return stampDuty.fixedAmount;
+      return stampDuty.fixedAmount * quantity;
     } else if (stampDuty.calculationType === "percentage") {
-      let amount = (baseAmount * stampDuty.percentage) / 100;
+      // Use consideration amount if provided, otherwise fallback to baseAmount
+      const amount = considerationAmount ? parseFloat(considerationAmount) : baseAmount;
+      let calculatedAmount = (amount * stampDuty.percentage) / 100;
+      
       if (stampDuty.minAmount > 0) {
-        amount = Math.max(amount, stampDuty.minAmount);
+        calculatedAmount = Math.max(calculatedAmount, stampDuty.minAmount);
       }
       if (stampDuty.maxAmount > 0) {
-        amount = Math.min(amount, stampDuty.maxAmount);
+        calculatedAmount = Math.min(calculatedAmount, stampDuty.maxAmount);
       }
-      return amount;
+      
+      return calculatedAmount * quantity;
     }
     return 0;
   };
@@ -154,6 +170,7 @@ const DocumentPaymentPage = () => {
 
     if (selectedService.requiresStamp && selectedStampDuty) {
       total += calculateStampDutyAmount(selectedStampDuty);
+      total += SERVICE_CHARGE_PER_DOCUMENT * quantity; // Add service charge
     }
 
     if (selectedService.requiresDelivery && selectedDeliveryCharge) {
@@ -178,6 +195,14 @@ const DocumentPaymentPage = () => {
           return false;
         }
       }
+    }
+
+    // Validate consideration amount for percentage-based stamps
+    if (
+      selectedStampDuty?.calculationType === "percentage" && 
+      (!considerationAmount || isNaN(parseFloat(considerationAmount)))
+    ) {
+      return false;
     }
 
     return true;
@@ -224,6 +249,9 @@ const DocumentPaymentPage = () => {
               deliveryAddress: selectedService?.requiresDelivery
                 ? JSON.stringify(deliveryAddress)
                 : null,
+              considerationAmount: considerationAmount,
+              quantity: quantity,
+              serviceCharge: SERVICE_CHARGE_PER_DOCUMENT * quantity,
             },
           });
         },
@@ -284,9 +312,6 @@ const DocumentPaymentPage = () => {
 
   const handlePaymentSuccess = async (paymentData) => {
     try {
-      setPaymentSuccess(true);
-      setPaymentDetails(paymentData);
-
       const paymentConfirmationData = {
         paymentId: paymentData.razorpay_payment_id,
         orderId: paymentData.razorpay_order_id,
@@ -308,6 +333,8 @@ const DocumentPaymentPage = () => {
         deliveryAddress: selectedService?.requiresDelivery
           ? deliveryAddress
           : null,
+        considerationAmount: considerationAmount,
+        quantity: quantity,
       };
       let confirmationResponse;
 
@@ -641,24 +668,75 @@ const DocumentPaymentPage = () => {
                           </span>
                         </div>
                       )}
-                      {/* <div className="border-t pt-2 flex justify-between items-center">
-                        <span className="font-bold text-gray-800">Total:</span>
-                        <span className="font-bold text-red-600 text-xl">
-                          ₹
-                          {selectedService?.id === service.id
-                            ? calculateTotalAmount()
-                            : service.price +
-                              (service.hasNotary ? service.notaryCharge : 0)}
-                        </span>
-                      </div> */}
                     </div>
                   </div>
                 </button>
               ))}
             </div>
 
-            {/* Stamp Duty Selection - Dropdown */}
-            {selectedService?.requiresStamp && (
+            {/* Document Details Section */}
+            {selectedService?.requiresStamp && selectedStampDuty && (
+              <div className="mb-6 p-6 bg-gray-50 rounded-xl border">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Document Details
+                </h3>
+                
+                {/* Quantity Field */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Quantity
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value) || 1}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all text-md"
+                  />
+                </div>
+                
+                {/* Consideration Amount (only show for percentage-based stamps) */}
+                {selectedStampDuty.calculationType === "percentage" && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Consideration Amount (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={considerationAmount}
+                      onChange={(e) => setConsiderationAmount(e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all text-md"
+                      placeholder="Enter amount"
+                    />
+                  </div>
+                )}
+                
+                {/* Calculation Explanation */}
+                <div className="bg-white p-4 rounded-lg border border-red-200 mt-4">
+                  <h4 className="font-medium text-gray-800 mb-2">Calculation Details</h4>
+                  <div className="space-y-2 text-sm">
+                    <p>
+                      <span className="text-gray-600">Stamp Duty:</span> ₹
+                      {calculateStampDutyAmount(selectedStampDuty)}
+                    </p>
+                    <p>
+                      <span className="text-gray-600">Service Charge:</span> ₹
+                      {SERVICE_CHARGE_PER_DOCUMENT * quantity}
+                    </p>
+                    {selectedStampDuty.calculationType === "percentage" && (
+                      <p className="text-gray-600 italic">
+                        {selectedStampDuty.percentage}% of ₹
+                        {considerationAmount || "0"} × {quantity}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Stamp Duty Information - Readonly */}
+            {selectedService?.requiresStamp && selectedStampDuty && (
               <div className="mb-6 p-6 bg-gray-50 rounded-xl border">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                   <svg
@@ -675,55 +753,33 @@ const DocumentPaymentPage = () => {
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
                   </svg>
-                  Select Stamp Duty Type
+                  Stamp Duty Information
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Choose Stamp Duty Option
-                    </label>
-                    <select
-                      value={selectedStampDuty?._id || ""}
-                      onChange={handleStampDutySelect}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all text-md"
-                    >
-                      <option value="">-- Select Stamp Duty --</option>
-                      {stampDutyOptions.map((stampDuty) => (
-                        <option key={stampDuty._id} value={stampDuty._id}>
-                          {stampDuty.documentType}
-                          {stampDuty.calculationType === "fixed"
-                            ? ` (₹${stampDuty.fixedAmount})`
-                            : ` (${stampDuty.percentage}% - Min: ₹${
-                                stampDuty.minAmount
-                              }${
-                                stampDuty.maxAmount > 0
-                                  ? `, Max: ₹${stampDuty.maxAmount}`
-                                  : ""
-                              })`}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  {selectedStampDuty && (
-                    <div className="bg-white p-4 rounded-lg border border-red-200">
-                      <h4 className="font-large text-gray-800 mb-2">
-                        Selected Stamp Duty
-                      </h4>
-                      <div className="space-y-1 text-lg">
-                        <p>
-                          <span className="text-gray-600">Document Type:</span>{" "}
-                          {selectedStampDuty.documentType}
-                        </p>
-                        <p>
-                          <span className="text-gray-600">Article No:</span>{" "}
-                          {selectedStampDuty.articleNo}
-                        </p>
-                        <p className="font-bold text-red-600 text-lg">
-                          Amount: ₹{calculateStampDutyAmount(selectedStampDuty)}
-                        </p>
-                      </div>
+                  <div className="bg-white p-4 rounded-lg border border-red-200">
+                    <h4 className="font-medium text-gray-800 mb-2">
+                      Selected Stamp Duty
+                    </h4>
+                    <div className="space-y-1 text-sm">
+                      <p>
+                        <span className="text-gray-600">Document Type:</span>{" "}
+                        {selectedStampDuty.documentType}
+                      </p>
+                      <p>
+                        <span className="text-gray-600">Article No:</span>{" "}
+                        {selectedStampDuty.articleNo}
+                      </p>
+                      <p>
+                        <span className="text-gray-600">Calculation:</span>{" "}
+                        {selectedStampDuty.calculationType === "fixed"
+                          ? `Fixed ₹${selectedStampDuty.fixedAmount}`
+                          : `${selectedStampDuty.percentage}%`}
+                      </p>
+                      <p className="font-bold text-red-600 text-lg">
+                        Total Stamp Duty: ₹{calculateStampDutyAmount(selectedStampDuty)}
+                      </p>
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
             )}
@@ -755,7 +811,13 @@ const DocumentPaymentPage = () => {
                     </label>
                     <select
                       value={selectedDeliveryCharge?._id || ""}
-                      onChange={handleDeliveryChargeSelect}
+                      onChange={(e) => {
+                        const selectedId = e.target.value;
+                        const deliveryCharge = deliveryChargeOptions.find(
+                          (dc) => dc._id === selectedId
+                        );
+                        setSelectedDeliveryCharge(deliveryCharge || null);
+                      }}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all text-lg"
                     >
                       <option value="">-- Select Delivery Service --</option>
@@ -795,153 +857,10 @@ const DocumentPaymentPage = () => {
             )}
 
             {selectedService?.requiresDelivery && selectedDeliveryCharge && (
-              <div className="mt-6 p-6 bg-blue-50 rounded-xl border border-blue-200">
-                <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2 text-blue-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  Enter Delivery Address
-                </h4>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress.fullName}
-                      onChange={(e) =>
-                        handleAddressChange("fullName", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-                      placeholder="Enter full name"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      value={deliveryAddress.phone}
-                      onChange={(e) =>
-                        handleAddressChange("phone", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-                      placeholder="Enter phone number"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      value={deliveryAddress.email}
-                      onChange={(e) =>
-                        handleAddressChange("email", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-                      placeholder="Enter your email"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Address Line 1 *
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress.addressLine1}
-                      onChange={(e) =>
-                        handleAddressChange("addressLine1", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-                      placeholder="House/Flat No, Street Name"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Address Line 2
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress.addressLine2}
-                      onChange={(e) =>
-                        handleAddressChange("addressLine2", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-                      placeholder="Area, Landmark (Optional)"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      City *
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress.city}
-                      onChange={(e) =>
-                        handleAddressChange("city", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-                      placeholder="Enter city"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      State *
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress.state}
-                      onChange={(e) =>
-                        handleAddressChange("state", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-                      placeholder="Enter state"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Pincode *
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress.pincode}
-                      onChange={(e) =>
-                        handleAddressChange("pincode", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-                      placeholder="Enter pincode"
-                      maxLength="6"
-                    />
-                  </div>
-                </div>
-              </div>
+              <DocumentDelivaryAddress  
+                deliveryAddress={deliveryAddress} 
+                handleAddressChange={handleAddressChange}  
+              />
             )}
 
             {/* Action Buttons */}
