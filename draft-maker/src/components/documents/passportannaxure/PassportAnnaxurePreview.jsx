@@ -10,39 +10,39 @@ export default function PassportAnnaxurePreview({ formData }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-9 shadow-lg border border-gray-300 rounded-lg relative min-h-[900px] font-serif">
+    <div className="max-w-4xl mx-auto bg-white p-3 sm:p-9 shadow-lg border border-gray-300 rounded-lg relative min-h-[900px] font-serif">
       {/* Watermark */}
-      <div className="mb-96 p-9">
+      <div className="mb-60 sm:mb-96 p-3 sm:p-9">
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-gray-200 text-4xl font-bold transform rotate-45 select-none font-sans opacity-50">
+          <div className="text-gray-200 text-2xl sm:text-4xl font-bold transform rotate-45 select-none font-sans opacity-50">
             INTERNAL PURPOSE ONLY
           </div>
         </div>
 
         {/* Content */}
         <div className="relative z-10">
-          <div className="text-center mb-4">
-            <h1 className="text-2xl font-bold">ANNEXURE 'F'</h1>
-            <h2 className="text-xl font-semibold mt-2">
+          <div className="text-center mb-3 sm:mb-4">
+            <h1 className="text-xl sm:text-2xl font-bold">ANNEXURE 'F'</h1>
+            <h2 className="text-lg sm:text-xl font-semibold mt-2 leading-tight">
               SPECIMEN DECLARATION OF APPLICANT FOR OBTAINING A PASSPORT IN LIEU
               OF LOST/DAMAGED PASSPORT
             </h2>
           </div>
 
-          <div className="space-y-8 text-base p-4">
+          <div className="space-y-6 sm:space-y-8 text-sm sm:text-base p-2 sm:p-4">
             {/* Personal Details */}
-            <div className="mb-10">
+            <div className="mb-6 sm:mb-10">
               <p className="leading-relaxed">
                 I,{" "}
-                <span className="font-medium  px-1">
+                <span className="font-medium px-1">
                   {formData.name || "_________________"}
                 </span>{" "}
                 {formData.relationType || "_________________"}{" "}
-                <span className="font-medium  px-1">
+                <span className="font-medium px-1">
                   {formData.guardianName || "_________________"}
                 </span>
                 , Aged:{" "}
-                <span className="font-medium  px-1">
+                <span className="font-medium px-1">
                   {formData.age || "___"}
                 </span>{" "}
                 Years,
@@ -50,33 +50,33 @@ export default function PassportAnnaxurePreview({ formData }) {
             </div>
 
             {/* Addresses */}
-            <div className="mb-10">
+            <div className="mb-6 sm:mb-10">
               <p className="mb-2 leading-relaxed">Permanent Address:</p>
-              <p className=" pb-2 leading-relaxed">
+              <p className="pb-2 leading-relaxed">
                 {formData.permanentAddress ||
                   "___________________________________________"}
               </p>
             </div>
 
-            <div className="mb-10">
+            <div className="mb-6 sm:mb-10">
               <p className="mb-2 leading-relaxed">Present Address:</p>
-              <p className=" pb-2 leading-relaxed">
+              <p className="pb-2 leading-relaxed">
                 {formData.presentAddress ||
                   "______________________________________________"}
               </p>
             </div>
 
             {/* Aadhaar/Passport */}
-            <div className="flex flex-wrap gap-8 mb-6">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 sm:gap-8 mb-6">
               <p className="leading-relaxed">
                 My Aadhaar No:{" "}
-                <span className="font-medium  px-1">
+                <span className="font-medium px-1">
                   {formData.aadhaarNo || "____ ____ ____"}
                 </span>
               </p>
               <p className="leading-relaxed">
                 My Passport No:{" "}
-                <span className="font-medium  px-1">
+                <span className="font-medium px-1">
                   {formData.passportNo || "_________________"}
                 </span>
               </p>
@@ -90,7 +90,7 @@ export default function PassportAnnaxurePreview({ formData }) {
                 lost/ damaged earlier?
               </p>
               <p className="mb-2 leading-relaxed">DETAILS OF INCIDENT:</p>
-              <div className=" pb-2 min-h-16">
+              <div className="pb-2 min-h-12 sm:min-h-16">
                 <p className="leading-relaxed">
                   {formData.incidentDetails ||
                     "_____________________________________________"}
@@ -134,39 +134,49 @@ export default function PassportAnnaxurePreview({ formData }) {
               </p>
 
               {formData.nonResidentIndian === "YES" && (
-                <table className="w-full  mt-4">
-                  <thead>
-                    <tr>
-                      <th className=" p-3 text-left w-16">S. No.</th>
-                      <th className=" p-3 text-left">Name of the Country</th>
-                      <th className=" p-3 text-left">
-                        Length of residence from... To...
-                      </th>
-                      <th className=" p-3 text-left">
-                        Page Nos. of passport bearing departure and arrival
-                        stamps
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(formData.residences || []).map(
-                      (residence, index) =>
-                        residence.country && (
-                          <tr key={index}>
-                            <td className=" p-3">{index + 1}.</td>
-                            <td className=" p-3">{residence.country}</td>
-                            <td className=" p-3">
-                              {residence.periodFrom || "___"} to{" "}
-                              {residence.periodTo || "___"}
-                            </td>
-                            <td className=" p-3">
-                              {residence.pageNos || "___"}
-                            </td>
-                          </tr>
-                        )
-                    )}
-                  </tbody>
-                </table>
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full min-w-[600px] border-collapse border border-gray-300">
+                    <thead>
+                      <tr>
+                        <th className="border border-gray-300 p-2 sm:p-3 text-left w-16">
+                          S. No.
+                        </th>
+                        <th className="border border-gray-300 p-2 sm:p-3 text-left">
+                          Name of the Country
+                        </th>
+                        <th className="border border-gray-300 p-2 sm:p-3 text-left">
+                          Length of residence from... To...
+                        </th>
+                        <th className="border border-gray-300 p-2 sm:p-3 text-left">
+                          Page Nos. of passport bearing departure and arrival
+                          stamps
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(formData.residences || []).map(
+                        (residence, index) =>
+                          residence.country && (
+                            <tr key={index}>
+                              <td className="border border-gray-300 p-2 sm:p-3">
+                                {index + 1}.
+                              </td>
+                              <td className="border border-gray-300 p-2 sm:p-3">
+                                {residence.country}
+                              </td>
+                              <td className="border border-gray-300 p-2 sm:p-3">
+                                {residence.periodFrom || "___"} to{" "}
+                                {residence.periodTo || "___"}
+                              </td>
+                              <td className="border border-gray-300 p-2 sm:p-3">
+                                {residence.pageNos || "___"}
+                              </td>
+                            </tr>
+                          )
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
 
@@ -183,7 +193,7 @@ export default function PassportAnnaxurePreview({ formData }) {
               </p>
             </div>
 
-            <div className="mb-8">
+            <div className="mb-6 sm:mb-8">
               <p className="font-medium mb-2 leading-relaxed">
                 6. State whether you were deported at any time at the expenses
                 of the Government and if so was the expenditure incurred
@@ -198,8 +208,8 @@ export default function PassportAnnaxurePreview({ formData }) {
             </div>
 
             {/* Closing Declaration */}
-            <div className="mt-8">
-              <p className="text-base leading-relaxed">
+            <div className="mt-6 sm:mt-8">
+              <p className="text-sm sm:text-base leading-relaxed">
                 I further affirm that I will take utmost care of my passport if
                 issued and the Government will be at liberty to take any legal
                 action under the Passports Act, 1967, if the lapse is repeated.
@@ -207,7 +217,7 @@ export default function PassportAnnaxurePreview({ formData }) {
             </div>
 
             {/* Signature & Date */}
-            <div className="flex justify-between mt-16">
+            <div className="flex flex-col sm:flex-row justify-between mt-12 sm:mt-16 gap-6 sm:gap-0">
               <div>
                 <p className="leading-relaxed">
                   Date:{" "}
@@ -223,17 +233,17 @@ export default function PassportAnnaxurePreview({ formData }) {
                 </p>
               </div>
 
-              <div className="text-center ">
-                <div className="h-10">
+              <div className="text-center">
+                <div className="h-8 sm:h-10">
                   {formData.useNameAsSignature ? (
                     <p className="font-medium italic leading-relaxed">
                       {formData.name || "_________________"}
                     </p>
                   ) : (
-                    <div className="h-10"></div>
+                    <div className="h-8 sm:h-10"></div>
                   )}
                 </div>
-                <div className="border-t border-black w-48"></div>
+                <div className="border-t border-black w-40 sm:w-48 mx-auto"></div>
                 <p className="leading-relaxed">(Signature of applicant)</p>
               </div>
             </div>
