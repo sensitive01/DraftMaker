@@ -293,7 +293,7 @@ export default function HufAgreement() {
           documentDetails: responseData.documentDetails,
           mobileNumber,
           userName,
-          formId: "DM-HUF-12"
+          formId: "DM-HUF-12",
         },
       });
 
@@ -497,7 +497,7 @@ export default function HufAgreement() {
   };
 
   return (
-    <div className="container-fluid mx-auto max-w-8xl">
+    <div className="container-fluid mx-auto max-w-8xl py-2 sm:py-4 md:py-6 lg:py-8 px-1 sm:px-2 md:px-4 lg:px-6">
       {/* Add Error Notification Component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
@@ -506,37 +506,46 @@ export default function HufAgreement() {
         />
       )}
 
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-2 sm:gap-4 md:gap-6">
         <div className="w-full lg:w-1/2">
-          <HufForm
-            formData={formData}
-            handleChange={handleChange}
-            handleCoparcenerChange={handleCoparcenerChange}
-            addCoparcener={addCoparcener}
-            removeCoparcener={removeCoparcener}
-          />
-          {submissionError && (
-            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
-              {submissionError}
-            </div>
-          )}
+          <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6 mb-4 lg:mb-0">
+            <HufForm
+              formData={formData}
+              handleChange={handleChange}
+              handleCoparcenerChange={handleCoparcenerChange}
+              addCoparcener={addCoparcener}
+              removeCoparcener={removeCoparcener}
+            />
+            {submissionError && (
+              <div className="mt-4 p-3 bg-red-100 text-red-700 rounded text-sm sm:text-base">
+                {submissionError}
+              </div>
+            )}
+          </div>
         </div>
         <div className="w-full lg:w-1/2">
-          <div className="sticky top-4">
-            <HufPreview formData={formData} />
+          <div className="lg:sticky lg:top-4">
+            <div className="bg-gray-50 rounded-lg p-1 sm:p-2 md:p-4">
+              <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4 text-center text-gray-800 lg:hidden">
+                Preview
+              </h3>
+              <div className="transform scale-90 sm:scale-95 md:scale-100 origin-top -mx-2 sm:mx-0">
+                <HufPreview formData={formData} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div className="mt-8 flex flex-col items-center">
+      <div className="mt-6 sm:mt-8 flex flex-col items-center px-2 sm:px-4">
         <button
           onClick={handleSubmitButtonClick}
           disabled={isSubmitting}
-          className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg w-full md:w-1/3 mb-4 transition duration-300 ease-in-out shadow-md"
+          className="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-lg text-sm sm:text-base md:text-lg w-full sm:w-3/4 md:w-1/2 lg:w-1/3 mb-4 transition duration-300 ease-in-out shadow-md"
         >
           {isSubmitting ? (
             <span className="flex items-center justify-center">
               <svg
-                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                className="animate-spin -ml-1 mr-3 h-4 w-4 sm:h-5 sm:w-5 text-white"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
