@@ -104,27 +104,7 @@ const Statistics = () => {
     },
   ];
 
-  // Sample recent bookings - in a real application, you would fetch this from an API
-  const recentBookings = [
-    {
-      id: "#B001",
-      customer: "Alice Johnson",
-      date: "2024-05-10",
-      status: "Pending",
-    },
-    {
-      id: "#B002",
-      customer: "Bob Smith",
-      date: "2024-05-11",
-      status: "Pending",
-    },
-    {
-      id: "#B003",
-      customer: "Charlie Brown",
-      date: "2024-05-12",
-      status: "Cancelled",
-    },
-  ];
+
 
   if (loading) {
     return (
@@ -147,7 +127,7 @@ const Statistics = () => {
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold text-red-900 mb-2">Dashboard</h1>
-        <p className="text-red-600">Welcome back, John Doe!</p>
+        <p className="text-red-600">Welcome back, Admin!</p>
       </div>
 
       {/* Booking Statistics Cards */}

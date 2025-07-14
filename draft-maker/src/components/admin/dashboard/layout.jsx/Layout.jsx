@@ -151,13 +151,13 @@ const Layout = ({ children }) => {
       {
         icon: Settings,
         label: "Settings",
-        path: "/settings",
+        path: "#",
         isActive: location.pathname === "/settings",
       },
       {
         icon: HelpCircle,
         label: "Help",
-        path: "/help",
+        path: "#",
         isActive: location.pathname === "/help",
       },
     ];
@@ -425,7 +425,7 @@ const Layout = ({ children }) => {
             <div className="relative ml-4 hidden md:block">
               <input
                 type="text"
-                placeholder="Search menu, orders..."
+                placeholder="Search ..."
                 className="
                   w-full 
                   pl-10 
@@ -492,8 +492,8 @@ const Layout = ({ children }) => {
                       <User size={24} className="text-red-700" />
                     </div>
                     <div>
-                      <p className="font-semibold text-red-900">John Doe</p>
-                      <p className="text-sm text-red-600">Restaurant Manager</p>
+                      <p className="font-semibold text-red-900">Admin</p>
+                      <p className="text-sm text-red-600">Draft Admin</p>
                     </div>
                   </div>
                   <ul>
