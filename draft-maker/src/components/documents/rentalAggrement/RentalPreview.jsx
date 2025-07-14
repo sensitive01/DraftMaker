@@ -440,7 +440,7 @@ const RentalPreview = ({ formData }) => {
             <div className="watermark">INTERNAL PURPOSE ONLY</div>
 
 
-            <div className="p-8 md:p-10 lg:p-12">
+            <div className="p-8 md:p-4 lg:p-4">
               <div className="text-center mt-6 mb-8">
                 <div className="font-bold mb-2 text-lg underline">
                   ANNEXURE I

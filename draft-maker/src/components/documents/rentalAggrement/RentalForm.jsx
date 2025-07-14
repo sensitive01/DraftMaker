@@ -14,7 +14,7 @@ const RentalForm = ({
   handleLesseeChange,
 }) => {
   return (
-    <div className="max-w-5xl mx-auto p-3 sm:p-6 bg-white rounded-lg shadow-sm">
+    <div className="max-w-5xl mx-auto p-3 sm:p-4 bg-white rounded-lg shadow-sm">
       <h1 className="text-xl sm:text-2xl font-semibold text-center mb-4">
         Realtime Document Drafting - Rental Agreement
       </h1>
