@@ -436,7 +436,7 @@ export default function GapPeriod() {
   };
 
   return (
-    <div className="container-fluid mx-auto py-8">
+    <div className="container-fluid mx-auto py-4 sm:py-6 md:py-8 px-2 sm:px-4 md:px-6">
       {/* Add Error Notification Component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
@@ -445,43 +445,48 @@ export default function GapPeriod() {
         />
       )}
 
-
-
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
         {/* Left column: Form */}
-        <div className="print:hidden">
-          <GapPeriodForm
-            formData={formData}
-            handleGapPeriodChange={handleGapPeriodChange}
-            handleChange={handleChange}
-            addGapPeriod={addGapPeriod}
-            removeGapPeriod={removeGapPeriod}
-          />
-          {submissionError && (
-            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
-              {submissionError}
-            </div>
-          )}
+        <div className="print:hidden w-full">
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 md:p-8 mb-4 lg:mb-0">
+            <GapPeriodForm
+              formData={formData}
+              handleGapPeriodChange={handleGapPeriodChange}
+              handleChange={handleChange}
+              addGapPeriod={addGapPeriod}
+              removeGapPeriod={removeGapPeriod}
+            />
+            {submissionError && (
+              <div className="mt-4 p-3 bg-red-100 text-red-700 rounded text-sm sm:text-base">
+                {submissionError}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right column: Preview */}
-        <div>
-          <AffidavitDisplay
-            data={formData} // Changed from formData to data to match your AffidavitDisplay component
-          />
+        <div className="w-full">
+          <div className="bg-gray-50 rounded-lg  sm:p-4 md:p-2">
+            <h3 className="text-lg sm:text-xl font-semibold mb-4 text-center text-gray-800 lg:hidden">
+              Preview
+            </h3>
+            <div className="transform scale-75 sm:scale-90 md:scale-100 origin-top">
+              <AffidavitDisplay data={formData} />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col items-center">
+      <div className="mt-6 sm:mt-8 flex flex-col items-center px-2 sm:px-4">
         <button
           onClick={handleSubmitButtonClick}
           disabled={isSubmitting}
-          className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg w-full md:w-1/3 mb-4 transition duration-300 ease-in-out shadow-md"
+          className="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-lg text-sm sm:text-base md:text-lg w-full sm:w-3/4 md:w-1/2 lg:w-1/3 mb-4 transition duration-300 ease-in-out shadow-md"
         >
           {isSubmitting ? (
             <span className="flex items-center justify-center">
               <svg
-                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                className="animate-spin -ml-1 mr-3 h-4 w-4 sm:h-5 sm:w-5 text-white"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
