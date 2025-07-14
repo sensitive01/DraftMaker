@@ -150,17 +150,13 @@ const CommercialPreview = ({ formData }) => {
 
   return (
     <>
-      <div className="max-w-full overflow-x-auto py-4">
+      <div className="max-w-full  py-4">
         <div ref={previewRef} className="print-container">
           {/* Page 1 */}
           <div className="page relative bg-white shadow-md mx-auto mb-8">
             <div className="watermark">INTERNAL PURPOSE ONLY</div>
 
-            {/* Corner decorations */}
-            <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-gray-500"></div>
-            <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-gray-500"></div>
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-gray-500"></div>
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-gray-500"></div>
+ 
 
             {/* Content with proper legal document padding */}
             <div className="p-8 md:p-10 lg:p-12">
@@ -301,10 +297,6 @@ const CommercialPreview = ({ formData }) => {
           <div className="page relative bg-white shadow-md mx-auto mb-8">
             <div className="watermark">INTERNAL PURPOSE ONLY</div>
 
-            <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-gray-500"></div>
-            <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-gray-500"></div>
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-gray-500"></div>
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-gray-500"></div>
 
             <div className="p-8 md:p-10 lg:p-12">
               <p className="mb-5 text-justify leading-relaxed">
@@ -442,13 +434,10 @@ const CommercialPreview = ({ formData }) => {
           </div>
 
           {/* Page 3 */}
-          <div className="page relative bg-white shadow-md mx-auto mb-8">
+          <div className="page relative bg-white  mx-auto mb-8">
             <div className="watermark">INTERNAL PURPOSE ONLY</div>
 
-            <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-gray-500"></div>
-            <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-gray-500"></div>
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-gray-500"></div>
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-gray-500"></div>
+
 
             <div className="p-8 md:p-10 lg:p-12">
               <div className="text-center mt-6 mb-8">
