@@ -220,7 +220,7 @@ const MatriculationPage = () => {
           documentDetails: responseData.documentDetails,
           mobileNumber,
           userName,
-          formId: "DM-MAL-9"
+          formId: "DM-MAL-9",
         },
       });
 
@@ -424,7 +424,7 @@ const MatriculationPage = () => {
   };
 
   return (
-    <div className="container-fluid mx-auto p-4 bg-gray-50 min-h-screen">
+    <div className="container-fluid mx-auto p-2 sm:p-4 bg-gray-50 min-h-screen">
       {/* Add Error Notification Component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
@@ -433,15 +433,13 @@ const MatriculationPage = () => {
         />
       )}
 
-
-
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
         {/* Left column: Form */}
         <div className="print:hidden">
           <MetriculationForm formData={formData} handleChange={handleChange} />
 
           {submissionError && (
-            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
+            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded text-sm sm:text-base">
               {submissionError}
             </div>
           )}
@@ -452,11 +450,12 @@ const MatriculationPage = () => {
           <MetriculationPreview formData={formData} />
         </div>
       </div>
-      <div className="mt-8 flex flex-col items-center">
+
+      <div className="mt-6 sm:mt-8 flex flex-col items-center px-2 sm:px-4">
         <button
           onClick={handleSubmitButtonClick}
           disabled={isSubmitting}
-          className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg w-full md:w-1/3 mb-4 transition duration-300 ease-in-out shadow-md"
+          className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg text-base sm:text-lg w-full sm:w-3/4 md:w-1/2 lg:w-1/3 mb-4 transition duration-300 ease-in-out shadow-md"
         >
           {isSubmitting ? (
             <span className="flex items-center justify-center">
