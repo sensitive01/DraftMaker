@@ -73,7 +73,8 @@ import ContactMePage from "./components/ContactMePage";
 import MesaageNotification from "./components/admin/dashboard/statistics/MesaageNotification";
 import Test from "./components/Test";
 import AboutUsContentPage from "./components/AboutUsContentPage";
-import FloatingContactButtons from "./FloatingContactButtons"; // Import the new component
+import FloatingContactButtons from "./FloatingContactButtons";
+import MoveToTop from "./MoveToTop";
 
 function MainLayout({ children }) {
   return (
@@ -150,11 +151,7 @@ function PaymentLayout({ children }) {
         </div>
       </div>
 
-      <div style={{ marginTop: "120px" }}>
-        {" "}
-        {/* Adjust this value based on your header height */}
-        {children}
-      </div>
+      <div style={{ marginTop: "120px" }}>{children}</div>
 
       <NeedSupport />
       <Footer />
@@ -221,7 +218,6 @@ function HomeLayout({ children }) {
             zIndex: "10",
           }}
         >
-          {/* <DocumentServices /> */}
           <WhatWeDo />
           <AboutUsHome />
         </div>
@@ -390,6 +386,7 @@ function App() {
 
   return (
     <Router>
+      <MoveToTop /> {/* Add this line */}
       <div className="page_wrapper">
         {loading && <Preloader />}
 

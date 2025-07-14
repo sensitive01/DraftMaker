@@ -52,19 +52,19 @@ const AffidavitPreview = ({ formData }) => {
   };
 
   return (
-    <div className="bg-gray-50 p-6 rounded-lg shadow-lg max-w-5xl mx-auto min-h-[600px]">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2 text-center">
+    <div className="bg-gray-50 p-2 sm:p-6 rounded-lg shadow-lg max-w-5xl mx-auto min-h-[600px]">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-800 border-b pb-2 text-center">
         Affidavit Preview
       </h2>
 
       {/* Document Content - This will be captured for PDF */}
       <div
         ref={affidavitRef}
-        className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 relative overflow-hidden min-h-[600px] font-serif"
+        className="bg-white p-3 sm:p-8 rounded-lg shadow-sm border border-gray-200 relative overflow-hidden min-h-[600px] font-serif"
       >
         {/* Watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-gray-200 text-4xl font-bold transform rotate-45 select-none font-sans">
+          <div className="text-gray-200 text-2xl sm:text-4xl font-bold transform rotate-45 select-none font-sans">
             INTERNAL PURPOSE ONLY
           </div>
         </div>
@@ -72,8 +72,8 @@ const AffidavitPreview = ({ formData }) => {
         {/* Document Content */}
         <div className="relative z-10">
           {/* Content */}
-          <div className="mb-8 leading-loose text-base">
-            <p className="mb-6 text-justify">
+          <div className="mb-6 sm:mb-8 leading-relaxed sm:leading-loose text-sm sm:text-base">
+            <p className="mb-4 sm:mb-6 text-justify">
               I,{" "}
               <span className="font-bold">
                 {formData.name || "Mr/Mrs/Ms ........................."}
@@ -82,30 +82,32 @@ const AffidavitPreview = ({ formData }) => {
               <span className="font-bold">{formData.age || "......"}</span>{" "}
               Years,
             </p>
-            <p className="mb-6">
+            <p className="mb-4 sm:mb-6">
               Permanent Address:{" "}
               <span className="font-bold">{formatPermanentAddress()}</span>
             </p>
-            <p className="mb-6">
+            <p className="mb-4 sm:mb-6">
               Present Address:{" "}
               <span className="font-bold">{formatPresentAddress()}</span>
             </p>
-            <p className="mb-12">
+            <p className="mb-8 sm:mb-12">
               My Aadhaar No:{" "}
               <span className="font-bold">
                 {formData.aadhaarNo || "536709665679"}
               </span>
               .
             </p>
-            <p className="mb-5 font-semibold text-center">
+            <p className="mb-4 sm:mb-5 font-semibold text-center">
               Do hereby solemnly affirm and declare as under:
             </p>
           </div>
 
-          <div className="mb-16 leading-loose text-base">
-            <div className="space-y-8">
+          <div className="mb-12 sm:mb-16 leading-relaxed sm:leading-loose text-sm sm:text-base">
+            <div className="space-y-6 sm:space-y-8">
               <div className="flex text-justify">
-                <span className="font-bold text-lg mr-4 flex-shrink-0">1.</span>
+                <span className="font-bold text-base sm:text-lg mr-2 sm:mr-4 flex-shrink-0">
+                  1.
+                </span>
                 <span>
                   I hereby declare that I am presently residing at above address
                   since{" "}
@@ -115,7 +117,9 @@ const AffidavitPreview = ({ formData }) => {
                 </span>
               </div>
               <div className="flex text-justify">
-                <span className="font-bold text-lg mr-4 flex-shrink-0">2.</span>
+                <span className="font-bold text-base sm:text-lg mr-2 sm:mr-4 flex-shrink-0">
+                  2.
+                </span>
                 <span>
                   I further declare that I am swearing this affidavit to produce
                   before the concerned{" "}
@@ -126,7 +130,9 @@ const AffidavitPreview = ({ formData }) => {
                 </span>
               </div>
               <div className="flex text-justify">
-                <span className="font-bold text-lg mr-4 flex-shrink-0">3.</span>
+                <span className="font-bold text-base sm:text-lg mr-2 sm:mr-4 flex-shrink-0">
+                  3.
+                </span>
                 <span>
                   That this affidavit is being made to serve as proof of my
                   <span className="font-bold"> Address </span> for the purpose
@@ -139,31 +145,33 @@ const AffidavitPreview = ({ formData }) => {
               </div>
             </div>
 
-            <p className="mt-6 text-justify">
+            <p className="mt-4 sm:mt-6 text-justify">
               I do hereby verify and declare that what is stated above are true
               and correct to the best of my knowledge, information and belief.
             </p>
           </div>
 
           {/* Space for stamp and signature */}
-          <div className="flex justify-between items-start mt-18">
+          <div className="flex flex-col sm:flex-row justify-between items-start mt-12 sm:mt-18">
             <div></div>
 
-            <div className="text-right">
-              <p className="mb-2">
+            <div className="text-right w-full sm:w-auto">
+              <p className="mb-2 text-sm sm:text-base">
                 Solemnly affirmed at{" "}
                 <span className="font-bold">
                   {formData.place || "Bangalore"}
                 </span>
               </p>
-              <p className="mb-6">
+              <p className="mb-4 sm:mb-6 text-sm sm:text-base">
                 Date:{" "}
                 <span className="font-bold">{formatDate(formData.date)}</span>
               </p>
 
-              <div className="mt-16 border-t-2 border-black pt-2 w-56 text-center ml-auto">
-                <p className="font-medium">(Signature of the Applicant)</p>
-                <p className="font-bold mt-2">Deponent</p>
+              <div className="mt-12 sm:mt-16 border-t-2 border-black pt-2 w-48 sm:w-56 text-center ml-auto">
+                <p className="font-medium text-sm sm:text-base">
+                  (Signature of the Applicant)
+                </p>
+                <p className="font-bold mt-2 text-sm sm:text-base">Deponent</p>
               </div>
             </div>
           </div>

@@ -109,7 +109,7 @@ const PassportNameChangePreview = ({ formData }) => {
                 <span>
                   That as per My Aadhaar card my given name is{" "}
                   <span className="font-bold">
-                    {formData.name || "NAME"}
+                    {formData.currentGivenName || "NAME"}
                   </span>{" "}
                   and in my Expired Passport, my given name is{" "}
                   <span className="font-bold">
