@@ -428,9 +428,7 @@ const VehicleInsuranceClaming = () => {
   };
 
   return (
-    <div className="container-fluid mx-auto p-4">
-
-
+    <div className="container-fluid mx-auto p-2 sm:p-4 lg:p-6">
       {/* Add Error Notification Component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
@@ -439,35 +437,36 @@ const VehicleInsuranceClaming = () => {
         />
       )}
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
         {/* Left column: Form */}
-        <div className="print:hidden">
+        <div className="print:hidden w-full">
           <VehicleInsuranceClamingForm
             formData={formData}
             handleChange={handleChange}
           />
           {submissionError && (
-            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
+            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded text-sm sm:text-base">
               {submissionError}
             </div>
           )}
         </div>
 
         {/* Right column: Preview */}
-        <div>
+        <div className="w-full">
           <VehicleInsuranceClamingPreview formData={formData} />
         </div>
       </div>
-      <div className="mt-8 flex flex-col items-center">
+
+      <div className="mt-6 sm:mt-8 flex flex-col items-center px-2 sm:px-4">
         <button
           onClick={handleSubmitButtonClick}
           disabled={isSubmitting}
-          className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg w-full md:w-1/3 mb-4 transition duration-300 ease-in-out shadow-md"
+          className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-bold py-2 sm:py-3 px-4 sm:px-6 rounded-lg text-base sm:text-lg w-full sm:w-4/5 md:w-3/5 lg:w-2/5 xl:w-1/3 mb-4 transition duration-300 ease-in-out shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
         >
           {isSubmitting ? (
             <span className="flex items-center justify-center">
               <svg
-                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                className="animate-spin -ml-1 mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 text-white"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -486,7 +485,7 @@ const VehicleInsuranceClaming = () => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              Submitting...
+              <span className="text-sm sm:text-base">Submitting...</span>
             </span>
           ) : (
             "Submit Application"
@@ -504,6 +503,7 @@ const VehicleInsuranceClaming = () => {
         username={userName}
         setUsername={setUserName}
       />
+
       {showServiceOptionsModal && (
         <ServicePackageNotification
           setShowServiceOptionsModal={setShowServiceOptionsModal}
@@ -514,6 +514,7 @@ const VehicleInsuranceClaming = () => {
           handleServiceSelection={handleServiceSelection}
         />
       )}
+
       {paymentSuccess && paymentDetails && (
         <PaymentConfirmation
           paymentSuccess={paymentSuccess}
