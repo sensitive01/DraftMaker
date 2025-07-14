@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 // Main Page Component containing both form and preview
 export default function BirthCertificateParentNameCorrectionPage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     formId: "DM-BCNCP-6",
     fatherTitle: "Mr.",
@@ -52,13 +52,13 @@ export default function BirthCertificateParentNameCorrectionPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Clear error notifications when user makes changes
     if (showErrorNotification) {
       setShowErrorNotification(false);
       setValidationError("");
     }
-    
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -113,12 +113,16 @@ export default function BirthCertificateParentNameCorrectionPage() {
 
     // Name correction validation
     if (!formData.incorrectFatherName.trim()) {
-      setValidationError("Please enter incorrect father's name as printed on certificate");
+      setValidationError(
+        "Please enter incorrect father's name as printed on certificate"
+      );
       return false;
     }
 
     if (!formData.incorrectMotherName.trim()) {
-      setValidationError("Please enter incorrect mother's name as printed on certificate");
+      setValidationError(
+        "Please enter incorrect mother's name as printed on certificate"
+      );
       return false;
     }
 
@@ -148,7 +152,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
 
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-    
+
     // First validate the form
     if (validateForm()) {
       setShowMobileModal(true);
@@ -183,7 +187,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
       const dataWithMobile = {
         ...formData,
         mobileNumber,
-        userName
+        userName,
       };
 
       const response = await dobParentNameCorrectionData(dataWithMobile);
@@ -192,7 +196,15 @@ export default function BirthCertificateParentNameCorrectionPage() {
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
-          navigate("/documents/payment-page",{state:{bookingId:responseData.bookingId,documentDetails:responseData.documentDetails,mobileNumber,userName,formId: "DM-BCNCP-6"}})
+      navigate("/documents/payment-page", {
+        state: {
+          bookingId: responseData.bookingId,
+          documentDetails: responseData.documentDetails,
+          mobileNumber,
+          userName,
+          formId: "DM-BCNCP-6",
+        },
+      });
 
       // setShowServiceOptionsModal(true);
       // setIsSubmitting(false);
@@ -299,7 +311,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
             serviceName: service.name,
             amount: totalPrice,
             includesNotary: service.hasNotary,
-            userName:userName
+            userName: userName,
           });
         },
         prefill: {
@@ -335,7 +347,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
             mobileNumber: mobileNumber,
             serviceType: service.id,
             status: "failed",
-            userName:userName
+            userName: userName,
           }),
         }).catch((error) => {
           console.error("Error logging payment failure:", error);
@@ -367,7 +379,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
         serviceName: paymentData.serviceName,
         amount: paymentData.amount,
         includesNotary: paymentData.includesNotary,
-        userName:userName,
+        userName: userName,
         status: "success",
       };
 
@@ -393,7 +405,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
   };
 
   return (
-    <div className="container-fluid mx-auto p-4 bg-gray-50 min-h-screen">
+    <div className="container-fluid mx-auto p-2 sm:p-4 bg-gray-50 min-h-screen">
       {/* Error notification component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
@@ -401,36 +413,35 @@ export default function BirthCertificateParentNameCorrectionPage() {
           setShowErrorNotification={setShowErrorNotification}
         />
       )}
-      
 
-
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
         <div className="print:hidden">
           <BirthCertificateParentNameCorrectionForm
             formData={formData}
             handleChange={handleChange}
           />
           {submissionError && (
-            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
+            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded text-sm">
               {submissionError}
             </div>
           )}
         </div>
 
-        <div>
+        <div className="w-full overflow-x-auto">
           <BirtCertificateParentNameCorrectionPreview formData={formData} />
         </div>
       </div>
-      <div className="mt-8 flex flex-col items-center">
+
+      <div className="mt-6 sm:mt-8 flex flex-col items-center">
         <button
           onClick={handleSubmitButtonClick}
           disabled={isSubmitting}
-          className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg w-full md:w-1/3 mb-4 transition duration-300 ease-in-out shadow-md"
+          className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base md:text-lg w-full sm:w-3/4 md:w-1/2 lg:w-1/3 mb-4 transition duration-300 ease-in-out shadow-md"
         >
           {isSubmitting ? (
             <span className="flex items-center justify-center">
               <svg
-                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                className="animate-spin -ml-1 mr-3 h-4 w-4 sm:h-5 sm:w-5 text-white"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
