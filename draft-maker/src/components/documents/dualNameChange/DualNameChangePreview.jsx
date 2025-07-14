@@ -13,45 +13,50 @@ const DualNameChangePreview = ({ formData }) => {
     <>
       <div className="flex flex-col items-center">
         {/* Single page preview with continuous content */}
-        <div className="bg-white border border-gray-300 shadow font-serif w-full max-w-3xl">
-          <div className="relative p-8">
-            {/* Watermark */}
-            <div className="watermark">INTERNAL PURPOSE ONLY</div>
+        <div className="bg-white p-3 sm:p-4 md:p-6 lg:p-8 border border-gray-300 rounded shadow relative mx-2 sm:mx-4 lg:mx-0 overflow-hidden font-serif w-full max-w-3xl">
+          {/* Watermark */}
+          <div className="watermark">INTERNAL PURPOSE ONLY</div>
 
-            {/* Corner marks */}
-            <div className="absolute top-0 left-0 border-t border-l w-4 h-4 border-gray-400"></div>
-            <div className="absolute top-0 right-0 border-t border-r w-4 h-4 border-gray-400"></div>
-            <div className="absolute bottom-0 left-0 border-b border-l w-4 h-4 border-gray-400"></div>
-            <div className="absolute bottom-0 right-0 border-b border-r w-4 h-4 border-gray-400"></div>
+          {/* Corner marks */}
+          <div className="absolute top-0 left-0 border-t border-l w-4 h-4 border-gray-400"></div>
+          <div className="absolute top-0 right-0 border-t border-r w-4 h-4 border-gray-400"></div>
+          <div className="absolute bottom-0 left-0 border-b border-l w-4 h-4 border-gray-400"></div>
+          <div className="absolute bottom-0 right-0 border-b border-r w-4 h-4 border-gray-400"></div>
 
-            {/* Page 1 Content */}
-            <div className="mb-12">
-              <h1 className="text-center font-bold text-xl mb-6">AFFIDAVIT</h1>
+          <div className="relative z-20 font-serif">
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-center underline mb-4 sm:mb-6 md:mb-8 tracking-wider">
+              AFFIDAVIT
+            </h1>
 
-              <p className="mb-4">
+            <div className="space-y-3 sm:space-y-4 md:space-y-5 text-sm sm:text-base md:text-lg leading-relaxed">
+              <p className="text-justify">
                 I,{" "}
                 <span
                   className={
                     isFilled(formData?.fullName) ? "" : "bg-yellow-200 px-1"
                   }
                 >
-                  {formData?.namePrefix}{" "}
-                  {formData?.fullName ||
-                    "Mr/Mrs/Ms ..........................."}
+                  <strong>
+                    {formData?.namePrefix}{" "}
+                    {formData?.fullName ||
+                      "Mr/Mrs/Ms ..........................."}
+                  </strong>
                 </span>{" "}
                 <span
                   className={
                     isFilled(formData?.relation) ? "" : "bg-yellow-200 px-1"
                   }
                 >
-                  {formData?.relation || "D/o, S/o, H/o, W/o"}
+                  <strong>{formData?.relation || "D/o, S/o, H/o, W/o"}</strong>
                 </span>{" "}
                 <span
                   className={
                     isFilled(formData?.relationName) ? "" : "bg-yellow-200 px-1"
                   }
                 >
-                  {formData?.relationName || "..................."}
+                  <strong>
+                    {formData?.relationName || "..................."}
+                  </strong>
                 </span>
                 , Aged:{" "}
                 <span
@@ -59,12 +64,12 @@ const DualNameChangePreview = ({ formData }) => {
                     isFilled(formData?.age) ? "" : "bg-yellow-200 px-1"
                   }
                 >
-                  {formData?.age || "......"}
+                  <strong>{formData?.age || "......"}</strong>
                 </span>{" "}
                 Years,
               </p>
 
-              <p className="mb-4">
+              <p className="text-justify">
                 Permanent Address{" "}
                 <span
                   className={
@@ -73,121 +78,140 @@ const DualNameChangePreview = ({ formData }) => {
                       : "bg-yellow-200 px-1"
                   }
                 >
-                  {formData?.permanentAddress ||
-                    "Address Line 1, Address Line 2, City, State, Pin Code"}
+                  <strong>
+                    {formData?.permanentAddress ||
+                      "Address Line 1, Address Line 2, City, State, Pin Code"}
+                  </strong>
                 </span>
               </p>
 
-              <p className="mb-4">
+              <p className="text-justify">
                 My Aadhaar No:{" "}
                 <span
                   className={
                     isFilled(formData?.aadhaarNo) ? "" : "bg-yellow-200 px-1"
                   }
                 >
-                  {formData?.aadhaarNo || "0000 0000 0000"}
+                  <strong>{formData?.aadhaarNo || "0000 0000 0000"}</strong>
                 </span>
               </p>
 
-              <p className="mb-4">
+              <p className="text-justify font-medium">
                 Do hereby solemnly affirm and declare as under:
               </p>
-            </div>
 
-            {/* Page 2 Content */}
-            <div className="pl-6">
-              <ol
-                className="list-decimal space-y-6"
-                style={{ counterReset: "item" }}
-              >
-                <li style={{ display: "block", counterIncrement: "item" }}>
-                  <span style={{ display: "inline-block", width: "1.5em" }}>
-                    {1}.
-                  </span>{" "}
-                  That I am the citizen of India.
-                </li>
+              <div className="space-y-3 sm:space-y-4 md:space-y-5 pl-2 sm:pl-4 md:pl-6 mt-6 sm:mt-8">
+                <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
+                  <span className="font-bold text-base sm:text-lg md:text-xl w-6 sm:w-8 md:w-10 flex-shrink-0 mt-0.5">
+                    1.
+                  </span>
+                  <p className="text-justify">
+                    That I am the citizen of India.
+                  </p>
+                </div>
 
-                <li style={{ display: "block", counterIncrement: "item" }}>
-                  <span style={{ display: "inline-block", width: "1.5em" }}>
-                    {2}.
-                  </span>{" "}
-                  That my name has been recorded as{" "}
-                  <span
-                    className={
-                      isFilled(formData?.name1) ? "" : "bg-yellow-200 px-1"
-                    }
-                  >
-                    {formData?.name1 || "NAME"}
+                <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
+                  <span className="font-bold text-base sm:text-lg md:text-xl w-6 sm:w-8 md:w-10 flex-shrink-0 mt-0.5">
+                    2.
                   </span>
-                  , Name of document-
-                  <span
-                    className={
-                      isFilled(formData?.document1) ? "" : "bg-yellow-200 px-1"
-                    }
-                  >
-                    {formData?.document1 || "NAME OF DOCUMENT"}
-                  </span>
-                  , Document Serial No-
-                  <span
-                    className={
-                      isFilled(formData?.documentNo1)
-                        ? ""
-                        : "bg-yellow-200 px-1"
-                    }
-                  >
-                    {formData?.documentNo1 || "DOCUMENT SERIAL NO"}
-                  </span>
-                </li>
+                  <p className="text-justify">
+                    That my name has been recorded as{" "}
+                    <span
+                      className={
+                        isFilled(formData?.name1) ? "" : "bg-yellow-200 px-1"
+                      }
+                    >
+                      <strong>{formData?.name1 || "NAME"}</strong>
+                    </span>
+                    , Name of document-
+                    <span
+                      className={
+                        isFilled(formData?.document1)
+                          ? ""
+                          : "bg-yellow-200 px-1"
+                      }
+                    >
+                      <strong>
+                        {formData?.document1 || "NAME OF DOCUMENT"}
+                      </strong>
+                    </span>
+                    , Document Serial No-
+                    <span
+                      className={
+                        isFilled(formData?.documentNo1)
+                          ? ""
+                          : "bg-yellow-200 px-1"
+                      }
+                    >
+                      <strong>
+                        {formData?.documentNo1 || "DOCUMENT SERIAL NO"}
+                      </strong>
+                    </span>
+                  </p>
+                </div>
 
-                <li style={{ display: "block", counterIncrement: "item" }}>
-                  <span style={{ display: "inline-block", width: "1.5em" }}>
-                    {3}.
-                  </span>{" "}
-                  That my name has been recorded as{" "}
-                  <span
-                    className={
-                      isFilled(formData?.name2) ? "" : "bg-yellow-200 px-1"
-                    }
-                  >
-                    {formData?.name2 || "NAME"}
+                <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
+                  <span className="font-bold text-base sm:text-lg md:text-xl w-6 sm:w-8 md:w-10 flex-shrink-0 mt-0.5">
+                    3.
                   </span>
-                  , Name of document-
-                  <span
-                    className={
-                      isFilled(formData?.document2) ? "" : "bg-yellow-200 px-1"
-                    }
-                  >
-                    {formData?.document2 || "NAME OF DOCUMENT"}
+                  <p className="text-justify">
+                    That my name has been recorded as{" "}
+                    <span
+                      className={
+                        isFilled(formData?.name2) ? "" : "bg-yellow-200 px-1"
+                      }
+                    >
+                      <strong>{formData?.name2 || "NAME"}</strong>
+                    </span>
+                    , Name of document-
+                    <span
+                      className={
+                        isFilled(formData?.document2)
+                          ? ""
+                          : "bg-yellow-200 px-1"
+                      }
+                    >
+                      <strong>
+                        {formData?.document2 || "NAME OF DOCUMENT"}
+                      </strong>
+                    </span>
+                    , Document Serial No-
+                    <span
+                      className={
+                        isFilled(formData?.documentNo2)
+                          ? ""
+                          : "bg-yellow-200 px-1"
+                      }
+                    >
+                      <strong>
+                        {formData?.documentNo2 || "DOCUMENT SERIAL NO"}
+                      </strong>
+                    </span>
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
+                  <span className="font-bold text-base sm:text-lg md:text-xl w-6 sm:w-8 md:w-10 flex-shrink-0 mt-0.5">
+                    4.
                   </span>
-                  , Document Serial No-
-                  <span
-                    className={
-                      isFilled(formData?.documentNo2)
-                        ? ""
-                        : "bg-yellow-200 px-1"
-                    }
-                  >
-                    {formData?.documentNo2 || "DOCUMENT SERIAL NO"}
+                  <p className="text-justify">
+                    That I further declare that both the names mentioned here in
+                    above belongs to one and the same person i.e.{" "}
+                    <strong>"myself"</strong>.
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
+                  <span className="font-bold text-base sm:text-lg md:text-xl w-6 sm:w-8 md:w-10 flex-shrink-0 mt-0.5">
+                    5.
                   </span>
-                </li>
+                  <p className="text-justify">
+                    That my statement is true and correct.
+                  </p>
+                </div>
+              </div>
 
-                <li style={{ display: "block", counterIncrement: "item" }}>
-                  <span style={{ display: "inline-block", width: "1.5em" }}>
-                    {4}.
-                  </span>{" "}
-                  That I further declare that both the names mentioned here in
-                  above belongs to one and the same person i.e. "myself".
-                </li>
-
-                <li style={{ display: "block", counterIncrement: "item" }}>
-                  <span style={{ display: "inline-block", width: "1.5em" }}>
-                    {5}.
-                  </span>{" "}
-                  That my statement is true and correct.
-                </li>
-              </ol>
-
-              <div className="mt-12">
+              <div className="mt-8 sm:mt-10 md:mt-12 text-justify">
                 <p>
                   Verified at{" "}
                   <span
@@ -195,7 +219,7 @@ const DualNameChangePreview = ({ formData }) => {
                       isFilled(formData?.place) ? "" : "bg-yellow-200 px-1"
                     }
                   >
-                    {formData?.place || "PLACE"}
+                    <strong>{formData?.place || "PLACE"}</strong>
                   </span>{" "}
                   on this{" "}
                   <span
@@ -203,14 +227,15 @@ const DualNameChangePreview = ({ formData }) => {
                       isFilled(formData?.day) ? "" : "bg-yellow-200 px-1"
                     }
                   >
-                    {getDayWithSuffix(formData?.day) || "XX"}{" "}
-                  </span>
+                    <strong>{getDayWithSuffix(formData?.day) || "XX"}</strong>
+                  </span>{" "}
+                  day of{" "}
                   <span
                     className={
                       isFilled(formData?.month) ? "" : "bg-yellow-200 px-1"
                     }
                   >
-                    {formData?.month || "XXXX"}
+                    <strong>{formData?.month || "XXXX"}</strong>
                   </span>
                   ,{" "}
                   <span
@@ -218,15 +243,22 @@ const DualNameChangePreview = ({ formData }) => {
                       isFilled(formData?.year) ? "" : "bg-yellow-200 px-1"
                     }
                   >
-                    {formData?.year || "XXXX"}
+                    <strong>{formData?.year || "XXXX"}</strong>
                   </span>{" "}
                   that the contents of the above said affidavit are true and
                   correct to the best of my knowledge and belief.
                 </p>
               </div>
 
-              <div className="mt-24 text-right pr-4">
-                <p>(Signature of the Deponent)</p>
+              <div className="mt-12 sm:mt-16 md:mt-20 text-right">
+                <div className="inline-block">
+                  <p className="text-sm sm:text-base md:text-lg">
+                    (Signature of the Deponent)
+                  </p>
+                  <p className="mt-2 sm:mt-3 font-semibold text-sm sm:text-base md:text-lg">
+                    {formData?.fullName}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -304,6 +336,7 @@ const DualNameChangePreview = ({ formData }) => {
                   fontWeight: "bold",
                   fontSize: "16pt",
                   marginBottom: "24px",
+                  textDecoration: "underline",
                 }}
               >
                 AFFIDAVIT
@@ -314,18 +347,27 @@ const DualNameChangePreview = ({ formData }) => {
                 <span
                   style={
                     isFilled(formData?.fullName)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                      ? { fontWeight: "bold" }
+                      : {
+                          backgroundColor: "#FEFCBF",
+                          padding: "0 0.25rem",
+                          fontWeight: "bold",
+                        }
                   }
                 >
+                  {formData?.namePrefix}{" "}
                   {formData?.fullName ||
                     "Mr/Mrs/Ms ..........................."}
                 </span>{" "}
                 <span
                   style={
                     isFilled(formData?.relation)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                      ? { fontWeight: "bold" }
+                      : {
+                          backgroundColor: "#FEFCBF",
+                          padding: "0 0.25rem",
+                          fontWeight: "bold",
+                        }
                   }
                 >
                   {formData?.relation || "D/o, S/o, H/o, W/o"}
@@ -333,8 +375,12 @@ const DualNameChangePreview = ({ formData }) => {
                 <span
                   style={
                     isFilled(formData?.relationName)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                      ? { fontWeight: "bold" }
+                      : {
+                          backgroundColor: "#FEFCBF",
+                          padding: "0 0.25rem",
+                          fontWeight: "bold",
+                        }
                   }
                 >
                   {formData?.relationName || "..................."}
@@ -343,8 +389,12 @@ const DualNameChangePreview = ({ formData }) => {
                 <span
                   style={
                     isFilled(formData?.age)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                      ? { fontWeight: "bold" }
+                      : {
+                          backgroundColor: "#FEFCBF",
+                          padding: "0 0.25rem",
+                          fontWeight: "bold",
+                        }
                   }
                 >
                   {formData?.age || "......"}
@@ -357,8 +407,12 @@ const DualNameChangePreview = ({ formData }) => {
                 <span
                   style={
                     isFilled(formData?.permanentAddress)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                      ? { fontWeight: "bold" }
+                      : {
+                          backgroundColor: "#FEFCBF",
+                          padding: "0 0.25rem",
+                          fontWeight: "bold",
+                        }
                   }
                 >
                   {formData?.permanentAddress ||
@@ -371,15 +425,25 @@ const DualNameChangePreview = ({ formData }) => {
                 <span
                   style={
                     isFilled(formData?.aadhaarNo)
-                      ? {}
-                      : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                      ? { fontWeight: "bold" }
+                      : {
+                          backgroundColor: "#FEFCBF",
+                          padding: "0 0.25rem",
+                          fontWeight: "bold",
+                        }
                   }
                 >
                   {formData?.aadhaarNo || "0000 0000 0000"}
                 </span>
               </p>
 
-              <p style={{ marginBottom: "20px", lineHeight: "1.5" }}>
+              <p
+                style={{
+                  marginBottom: "20px",
+                  lineHeight: "1.5",
+                  fontWeight: "500",
+                }}
+              >
                 Do hereby solemnly affirm and declare as under:
               </p>
 
@@ -401,28 +465,40 @@ const DualNameChangePreview = ({ formData }) => {
                   <span
                     style={
                       isFilled(formData?.name1)
-                        ? {}
-                        : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                        ? { fontWeight: "bold" }
+                        : {
+                            backgroundColor: "#FEFCBF",
+                            padding: "0 0.25rem",
+                            fontWeight: "bold",
+                          }
                     }
                   >
                     {formData?.name1 || "NAME"}
                   </span>
-                  ,{" "}
+                  , Name of document-
                   <span
                     style={
                       isFilled(formData?.document1)
-                        ? {}
-                        : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                        ? { fontWeight: "bold" }
+                        : {
+                            backgroundColor: "#FEFCBF",
+                            padding: "0 0.25rem",
+                            fontWeight: "bold",
+                          }
                     }
                   >
                     {formData?.document1 || "NAME OF DOCUMENT"}
                   </span>
-                  ,{" "}
+                  , Document Serial No-
                   <span
                     style={
                       isFilled(formData?.documentNo1)
-                        ? {}
-                        : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                        ? { fontWeight: "bold" }
+                        : {
+                            backgroundColor: "#FEFCBF",
+                            padding: "0 0.25rem",
+                            fontWeight: "bold",
+                          }
                     }
                   >
                     {formData?.documentNo1 || "DOCUMENT SERIAL NO"}
@@ -496,28 +572,40 @@ const DualNameChangePreview = ({ formData }) => {
                   <span
                     style={
                       isFilled(formData?.name2)
-                        ? {}
-                        : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                        ? { fontWeight: "bold" }
+                        : {
+                            backgroundColor: "#FEFCBF",
+                            padding: "0 0.25rem",
+                            fontWeight: "bold",
+                          }
                     }
                   >
                     {formData?.name2 || "NAME"}
                   </span>
-                  ,{" "}
+                  , Name of document-
                   <span
                     style={
                       isFilled(formData?.document2)
-                        ? {}
-                        : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                        ? { fontWeight: "bold" }
+                        : {
+                            backgroundColor: "#FEFCBF",
+                            padding: "0 0.25rem",
+                            fontWeight: "bold",
+                          }
                     }
                   >
                     {formData?.document2 || "NAME OF DOCUMENT"}
                   </span>
-                  ,{" "}
+                  , Document Serial No-
                   <span
                     style={
                       isFilled(formData?.documentNo2)
-                        ? {}
-                        : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                        ? { fontWeight: "bold" }
+                        : {
+                            backgroundColor: "#FEFCBF",
+                            padding: "0 0.25rem",
+                            fontWeight: "bold",
+                          }
                     }
                   >
                     {formData?.documentNo2 || "DOCUMENT SERIAL NO"}
@@ -529,7 +617,8 @@ const DualNameChangePreview = ({ formData }) => {
                   <span style={{ textDecoration: "underline" }}>
                     hereinabove
                   </span>{" "}
-                  belongs to one and the same person i.e. "myself".
+                  belongs to one and the same person i.e.{" "}
+                  <span style={{ fontWeight: "bold" }}>"myself"</span>.
                 </li>
 
                 <li style={{ marginBottom: "16px" }}>
@@ -543,8 +632,12 @@ const DualNameChangePreview = ({ formData }) => {
                   <span
                     style={
                       isFilled(formData?.place)
-                        ? {}
-                        : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                        ? { fontWeight: "bold" }
+                        : {
+                            backgroundColor: "#FEFCBF",
+                            padding: "0 0.25rem",
+                            fontWeight: "bold",
+                          }
                     }
                   >
                     {formData?.place || "PLACE"}
@@ -553,18 +646,26 @@ const DualNameChangePreview = ({ formData }) => {
                   <span
                     style={
                       isFilled(formData?.day)
-                        ? {}
-                        : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                        ? { fontWeight: "bold" }
+                        : {
+                            backgroundColor: "#FEFCBF",
+                            padding: "0 0.25rem",
+                            fontWeight: "bold",
+                          }
                     }
                   >
-                    {formData?.day || "XX"}
+                    {getDayWithSuffix(formData?.day) || "XX"}
                   </span>{" "}
                   day of{" "}
                   <span
                     style={
                       isFilled(formData?.month)
-                        ? {}
-                        : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                        ? { fontWeight: "bold" }
+                        : {
+                            backgroundColor: "#FEFCBF",
+                            padding: "0 0.25rem",
+                            fontWeight: "bold",
+                          }
                     }
                   >
                     {formData?.month || "XXXX"}
@@ -573,8 +674,12 @@ const DualNameChangePreview = ({ formData }) => {
                   <span
                     style={
                       isFilled(formData?.year)
-                        ? {}
-                        : { backgroundColor: "#FEFCBF", padding: "0 0.25rem" }
+                        ? { fontWeight: "bold" }
+                        : {
+                            backgroundColor: "#FEFCBF",
+                            padding: "0 0.25rem",
+                            fontWeight: "bold",
+                          }
                     }
                   >
                     {formData?.year || "XXXX"}
@@ -592,6 +697,9 @@ const DualNameChangePreview = ({ formData }) => {
                 }}
               >
                 <p>(Signature of the Deponent)</p>
+                <p style={{ marginTop: "12px", fontWeight: "600" }}>
+                  {formData?.fullName}
+                </p>
               </div>
             </div>
           </div>
@@ -605,7 +713,7 @@ const DualNameChangePreview = ({ formData }) => {
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%) rotate(-45deg);
-          font-size: 3rem;
+          font-size: clamp(1.5rem, 4vw, 3rem);
           font-weight: bold;
           color: rgba(0, 0, 0, 0.1);
           font-family: Arial, sans-serif;
@@ -614,6 +722,34 @@ const DualNameChangePreview = ({ formData }) => {
           z-index: 1;
           white-space: nowrap;
           user-select: none;
+        }
+
+        @media (max-width: 640px) {
+          .watermark {
+            font-size: 1.5rem;
+            letter-spacing: 0.1em;
+          }
+        }
+
+        @media (min-width: 641px) and (max-width: 768px) {
+          .watermark {
+            font-size: 2rem;
+            letter-spacing: 0.15em;
+          }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .watermark {
+            font-size: 2.5rem;
+            letter-spacing: 0.2em;
+          }
+        }
+
+        @media (min-width: 1025px) {
+          .watermark {
+            font-size: 3rem;
+            letter-spacing: 0.2em;
+          }
         }
 
         @media print {
