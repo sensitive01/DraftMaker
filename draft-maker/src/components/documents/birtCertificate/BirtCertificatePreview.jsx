@@ -8,7 +8,7 @@ const BirthCertificatePreview = ({ formData }) => {
   };
 
   return (
-    <div className="bg-red-100 min-h-screen px-2 sm:px-4 lg:px-6 py-4">
+    <div className="bg-white min-h-screen px-2 sm:px-4 lg:px-6 py-4">
       <div className="bg-white rounded-lg shadow-md border border-gray-200 relative max-w-4xl mx-auto">
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="text-gray-300 text-sm sm:text-lg md:text-xl lg:text-2xl font-bold transform rotate-45 select-none font-sans opacity-80">

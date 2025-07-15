@@ -8,7 +8,7 @@ const MetriculationPreview = ({ formData }) => {
   };
 
   return (
-    <div className="bg-red-100 min-h-[500px] sm:min-h-[600px] md:min-h-[700px] p-2 sm:p-4 md:p-6">
+    <div className="bg-white min-h-[500px] sm:min-h-[600px] md:min-h-[700px] p-2 sm:p-4 md:p-6">
       <div className="bg-white rounded-lg shadow-md border border-gray-200 relative max-w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto">
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="text-gray-300 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold transform rotate-45 select-none font-sans opacity-80">

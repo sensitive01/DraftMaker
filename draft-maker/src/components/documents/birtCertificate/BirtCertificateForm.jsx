@@ -2,13 +2,13 @@ import React from 'react'
 
 const BirtCertificateForm = ({formData,handleChange}) => {
   return (
-    <div className="border p-6 bg-white shadow-md">
-    <h2 className="text-xl font-bold mb-4">
+    <div className="border p-4 sm:p-6 bg-white shadow-md max-w-4xl mx-auto">
+    <h2 className="text-lg sm:text-xl font-bold mb-4">
       Birth Certificate Correction Form
     </h2>
-    <form className="space-y-4">
+    <div className="space-y-4">
       <div>
-        <label className="block text-red-600 font-medium mb-1">
+        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
           Parent Title & Name
         </label>
         <div className="flex gap-2">
@@ -16,7 +16,7 @@ const BirtCertificateForm = ({formData,handleChange}) => {
             name="parentTitle"
             value={formData.parentTitle}
             onChange={handleChange}
-            className="border p-2 w-24"
+            className="border p-2 w-20 sm:w-24 text-sm sm:text-base"
           >
             <option>Mr.</option>
             <option>Mrs.</option>
@@ -28,13 +28,13 @@ const BirtCertificateForm = ({formData,handleChange}) => {
             value={formData.parentName}
             onChange={handleChange}
             placeholder="Parent's Full Name"
-            className="border p-2 flex-1"
+            className="border p-2 flex-1 text-sm sm:text-base"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-red-600 font-medium mb-1">
+        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
           Spouse Title & Name
         </label>
         <div className="flex gap-2">
@@ -42,7 +42,7 @@ const BirtCertificateForm = ({formData,handleChange}) => {
             name="spouseTitle"
             value={formData.spouseTitle}
             onChange={handleChange}
-            className="border p-2 w-24"
+            className="border p-2 w-20 sm:w-24 text-sm sm:text-base"
           >
             <option>Mrs.</option>
             <option>Mr.</option>
@@ -54,13 +54,13 @@ const BirtCertificateForm = ({formData,handleChange}) => {
             value={formData.spouseName}
             onChange={handleChange}
             placeholder="Spouse's Full Name"
-            className="border p-2 flex-1"
+            className="border p-2 flex-1 text-sm sm:text-base"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-red-600 font-medium mb-1">
+        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
           Permanent Address
         </label>
         <textarea
@@ -68,14 +68,14 @@ const BirtCertificateForm = ({formData,handleChange}) => {
           value={formData.address}
           onChange={handleChange}
           placeholder="Complete Address with Pin Code"
-          className="border p-2 w-full"
+          className="border p-2 w-full text-sm sm:text-base"
           rows="3"
         ></textarea>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-red-600 font-medium mb-1">
+          <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
             Parent's Aadhaar No.
           </label>
           <input
@@ -84,12 +84,12 @@ const BirtCertificateForm = ({formData,handleChange}) => {
             value={formData.parentAadhaar}
             onChange={handleChange}
             placeholder="0000 0000 0000"
-            className="border p-2 w-full"
+            className="border p-2 w-full text-sm sm:text-base"
           />
         </div>
 
         <div>
-          <label className="block text-red-600 font-medium mb-1">
+          <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
             Spouse's Aadhaar No.
           </label>
           <input
@@ -98,20 +98,20 @@ const BirtCertificateForm = ({formData,handleChange}) => {
             value={formData.spouseAadhaar}
             onChange={handleChange}
             placeholder="0000 0000 0000"
-            className="border p-2 w-full"
+            className="border p-2 w-full text-sm sm:text-base"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-red-600 font-medium mb-1">
+        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
           Child Relation
         </label>
         <select
           name="childRelation"
           value={formData.childRelation}
           onChange={handleChange}
-          className="border p-2 w-full"
+          className="border p-2 w-full text-sm sm:text-base"
         >
           <option>Daughter</option>
           <option>Son</option>
@@ -119,7 +119,7 @@ const BirtCertificateForm = ({formData,handleChange}) => {
       </div>
 
       <div>
-        <label className="block text-red-600 font-medium mb-1">
+        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
           Child's Name
         </label>
         <input
@@ -128,12 +128,12 @@ const BirtCertificateForm = ({formData,handleChange}) => {
           value={formData.childName}
           onChange={handleChange}
           placeholder="Child's Name"
-          className="border p-2 w-full"
+          className="border p-2 w-full text-sm sm:text-base"
         />
       </div>
 
       <div>
-        <label className="block text-red-600 font-medium mb-1">
+        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
           Certificate Number
         </label>
         <input
@@ -142,12 +142,12 @@ const BirtCertificateForm = ({formData,handleChange}) => {
           value={formData.certificateNumber}
           onChange={handleChange}
           placeholder="Birth Certificate Number"
-          className="border p-2 w-full"
+          className="border p-2 w-full text-sm sm:text-base"
         />
       </div>
 
       <div>
-        <label className="block text-red-600 font-medium mb-1">
+        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
           Incorrect Name (as per Birth Certificate)
         </label>
         <input
@@ -156,12 +156,12 @@ const BirtCertificateForm = ({formData,handleChange}) => {
           value={formData.incorrectName}
           onChange={handleChange}
           placeholder="Incorrect Name"
-          className="border p-2 w-full"
+          className="border p-2 w-full text-sm sm:text-base"
         />
       </div>
 
       <div>
-        <label className="block text-red-600 font-medium mb-1">
+        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
           Correct Name (as per Aadhaar)
         </label>
         <input
@@ -170,12 +170,12 @@ const BirtCertificateForm = ({formData,handleChange}) => {
           value={formData.correctName}
           onChange={handleChange}
           placeholder="Correct Name"
-          className="border p-2 w-full"
+          className="border p-2 w-full text-sm sm:text-base"
         />
       </div>
 
       <div>
-        <label className="block text-red-600 font-medium mb-1">
+        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
           Place of Verification
         </label>
         <input
@@ -184,13 +184,13 @@ const BirtCertificateForm = ({formData,handleChange}) => {
           value={formData.place}
           onChange={handleChange}
           placeholder="City/Town"
-          className="border p-2 w-full"
+          className="border p-2 w-full text-sm sm:text-base"
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <div>
-          <label className="block text-red-600 font-medium mb-1">Day</label>
+          <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">Day</label>
           <input
             type="number"
             name="day"
@@ -199,17 +199,17 @@ const BirtCertificateForm = ({formData,handleChange}) => {
             min="1"
             max="31"
             placeholder="DD"
-            className="border p-2 w-full"
+            className="border p-2 w-full text-sm sm:text-base"
           />
         </div>
 
         <div>
-          <label className="block text-red-600 font-medium mb-1">Month</label>
+          <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">Month</label>
           <select
             name="month"
             value={formData.month}
             onChange={handleChange}
-            className="border p-2 w-full"
+            className="border p-2 w-full text-sm sm:text-base"
           >
             <option>January</option>
             <option>February</option>
@@ -227,18 +227,18 @@ const BirtCertificateForm = ({formData,handleChange}) => {
         </div>
 
         <div>
-          <label className="block text-red-600 font-medium mb-1">Year</label>
+          <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">Year</label>
           <input
             type="number"
             name="year"
             value={formData.year}
             onChange={handleChange}
             placeholder="YYYY"
-            className="border p-2 w-full"
+            className="border p-2 w-full text-sm sm:text-base"
           />
         </div>
       </div>
-    </form>
+    </div>
   </div>
   )
 }

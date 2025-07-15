@@ -4,17 +4,19 @@ const GstForm = ({ formData, handleChange }) => {
   const requiredFieldStyle = "text-red-600 font-medium";
 
   return (
-    <div className="w-full bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-4 text-blue-700 border-b pb-2">
+    <div className="w-full max-w-4xl mx-auto bg-white p-4 sm:p-6 rounded-lg shadow-md">
+      <h2 className="text-lg sm:text-xl font-bold mb-4 text-blue-700 border-b pb-2">
         GST NOC Form
       </h2>
-      <p className="text-sm text-gray-500 mb-4">
+      <p className="text-xs sm:text-sm text-gray-500 mb-4">
         Fields marked with <span className="text-red-600">*</span> are required
       </p>
 
-      <form className="space-y-4">
+      <div className="space-y-4">
         <div>
-          <label className={`block mb-1 ${requiredFieldStyle}`}>
+          <label
+            className={`block mb-1 text-sm sm:text-base ${requiredFieldStyle}`}
+          >
             Property Owner Name *
           </label>
           <input
@@ -22,13 +24,15 @@ const GstForm = ({ formData, handleChange }) => {
             name="ownerName"
             value={formData?.ownerName}
             onChange={handleChange}
-            className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition"
+            className="w-full p-2 sm:p-3 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition text-sm sm:text-base"
             required
           />
         </div>
 
         <div>
-          <label className={`block mb-1 ${requiredFieldStyle}`}>
+          <label
+            className={`block mb-1 text-sm sm:text-base ${requiredFieldStyle}`}
+          >
             Aadhaar Number *
           </label>
           <input
@@ -36,41 +40,47 @@ const GstForm = ({ formData, handleChange }) => {
             name="aadhaarNo"
             value={formData?.aadhaarNo}
             onChange={handleChange}
-            className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition"
+            className="w-full p-2 sm:p-3 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition text-sm sm:text-base"
             required
           />
         </div>
 
         <div>
-          <label className={`block mb-1 ${requiredFieldStyle}`}>
+          <label
+            className={`block mb-1 text-sm sm:text-base ${requiredFieldStyle}`}
+          >
             Owner Address *
           </label>
           <textarea
             name="ownerAddress"
             value={formData?.ownerAddress}
             onChange={handleChange}
-            className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition"
+            className="w-full p-2 sm:p-3 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition text-sm sm:text-base"
             rows="2"
             required
           ></textarea>
         </div>
 
         <div>
-          <label className={`block mb-1 ${requiredFieldStyle}`}>
+          <label
+            className={`block mb-1 text-sm sm:text-base ${requiredFieldStyle}`}
+          >
             Premises Address *
           </label>
           <textarea
             name="premisesAddress"
             value={formData?.premisesAddress}
             onChange={handleChange}
-            className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition"
+            className="w-full p-2 sm:p-3 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition text-sm sm:text-base"
             rows="2"
             required
           ></textarea>
         </div>
 
         <div>
-          <label className={`block mb-1 ${requiredFieldStyle}`}>
+          <label
+            className={`block mb-1 text-sm sm:text-base ${requiredFieldStyle}`}
+          >
             Tenant Name *
           </label>
           <input
@@ -78,13 +88,15 @@ const GstForm = ({ formData, handleChange }) => {
             name="tenantName"
             value={formData?.tenantName}
             onChange={handleChange}
-            className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition"
+            className="w-full p-2 sm:p-3 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition text-sm sm:text-base"
             required
           />
         </div>
 
         <div>
-          <label className={`block mb-1 ${requiredFieldStyle}`}>
+          <label
+            className={`block mb-1 text-sm sm:text-base ${requiredFieldStyle}`}
+          >
             Company/Firm Name *
           </label>
           <input
@@ -92,28 +104,32 @@ const GstForm = ({ formData, handleChange }) => {
             name="companyName"
             value={formData?.companyName}
             onChange={handleChange}
-            className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition"
+            className="w-full p-2 sm:p-3 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition text-sm sm:text-base"
             required
           />
         </div>
 
         <div>
-          <label className={`block mb-1 ${requiredFieldStyle}`}>
+          <label
+            className={`block mb-1 text-sm sm:text-base ${requiredFieldStyle}`}
+          >
             Office Address *
           </label>
           <textarea
             name="officeAddress"
             value={formData?.officeAddress}
             onChange={handleChange}
-            className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition"
+            className="w-full p-2 sm:p-3 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition text-sm sm:text-base"
             rows="2"
             required
           ></textarea>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
-          <div className="col-span-1">
-            <label className={`block mb-1 ${requiredFieldStyle}`}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+          <div>
+            <label
+              className={`block mb-1 text-sm sm:text-base ${requiredFieldStyle}`}
+            >
               Place *
             </label>
             <input
@@ -121,24 +137,30 @@ const GstForm = ({ formData, handleChange }) => {
               name="place"
               value={formData?.place}
               onChange={handleChange}
-              className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition"
+              className="w-full p-2 sm:p-3 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition text-sm sm:text-base"
               required
             />
           </div>
-          <div className="col-span-1">
-            <label className={`block mb-1 ${requiredFieldStyle}`}>Day *</label>
+          <div>
+            <label
+              className={`block mb-1 text-sm sm:text-base ${requiredFieldStyle}`}
+            >
+              Day *
+            </label>
             <input
               type="text"
               name="day"
               value={formData?.day}
               onChange={handleChange}
-              className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition"
+              className="w-full p-2 sm:p-3 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition text-sm sm:text-base"
               placeholder="DD"
               required
             />
           </div>
-          <div className="col-span-1">
-            <label className={`block mb-1 ${requiredFieldStyle}`}>
+          <div>
+            <label
+              className={`block mb-1 text-sm sm:text-base ${requiredFieldStyle}`}
+            >
               Month *
             </label>
             <input
@@ -146,25 +168,29 @@ const GstForm = ({ formData, handleChange }) => {
               name="month"
               value={formData?.month}
               onChange={handleChange}
-              className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition"
+              className="w-full p-2 sm:p-3 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition text-sm sm:text-base"
               placeholder="Month"
               required
             />
           </div>
-          <div className="col-span-1">
-            <label className={`block mb-1 ${requiredFieldStyle}`}>Year *</label>
+          <div>
+            <label
+              className={`block mb-1 text-sm sm:text-base ${requiredFieldStyle}`}
+            >
+              Year *
+            </label>
             <input
               type="text"
               name="year"
               value={formData?.year}
               onChange={handleChange}
-              className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition"
+              className="w-full p-2 sm:p-3 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition text-sm sm:text-base"
               placeholder="YYYY"
               required
             />
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
