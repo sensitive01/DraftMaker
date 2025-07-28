@@ -75,6 +75,8 @@ import Test from "./components/Test";
 import AboutUsContentPage from "./components/AboutUsContentPage";
 import FloatingContactButtons from "./FloatingContactButtons";
 import MoveToTop from "./MoveToTop";
+import DocumentUpload from "./components/uploadfile/UploadDocument";
+import UploadDocumentBookings from "./components/admin/dashboard/statistics/UploadDocumentBookings";
 
 function MainLayout({ children }) {
   return (
@@ -417,6 +419,14 @@ function App() {
             element={
               <ProtectedAdminRoute>
                 <StampDutyTable />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/uploaded-document-table"
+            element={
+              <ProtectedAdminRoute>
+                <UploadDocumentBookings />
               </ProtectedAdminRoute>
             }
           />
@@ -804,6 +814,14 @@ function App() {
           element={
             <PaymentLayout>
               <TrackMyDocuments />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/upload-document"
+          element={
+            <PaymentLayout>
+              <DocumentUpload />
             </PaymentLayout>
           }
         />

@@ -29,14 +29,20 @@ const Header = () => {
         <div className="running-message-banner">
           <div className="running-message">
             <i className="icofont-info-circle notification-icon"></i>
-            <span className="message-text">Services only available in Karnataka</span>
+            <span className="message-text">
+              Services only available in Karnataka
+            </span>
             <i className="icofont-info-circle notification-icon"></i>
-            <span className="message-text">Services only available in Karnataka</span>
+            <span className="message-text">
+              Services only available in Karnataka
+            </span>
             <i className="icofont-info-circle notification-icon"></i>
-            <span className="message-text">Services only available in Karnataka</span>
+            <span className="message-text">
+              Services only available in Karnataka
+            </span>
           </div>
         </div>
-        <div className="container">
+        <div className="ml-7 mr-3">
           <nav className="navbar navbar-expand-lg">
             <Link className="navbar-brand" to="/" onClick={closeMenu}>
               <img src={draftMakerLogo} alt="Draft Maker" />
@@ -66,26 +72,34 @@ const Header = () => {
                     <i className="icofont-home"></i>
                   </Link>
                 </li>
-                
+
                 {/* Document Drafting Dropdown */}
                 <li className="nav-item has_dropdown">
-                  <a 
-                    className="nav-link dropdown-toggle-custom" 
+                  <a
+                    className="nav-link dropdown-toggle-custom"
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
-                      toggleDropdown('documents');
+                      toggleDropdown("documents");
                     }}
                   >
                     Document Drafting
                   </a>
-                  <span 
+                  <span
                     className="drp_btn"
-                    onClick={() => toggleDropdown('documents')}
+                    onClick={() => toggleDropdown("documents")}
                   >
-                    <i className={`icofont-rounded-down ${activeDropdown === 'documents' ? 'rotate-180' : ''}`}></i>
+                    <i
+                      className={`icofont-rounded-down ${
+                        activeDropdown === "documents" ? "rotate-180" : ""
+                      }`}
+                    ></i>
                   </span>
-                  <div className={`sub_menu scrollable-submenu ${activeDropdown === 'documents' ? 'show-dropdown' : ''}`}>
+                  <div
+                    className={`sub_menu scrollable-submenu ${
+                      activeDropdown === "documents" ? "show-dropdown" : ""
+                    }`}
+                  >
                     <div className="submenu-scroll-container">
                       <ul>
                         <li>
@@ -246,26 +260,34 @@ const Header = () => {
                     Buy E-Stamp
                   </Link>
                 </li>
-                
+
                 {/* Newspaper Ad Dropdown */}
                 <li className="nav-item has_dropdown">
-                  <a 
-                    className="nav-link dropdown-toggle-custom" 
+                  <a
+                    className="nav-link dropdown-toggle-custom"
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
-                      toggleDropdown('newspaper');
+                      toggleDropdown("newspaper");
                     }}
                   >
                     Newspaper Ad
                   </a>
-                  <span 
+                  <span
                     className="drp_btn"
-                    onClick={() => toggleDropdown('newspaper')}
+                    onClick={() => toggleDropdown("newspaper")}
                   >
-                    <i className={`icofont-rounded-down ${activeDropdown === 'newspaper' ? 'rotate-180' : ''}`}></i>
+                    <i
+                      className={`icofont-rounded-down ${
+                        activeDropdown === "newspaper" ? "rotate-180" : ""
+                      }`}
+                    ></i>
                   </span>
-                  <div className={`sub_menu ${activeDropdown === 'newspaper' ? 'show-dropdown' : ''}`}>
+                  <div
+                    className={`sub_menu ${
+                      activeDropdown === "newspaper" ? "show-dropdown" : ""
+                    }`}
+                  >
                     <ul>
                       <li>
                         <Link
@@ -276,10 +298,7 @@ const Header = () => {
                         </Link>
                       </li>
                       <li>
-                        <Link
-                          to="#"
-                          onClick={closeMenu}
-                        >
+                        <Link to="#" onClick={closeMenu}>
                           Others
                         </Link>
                       </li>
@@ -289,76 +308,80 @@ const Header = () => {
 
                 {/* In-Shop Services Dropdown */}
                 <li className="nav-item has_dropdown">
-                  <a 
-                    className="nav-link dropdown-toggle-custom" 
+                  <a
+                    className="nav-link dropdown-toggle-custom"
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
-                      toggleDropdown('services');
+                      toggleDropdown("services");
                     }}
                   >
                     In-Shop Services
                   </a>
-                  <span 
+                  <span
                     className="drp_btn"
-                    onClick={() => toggleDropdown('services')}
+                    onClick={() => toggleDropdown("services")}
                   >
-                    <i className={`icofont-rounded-down ${activeDropdown === 'services' ? 'rotate-180' : ''}`}></i>
+                    <i
+                      className={`icofont-rounded-down ${
+                        activeDropdown === "services" ? "rotate-180" : ""
+                      }`}
+                    ></i>
                   </span>
-                  <div className={`sub_menu ${activeDropdown === 'services' ? 'show-dropdown' : ''}`}>
+                  <div
+                    className={`sub_menu ${
+                      activeDropdown === "services" ? "show-dropdown" : ""
+                    }`}
+                  >
                     <ul>
                       <li>
-                        <Link
-                          to="#"
-                          onClick={closeMenu}
-                        >
+                        <Link to="#" onClick={closeMenu}>
                           Notary Services
                         </Link>
                       </li>
                       <li>
-                        <Link
-                          to="#"
-                          onClick={closeMenu}
-                        >
+                        <Link to="#" onClick={closeMenu}>
                           Police Verification Certificate
                         </Link>
                       </li>
                       <li>
-                        <Link
-                          to="#"
-                          onClick={closeMenu}
-                        >
+                        <Link to="#" onClick={closeMenu}>
                           Passport Services
                         </Link>
                       </li>
                       <li>
-                        <Link
-                          to="#"
-                          onClick={closeMenu}
-                        >
+                        <Link to="#" onClick={closeMenu}>
                           PAN Card Services
                         </Link>
                       </li>
                       <li>
-                        <Link
-                          to="#"
-                          onClick={closeMenu}
-                        >
+                        <Link to="#" onClick={closeMenu}>
                           Voter ID Services
                         </Link>
                       </li>
                       <li>
-                        <Link
-                          to="#"
-                          onClick={closeMenu}
-                        >
+                        <Link to="#" onClick={closeMenu}>
                           Jeevan Pramaan Certificate
                         </Link>
                       </li>
                     </ul>
                   </div>
                 </li>
-                
+
+                <li className="nav-item active">
+                  <Link
+                    className="nav-link dark_btn"
+                    to="/documents/upload-document"
+                    onClick={closeMenu}
+                  >
+                    Upload Document{" "}
+                    <i
+                      className="icofont-upload-alt"
+                      style={{ color: "white" }}
+                    ></i>
+                  </Link>
+                </li>
+
                 <li className="nav-item active">
                   <Link
                     className="nav-link dark_btn"
@@ -431,7 +454,8 @@ const Header = () => {
           }
 
           @keyframes pulse {
-            0%, 100% {
+            0%,
+            100% {
               opacity: 1;
             }
             50% {

@@ -597,7 +597,7 @@ export default function CommercialAggrement() {
         />
       )}
 
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col md:flex-row gap-6 md:items-start">
         <div className="w-full md:w-1/2">
           <RentalForm
             formData={formData}
@@ -618,7 +618,10 @@ export default function CommercialAggrement() {
             </div>
           )}
         </div>
-        <div className="w-full md:w-1/2 bg-white shadow-lg rounded-lg">
+        <div
+          className="w-full md:w-1/2 bg-white shadow-lg rounded-lg"
+          style={{ height: "2100px", overflowY: "scroll" }}
+        >
           <CommercialPreview formData={formData} />
         </div>
       </div>

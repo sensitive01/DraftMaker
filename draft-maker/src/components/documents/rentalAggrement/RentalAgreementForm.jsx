@@ -205,7 +205,6 @@ export default function RentalAgreementForm() {
       return false;
     }
 
-
     // if (!formData.lessorAddressLine1.trim()) {
     //   setValidationError("Please enter lessor's address line 1");
     //   return false;
@@ -228,8 +227,6 @@ export default function RentalAgreementForm() {
     //   setValidationError("Lessor's PIN code must be 6 digits");
     //   return false;
     // }
-
-
 
     // if (!formData.lesseeAadhaar.trim()) {
     //   setValidationError("Please enter lessee's Aadhaar number");
@@ -592,8 +589,6 @@ export default function RentalAgreementForm() {
 
   return (
     <div className="container-fluid mx-auto p-4">
-
-
       {/* Add Error Notification Component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
@@ -602,7 +597,7 @@ export default function RentalAgreementForm() {
         />
       )}
 
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col md:flex-row gap-6 md:items-start">
         <div className="w-full md:w-1/2">
           <RentalForm
             formData={formData}
@@ -623,7 +618,10 @@ export default function RentalAgreementForm() {
             </div>
           )}
         </div>
-        <div className="w-full md:w-1/2 bg-white shadow-lg rounded-lg">
+        <div
+          className="w-full md:w-1/2 bg-white shadow-lg rounded-lg"
+          style={{ height: "2300px", overflowY: "scroll" }}
+        >
           <RentalPreview formData={formData} />
         </div>
       </div>

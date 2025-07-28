@@ -18,8 +18,9 @@ const passportNameChange = require("../model/documentsModel/passportNameChange")
 const adressAffadavit = require("../model/documentsModel/adressAffadavit");
 const commercialSchema = require("../model/documentsModel/commercialData");
 const recidentialSchema = require("../model/documentsModel/recidentialData");
-const eStampPaymentData = require("../model/eStampPaymentSchema")
-
+const eStampPaymentData = require("../model/eStampPaymentSchema");
+const uploadDocument = require("../model/upload/uploadDocument");
+const BookingIdRegistry = require("../model/documentsModel/bookingId");
 
 const getDashboardStatistics = async (req, res) => {
   try {
@@ -105,14 +106,64 @@ const getDashboardStatistics = async (req, res) => {
   }
 };
 
+const getDocumentNames = async (req, res) => {
+  try {
+    const documentsData = await documentPriceData.find(
+      {},
+      { documentType: 1, formId: 1, draftCharge: 1, draftNotaryCharge: 1 }
+    );
+
+    if (!documentsData || documentsData.length === 0) {
+      return res.status(404).json({ message: "No documents found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: documentsData,
+    });
+  } catch (err) {
+    console.error("Error in getting the document names:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getUploadedDocumentData = async (req, res) => {
+  try {
+    const uploadedDocuments = await uploadDocument.find({});
+
+    if (!uploadedDocuments || uploadedDocuments.length === 0) {
+      return res.status(404).json({ message: "No uploaded documents found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: uploadedDocuments,
+    });
+  } catch (err) {
+    console.error("Error in getting uploaded documents:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const trackMyDocumentStatus = async (req, res) => {
   try {
     const { mobile } = req.body;
 
     // Filter to use in every find query
-    const filter = { mobileNumber: mobile,paymentStatus:"success" };
+    const filter = { mobileNumber: mobile, paymentStatus: "success" };
 
-    const eStambData = await eStampPaymentData.find({mobileNumber:mobile,paymentStatus:"completed"},{mobileNumber:1,documentStatus:1,bookingId:1,createdAt:1,documentType:1,requestorName:1,totalAmount:1})
+    const eStambData = await eStampPaymentData.find(
+      { mobileNumber: mobile, paymentStatus: "completed" },
+      {
+        mobileNumber: 1,
+        documentStatus: 1,
+        bookingId: 1,
+        createdAt: 1,
+        documentType: 1,
+        requestorName: 1,
+        totalAmount: 1,
+      }
+    );
 
     const dualNameData = await dualNameCorrection.find(filter, {
       paymentDetails: 1,
@@ -353,7 +404,7 @@ const trackMyDocumentStatus = async (req, res) => {
       ...adressAffadavitData,
       ...commercialData,
       ...recidentialData,
-      ...eStambData
+      ...eStambData,
     ];
 
     // Sort by createdAt descending
@@ -386,7 +437,7 @@ const trackMyDocumentStatus = async (req, res) => {
     res.status(200).json({
       message: "Documents data fetched successfully",
       data: formattedData,
-      eStambData
+      eStambData,
     });
   } catch (err) {
     console.error("Error in getting all Documents data:", err);
@@ -844,10 +895,29 @@ const updateBookingStatus = async (req, res) => {
   }
 };
 
-function generateBookingId() {
+// function generateBookingId() {
+//   const prefix = "DM";
+//   const randomNumber = Math.floor(1000000 + Math.random() * 9000000);
+//   return `${prefix}${randomNumber}`;
+// }
+
+async function generateBookingId() {
   const prefix = "DM";
-  const randomNumber = Math.floor(1000000 + Math.random() * 9000000);
-  return `${prefix}${randomNumber}`;
+  let unique = false;
+  let bookingId;
+
+  while (!unique) {
+    const randomNumber = Math.floor(1000000 + Math.random() * 9000000);
+    bookingId = `${prefix}${randomNumber}`;
+
+    const exists = await BookingIdRegistry.findOne({ bookingId });
+    if (!exists) {
+      await new BookingIdRegistry({ bookingId }).save();
+      unique = true;
+    }
+  }
+
+  return bookingId;
 }
 
 const saveDualNameCorrection = async (req, res) => {
@@ -865,7 +935,7 @@ const saveDualNameCorrection = async (req, res) => {
       return res.status(404).json({ message: "Document type not found" });
     }
 
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
 
     const newData = new dualNameCorrection({
       ...formData,
@@ -1018,7 +1088,7 @@ const saveNameCorrection = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new nameCorrection({
       ...document,
       bookingId,
@@ -1124,7 +1194,7 @@ const createDobCorrection = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new dobCorrection({
       ...document,
       bookingId,
@@ -1230,7 +1300,7 @@ const createGasCorrection = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new GasFormData({
       ...document,
       bookingId,
@@ -1336,7 +1406,7 @@ const createDocumentLost = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new documentLost({
       ...document,
       bookingId,
@@ -1440,7 +1510,7 @@ const createDobParentNameCorrection = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new dobParentNameCorrection({
       ...document,
       bookingId,
@@ -1540,7 +1610,7 @@ const createBirthCertificateNameCorrection = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new birthCertificateNameCorrection({
       ...document,
       bookingId,
@@ -1640,7 +1710,7 @@ const saveGstData = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new gstSchema({
       ...document,
       bookingId,
@@ -1746,7 +1816,7 @@ const createMetriculationLostData = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new metriculationLost({
       ...document,
       bookingId,
@@ -1852,7 +1922,7 @@ const createKhataCorrectionData = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new khataCorrection({
       ...document,
       bookingId,
@@ -1958,7 +2028,7 @@ const createVehicleInsurenceData = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new vehicleInsurence({
       ...document,
       bookingId,
@@ -2064,7 +2134,7 @@ const createHufData = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new hufSchema({
       ...document,
       bookingId,
@@ -2170,7 +2240,7 @@ const createGapPeriodData = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new gapPeriodSchema({
       ...document,
       bookingId,
@@ -2270,7 +2340,7 @@ const createPasswordAnnaxureData = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new passportAnnaxure({
       ...document,
       bookingId,
@@ -2370,7 +2440,7 @@ const createPassportNameChangeData = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new passportNameChange({
       ...document,
       bookingId,
@@ -2476,7 +2546,7 @@ const createAdressAffadavitData = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new adressAffadavit({
       ...document,
       bookingId,
@@ -2582,7 +2652,7 @@ const createCommercialData = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new commercialSchema({
       ...document,
       bookingId,
@@ -2697,7 +2767,7 @@ const createRecidentialData = async (req, res) => {
     if (!documentName) {
       return res.status(404).json({ message: "Document type not found" });
     }
-    const bookingId = generateBookingId();
+    const bookingId = await generateBookingId();
     const newData = new recidentialSchema({
       ...document,
       bookingId,
@@ -2789,7 +2859,80 @@ const updateRecidentialPaymentData = async (req, res) => {
   }
 };
 
+const uploadDocumentData = async (req, res) => {
+  try {
+    const {
+      userName,
+      contactNumber,
+      documentUrls,
+      totalDocuments,
+      submittedAt,
+    } = req.body.documentData;
+
+    const bookingId = await generateBookingId();
+    console.log("bookingId", bookingId);
+
+    console.log("documentData", req.body.documentData);
+
+    const newUpload = new uploadDocument({
+      username: userName,
+      userMobile: contactNumber,
+      documents: documentUrls,
+      totalDocuments,
+      submittedAt,
+      bookingId,
+    });
+
+    await newUpload.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Document data uploaded successfully",
+      data: newUpload,
+    });
+  } catch (err) {
+    console.error("Error uploading document data:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to upload document data",
+    });
+  }
+};
+
+const updateUploadedDocumentStatus = async (req, res) => {
+  try {
+    const { documentId } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ message: "Status is required" });
+    }
+
+    const updatedDocument = await uploadDocument.findByIdAndUpdate(
+      documentId,
+      { documentStatus: status },
+      { new: true }
+    );
+
+    if (!updatedDocument) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Document status updated successfully",
+      data: updatedDocument,
+    });
+  } catch (err) {
+    console.error("Error updating document status:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
+  updateUploadedDocumentStatus,
+  getDocumentNames,
+  uploadDocumentData,
   trackMyDocumentStatus,
   getDocumentFormData,
   updateRecidentialPaymentData,
@@ -2831,4 +2974,5 @@ module.exports = {
   createDobParentNameCorrection,
   updateBookingStatus,
   getDashboardStatistics,
+  getUploadedDocumentData,
 };

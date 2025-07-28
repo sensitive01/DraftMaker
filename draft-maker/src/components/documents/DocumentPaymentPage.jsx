@@ -72,7 +72,7 @@ const DocumentPaymentPage = () => {
   useEffect(() => {
     if (stampDutyOptions.length > 0 && formId) {
       let stampDutyId;
-      
+
       if (formId === "DM-CFD-17") {
         stampDutyId = "684145ffb333b68bfef00580";
       } else if (formId === "DM-RFD-18") {
@@ -80,8 +80,10 @@ const DocumentPaymentPage = () => {
       } else {
         stampDutyId = "68414437b333b68bfef00576";
       }
-      
-      const selectedStamp = stampDutyOptions.find(sd => sd._id === stampDutyId);
+
+      const selectedStamp = stampDutyOptions.find(
+        (sd) => sd._id === stampDutyId
+      );
       setSelectedStampDuty(selectedStamp || null);
     }
   }, [stampDutyOptions, formId]);
@@ -139,21 +141,23 @@ const DocumentPaymentPage = () => {
 
   const calculateStampDutyAmount = (stampDuty, baseAmount = 1000) => {
     if (!stampDuty) return 0;
-    
+
     if (stampDuty.calculationType === "fixed") {
       return stampDuty.fixedAmount * quantity;
     } else if (stampDuty.calculationType === "percentage") {
       // Use consideration amount if provided, otherwise fallback to baseAmount
-      const amount = considerationAmount ? parseFloat(considerationAmount) : baseAmount;
+      const amount = considerationAmount
+        ? parseFloat(considerationAmount)
+        : baseAmount;
       let calculatedAmount = (amount * stampDuty.percentage) / 100;
-      
+
       if (stampDuty.minAmount > 0) {
         calculatedAmount = Math.max(calculatedAmount, stampDuty.minAmount);
       }
       if (stampDuty.maxAmount > 0) {
         calculatedAmount = Math.min(calculatedAmount, stampDuty.maxAmount);
       }
-      
+
       return calculatedAmount * quantity;
     }
     return 0;
@@ -199,7 +203,7 @@ const DocumentPaymentPage = () => {
 
     // Validate consideration amount for percentage-based stamps
     if (
-      selectedStampDuty?.calculationType === "percentage" && 
+      selectedStampDuty?.calculationType === "percentage" &&
       (!considerationAmount || isNaN(parseFloat(considerationAmount)))
     ) {
       return false;
@@ -680,7 +684,7 @@ const DocumentPaymentPage = () => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
                   Document Details
                 </h3>
-                
+
                 {/* Quantity Field */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -694,7 +698,7 @@ const DocumentPaymentPage = () => {
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all text-md"
                   />
                 </div>
-                
+
                 {/* Consideration Amount (only show for percentage-based stamps) */}
                 {selectedStampDuty.calculationType === "percentage" && (
                   <div className="mb-4">
@@ -711,27 +715,8 @@ const DocumentPaymentPage = () => {
                     />
                   </div>
                 )}
-                
+
                 {/* Calculation Explanation */}
-                <div className="bg-white p-4 rounded-lg border border-red-200 mt-4">
-                  <h4 className="font-medium text-gray-800 mb-2">Calculation Details</h4>
-                  <div className="space-y-2 text-sm">
-                    <p>
-                      <span className="text-gray-600">Stamp Duty:</span> ₹
-                      {calculateStampDutyAmount(selectedStampDuty)}
-                    </p>
-                    <p>
-                      <span className="text-gray-600">Service Charge:</span> ₹
-                      {SERVICE_CHARGE_PER_DOCUMENT * quantity}
-                    </p>
-                    {selectedStampDuty.calculationType === "percentage" && (
-                      <p className="text-gray-600 italic">
-                        {selectedStampDuty.percentage}% of ₹
-                        {considerationAmount || "0"} × {quantity}
-                      </p>
-                    )}
-                  </div>
-                </div>
               </div>
             )}
 
@@ -776,13 +761,35 @@ const DocumentPaymentPage = () => {
                           : `${selectedStampDuty.percentage}%`}
                       </p>
                       <p className="font-bold text-red-600 text-lg">
-                        Total Stamp Duty: ₹{calculateStampDutyAmount(selectedStampDuty)}
+                        Total Stamp Duty: ₹
+                        {calculateStampDutyAmount(selectedStampDuty)}
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
             )}
+            <div className="bg-white p-4 rounded-lg border border-red-200 mt-4 mb-6">
+              <h4 className="font-medium text-gray-800 mb-2">
+                Calculation Details
+              </h4>
+              <div className="space-y-2 text-sm">
+                <p>
+                  <span className="text-gray-600">Stamp Duty:</span> ₹
+                  {calculateStampDutyAmount(selectedStampDuty)}
+                </p>
+                <p>
+                  <span className="text-gray-600">Service Charge:</span> ₹
+                  {SERVICE_CHARGE_PER_DOCUMENT * quantity}
+                </p>
+                {selectedStampDuty.calculationType === "percentage" && (
+                  <p className="text-gray-600 italic">
+                    {selectedStampDuty.percentage}% of ₹
+                    {considerationAmount || "0"} × {quantity}
+                  </p>
+                )}
+              </div>
+            </div>
 
             {/* Delivery Charge Selection - Dropdown */}
             {selectedService?.requiresDelivery && (
@@ -857,9 +864,9 @@ const DocumentPaymentPage = () => {
             )}
 
             {selectedService?.requiresDelivery && selectedDeliveryCharge && (
-              <DocumentDelivaryAddress  
-                deliveryAddress={deliveryAddress} 
-                handleAddressChange={handleAddressChange}  
+              <DocumentDelivaryAddress
+                deliveryAddress={deliveryAddress}
+                handleAddressChange={handleAddressChange}
               />
             )}
 

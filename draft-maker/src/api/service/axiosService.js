@@ -779,11 +779,55 @@ export const getNotificationMessage = async () => {
 
 export const markMessageAsSeen = async (messageId) => {
   try {
-    const response = await axiosInstance.put(`/message/update-message-data/${messageId}`);
+    const response = await axiosInstance.put(
+      `/message/update-message-data/${messageId}`
+    );
     return response;
   } catch (err) {
     return err;
   }
 };
 
+export const sendDocumentsToBackend = async (documentData) => {
+  try {
+    const response = await axiosInstance.post(
+      `/documents/upload-document-data`,
+      { documentData }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
 
+export const getDocumentsNames = async () => {
+  try {
+    const response = await axiosInstance.get(`/documents/get-document-names`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getUploadedDocumentBookings = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/documents/get-uploaded-document-data`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const updateUploadDocumentStatus = async (documentId, status) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-uploaded-document-status/${documentId}`,
+      { status }
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};

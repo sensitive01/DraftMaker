@@ -149,13 +149,11 @@ const RentalPreview = ({ formData }) => {
 
   return (
     <>
-      <div className="max-w-full py-4">
+      <div className="max-w-full py-3">
         <div ref={previewRef} className="print-container">
           {/* Page 1 */}
           <div className="page relative bg-white shadow-md mx-auto mb-8">
             <div className="watermark">INTERNAL PURPOSE ONLY</div>
-
-     
 
             {/* Content with proper legal document padding */}
             <div className="p-8 md:p-10 lg:p-12">
@@ -284,6 +282,8 @@ const RentalPreview = ({ formData }) => {
                     </span>{" "}
                     On termination of the tenancy period to any renewal thereof,
                     the LESSEE shall deliver back vacant possession of the
+                    schedule premises to the LESSOR in the same condition in
+                    which it was handed over at the time of joining.
                   </div>
                 </div>
               </div>
@@ -298,14 +298,7 @@ const RentalPreview = ({ formData }) => {
           <div className="page relative bg-white shadow-md mx-auto mb-8">
             <div className="watermark">INTERNAL PURPOSE ONLY</div>
 
- 
-
             <div className="p-8 md:p-10 lg:p-12">
-              <p className="mb-5 text-justify leading-relaxed">
-                schedule premises to the LESSOR in the same condition in which
-                it was handed over at the time of joining.
-              </p>
-
               <div className="pl-8 mb-5 space-y-4">
                 <div className="text-justify leading-relaxed flex">
                   <span className="font-semibold mr-3 flex-shrink-0">6.</span>
@@ -438,7 +431,6 @@ const RentalPreview = ({ formData }) => {
           {/* Page 3 */}
           <div className="page relative bg-white mx-auto mb-8">
             <div className="watermark">INTERNAL PURPOSE ONLY</div>
-
 
             <div className="p-8 md:p-4 lg:p-4">
               <div className="text-center mt-6 mb-8">

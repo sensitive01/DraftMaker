@@ -139,6 +139,12 @@ const Layout = ({ children }) => {
         isActive: location.pathname === "/admin/e-stamp-booking-table",
       },
       {
+        icon: Files,
+        label: "Uploaded Documents",
+        path: "/admin/uploaded-document-table",
+        isActive: location.pathname === "/admin/uploaded-document-table",
+      },
+      {
         icon: MessageCircle,
         label: "Notifications",
         path: "/admin/draft-notification",
@@ -148,12 +154,6 @@ const Layout = ({ children }) => {
     ];
 
     const bottomNavItems = [
-      {
-        icon: Settings,
-        label: "Settings",
-        path: "#",
-        isActive: location.pathname === "/settings",
-      },
       {
         icon: HelpCircle,
         label: "Help",
@@ -281,9 +281,10 @@ const Layout = ({ children }) => {
                         absolute -top-2 -right-2 min-w-[20px] h-[20px] px-1
                         text-xs font-bold rounded-full flex items-center justify-center
                         border-2 border-white shadow-lg z-10
-                        ${item.isActive 
-                          ? "bg-white text-red-600" 
-                          : "bg-red-500 text-white"
+                        ${
+                          item.isActive
+                            ? "bg-white text-red-600"
+                            : "bg-red-500 text-white"
                         }
                       `}
                       >
@@ -312,9 +313,10 @@ const Layout = ({ children }) => {
                       min-w-[24px] h-[24px] px-2
                       text-xs font-bold rounded-full flex items-center justify-center
                       shadow-md
-                      ${item.isActive 
-                        ? "bg-white text-red-600 border border-white" 
-                        : "bg-red-500 text-white"
+                      ${
+                        item.isActive
+                          ? "bg-white text-red-600 border border-white"
+                          : "bg-red-500 text-white"
                       }
                     `}
                   >

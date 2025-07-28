@@ -5,6 +5,12 @@ const documentController = require("../controller/documentsController")
 // documentRouter.get("/get-documents-name-data",documentController.getDocumentNameData)
 documentRouter.get("/get-dashboard-statistics",documentController.getDashboardStatistics)
 documentRouter.get("/get-all-booking-data",documentController.getAllBookingData)
+documentRouter.get("/get-document-names",documentController.getDocumentNames)
+documentRouter.get("/get-uploaded-document-data",documentController.getUploadedDocumentData)
+
+
+
+
 documentRouter.post("/track-my-document-status",documentController.trackMyDocumentStatus)
 
 documentRouter.get("/get-aggrement-preview-data/:bookingId",documentController.getDocumentFormData)
@@ -80,6 +86,11 @@ documentRouter.put("/update-commercial-payment-data",documentController.updateCo
 
 documentRouter.post("/save-recidential-data",documentController.createRecidentialData)
 documentRouter.put("/update-recidential-payment-data",documentController.updateRecidentialPaymentData)
+
+
+documentRouter.post("/upload-document-data",documentController.uploadDocumentData)
+documentRouter.put("/update-uploaded-document-status/:documentId",documentController.updateUploadedDocumentStatus)
+
 
 
 
