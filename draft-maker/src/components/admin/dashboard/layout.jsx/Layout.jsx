@@ -86,7 +86,7 @@ const Layout = ({ children }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("admin");
-    navigate("/login");
+    navigate("/admin/login");
   };
 
   const SidebarContent = () => {
@@ -483,7 +483,7 @@ const Layout = ({ children }) => {
                   <User size={20} className="text-red-700" />
                 </div>
                 <span className="hidden md:inline text-red-900 font-medium">
-                  John Doe
+                  Admin
                 </span>
               </button>
 
