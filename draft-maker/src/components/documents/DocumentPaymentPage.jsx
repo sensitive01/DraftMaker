@@ -769,27 +769,30 @@ const DocumentPaymentPage = () => {
                 </div>
               </div>
             )}
-            <div className="bg-white p-4 rounded-lg border border-red-200 mt-4 mb-6">
-              <h4 className="font-medium text-gray-800 mb-2">
-                Calculation Details
-              </h4>
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="text-gray-600">Stamp Duty:</span> ₹
-                  {calculateStampDutyAmount(selectedStampDuty)}
-                </p>
-                <p>
-                  <span className="text-gray-600">Service Charge:</span> ₹
-                  {SERVICE_CHARGE_PER_DOCUMENT * quantity}
-                </p>
-                {selectedStampDuty.calculationType === "percentage" && (
-                  <p className="text-gray-600 italic">
-                    {selectedStampDuty.percentage}% of ₹
-                    {considerationAmount || "0"} × {quantity}
+
+            {selectedStampDuty && (
+              <div className="bg-white p-4 rounded-lg border border-red-200 mt-4 mb-6">
+                <h4 className="font-medium text-gray-800 mb-2">
+                  Calculation Details
+                </h4>
+                <div className="space-y-2 text-sm">
+                  <p>
+                    <span className="text-gray-600">Stamp Duty:</span> ₹
+                    {calculateStampDutyAmount(selectedStampDuty)}
                   </p>
-                )}
+                  <p>
+                    <span className="text-gray-600">Service Charge:</span> ₹
+                    {SERVICE_CHARGE_PER_DOCUMENT * quantity}
+                  </p>
+                  {selectedStampDuty.calculationType === "percentage" && (
+                    <p className="text-gray-600 italic">
+                      {selectedStampDuty.percentage}% of ₹
+                      {considerationAmount || "0"} × {quantity}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Delivery Charge Selection - Dropdown */}
             {selectedService?.requiresDelivery && (
