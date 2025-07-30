@@ -115,7 +115,7 @@ const UploadDocumentBookings = () => {
         if (response.status === 200) {
           const formattedBookings = response.data.data.map((booking) => ({
             ...booking, // Keep all original data
-            username: safeDisplay(booking.username, "Unknown"),
+            username: safeDisplay(booking.userName, "Unknown"),
             userMobile: safeDisplay(booking.userMobile),
             documents: booking.documents || [],
             totalDocuments: booking.totalDocuments || 0,
