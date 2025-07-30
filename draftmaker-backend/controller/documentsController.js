@@ -420,7 +420,7 @@ const trackMyDocumentStatus = async (req, res) => {
       formId: 1,
     });
 
-    const uploadedData = await uploadedSchema.find(filter, {userName:1,userMobile:1,documentStatus:1,bookingId:1,createdAt:1,documentType:1})
+    const uploadedData = await uploadDocument.find(filter, {userName:1,userMobile:1,documentStatus:1,bookingId:1,createdAt:1,documentType:1})
 
     // Combine all arrays
     let allBookingData = [
