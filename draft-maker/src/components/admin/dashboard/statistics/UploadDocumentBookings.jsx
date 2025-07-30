@@ -185,7 +185,7 @@ const UploadDocumentBookings = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handlePreviewBooking = (booking) => {
-    navigate(`/admin/upload-document-bookings/preview/${booking._id}`);
+    navigate(`/admin/upload-document-bookings/preview/${booking.bookingId}`);
   };
 
   const handleClosePreview = () => {
