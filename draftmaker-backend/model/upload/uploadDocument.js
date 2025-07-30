@@ -1,35 +1,87 @@
 // models/uploadDocumentModel.js
 const mongoose = require("mongoose");
 
-const uploadDocumentSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  userMobile: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  documents: [
-    {
+const uploadDocumentSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    userMobile: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    documentType: {
       type: String,
       required: true,
     },
-  ],
-  totalDocuments: {
-    type: Number,
-    required: true,
+    formId: {
+      type: String,
+      required: true,
+    },
+    documents: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    totalDocuments: {
+      type: Number,
+      required: true,
+    },
+    documentStatus: {
+      type: String,
+      enum: ["Pending", "Approved", "Rejected"],
+      default: "Pending",
+    },
+    bookingId: {
+      type: String,
+    },
+    submittedAt: {
+      type: Date,
+      default: Date.now,
+    },
+    selectedService: {
+      serviceId: String,
+      serviceName: String,
+      basePrice: Number,
+      hasNotary: Boolean,
+      notaryCharge: Number,
+      requiresStamp: Boolean,
+      requiresDelivery: Boolean,
+    },
+    stampDuty: {
+      stampDutyId: String,
+      documentType: String,
+      articleNo: String,
+      calculationType: String,
+      fixedAmount: Number,
+      percentage: Number,
+      quantity: String,
+      considerationAmount: Number,
+      calculatedAmount: Number,
+      serviceCharge: Number,
+    },
+    delivery: {
+      deliveryChargeId: String,
+      serviceName: String,
+      charge: Number,
+      address: {
+        type: Object, // or define specific keys if address has a structure
+      },
+    },
+    payment: {
+      totalAmount: Number,
+      paymentId: String,
+      paymentStatus: String,
+      paymentDate: Date,
+    },
   },
-  documentStatus: { type: String, default: "Pending" },
-  bookingId: {
-    type: String,
-  },
-  submittedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 module.exports = mongoose.model("UploadDocument", uploadDocumentSchema);

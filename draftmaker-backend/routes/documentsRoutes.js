@@ -5,8 +5,12 @@ const documentController = require("../controller/documentsController")
 // documentRouter.get("/get-documents-name-data",documentController.getDocumentNameData)
 documentRouter.get("/get-dashboard-statistics",documentController.getDashboardStatistics)
 documentRouter.get("/get-all-booking-data",documentController.getAllBookingData)
+documentRouter.get("/get-booking-table-document-details/:bookingId",documentController.getBookingDataPreview)
+
 documentRouter.get("/get-document-names",documentController.getDocumentNames)
 documentRouter.get("/get-uploaded-document-data",documentController.getUploadedDocumentData)
+documentRouter.get("/get-uploaded-document-details/:bookingId",documentController.getUploadedBookingDetailsPreview)
+
 
 
 

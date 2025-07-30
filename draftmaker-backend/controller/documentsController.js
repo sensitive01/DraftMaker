@@ -768,6 +768,82 @@ const getAllBookingData = async (req, res) => {
   }
 };
 
+const getBookingDataPreview = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+
+    const collections = [
+      dualNameCorrection,
+      nameCorrection,
+      dobCorrection,
+      GasFormData,
+      documentLost,
+      dobParentNameCorrection,
+      birthCertificateNameCorrection,
+      gstSchema,
+      metriculationLost,
+      khataCorrection,
+      vehicleInsurence,
+      hufSchema,
+      gapPeriodSchema,
+      passportAnnaxure,
+      passportNameChange,
+      adressAffadavit,
+      commercialSchema,
+      recidentialSchema,
+    ];
+
+    let bookingData = null;
+
+    for (const model of collections) {
+      const found = await model.findOne({ bookingId });
+      if (found) {
+        bookingData = found;
+        break;
+      }
+    }
+
+    if (!bookingData) {
+      return res.status(404).json({
+        success: false,
+        message: "No booking found for the provided ID",
+      });
+    }
+
+    // Format createdAt
+    const date = new Date(bookingData.createdAt);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+
+    hours = hours % 12 || 12;
+    const formattedHours = String(hours).padStart(2, "0");
+
+    const formattedDateTime = `${day}-${month}-${String(year).slice(
+      -2
+    )} ${formattedHours}:${minutes}:${seconds} ${ampm}`;
+
+    const formattedData = {
+      ...bookingData._doc,
+      createdAt: formattedDateTime,
+    };
+
+    res.status(200).json({
+      success: true,
+      message: "Booking data fetched successfully",
+      data: formattedData,
+    });
+  } catch (err) {
+    console.error("Error in getBookingDataPreview:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 const getDocumentFormData = async (req, res) => {
   try {
     const { bookingId } = req.params;
@@ -2861,26 +2937,37 @@ const updateRecidentialPaymentData = async (req, res) => {
 
 const uploadDocumentData = async (req, res) => {
   try {
+    console.log("Upload", req.body);
+
     const {
-      userName,
-      contactNumber,
-      documentUrls,
+      username,
+      userMobile,
+      documentType,
+      formId,
+      documents,
       totalDocuments,
       submittedAt,
+      selectedService,
+      stampDuty,
+      delivery,
+      payment,
     } = req.body.documentData;
 
     const bookingId = await generateBookingId();
-    console.log("bookingId", bookingId);
-
-    console.log("documentData", req.body.documentData);
 
     const newUpload = new uploadDocument({
-      username: userName,
-      userMobile: contactNumber,
-      documents: documentUrls,
+      username,
+      userMobile,
+      documentType,
+      formId,
+      documents,
       totalDocuments,
       submittedAt,
       bookingId,
+      selectedService,
+      stampDuty,
+      delivery,
+      payment,
     });
 
     await newUpload.save();
@@ -2929,7 +3016,35 @@ const updateUploadedDocumentStatus = async (req, res) => {
   }
 };
 
+const getUploadedBookingDetailsPreview = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+
+    const bookingData = await uploadDocument.findOne({ bookingId });
+
+    if (!bookingData) {
+      return res.status(404).json({
+        success: false,
+        message: "No booking found with the provided ID",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Booking details fetched successfully",
+      data: bookingData,
+    });
+  } catch (err) {
+    console.error("Error fetching booking preview:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching booking details",
+    });
+  }
+};
 module.exports = {
+  getBookingDataPreview,
+  getUploadedBookingDetailsPreview,
   updateUploadedDocumentStatus,
   getDocumentNames,
   uploadDocumentData,

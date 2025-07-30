@@ -14,15 +14,23 @@ import {
   Clock,
   XCircle,
   AlertCircle,
+  Download,
+  MapPin,
+  CreditCard,
+  Package,
+  FileImage,
+  File,
+  Smartphone,
 } from "lucide-react";
 import {
   getUploadedDocumentBookings,
   updateUploadDocumentStatus,
-//   updateDocumentStatus, // You'll need to create this API function
 } from "../../../../api/service/axiosService";
 import Pagination from "./Pagination";
+import { useNavigate } from "react-router-dom";
 
 const UploadDocumentBookings = () => {
+  const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -69,9 +77,9 @@ const UploadDocumentBookings = () => {
         setLoading(true);
         const response = await getUploadedDocumentBookings();
 
-        if (response.status===200) {
+        if (response.status === 200) {
           const formattedBookings = response.data.data.map((booking) => ({
-            _id: booking._id,
+            ...booking, // Keep all original data
             username: booking.username || "Unknown",
             userMobile: booking.userMobile || "",
             documents: booking.documents || [],
@@ -82,6 +90,8 @@ const UploadDocumentBookings = () => {
               new Date(booking.submittedAt).toLocaleDateString() || "",
             submittedTime:
               new Date(booking.submittedAt).toLocaleTimeString() || "",
+            documentType: booking.documentType || "N/A",
+            formId: booking.formId || "N/A",
           }));
 
           setBookings(formattedBookings);
@@ -117,6 +127,10 @@ const UploadDocumentBookings = () => {
           (booking.username || "").toLowerCase().includes(lowercasedSearch) ||
           (booking.userMobile || "").toLowerCase().includes(lowercasedSearch) ||
           (booking.bookingId || "").toLowerCase().includes(lowercasedSearch) ||
+          (booking.documentType || "")
+            .toLowerCase()
+            .includes(lowercasedSearch) ||
+          (booking.formId || "").toLowerCase().includes(lowercasedSearch) ||
           (booking.documentStatus || "")
             .toLowerCase()
             .includes(lowercasedSearch)
@@ -138,8 +152,7 @@ const UploadDocumentBookings = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handlePreviewBooking = (booking) => {
-    setSelectedBooking(booking);
-    setIsPreviewOpen(true);
+    navigate(`/admin/upload-document-bookings/preview/${booking.bookingId}`);
   };
 
   const handleClosePreview = () => {
@@ -165,14 +178,12 @@ const UploadDocumentBookings = () => {
     try {
       setUpdatingStatus(true);
 
-      // Call API to update status
       const response = await updateUploadDocumentStatus(
         statusUpdateBooking._id,
         newStatus
       );
 
-      if (response.status===200) {
-        // Update local state
+      if (response.status === 200) {
         const updatedBookings = bookings.map((booking) => {
           if (booking._id === statusUpdateBooking._id) {
             return { ...booking, documentStatus: newStatus };
@@ -182,8 +193,6 @@ const UploadDocumentBookings = () => {
 
         setBookings(updatedBookings);
         handleCloseStatusModal();
-
-        // Show success message (you can replace with toast notification)
         alert(`Status updated successfully to ${newStatus}`);
       }
     } catch (error) {
@@ -229,6 +238,50 @@ const UploadDocumentBookings = () => {
     }
   };
 
+  const getFileIcon = (url) => {
+    if (!url) return <File size={16} />;
+
+    const extension = url.split(".").pop().toLowerCase();
+    switch (extension) {
+      case "pdf":
+        return <File size={16} className="text-red-500" />;
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "gif":
+      case "webp":
+        return <FileImage size={16} className="text-blue-500" />;
+      default:
+        return <File size={16} className="text-gray-500" />;
+    }
+  };
+
+  const handleDownload = async (url, filename) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = filename || "document";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error("Download failed:", error);
+      // Fallback: open in new tab
+      window.open(url, "_blank");
+    }
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+    }).format(amount);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -239,7 +292,7 @@ const UploadDocumentBookings = () => {
 
   if (error) {
     return (
-      <div className="p-6 bg-white rounded-lg">
+      <div className="p-4 sm:p-6 bg-white rounded-lg">
         <div className="text-center text-red-600 p-4 border border-red-200 rounded-lg">
           {error}
         </div>
@@ -248,58 +301,61 @@ const UploadDocumentBookings = () => {
   }
 
   return (
-    <div className="space-y-6 p-6 bg-white rounded-lg shadow">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-        <h2 className="text-2xl font-bold text-red-900">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 bg-white rounded-lg shadow">
+      {/* Header Section */}
+      <div className="flex flex-col space-y-4 md:flex-row md:justify-between md:items-center md:space-y-0">
+        <h2 className="text-xl sm:text-2xl font-bold text-red-900">
           Upload Document Bookings
         </h2>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+        {/* Search and Filter Section */}
+        <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:space-x-3 w-full md:w-auto">
+          {/* Search Input */}
           <div className="relative w-full sm:w-64">
             <input
               type="text"
               value={searchTerm}
               onChange={handleSearchChange}
               placeholder="Search bookings..."
-              className="px-4 py-2 pr-10 w-full border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="px-4 py-2 pr-10 w-full border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
             />
             <span className="absolute right-3 top-2.5 text-gray-400">
               {searchTerm ? (
                 <button onClick={clearSearch}>
-                  <X size={18} className="text-red-500" />
+                  <X size={16} className="text-red-500" />
                 </button>
               ) : (
-                <Search size={18} />
+                <Search size={16} />
               )}
             </span>
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="w-full sm:w-auto">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white"
-              >
-                <option value="all">All Status</option>
-                {statusOptions.map((option) => (
-                  <option key={option.value} value={option.value.toLowerCase()}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Filter Controls */}
+          <div className="flex items-center space-x-2 w-full sm:w-auto">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="flex-1 sm:flex-none px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white"
+            >
+              <option value="all">All Status</option>
+              {statusOptions.map((option) => (
+                <option key={option.value} value={option.value.toLowerCase()}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
 
             <button
               onClick={clearFilters}
-              className="px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm flex items-center"
+              className="px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm flex items-center whitespace-nowrap"
             >
-              <X size={16} className="mr-1" /> Clear
+              <X size={14} className="mr-1" /> Clear
             </button>
           </div>
         </div>
       </div>
 
+      {/* Results Count */}
       <div className="flex items-center gap-2 text-sm text-gray-500">
         <Filter size={16} />
         <span>
@@ -307,7 +363,76 @@ const UploadDocumentBookings = () => {
         </span>
       </div>
 
-      <div className="bg-white rounded-lg border border-red-100 shadow-md overflow-hidden">
+      {/* Mobile Card View */}
+      <div className="block lg:hidden space-y-4">
+        {currentItems.length > 0 ? (
+          currentItems.map((booking, index) => (
+            <div
+              key={booking._id}
+              className="bg-white border border-red-100 rounded-lg p-4 shadow-sm"
+            >
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex items-center text-sm font-medium text-blue-600">
+                  <FileText size={14} className="mr-1" />
+                  {booking.bookingId}
+                </div>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-medium flex items-center ${getStatusBadgeColor(
+                    booking.documentStatus
+                  )}`}
+                >
+                  {getStatusIcon(booking.documentStatus)}
+                  {booking.documentStatus}
+                </span>
+              </div>
+
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center text-sm">
+                  <User size={12} className="mr-2 text-gray-400" />
+                  <span className="font-medium">{booking.username}</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Phone size={12} className="mr-2 text-gray-400" />
+                  {booking.userMobile}
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Calendar size={12} className="mr-2 text-gray-400" />
+                  {booking.submittedAt} at {booking.submittedTime}
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <FileText size={12} className="mr-2 text-gray-400" />
+                  {booking.totalDocuments} document
+                  {booking.totalDocuments !== 1 ? "s" : ""}
+                </div>
+              </div>
+
+              <div className="flex space-x-2">
+                <button
+                  className="flex-1 px-3 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center justify-center space-x-1 text-sm"
+                  onClick={() => handlePreviewBooking(booking)}
+                >
+                  <Eye size={14} />
+                  <span>View</span>
+                </button>
+                <button
+                  className="flex-1 px-3 py-2 bg-orange-100 text-orange-600 rounded-md hover:bg-orange-200 transition-colors flex items-center justify-center space-x-1 text-sm"
+                  onClick={() => handleUpdateStatus(booking)}
+                >
+                  <Edit size={14} />
+                  <span>Status</span>
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center text-gray-500 py-8">
+            No bookings found matching your criteria
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden lg:block bg-white rounded-lg border border-red-100 shadow-md overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-red-50 border-b border-red-100">
@@ -438,70 +563,47 @@ const UploadDocumentBookings = () => {
         )}
       </div>
 
-      {/* Booking Preview Modal */}
-      {isPreviewOpen && selectedBooking && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-red-900 flex items-center">
-                <FileText size={20} className="mr-2" />
-                Booking Details - {selectedBooking.bookingId}
-              </h3>
-              <button
-                onClick={handleClosePreview}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X size={20} />
-              </button>
-            </div>
+      {/* Mobile Pagination */}
+      {filteredBookings.length > 0 && (
+        <div className="block lg:hidden">
+          <Pagination
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+            indexOfFirstItem={indexOfFirstItem}
+            indexOfLastItem={indexOfLastItem}
+            filteredBookings={filteredBookings}
+            paginate={paginate}
+            currentPage={currentPage}
+            totalPages={totalPages}
+          />
+        </div>
+      )}
 
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Status Update Modal */}
+      {isStatusModalOpen && statusUpdateBooking && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div className="p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-red-900 flex items-center">
+                  <Edit size={20} className="mr-2" />
+                  Update Status
+                </h3>
+                <button
+                  onClick={handleCloseStatusModal}
+                  className="text-gray-400 hover:text-gray-600 p-1"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Booking ID
                   </label>
                   <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-medium">
-                    {selectedBooking.bookingId}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    User Name
-                  </label>
-                  <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
-                    {selectedBooking.username}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Mobile Number
-                  </label>
-                  <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
-                    {selectedBooking.userMobile}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Submitted Date & Time
-                  </label>
-                  <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm flex items-center">
-                    <Calendar size={14} className="mr-2" />
-                    {selectedBooking.submittedAt} at{" "}
-                    {selectedBooking.submittedTime}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Total Documents
-                  </label>
-                  <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
-                    {selectedBooking.totalDocuments} document
-                    {selectedBooking.totalDocuments !== 1 ? "s" : ""}
+                    {statusUpdateBooking.bookingId}
                   </div>
                 </div>
 
@@ -512,176 +614,59 @@ const UploadDocumentBookings = () => {
                   <div className="bg-gray-50 p-3 rounded border border-gray-200">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium flex items-center w-fit ${getStatusBadgeColor(
-                        selectedBooking.documentStatus
+                        statusUpdateBooking.documentStatus
                       )}`}
                     >
-                      {getStatusIcon(selectedBooking.documentStatus)}
-                      {selectedBooking.documentStatus}
+                      {getStatusIcon(statusUpdateBooking.documentStatus)}
+                      {statusUpdateBooking.documentStatus}
                     </span>
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Uploaded Documents
-                </label>
-                <div className="bg-gray-50 p-4 rounded border border-gray-200">
-                  {selectedBooking.documents.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {selectedBooking.documents.map((docUrl, index) => (
-                        <div
-                          key={index}
-                          className="border border-gray-300 rounded-lg p-3 bg-white"
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-gray-700">
-                              Document {index + 1}
-                            </span>
-                            <a
-                              href={docUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center text-blue-600 hover:text-blue-800 text-sm"
-                            >
-                              <ExternalLink size={14} className="mr-1" />
-                              View
-                            </a>
-                          </div>
-                          {docUrl.includes(".pdf") ? (
-                            <div className="flex items-center justify-center h-20 bg-red-50 rounded border-2 border-dashed border-red-200">
-                              <FileText size={24} className="text-red-500" />
-                            </div>
-                          ) : (
-                            <img
-                              src={docUrl}
-                              alt={`Document ${index + 1}`}
-                              className="w-full h-20 object-cover rounded border"
-                              onError={(e) => {
-                                e.target.style.display = "none";
-                                e.target.nextSibling.style.display = "flex";
-                              }}
-                            />
-                          )}
-                          <div className="hidden items-center justify-center h-20 bg-gray-100 rounded border-2 border-dashed border-gray-300">
-                            <FileText size={24} className="text-gray-400" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-sm">
-                      No documents uploaded
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end space-x-3">
-              <button
-                onClick={() => handleUpdateStatus(selectedBooking)}
-                className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
-              >
-                Update Status
-              </button>
-              <button
-                onClick={handleClosePreview}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Status Update Modal */}
-      {isStatusModalOpen && statusUpdateBooking && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-red-900 flex items-center">
-                <Edit size={20} className="mr-2" />
-                Update Status
-              </h3>
-              <button
-                onClick={handleCloseStatusModal}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Booking ID
-                </label>
-                <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-medium">
-                  {statusUpdateBooking.bookingId}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Current Status
-                </label>
-                <div className="bg-gray-50 p-3 rounded border border-gray-200">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium flex items-center w-fit ${getStatusBadgeColor(
-                      statusUpdateBooking.documentStatus
-                    )}`}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    New Status
+                  </label>
+                  <select
+                    value={newStatus}
+                    onChange={(e) => setNewStatus(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                   >
-                    {getStatusIcon(statusUpdateBooking.documentStatus)}
-                    {statusUpdateBooking.documentStatus}
-                  </span>
+                    {statusOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  New Status
-                </label>
-                <select
-                  value={newStatus}
-                  onChange={(e) => setNewStatus(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              <div className="mt-6 flex flex-col-reverse sm:flex-row justify-end space-y-reverse space-y-3 sm:space-y-0 sm:space-x-3">
+                <button
+                  onClick={handleCloseStatusModal}
+                  className="w-full sm:w-auto px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                  disabled={updatingStatus}
                 >
-                  {statusOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  Cancel
+                </button>
+                <button
+                  onClick={handleStatusSubmit}
+                  disabled={
+                    updatingStatus ||
+                    newStatus === statusUpdateBooking.documentStatus
+                  }
+                  className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  {updatingStatus ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                      Updating...
+                    </>
+                  ) : (
+                    "Update Status"
+                  )}
+                </button>
               </div>
-            </div>
-
-            <div className="mt-6 flex justify-end space-x-3">
-              <button
-                onClick={handleCloseStatusModal}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
-                disabled={updatingStatus}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleStatusSubmit}
-                disabled={
-                  updatingStatus ||
-                  newStatus === statusUpdateBooking.documentStatus
-                }
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-              >
-                {updatingStatus ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                    Updating...
-                  </>
-                ) : (
-                  "Update Status"
-                )}
-              </button>
             </div>
           </div>
         </div>

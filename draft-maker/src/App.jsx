@@ -77,6 +77,8 @@ import FloatingContactButtons from "./FloatingContactButtons";
 import MoveToTop from "./MoveToTop";
 import DocumentUpload from "./components/uploadfile/UploadDocument";
 import UploadDocumentBookings from "./components/admin/dashboard/statistics/UploadDocumentBookings";
+import ViewUploadDetails from "./components/admin/dashboard/statistics/ViewUploadDetails";
+import DocumentBookingTablePreview from "./components/admin/dashboard/statistics/DocumentBookingTablePreview";
 
 function MainLayout({ children }) {
   return (
@@ -427,6 +429,22 @@ function App() {
             element={
               <ProtectedAdminRoute>
                 <UploadDocumentBookings />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/upload-document-bookings/preview/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <ViewUploadDetails />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/-document-bookings-table/preview/:bookingId"
+            element={
+              <ProtectedAdminRoute>
+                <DocumentBookingTablePreview />
               </ProtectedAdminRoute>
             }
           />

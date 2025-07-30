@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Eye, X, Search, Filter, Calendar, Edit } from "lucide-react";
+import { Eye, X, Search, Filter, Calendar, Edit, File } from "lucide-react";
 import {
   getAllBookingData,
   updateBookingStatus,
@@ -38,7 +38,7 @@ const BookingTable = () => {
         const formattedBookings = response.data.data.map((booking) => ({
           _id: booking._id,
           id: booking.bookingId || "",
-          name:booking.userName|| "Unknown",
+          name: booking.userName || "Unknown",
           phoneNumber: booking.mobileNumber || "",
           status: booking.doumentStatus || "",
           paymentId: booking.paymentDetails?.paymentId || "",
@@ -70,7 +70,8 @@ const BookingTable = () => {
 
     if (filterStatus !== "all") {
       result = result.filter(
-        (booking) => (booking.status || "").toLowerCase() === filterStatus.toLowerCase()
+        (booking) =>
+          (booking.status || "").toLowerCase() === filterStatus.toLowerCase()
       );
     }
 
@@ -88,10 +89,11 @@ const BookingTable = () => {
         (booking) =>
           (booking.id || "").toLowerCase().includes(lowercasedSearch) ||
           (booking.name || "").toLowerCase().includes(lowercasedSearch) ||
-          (booking.phoneNumber || "").toLowerCase().includes(lowercasedSearch) ||
-          (booking.paymentId || "").toLowerCase().includes(lowercasedSearch)||
+          (booking.phoneNumber || "")
+            .toLowerCase()
+            .includes(lowercasedSearch) ||
+          (booking.paymentId || "").toLowerCase().includes(lowercasedSearch) ||
           (booking.documentType || "").toLowerCase().includes(lowercasedSearch)
-
       );
     }
 
@@ -385,11 +387,27 @@ const BookingTable = () => {
                     <td className="p-3 whitespace-nowrap">
                       <button
                         className="px-2 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center space-x-1"
-                        onClick={() => handleViewDetails(booking)}
+                        onClick={() =>
+                          navigate(
+                            `/admin/-document-bookings-table/preview/${booking.id}`
+                          )
+                        }
                         title="View Details"
                       >
                         <Eye size={14} />
-                        <span className="text-xs font-medium">View</span>
+                        <span className="text-xs font-medium">
+                          View details
+                        </span>
+                      </button>
+                      <button
+                        className="px-2 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center space-x-1"
+                        onClick={() => handleViewDetails(booking)}
+                        title="View Details"
+                      >
+                        <File size={14} />
+                        <span className="text-xs font-medium">
+                          View document
+                        </span>
                       </button>
                     </td>
                     <td className="p-3 whitespace-nowrap">

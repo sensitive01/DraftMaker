@@ -22,15 +22,44 @@ import {
   sendDocumentsToBackend,
 } from "../../api/service/axiosService";
 import SuccessNotification from "../documents/serviceNotification/SuccessNotification";
+import UploadDocumentUi from "./UploadDocumentUi";
 
 const DocumentUpload = () => {
   const [formData, setFormData] = useState({
     userName: "",
     contactNumber: "",
   });
+
+  // Document and pricing related states
+  const [documentTypes, setDocumentTypes] = useState([]);
+  const [selectedDocumentType, setSelectedDocumentType] = useState(null);
+  const [stampDutyOptions, setStampDutyOptions] = useState([]);
+  const [deliveryChargeOptions, setDeliveryChargeOptions] = useState([]);
+  const [selectedStampDuty, setSelectedStampDuty] = useState(null);
+  const [selectedDeliveryCharge, setSelectedDeliveryCharge] = useState(null);
+  const [selectedService, setSelectedService] = useState(null);
+
+  // E-stamp logic states
+  const [considerationAmount, setConsiderationAmount] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [deliveryAddress, setDeliveryAddress] = useState({
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
+
+  // Loading and error states
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const CLOUDINARY_UPLOAD_PRESET = import.meta.env
     .VITE_CLOUDINARY_UPLOAD_PRESET;
   const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const SERVICE_CHARGE_PER_DOCUMENT = 210;
+
+  // File upload states
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -42,6 +71,63 @@ const DocumentUpload = () => {
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
 
+  // Fetch document types and pricing data
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const docTypesResponse = await getDocumentsNames();
+        const pricingResponse = await getStampAndDeliveryCharges();
+
+        console.log("docTypesResponse", docTypesResponse);
+        console.log("pricingResponse", pricingResponse);
+
+        if (docTypesResponse.status === 200) {
+          setDocumentTypes(docTypesResponse.data.data);
+        }
+
+        if (pricingResponse.status === 200) {
+          setStampDutyOptions(pricingResponse.data.stampDuty || []);
+          setDeliveryChargeOptions(pricingResponse.data.deliveryCharges || []);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(
+          "Failed to load document types and pricing. Please refresh the page."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Auto-select stamp duty based on selected document type
+  useEffect(() => {
+    if (stampDutyOptions?.length > 0 && selectedDocumentType?.formId) {
+      let stampDutyId;
+
+      switch (selectedDocumentType?.formId) {
+        case "DM-CFD-17":
+          stampDutyId = "684145ffb333b68bfef00580";
+          break;
+        case "DM-RFD-18":
+          stampDutyId = "6841457bb333b68bfef0057c";
+          break;
+        default:
+          stampDutyId = "68414437b333b68bfef00576";
+          break;
+      }
+
+      const selectedStamp = stampDutyOptions.find(
+        (sd) => sd._id === stampDutyId
+      );
+      console.log("selectedStamp", selectedStamp);
+      setSelectedStampDuty(selectedStamp || null);
+    }
+  }, [stampDutyOptions, selectedDocumentType]);
+
   const ALLOWED_TYPES = {
     "image/jpeg": ".jpg, .jpeg",
     "image/png": ".png",
@@ -52,8 +138,133 @@ const DocumentUpload = () => {
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
+  // Get service options based on selected document type
+  const getServiceOptions = () => {
+    if (!selectedDocumentType) return [];
+
+    return [
+      {
+        id: "draft",
+        name: "Draft Only",
+        description: "Get your document drafted by experts.",
+        price: selectedDocumentType.draftCharge || 0,
+        hasNotary: (selectedDocumentType.draftNotaryCharge || 0) > 0,
+        notaryCharge: selectedDocumentType.draftNotaryCharge || 0,
+        requiresStamp: false,
+        requiresDelivery: false,
+      },
+      {
+        id: "draft_estamp",
+        name: "Draft + e-Stamp",
+        description: "Includes e-stamp along with document draft.",
+        price: selectedDocumentType.draftCharge || 0,
+        hasNotary: (selectedDocumentType.draftNotaryCharge || 0) > 0,
+        notaryCharge: selectedDocumentType.draftNotaryCharge || 0,
+        requiresStamp: true,
+        requiresDelivery: false,
+      },
+      {
+        id: "draft_estamp_delivery",
+        name: "Draft + e-Stamp + Delivery",
+        description: "Complete service including document delivery.",
+        price: selectedDocumentType.draftCharge || 0,
+        hasNotary: (selectedDocumentType.draftNotaryCharge || 0) > 0,
+        notaryCharge: selectedDocumentType.draftNotaryCharge || 0,
+        requiresStamp: true,
+        requiresDelivery: true,
+      },
+    ];
+  };
+
+  // Calculate stamp duty amount
+  const calculateStampDutyAmount = (stampDuty, baseAmount = 1000) => {
+    if (!stampDuty) return 0;
+
+    if (stampDuty.calculationType === "fixed") {
+      return (stampDuty.fixedAmount || 0) * (quantity || 1);
+    } else if (stampDuty.calculationType === "percentage") {
+      const amount = considerationAmount
+        ? parseFloat(considerationAmount) || 0
+        : baseAmount;
+      let calculatedAmount = (amount * (stampDuty.percentage || 0)) / 100;
+
+      if (stampDuty.minAmount && stampDuty.minAmount > 0) {
+        calculatedAmount = Math.max(calculatedAmount, stampDuty.minAmount);
+      }
+      if (stampDuty.maxAmount && stampDuty.maxAmount > 0) {
+        calculatedAmount = Math.min(calculatedAmount, stampDuty.maxAmount);
+      }
+
+      return calculatedAmount * (quantity || 1);
+    }
+    return 0;
+  };
+
+  // Calculate total amount
+  const calculateTotalAmount = () => {
+    if (!selectedService) return 0;
+
+    let total = selectedService.price || 0;
+
+    if (selectedService.hasNotary) {
+      total += selectedService.notaryCharge || 0;
+    }
+
+    if (selectedService.requiresStamp && selectedStampDuty) {
+      total += calculateStampDutyAmount(selectedStampDuty);
+      total += SERVICE_CHARGE_PER_DOCUMENT * (quantity || 1);
+    }
+
+    if (selectedService.requiresDelivery && selectedDeliveryCharge) {
+      total += selectedDeliveryCharge.charge || 0;
+    }
+
+    return total;
+  };
+
+  // Check if can proceed to payment
+  const canProceedToPayment = () => {
+    if (!selectedDocumentType || !selectedService) return false;
+    if (files.length === 0) return false;
+    if (!formData.userName.trim() || !formData.contactNumber.trim())
+      return false;
+
+    if (selectedService.requiresStamp && !selectedStampDuty) return false;
+    if (selectedService.requiresDelivery && !selectedDeliveryCharge)
+      return false;
+
+    // Check delivery address
+    if (selectedService.requiresDelivery && selectedDeliveryCharge) {
+      const requiredFields = ["addressLine1", "city", "state", "pincode"];
+      for (let field of requiredFields) {
+        if (!deliveryAddress[field] || deliveryAddress[field].trim() === "") {
+          return false;
+        }
+      }
+    }
+
+    // Validate consideration amount for percentage-based stamps ONLY if service requires stamp
+    if (
+      selectedService.requiresStamp &&
+      selectedStampDuty?.calculationType === "percentage" &&
+      (!considerationAmount || isNaN(parseFloat(considerationAmount)))
+    ) {
+      return false;
+    }
+
+    return true;
+  };
+
   const validateForm = () => {
     const newErrors = {};
+
+    if (!selectedDocumentType) {
+      newErrors.documentType = "Please select a document type";
+    }
+
+    if (!selectedService) {
+      newErrors.service = "Please select a service package";
+    }
 
     if (!formData.userName.trim()) {
       newErrors.userName = "Username is required";
@@ -93,6 +304,56 @@ const DocumentUpload = () => {
     }
   };
 
+  const handleDocumentTypeChange = (e) => {
+    console.log("Document type change triggered");
+    const selectedId = e.target.value;
+    console.log("selectedId", selectedId);
+
+    if (!selectedId) {
+      setSelectedDocumentType(null);
+      setSelectedStampDuty(null);
+      setSelectedService(null);
+      return;
+    }
+
+    const docType = documentTypes.find((dt) => dt._id === selectedId);
+    console.log("Found docType:", docType);
+    setSelectedDocumentType(docType || null);
+    setSelectedService(null); // Reset service selection
+
+    if (errors.documentType) {
+      setErrors((prev) => ({
+        ...prev,
+        documentType: "",
+      }));
+    }
+  };
+
+  const handleServiceSelect = (service) => {
+    setSelectedService(service);
+    if (!service.requiresStamp) {
+      setSelectedStampDuty(null);
+    }
+    if (!service.requiresDelivery) {
+      setSelectedDeliveryCharge(null);
+    }
+
+    if (errors.service) {
+      setErrors((prev) => ({
+        ...prev,
+        service: "",
+      }));
+    }
+  };
+
+  const handleAddressChange = (field, value) => {
+    setDeliveryAddress((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // File handling functions
   const getFileIcon = (fileObj) => {
     if (fileObj.file.type.startsWith("image/")) {
       return <Image className="w-6 h-6 text-blue-600" />;
@@ -127,7 +388,6 @@ const DocumentUpload = () => {
       let isValid = true;
       let reason = "";
 
-      // Check file size
       if (file.size > MAX_FILE_SIZE) {
         isValid = false;
         reason = `File too large (${(file.size / 1024 / 1024).toFixed(
@@ -147,12 +407,12 @@ const DocumentUpload = () => {
 
     if (rejectedFiles.length > 0) {
       const rejectionMessage = rejectedFiles
-        .map((f) => `${f.name}: ${f.reason}`)
+        ?.map((f) => `${f.name}: ${f.reason}`)
         .join("\n");
       alert(`Some files were rejected:\n\n${rejectionMessage}`);
     }
 
-    const newFiles = validFiles.map((file) => ({
+    const newFiles = validFiles?.map((file) => ({
       id: Date.now() + Math.random(),
       file,
       status: "pending",
@@ -182,14 +442,7 @@ const DocumentUpload = () => {
     setFiles((prev) => prev.filter((file) => file.id !== fileId));
   };
 
-  const openPreview = (fileObj) => {
-    setPreviewModal({ isOpen: true, file: fileObj });
-  };
-
-  const closePreview = () => {
-    setPreviewModal({ isOpen: false, file: null });
-  };
-
+  // Cloudinary upload function
   const uploadToCloudinary = async (fileObj) => {
     const formData = new FormData();
     formData.append("file", fileObj.file);
@@ -214,7 +467,6 @@ const DocumentUpload = () => {
       }
 
       const data = await response.json();
-      console.log("Cloudinary response:", data);
 
       if (!data.secure_url) {
         throw new Error("No URL returned from Cloudinary");
@@ -227,6 +479,7 @@ const DocumentUpload = () => {
     }
   };
 
+  // Upload all files to Cloudinary
   const uploadFiles = async () => {
     setUploading(true);
     const updatedFiles = [...files];
@@ -258,14 +511,229 @@ const DocumentUpload = () => {
     return updatedFiles;
   };
 
+  // Razorpay integration
+  const initializeRazorpay = async (service, totalPrice, uploadedDocuments) => {
+    try {
+      const bookingId = `DOC-${Date.now()}`;
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: totalPrice * 100,
+        currency: "INR",
+        name: "Draft Maker",
+        description: `${selectedDocumentType?.documentType || "Document"} - ${
+          service.name
+        }`,
+        handler: function (response) {
+          console.log("razorpay response", response);
+          handlePaymentSuccess({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            bookingId: bookingId,
+            mobileNumber: formData.contactNumber,
+            documentType: selectedDocumentType?.documentType,
+            fullName: formData.userName,
+            serviceType: service.id,
+            serviceName: service.name,
+            amount: totalPrice,
+            includesNotary: service.hasNotary,
+            userName: formData.userName,
+            uploadedDocuments: uploadedDocuments,
+            selectedStampDuty: selectedStampDuty,
+            selectedDeliveryCharge: selectedDeliveryCharge,
+            serviceDetails: {
+              basePrice: service.price,
+              notaryCharge: service.hasNotary ? service.notaryCharge : 0,
+              stampDutyAmount: selectedStampDuty
+                ? calculateStampDutyAmount(selectedStampDuty)
+                : 0,
+              deliveryCharge: selectedDeliveryCharge
+                ? selectedDeliveryCharge.charge
+                : 0,
+              requiresStamp: service.requiresStamp,
+              requiresDelivery: service.requiresDelivery,
+              deliveryAddress: selectedService?.requiresDelivery
+                ? JSON.stringify(deliveryAddress)
+                : null,
+              considerationAmount: considerationAmount,
+              quantity: quantity,
+              serviceCharge: SERVICE_CHARGE_PER_DOCUMENT * (quantity || 1),
+            },
+          });
+        },
+        prefill: {
+          name: formData.userName || "",
+          contact: formData.contactNumber || "",
+        },
+        notes: {
+          bookingId: bookingId,
+          serviceType: service.id,
+          serviceName: service.name,
+          stampDutyId: selectedStampDuty?._id || null,
+          deliveryChargeId: selectedDeliveryCharge?._id || null,
+          documentType: selectedDocumentType?.documentType,
+        },
+        theme: {
+          color: "#dc2626",
+        },
+        modal: {
+          ondismiss: function () {
+            console.log("Checkout form closed");
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+
+      razorpay.on("payment.failed", function (response) {
+        console.error("Payment failed:", response.error);
+        alert(
+          `Payment failed: ${response.error.description || "Unknown error"}`
+        );
+        setSubmitting(false);
+      });
+    } catch (error) {
+      console.error("Error in Razorpay initialization:", error);
+      alert("Payment initialization failed. Please try again.");
+      setSubmitting(false);
+    }
+  };
+
+  // Handle payment success
+  const handlePaymentSuccess = async (paymentData) => {
+    try {
+      const paymentConfirmationData = {
+        paymentId: paymentData.razorpay_payment_id,
+        orderId: paymentData.razorpay_order_id,
+        signature: paymentData.razorpay_signature,
+        bookingId: paymentData.bookingId,
+        mobileNumber: paymentData.mobileNumber,
+        documentType: selectedDocumentType?.documentType,
+        formId: selectedDocumentType?.formId,
+        fullName: formData.userName,
+        serviceType: paymentData.serviceType,
+        serviceName: paymentData.serviceName,
+        amount: paymentData.amount,
+        includesNotary: paymentData.includesNotary,
+        status: "success",
+        userName: formData.userName,
+        uploadedDocuments: paymentData.uploadedDocuments,
+        selectedStampDuty: paymentData.selectedStampDuty,
+        selectedDeliveryCharge: paymentData.selectedDeliveryCharge,
+        serviceDetails: paymentData.serviceDetails,
+        deliveryAddress: selectedService?.requiresDelivery
+          ? deliveryAddress
+          : null,
+        considerationAmount: considerationAmount,
+        quantity: quantity,
+        documents: paymentData.uploadedDocuments?.map(
+          (file) => file.cloudinaryUrl
+        ),
+        totalDocuments: files.length,
+      };
+
+
+   
+        // Fallback to original document submission
+        const documentUrls = paymentData?.uploadedDocuments?.map(
+          (file) => file.cloudinaryUrl
+        );
+        const submitData = {
+          username: formData.userName,
+          userMobile: formData.contactNumber,
+          documentType: selectedDocumentType?.documentType,
+          formId: selectedDocumentType?.formId,
+          documents: documentUrls,
+          totalDocuments: files.length,
+          selectedService: {
+            serviceId: selectedService.id,
+            serviceName: selectedService.name,
+            basePrice: selectedService.price,
+            hasNotary: selectedService.hasNotary,
+            notaryCharge: selectedService.notaryCharge,
+            requiresStamp: selectedService.requiresStamp,
+            requiresDelivery: selectedService.requiresDelivery,
+          },
+          stampDuty: selectedStampDuty
+            ? {
+                stampDutyId: selectedStampDuty._id,
+                documentType: selectedStampDuty.documentType,
+                articleNo: selectedStampDuty.articleNo,
+                calculationType: selectedStampDuty.calculationType,
+                fixedAmount: selectedStampDuty.fixedAmount,
+                percentage: selectedStampDuty.percentage,
+                quantity: quantity,
+                considerationAmount: parseFloat(considerationAmount) || 0,
+                calculatedAmount: calculateStampDutyAmount(selectedStampDuty),
+                serviceCharge: SERVICE_CHARGE_PER_DOCUMENT * quantity,
+              }
+            : null,
+          delivery: selectedDeliveryCharge
+            ? {
+                deliveryChargeId: selectedDeliveryCharge._id,
+                serviceName: selectedDeliveryCharge.serviceName,
+                charge: selectedDeliveryCharge.charge,
+                address: deliveryAddress,
+              }
+            : null,
+          payment: {
+            totalAmount: paymentData.amount,
+            paymentId: paymentData.razorpay_payment_id,
+            orderId: paymentData.razorpay_order_id,
+            signature: paymentData.razorpay_signature,
+            paymentStatus: "completed",
+            paymentDate: new Date(),
+          },
+          bookingId: paymentData.bookingId,
+          submittedAt: new Date().toISOString(),
+        };
+
+        const response = await sendDocumentsToBackend(submitData);
+
+        if (response.status === 201 || response.status === 200) {
+          setSuccess(true);
+          setSuccessMessage("Payment and document submission successful!");
+
+          // Reset form
+          setFormData({ userName: "", contactNumber: "" });
+          setFiles([]);
+          setSelectedDocumentType(null);
+          setSelectedService(null);
+
+          setTimeout(() => {
+            setSuccess(false);
+          }, 5000);
+        }
+     
+    } catch (error) {
+      console.error("Error confirming payment:", error);
+      alert(
+        "Payment was processed but we couldn't update your booking. Our team will contact you shortly."
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Main submit handler
   const handleSubmit = async () => {
     if (!validateForm()) {
+      return;
+    }
+
+    if (!canProceedToPayment()) {
+      alert(
+        "Please complete all required selections before proceeding to payment."
+      );
       return;
     }
 
     setSubmitting(true);
 
     try {
+      // Upload files first
       const uploadedFiles = await uploadFiles();
 
       const failedUploads = uploadedFiles.filter(
@@ -279,528 +747,106 @@ const DocumentUpload = () => {
         return;
       }
 
-      // Prepare data for backend
-      const documentUrls = uploadedFiles.map((file) => file.cloudinaryUrl);
+      // Calculate total price
+      const totalPrice = calculateTotalAmount();
 
-      const submitData = {
-        userName: formData.userName,
-        contactNumber: formData.contactNumber,
-        documentUrls: documentUrls,
-        totalDocuments: files.length,
-        submittedAt: new Date().toISOString(),
-      };
+      // Initialize Razorpay payment
+      if (!window.Razorpay) {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
 
-      console.log("Data to be sent to backend:", submitData);
+        script.onload = () => {
+          initializeRazorpay(selectedService, totalPrice, uploadedFiles);
+        };
 
-      // Replace with your actual backend API call
-      const response = await sendDocumentsToBackend(submitData);
-      console.log(response);
-      if (response.status === 201) {
-        setSuccess(true);
-        setSuccessMessage(response.data.message);
-        setTimeout(() => {
-          setSuccess(false);
-        }, 1500);
+        script.onerror = () => {
+          console.error("Razorpay SDK failed to load");
+          alert("Payment gateway failed to load. Please try again later.");
+          setSubmitting(false);
+        };
+
+        document.body.appendChild(script);
+      } else {
+        initializeRazorpay(selectedService, totalPrice, uploadedFiles);
       }
-
-      files.forEach((file) => {
-        if (file.previewUrl) {
-          URL.revokeObjectURL(file.previewUrl);
-        }
-      });
-      setFormData({ userName: "", contactNumber: "" });
-      setFiles([]);
     } catch (error) {
       console.error("Submission error:", error);
-      alert("Error submitting documents. Please try again.");
-    } finally {
+      alert("Error processing your request. Please try again.");
       setSubmitting(false);
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "uploading":
-        return (
-          <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        );
-      case "uploaded":
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
-      case "error":
-        return <AlertCircle className="w-4 h-4 text-red-600" />;
-      default:
-        return <Cloud className="w-4 h-4 text-gray-400" />;
-    }
-  };
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text).then(() => {
-      alert("URL copied to clipboard!");
-    });
-  };
-
-  const allFilesUploaded =
-    files.length > 0 && files.every((file) => file.status === "uploaded");
-  const hasFailedUploads = files.some((file) => file.status === "error");
-
-  const PreviewModal = () => {
-    if (!previewModal.isOpen || !previewModal.file) return null;
-
-    const file = previewModal.file;
-    const isImage = file.file.type.startsWith("image/");
-    const isPDF = file.file.type === "application/pdf";
-
+  // Loading state
+  if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl max-w-6xl max-h-[95vh] w-full flex flex-col">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 rounded-t-2xl">
-            <div className="flex items-center gap-3">
-              {getFileIcon(file)}
-              <div>
-                <h3 className="font-semibold text-gray-900 truncate max-w-xs">
-                  {file.file.name}
-                </h3>
-                <p className="text-sm text-gray-500">
-                  {(file.file.size / 1024 / 1024).toFixed(2)} MB •{" "}
-                  {file.file.type}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={closePreview}
-              className="p-2 hover:bg-gray-200 rounded-full transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 overflow-auto p-6 bg-gray-50">
-            {isImage ? (
-              <div className="flex justify-center items-center min-h-full">
-                <img
-                  src={file.previewUrl}
-                  alt={file.file.name}
-                  className="max-w-full max-h-full object-contain rounded-lg shadow-lg bg-white"
-                  style={{ maxHeight: "70vh" }}
-                />
-              </div>
-            ) : isPDF ? (
-              <div className="flex flex-col items-center justify-center h-96 text-gray-600 bg-white rounded-lg border-2 border-dashed border-gray-300">
-                <FileText className="w-20 h-20 mb-4 text-red-500" />
-                <p className="text-xl font-medium mb-2">PDF Document</p>
-                <p className="text-sm text-center mb-6 max-w-md">
-                  PDF preview is not available in this browser. You can download
-                  the file to view it or view it after uploading to Cloudinary.
-                </p>
-                <div className="flex gap-3">
-                  <a
-                    href={file.previewUrl}
-                    download={file.file.name}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    Download File
-                  </a>
-                  {file.cloudinaryUrl && (
-                    <a
-                      href={file.cloudinaryUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      View Online
-                    </a>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-96 text-gray-500 bg-white rounded-lg border-2 border-dashed border-gray-300">
-                <FileText className="w-20 h-20 mb-4" />
-                <p className="text-xl font-medium mb-2">File Preview</p>
-                <p className="text-sm text-center mb-4">
-                  Preview not available for this file type.
-                </p>
-                <a
-                  href={file.previewUrl}
-                  download={file.file.name}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  Download File
-                </a>
-              </div>
-            )}
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading document types...</p>
         </div>
       </div>
     );
-  };
+  }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-pink-50">
-      <div className="max-w-4xl mx-auto px-3 sm:px-6 py-6 sm:py-12">
-        {success && (
-          <SuccessNotification
-            successMessage={successMessage}
-            setSuccess={setSuccess}
-          />
-        )}
-        {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl sm:rounded-3xl mb-4 sm:mb-8 shadow-xl">
-            <Upload className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center bg-white p-8 rounded-lg shadow">
+          <div className="text-red-600 mb-4">
+            <AlertCircle className="h-16 w-16 mx-auto" />
           </div>
-          <h1 className="text-2xl sm:text-4xl font-bold text-red-700 mb-2 sm:mb-4 bg-gradient-to-r from-red-700 to-red-600 bg-clip-text text-transparent px-4">
-            Upload Legal Documents
-          </h1>
-          <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed px-4">
-            Submit your legal documents for stamp application processing
-          </p>
-        </div>
-
-        {/* Form Section */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-red-100 p-4 sm:p-10 mb-8 backdrop-blur-sm bg-opacity-90">
-          <div className="space-y-6 sm:space-y-8">
-            {/* User Information */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <div>
-                <label
-                  htmlFor="userName"
-                  className="block text-sm font-bold text-red-800 mb-3"
-                >
-                  Username *
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    id="userName"
-                    name="userName"
-                    value={formData.userName}
-                    onChange={handleInputChange}
-                    placeholder="Enter your full name"
-                    className={`w-full px-4 py-3 sm:py-4 pl-12 border-2 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-200 transition-all text-base font-medium ${
-                      errors.userName
-                        ? "border-red-500 focus:border-red-500"
-                        : "border-red-200 focus:border-red-500"
-                    }`}
-                  />
-                </div>
-                {errors.userName && (
-                  <p className="mt-2 text-sm text-red-600 font-medium flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.userName}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="contactNumber"
-                  className="block text-sm font-bold text-red-800 mb-3"
-                >
-                  Contact Number *
-                </label>
-                <div className="relative">
-                  <input
-                    type="tel"
-                    id="contactNumber"
-                    name="contactNumber"
-                    value={formData.contactNumber}
-                    onChange={handleInputChange}
-                    placeholder="10-digit mobile number"
-                    className={`w-full px-4 py-3 sm:py-4 pl-12 border-2 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-200 transition-all text-base font-medium ${
-                      errors.contactNumber
-                        ? "border-red-500 focus:border-red-500"
-                        : "border-red-200 focus:border-red-500"
-                    }`}
-                  />
-                </div>
-                {errors.contactNumber && (
-                  <p className="mt-2 text-sm text-red-600 font-medium flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.contactNumber}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* File Upload Section */}
-            <div>
-              <label className="block text-sm font-bold text-red-800 mb-3">
-                Upload Documents * (Images: JPG, PNG, GIF, WebP | PDF files
-                only, max 10MB each)
-              </label>
-
-              {/* Upload Area */}
-              <div className="relative">
-                <input
-                  type="file"
-                  multiple
-                  accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,image/*,application/pdf"
-                  onChange={handleFileSelect}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-                <div
-                  className={`border-2 border-dashed rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center transition-all hover:border-red-400 hover:bg-red-25 ${
-                    errors.files
-                      ? "border-red-500 bg-red-50"
-                      : "border-red-300 bg-red-25"
-                  }`}
-                >
-                  <Upload className="w-12 h-12 sm:w-16 sm:h-16 text-red-400 mx-auto mb-4" />
-                  <p className="text-base sm:text-lg font-bold text-red-700 mb-2">
-                    Click to upload or drag and drop
-                  </p>
-                  <p className="text-sm text-red-500">
-                    Support for images (JPG, PNG, GIF, WebP) and PDF files only
-                  </p>
-                </div>
-              </div>
-
-              {errors.files && (
-                <p className="mt-2 text-sm text-red-600 font-medium flex items-center gap-1">
-                  <AlertCircle className="w-4 h-4" />
-                  {errors.files}
-                </p>
-              )}
-            </div>
-
-            {/* Selected Files with Enhanced Links and Preview */}
-            {files.length > 0 && (
-              <div>
-                <h3 className="text-lg font-bold text-red-800 mb-4">
-                  Selected Files ({files.length})
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {files.map((fileObj) => (
-                    <div
-                      key={fileObj.id}
-                      className="bg-red-25 border border-red-200 rounded-xl p-4 space-y-3"
-                    >
-                      {/* File Preview Thumbnail */}
-                      <div className="relative">
-                        {fileObj.file.type.startsWith("image/") ? (
-                          <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden group cursor-pointer">
-                            <img
-                              src={fileObj.previewUrl}
-                              alt={fileObj.file.name}
-                              className="w-full h-full object-cover"
-                              onClick={() => openPreview(fileObj)}
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
-                              <button
-                                onClick={() => openPreview(fileObj)}
-                                className="bg-white bg-opacity-0 group-hover:bg-opacity-90 rounded-full p-3 transition-all transform scale-0 group-hover:scale-100"
-                              >
-                                <Eye className="w-6 h-6 text-gray-700" />
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div
-                            className="aspect-video bg-gray-100 rounded-lg flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:bg-gray-200 transition-colors group"
-                            onClick={() => openPreview(fileObj)}
-                          >
-                            <FileText className="w-12 h-12 mb-2 text-red-500" />
-                            <span className="text-sm font-medium">PDF</span>
-                            <div className="mt-2 text-xs text-blue-600 flex items-center gap-1 group-hover:text-blue-800">
-                              <Eye className="w-3 h-3" />
-                              Click to Preview
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* File Info with Clickable Name */}
-                      <div className="space-y-2">
-                        <div className="flex items-start gap-2">
-                          {getFileIcon(fileObj)}
-                          <div className="flex-1 min-w-0">
-                            <button
-                              onClick={() => openPreview(fileObj)}
-                              className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline truncate block w-full text-left transition-colors"
-                              title="Click to preview file"
-                            >
-                              {fileObj.file.name}
-                            </button>
-                            <p className="text-xs text-red-500">
-                              {(fileObj.file.size / 1024 / 1024).toFixed(2)} MB
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Status and Actions */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            {getStatusIcon(fileObj.status)}
-                            <span className="text-xs font-medium text-red-600 capitalize">
-                              {fileObj.status}
-                            </span>
-                          </div>
-
-                          {fileObj.status !== "uploading" && (
-                            <button
-                              onClick={() => removeFile(fileObj.id)}
-                              className="p-1 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full transition-all"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Error Message */}
-                        {fileObj.error && (
-                          <p className="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-200">
-                            Error: {fileObj.error}
-                          </p>
-                        )}
-
-                        {/* Enhanced File Links Section */}
-                        <div className="space-y-2 pt-2 border-t border-red-200">
-                          {/* Local Preview Link */}
-                          <div className="flex items-center gap-2">
-                            <Link className="w-3 h-3 text-gray-500" />
-                            <button
-                              onClick={() => openPreview(fileObj)}
-                              className="text-xs text-blue-600 hover:text-blue-800 hover:underline transition-colors"
-                            >
-                              Preview File
-                            </button>
-                          </div>
-
-                          {/* Cloudinary URL Actions */}
-                          {fileObj.cloudinaryUrl && (
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
-                                <ExternalLink className="w-3 h-3 text-green-600" />
-                                <a
-                                  href={fileObj.cloudinaryUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-xs text-green-600 hover:text-green-800 hover:underline transition-colors"
-                                >
-                                  View Online (Cloudinary)
-                                </a>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Copy className="w-3 h-3 text-gray-500" />
-                                <button
-                                  onClick={() =>
-                                    copyToClipboard(fileObj.cloudinaryUrl)
-                                  }
-                                  className="text-xs text-gray-600 hover:text-gray-800 hover:underline transition-colors"
-                                >
-                                  Copy Cloudinary URL
-                                </button>
-                              </div>
-                              {/* Display the actual URL (truncated) */}
-                              <div className="bg-gray-50 p-2 rounded text-xs text-gray-600 break-all border">
-                                <span className="font-mono">
-                                  {fileObj.cloudinaryUrl.length > 50
-                                    ? `${fileObj.cloudinaryUrl.substring(
-                                        0,
-                                        50
-                                      )}...`
-                                    : fileObj.cloudinaryUrl}
-                                </span>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Download Local File Link */}
-                          <div className="flex items-center gap-2">
-                            <Download className="w-3 h-3 text-purple-600" />
-                            <a
-                              href={fileObj.previewUrl}
-                              download={fileObj.file.name}
-                              className="text-xs text-purple-600 hover:text-purple-800 hover:underline transition-colors"
-                            >
-                              Download Original File
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <div className="flex justify-center pt-4">
-              <button
-                onClick={handleSubmit}
-                disabled={submitting || uploading}
-                className="px-8 sm:px-12 py-4 sm:py-5 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl sm:rounded-2xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-4 focus:ring-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5 min-w-[200px]"
-              >
-                {submitting ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Submitting...
-                  </>
-                ) : uploading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Uploading...
-                  </>
-                ) : (
-                  <>
-                    <FileCheck className="w-5 h-5" />
-                    Submit Documents
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Upload Status Messages */}
-            {hasFailedUploads && (
-              <div className="text-center text-sm text-red-600 bg-red-50 p-3 rounded-xl border border-red-200">
-                Some files failed to upload. Please check the errors above and
-                try again.
-              </div>
-            )}
-
-            {allFilesUploaded && files.length > 0 && (
-              <div className="text-center text-sm text-green-600 bg-green-50 p-3 rounded-xl border border-green-200 flex items-center justify-center gap-2">
-                <CheckCircle className="w-4 h-4" />
-                All files uploaded successfully! URLs are available above. Ready
-                to submit.
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Instructions */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-red-100 p-6 sm:p-8 backdrop-blur-sm bg-opacity-90">
-          <h3 className="text-lg font-bold text-red-800 mb-4 flex items-center gap-2">
-            <AlertCircle className="w-5 h-5" />
-            Important Instructions
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Error Loading Data
           </h3>
-          <ul className="space-y-2 text-sm text-red-600">
-            <li>• Ensure all documents are clear and readable</li>
-            <li>• Only upload images (JPG, PNG, GIF, WebP) and PDF files</li>
-            <li>• Maximum file size: 10MB per file</li>
-            <li>• All fields marked with * are mandatory</li>
-            <li>• You will receive a booking ID after successful submission</li>
-            <li>• File URLs will be displayed after successful upload</li>
-            <li>
-              • Click on file thumbnails or file names to preview before
-              uploading
-            </li>
-            <li>
-              • Use the provided links to navigate to file previews and download
-              options
-            </li>
-          </ul>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Refresh Page
+          </button>
         </div>
       </div>
+    );
+  }
 
-      {/* Preview Modal */}
-      <PreviewModal />
-    </div>
+  return (
+    <UploadDocumentUi
+      success={success}
+      successMessage={successMessage}
+      setSuccess={setSuccess}
+      selectedDocumentType={selectedDocumentType}
+      handleDocumentTypeChange={handleDocumentTypeChange}
+      documentTypes={documentTypes}
+      errors={errors}
+      selectedStampDuty={selectedStampDuty}
+      quantity={quantity}
+      setQuantity={setQuantity}
+      considerationAmount={considerationAmount}
+      setConsiderationAmount={setConsiderationAmount}
+      calculateStampDutyAmount={calculateStampDutyAmount}
+      formData={formData}
+      handleInputChange={handleInputChange}
+      handleFileSelect={handleFileSelect}
+      files={files}
+      getFileIcon={getFileIcon}
+      removeFile={removeFile}
+      getServiceOptions={getServiceOptions}
+      handleServiceSelect={handleServiceSelect}
+      selectedService={selectedService}
+      selectedDeliveryCharge={selectedDeliveryCharge}
+      setSelectedDeliveryCharge={setSelectedDeliveryCharge}
+      deliveryChargeOptions={deliveryChargeOptions}
+      deliveryAddress={deliveryAddress}
+      handleAddressChange={handleAddressChange}
+      SERVICE_CHARGE_PER_DOCUMENT={SERVICE_CHARGE_PER_DOCUMENT}
+      calculateTotalAmount={calculateTotalAmount}
+      canProceedToPayment={canProceedToPayment}
+      submitting={submitting}
+      uploading={uploading}
+      handleSubmit={handleSubmit}
+    />
   );
 };
 

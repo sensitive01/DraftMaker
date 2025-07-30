@@ -831,3 +831,26 @@ export const updateUploadDocumentStatus = async (documentId, status) => {
     return err;
   }
 };
+
+export const getUploadBookingDetails = async (bookingId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/documents/get-uploaded-document-details/${bookingId}`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const getBookingTablePreviewData = async (bookingId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/documents/get-booking-table-document-details/${bookingId}`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
