@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const uploadDocumentSchema = new mongoose.Schema(
   {
-    username: {
+    userName: {
       type: String,
       required: true,
       trim: true,

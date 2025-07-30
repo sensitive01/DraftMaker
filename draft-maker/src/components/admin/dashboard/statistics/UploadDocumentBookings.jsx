@@ -71,6 +71,41 @@ const UploadDocumentBookings = () => {
     { value: "Rejected", label: "Rejected", color: "bg-red-100 text-red-800" },
   ];
 
+  // Utility function to format date in human-readable format
+  const formatHumanDate = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch (error) {
+      return dateString;
+    }
+  };
+
+  // Utility function to format time in 12-hour format
+  const formatHumanTime = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+    } catch (error) {
+      return dateString;
+    }
+  };
+
+  // Utility function to safely display values
+  const safeDisplay = (value, fallback = "N/A") => {
+    return value && value.toString().trim() !== "" ? value : fallback;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -80,18 +115,16 @@ const UploadDocumentBookings = () => {
         if (response.status === 200) {
           const formattedBookings = response.data.data.map((booking) => ({
             ...booking, // Keep all original data
-            username: booking.username || "Unknown",
-            userMobile: booking.userMobile || "",
+            username: safeDisplay(booking.username, "Unknown"),
+            userMobile: safeDisplay(booking.userMobile),
             documents: booking.documents || [],
             totalDocuments: booking.totalDocuments || 0,
-            documentStatus: booking.documentStatus || "Pending",
-            bookingId: booking.bookingId || "",
-            submittedAt:
-              new Date(booking.submittedAt).toLocaleDateString() || "",
-            submittedTime:
-              new Date(booking.submittedAt).toLocaleTimeString() || "",
-            documentType: booking.documentType || "N/A",
-            formId: booking.formId || "N/A",
+            documentStatus: safeDisplay(booking.documentStatus, "Pending"),
+            bookingId: safeDisplay(booking.bookingId),
+            submittedAt: formatHumanDate(booking.submittedAt),
+            submittedTime: formatHumanTime(booking.submittedAt),
+            documentType: safeDisplay(booking.documentType),
+            formId: safeDisplay(booking.formId),
           }));
 
           setBookings(formattedBookings);
@@ -152,7 +185,7 @@ const UploadDocumentBookings = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handlePreviewBooking = (booking) => {
-    navigate(`/admin/upload-document-bookings/preview/${booking.bookingId}`);
+    navigate(`/admin/upload-document-bookings/preview/${booking._id}`);
   };
 
   const handleClosePreview = () => {
@@ -220,7 +253,9 @@ const UploadDocumentBookings = () => {
     const statusOption = statusOptions.find(
       (option) => option.value.toLowerCase() === status.toLowerCase()
     );
-    return statusOption ? statusOption.color : "bg-gray-100 text-gray-800";
+    return statusOption
+      ? statusOption.color + " border border-current border-opacity-20"
+      : "bg-gray-100 text-gray-800 border border-gray-200";
   };
 
   const getStatusIcon = (status) => {
@@ -303,13 +338,13 @@ const UploadDocumentBookings = () => {
   return (
     <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 bg-white rounded-lg shadow">
       {/* Header Section */}
-      <div className="flex flex-col space-y-4 md:flex-row md:justify-between md:items-center md:space-y-0">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <h2 className="text-xl sm:text-2xl font-bold text-red-900">
           Upload Document Bookings
         </h2>
 
         {/* Search and Filter Section */}
-        <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:space-x-3 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
           {/* Search Input */}
           <div className="relative w-full sm:w-64">
             <input
@@ -317,12 +352,15 @@ const UploadDocumentBookings = () => {
               value={searchTerm}
               onChange={handleSearchChange}
               placeholder="Search bookings..."
-              className="px-4 py-2 pr-10 w-full border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+              className="px-4 py-2 pr-10 w-full border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
             />
             <span className="absolute right-3 top-2.5 text-gray-400">
               {searchTerm ? (
-                <button onClick={clearSearch}>
-                  <X size={16} className="text-red-500" />
+                <button
+                  onClick={clearSearch}
+                  className="hover:text-red-500 transition-colors"
+                >
+                  <X size={16} />
                 </button>
               ) : (
                 <Search size={16} />
@@ -331,11 +369,11 @@ const UploadDocumentBookings = () => {
           </div>
 
           {/* Filter Controls */}
-          <div className="flex items-center space-x-2 w-full sm:w-auto">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="flex-1 sm:flex-none px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white"
+              className="flex-1 sm:flex-none px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm bg-white"
             >
               <option value="all">All Status</option>
               {statusOptions.map((option) => (
@@ -347,7 +385,7 @@ const UploadDocumentBookings = () => {
 
             <button
               onClick={clearFilters}
-              className="px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm flex items-center whitespace-nowrap"
+              className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm flex items-center whitespace-nowrap"
             >
               <X size={14} className="mr-1" /> Clear
             </button>
@@ -356,10 +394,14 @@ const UploadDocumentBookings = () => {
       </div>
 
       {/* Results Count */}
-      <div className="flex items-center gap-2 text-sm text-gray-500">
+      <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
         <Filter size={16} />
         <span>
-          Showing {filteredBookings.length} of {bookings.length} bookings
+          Showing{" "}
+          <span className="font-semibold text-red-600">
+            {filteredBookings.length}
+          </span>{" "}
+          of <span className="font-semibold">{bookings.length}</span> bookings
         </span>
       </div>
 
@@ -369,12 +411,12 @@ const UploadDocumentBookings = () => {
           currentItems.map((booking, index) => (
             <div
               key={booking._id}
-              className="bg-white border border-red-100 rounded-lg p-4 shadow-sm"
+              className="bg-white border border-red-100 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center text-sm font-medium text-blue-600">
                   <FileText size={14} className="mr-1" />
-                  {booking.bookingId}
+                  {safeDisplay(booking.bookingId)}
                 </div>
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-medium flex items-center ${getStatusBadgeColor(
@@ -388,19 +430,36 @@ const UploadDocumentBookings = () => {
 
               <div className="space-y-2 mb-4">
                 <div className="flex items-center text-sm">
-                  <User size={12} className="mr-2 text-gray-400" />
+                  <User
+                    size={12}
+                    className="mr-2 text-gray-400 flex-shrink-0"
+                  />
                   <span className="font-medium">{booking.username}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <Phone size={12} className="mr-2 text-gray-400" />
+                  <Phone
+                    size={12}
+                    className="mr-2 text-gray-400 flex-shrink-0"
+                  />
                   {booking.userMobile}
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Calendar size={12} className="mr-2 text-gray-400" />
-                  {booking.submittedAt} at {booking.submittedTime}
+                <div className="flex items-start text-sm text-gray-600">
+                  <Calendar
+                    size={12}
+                    className="mr-2 text-gray-400 flex-shrink-0 mt-0.5"
+                  />
+                  <div className="flex flex-col">
+                    <span>{booking.submittedAt}</span>
+                    <span className="text-xs text-gray-500">
+                      at {booking.submittedTime}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <FileText size={12} className="mr-2 text-gray-400" />
+                  <FileText
+                    size={12}
+                    className="mr-2 text-gray-400 flex-shrink-0"
+                  />
                   {booking.totalDocuments} document
                   {booking.totalDocuments !== 1 ? "s" : ""}
                 </div>
@@ -408,14 +467,14 @@ const UploadDocumentBookings = () => {
 
               <div className="flex space-x-2">
                 <button
-                  className="flex-1 px-3 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center justify-center space-x-1 text-sm"
+                  className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors flex items-center justify-center space-x-1 text-sm border border-blue-200"
                   onClick={() => handlePreviewBooking(booking)}
                 >
                   <Eye size={14} />
                   <span>View</span>
                 </button>
                 <button
-                  className="flex-1 px-3 py-2 bg-orange-100 text-orange-600 rounded-md hover:bg-orange-200 transition-colors flex items-center justify-center space-x-1 text-sm"
+                  className="flex-1 px-3 py-2 bg-orange-50 text-orange-600 rounded-md hover:bg-orange-100 transition-colors flex items-center justify-center space-x-1 text-sm border border-orange-200"
                   onClick={() => handleUpdateStatus(booking)}
                 >
                   <Edit size={14} />
@@ -425,37 +484,68 @@ const UploadDocumentBookings = () => {
             </div>
           ))
         ) : (
-          <div className="text-center text-gray-500 py-8">
-            No bookings found matching your criteria
+          <div className="text-center py-12">
+            <div className="flex flex-col items-center justify-center space-y-3">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                <Search size={24} className="text-gray-400" />
+              </div>
+              <div className="text-gray-500 text-lg font-medium">
+                No bookings found
+              </div>
+              <div className="text-gray-400 text-sm">
+                Try adjusting your search or filter criteria
+              </div>
+            </div>
           </div>
         )}
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden lg:block bg-white rounded-lg border border-red-100 shadow-md overflow-hidden">
+      <div className="hidden lg:block bg-white rounded-lg border border-red-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="min-w-[1200px] w-full">
             <thead className="bg-red-50 border-b border-red-100">
               <tr>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "60px" }}
+                >
                   Sl. No.
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "150px" }}
+                >
                   Booking ID
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "200px" }}
+                >
                   Date & Time
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "180px" }}
+                >
                   User Details
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "120px" }}
+                >
                   Documents
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "120px" }}
+                >
                   Status
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "160px" }}
+                >
                   Actions
                 </th>
               </tr>
@@ -470,45 +560,49 @@ const UploadDocumentBookings = () => {
                     <td className="p-3 whitespace-nowrap text-sm text-gray-600 font-medium">
                       {indexOfFirstItem + index + 1}
                     </td>
-                    <td className="p-3 whitespace-nowrap">
+                    <td className="p-3">
                       <div className="flex items-center text-sm font-medium text-blue-600">
-                        <FileText size={14} className="mr-1" />
-                        {booking.bookingId}
+                        <FileText size={14} className="mr-1 flex-shrink-0" />
+                        <span className="truncate" title={booking.bookingId}>
+                          {safeDisplay(booking.bookingId)}
+                        </span>
                       </div>
                     </td>
-                    <td className="p-3 whitespace-nowrap">
-                      <div className="flex flex-col">
+                    <td className="p-3">
+                      <div className="space-y-1">
                         <div className="flex items-center text-sm text-gray-900">
-                          <Calendar size={12} className="mr-1" />
-                          {booking.submittedAt}
+                          <Calendar size={12} className="mr-1 flex-shrink-0" />
+                          <span>{booking.submittedAt}</span>
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-500 ml-4">
                           {booking.submittedTime}
                         </div>
                       </div>
                     </td>
                     <td className="p-3">
-                      <div className="flex flex-col">
+                      <div className="space-y-1">
                         <div className="flex items-center text-sm font-medium text-gray-900">
-                          <User size={12} className="mr-1" />
-                          {booking.username}
+                          <User size={12} className="mr-1 flex-shrink-0" />
+                          <span className="truncate" title={booking.username}>
+                            {booking.username}
+                          </span>
                         </div>
                         <div className="flex items-center text-xs text-gray-500">
-                          <Phone size={10} className="mr-1" />
-                          {booking.userMobile}
+                          <Phone size={10} className="mr-1 flex-shrink-0" />
+                          <span>{booking.userMobile}</span>
                         </div>
                       </div>
                     </td>
                     <td className="p-3 whitespace-nowrap">
                       <div className="flex items-center text-sm text-gray-900">
-                        <FileText size={12} className="mr-1" />
+                        <FileText size={12} className="mr-1 flex-shrink-0" />
                         {booking.totalDocuments} document
                         {booking.totalDocuments !== 1 ? "s" : ""}
                       </div>
                     </td>
                     <td className="p-3 whitespace-nowrap">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium flex items-center w-fit ${getStatusBadgeColor(
+                        className={`inline-flex px-2 py-1 rounded-full text-xs font-medium items-center ${getStatusBadgeColor(
                           booking.documentStatus
                         )}`}
                       >
@@ -516,23 +610,23 @@ const UploadDocumentBookings = () => {
                         {booking.documentStatus}
                       </span>
                     </td>
-                    <td className="p-3 whitespace-nowrap">
-                      <div className="flex items-center space-x-2">
+                    <td className="p-3">
+                      <div className="flex items-center gap-2">
                         <button
-                          className="px-2 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center space-x-1"
+                          className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors flex items-center space-x-1 text-xs border border-blue-200"
                           onClick={() => handlePreviewBooking(booking)}
                           title="Preview Details"
                         >
-                          <Eye size={14} />
-                          <span className="text-xs font-medium">View</span>
+                          <Eye size={12} />
+                          <span className="font-medium">View</span>
                         </button>
                         <button
-                          className="px-2 py-1 bg-orange-100 text-orange-600 rounded-md hover:bg-orange-200 transition-colors flex items-center space-x-1"
+                          className="px-3 py-1.5 bg-orange-50 text-orange-600 rounded-md hover:bg-orange-100 transition-colors flex items-center space-x-1 text-xs border border-orange-200"
                           onClick={() => handleUpdateStatus(booking)}
                           title="Update Status"
                         >
-                          <Edit size={14} />
-                          <span className="text-xs font-medium">Status</span>
+                          <Edit size={12} />
+                          <span className="font-medium">Status</span>
                         </button>
                       </div>
                     </td>
@@ -540,8 +634,18 @@ const UploadDocumentBookings = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="p-6 text-center text-gray-500">
-                    No bookings found matching your criteria
+                  <td colSpan="7" className="p-6 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                        <Search size={24} className="text-gray-400" />
+                      </div>
+                      <div className="text-gray-500 text-lg font-medium">
+                        No bookings found
+                      </div>
+                      <div className="text-gray-400 text-sm">
+                        Try adjusting your search or filter criteria
+                      </div>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -550,16 +654,18 @@ const UploadDocumentBookings = () => {
         </div>
 
         {filteredBookings.length > 0 && (
-          <Pagination
-            itemsPerPage={itemsPerPage}
-            setItemsPerPage={setItemsPerPage}
-            indexOfFirstItem={indexOfFirstItem}
-            indexOfLastItem={indexOfLastItem}
-            filteredBookings={filteredBookings}
-            paginate={paginate}
-            currentPage={currentPage}
-            totalPages={totalPages}
-          />
+          <div className="border-t border-red-100 bg-red-50/30">
+            <Pagination
+              itemsPerPage={itemsPerPage}
+              setItemsPerPage={setItemsPerPage}
+              indexOfFirstItem={indexOfFirstItem}
+              indexOfLastItem={indexOfLastItem}
+              filteredBookings={filteredBookings}
+              paginate={paginate}
+              currentPage={currentPage}
+              totalPages={totalPages}
+            />
+          </div>
         )}
       </div>
 
@@ -579,41 +685,62 @@ const UploadDocumentBookings = () => {
         </div>
       )}
 
-      {/* Status Update Modal */}
+      {/* Status Update Modal - Compact Design */}
       {isStatusModalOpen && statusUpdateBooking && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-            <div className="p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-red-900 flex items-center">
-                  <Edit size={20} className="mr-2" />
-                  Update Status
-                </h3>
-                <button
-                  onClick={handleCloseStatusModal}
-                  className="text-gray-400 hover:text-gray-600 p-1"
-                >
-                  <X size={20} />
-                </button>
-              </div>
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-red-900 flex items-center">
+                <Edit size={18} className="mr-2" />
+                Update Status
+              </h3>
+              <button
+                onClick={handleCloseStatusModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
 
-              <div className="space-y-4">
+            {/* Content */}
+            <div className="p-4 space-y-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
                     Booking ID
                   </label>
-                  <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-medium">
+                  <div className="bg-gray-50 p-2 rounded text-sm font-medium">
                     {statusUpdateBooking.bookingId}
                   </div>
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    User
+                  </label>
+                  <div className="bg-gray-50 p-2 rounded text-sm">
+                    {statusUpdateBooking.username}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Documents
+                  </label>
+                  <div className="bg-gray-50 p-2 rounded text-sm">
+                    {statusUpdateBooking.totalDocuments} document
+                    {statusUpdateBooking.totalDocuments !== 1 ? "s" : ""}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
                     Current Status
                   </label>
-                  <div className="bg-gray-50 p-3 rounded border border-gray-200">
+                  <div className="bg-gray-50 p-2 rounded">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium flex items-center w-fit ${getStatusBadgeColor(
+                      className={`inline-flex px-2 py-1 rounded-full text-xs font-medium items-center ${getStatusBadgeColor(
                         statusUpdateBooking.documentStatus
                       )}`}
                     >
@@ -622,51 +749,52 @@ const UploadDocumentBookings = () => {
                     </span>
                   </div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    New Status
-                  </label>
-                  <select
-                    value={newStatus}
-                    onChange={(e) => setNewStatus(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                  >
-                    {statusOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
               </div>
 
-              <div className="mt-6 flex flex-col-reverse sm:flex-row justify-end space-y-reverse space-y-3 sm:space-y-0 sm:space-x-3">
-                <button
-                  onClick={handleCloseStatusModal}
-                  className="w-full sm:w-auto px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
-                  disabled={updatingStatus}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  New Status <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleStatusSubmit}
-                  disabled={
-                    updatingStatus ||
-                    newStatus === statusUpdateBooking.documentStatus
-                  }
-                  className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                >
-                  {updatingStatus ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                      Updating...
-                    </>
-                  ) : (
-                    "Update Status"
-                  )}
-                </button>
+                  {statusOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
               </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end space-x-3 p-4 border-t border-gray-200">
+              <button
+                onClick={handleCloseStatusModal}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                disabled={updatingStatus}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleStatusSubmit}
+                disabled={
+                  updatingStatus ||
+                  newStatus === statusUpdateBooking.documentStatus
+                }
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              >
+                {updatingStatus ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                    Updating...
+                  </>
+                ) : (
+                  "Update"
+                )}
+              </button>
             </div>
           </div>
         </div>

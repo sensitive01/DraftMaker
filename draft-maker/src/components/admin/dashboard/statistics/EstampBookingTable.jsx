@@ -28,6 +28,26 @@ const EstampBookingTable = () => {
   const [newStatus, setNewStatus] = useState("");
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
 
+  // Utility function to safely display values
+  const safeDisplay = (value, fallback = "N/A") => {
+    return value && value.toString().trim() !== "" ? value : fallback;
+  };
+
+  // Utility function to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+      });
+    } catch (error) {
+      return dateString;
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -37,21 +57,20 @@ const EstampBookingTable = () => {
         if (response.data && response.data.data) {
           const formattedBookings = response.data.data.map((booking) => ({
             _id: booking._id,
-            id: booking.bookingId, // Using _id as the booking ID
-            firstPartyName: booking.firstPartyName || "N/A",
-            secondPartyName: booking.secondPartyName || "N/A",
-            documentType: booking.documentType || "N/A",
-            deliveryServiceName: booking.deliveryServiceName || "N/A",
-            requestorName: booking.requestorName || "N/A",
-            mobileNumber: booking.mobileNumber || "N/A",
+            id: safeDisplay(booking.bookingId),
+            firstPartyName: safeDisplay(booking.firstPartyName),
+            secondPartyName: safeDisplay(booking.secondPartyName),
+            documentType: safeDisplay(booking.documentType),
+            deliveryServiceName: safeDisplay(booking.deliveryServiceName),
+            requestorName: safeDisplay(booking.requestorName),
+            mobileNumber: safeDisplay(booking.mobileNumber),
             totalAmount: booking.totalAmount || 0,
-            orderDate: booking.orderDate
-              ? new Date(booking.orderDate).toLocaleDateString()
-              : "N/A",
-            status: booking.documentStatus || "Pending", // Using payment status as default status
-            paymentStatus: booking.paymentStatus || "Pending",
-            paymentId: booking.razorpayPaymentId || "N/A",
-            // Additional fields for preview
+            orderDate: formatDate(booking.orderDate),
+            status: safeDisplay(booking.documentStatus, "Pending"),
+            paymentStatus: safeDisplay(booking.paymentStatus, "Pending"),
+            paymentId: safeDisplay(booking.razorpayPaymentId),
+            deliveryType: safeDisplay(booking.deliveryType),
+            // Additional fields preserved for functionality
             selectedDocumentId: booking.selectedDocumentId || "",
             documentCalculationType: booking.documentCalculationType || "",
             documentFixedAmount: booking.documentFixedAmount || 0,
@@ -59,13 +78,11 @@ const EstampBookingTable = () => {
             documentMinAmount: booking.documentMinAmount || 0,
             documentMaxAmount: booking.documentMaxAmount || 0,
             stampDutyAmount: booking.stampDutyAmount || 0,
-            deliveryType: booking.deliveryType || "",
             selectedDeliveryServiceId: booking.selectedDeliveryServiceId || "",
             deliveryCharge: booking.deliveryCharge || 0,
             deliveryDescription: booking.deliveryDescription || "",
             paymentMethod: booking.paymentMethod || "",
             currency: booking.currency || "",
-            razorpayPaymentId: booking.razorpayPaymentId || "",
             razorpayOrderId: booking.razorpayOrderId || "",
             razorpaySignature: booking.razorpaySignature || "",
             paymentCompletedAt: booking.paymentCompletedAt
@@ -165,9 +182,7 @@ const EstampBookingTable = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Updated handleViewDetails function to navigate to details page
   const handleViewDetails = (booking) => {
-    // Navigate to the details page with the booking _id
     navigate(`/admin/estamp-booking-details/${booking._id}`);
   };
 
@@ -189,10 +204,8 @@ const EstampBookingTable = () => {
     try {
       setStatusUpdateLoading(true);
 
-      // Call API to update the status
       await updateEstampBookingStatus(statusUpdateBooking._id, newStatus);
 
-      // Update local state
       const updatedBookings = bookings.map((booking) => {
         if (booking._id === statusUpdateBooking._id) {
           return { ...booking, status: newStatus };
@@ -204,7 +217,6 @@ const EstampBookingTable = () => {
       setStatusUpdateLoading(false);
       handleCloseStatusModal();
 
-      // Show success message
       alert("Status updated successfully!");
     } catch (error) {
       console.error("Error updating status:", error);
@@ -231,34 +243,34 @@ const EstampBookingTable = () => {
   const getStatusBadgeColor = (status) => {
     switch ((status || "").toLowerCase()) {
       case "approved":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 border border-green-200";
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-100 text-yellow-800 border border-yellow-200";
       case "cancelled":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 text-red-800 border border-red-200";
       case "processing":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 text-blue-800 border border-blue-200";
       case "processed":
-        return "bg-indigo-100 text-indigo-800";
+        return "bg-indigo-100 text-indigo-800 border border-indigo-200";
       case "delivered":
-        return "bg-emerald-100 text-emerald-800";
+        return "bg-emerald-100 text-emerald-800 border border-emerald-200";
       case "completed":
-        return "bg-purple-100 text-purple-800";
+        return "bg-purple-100 text-purple-800 border border-purple-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 border border-gray-200";
     }
   };
 
   const getPaymentStatusBadgeColor = (status) => {
     switch ((status || "").toLowerCase()) {
       case "completed":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 border border-green-200";
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-100 text-yellow-800 border border-yellow-200";
       case "failed":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 text-red-800 border border-red-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 border border-gray-200";
     }
   };
 
@@ -289,24 +301,30 @@ const EstampBookingTable = () => {
 
   return (
     <div className="space-y-6 p-6 bg-white rounded-lg shadow">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <h2 className="text-2xl font-bold text-red-900">
           E-Stamp Booking Details
         </h2>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+        {/* Search and Filter Controls */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+          {/* Search Input */}
           <div className="relative w-full sm:w-64">
             <input
               type="text"
               value={searchTerm}
               onChange={handleSearchChange}
               placeholder="Search bookings..."
-              className="px-4 py-2 pr-10 w-full border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="px-4 py-2 pr-10 w-full border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
             />
             <span className="absolute right-3 top-2.5 text-gray-400">
               {searchTerm ? (
-                <button onClick={clearSearch}>
-                  <X size={18} className="text-red-500" />
+                <button
+                  onClick={clearSearch}
+                  className="hover:text-red-500 transition-colors"
+                >
+                  <X size={18} />
                 </button>
               ) : (
                 <Search size={18} />
@@ -314,52 +332,47 @@ const EstampBookingTable = () => {
             </span>
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="w-full sm:w-auto">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white"
-              >
-                <option value="all">All Statuses</option>
-                <option value="Completed">Completed</option>
-                <option value="Pending">Pending</option>
-                <option value="Processing">Processing</option>
-                <option value="Processed">Processed</option>
-                <option value="Approved">Approved</option>
-                <option value="Delivered">Delivered</option>
-                <option value="Cancelled">Cancelled</option>
-              </select>
-            </div>
+          {/* Filter Controls */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm bg-white"
+            >
+              <option value="all">All Statuses</option>
+              <option value="Completed">Completed</option>
+              <option value="Pending">Pending</option>
+              <option value="Processing">Processing</option>
+              <option value="Processed">Processed</option>
+              <option value="Approved">Approved</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
 
-            <div className="w-full sm:w-auto">
-              <select
-                value={filterPaymentStatus}
-                onChange={(e) => setFilterPaymentStatus(e.target.value)}
-                className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white"
-              >
-                <option value="all">All Payments</option>
-                <option value="completed">Completed</option>
-                <option value="pending">Pending</option>
-                <option value="failed">Failed</option>
-              </select>
-            </div>
+            <select
+              value={filterPaymentStatus}
+              onChange={(e) => setFilterPaymentStatus(e.target.value)}
+              className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm bg-white"
+            >
+              <option value="all">All Payments</option>
+              <option value="completed">Completed</option>
+              <option value="pending">Pending</option>
+              <option value="failed">Failed</option>
+            </select>
 
-            <div className="w-full sm:w-auto">
-              <select
-                value={filterDeliveryType}
-                onChange={(e) => setFilterDeliveryType(e.target.value)}
-                className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white"
-              >
-                <option value="all">All Delivery Types</option>
-                <option value="delivery">Delivery</option>
-                <option value="pickup">Pickup</option>
-              </select>
-            </div>
+            <select
+              value={filterDeliveryType}
+              onChange={(e) => setFilterDeliveryType(e.target.value)}
+              className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm bg-white"
+            >
+              <option value="all">All Delivery Types</option>
+              <option value="delivery">Delivery</option>
+              <option value="pickup">Pickup</option>
+            </select>
 
             <button
               onClick={clearFilters}
-              className="px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm flex items-center"
+              className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm flex items-center justify-center whitespace-nowrap"
             >
               <X size={16} className="mr-1" /> Clear
             </button>
@@ -367,51 +380,78 @@ const EstampBookingTable = () => {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 text-sm text-gray-500">
+      {/* Results Counter */}
+      <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
         <Filter size={16} />
         <span>
-          Showing {filteredBookings.length} of {bookings.length} e-stamp
+          Showing{" "}
+          <span className="font-semibold text-red-600">
+            {filteredBookings.length}
+          </span>{" "}
+          of <span className="font-semibold">{bookings.length}</span> e-stamp
           bookings
         </span>
       </div>
 
-      <div className="bg-white rounded-lg border border-red-100 shadow-md overflow-hidden">
-        {/* Enhanced horizontal scroll container with custom scrollbar */}
-        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-red-300 scrollbar-track-red-50">
-          <table className="w-full min-w-[2000px]">
-            {" "}
-            {/* Set minimum width for horizontal scroll */}
+      {/* Table Container */}
+      <div className="bg-white rounded-lg border border-red-100 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-[1400px] w-full">
             <thead className="bg-red-50 border-b border-red-100">
               <tr>
-                <th className="p-2 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-64">
-                  SNo.
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "60px" }}
+                >
+                  S.No.
                 </th>
-                <th className="p-2 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-64">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "180px" }}
+                >
                   Booking ID & Date
                 </th>
-                <th className="p-2 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-96">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "300px" }}
+                >
                   Party Details
                 </th>
-                <th className="p-2 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-52">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "200px" }}
+                >
                   Document & Service Type
                 </th>
-                <th className="p-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-32">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "120px" }}
+                >
                   Document Status
                 </th>
-                <th className="p-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-32">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "120px" }}
+                >
                   Payment Status
                 </th>
-                <th className="p-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-40">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "150px" }}
+                >
                   Payment ID
                 </th>
-                <th className="p-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-32">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "100px" }}
+                >
                   Total Amount
                 </th>
-                <th className="p-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-24">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "180px" }}
+                >
                   Actions
-                </th>
-                <th className="p-4 text-left text-xs font-medium text-red-600 uppercase tracking-wider w-32">
-                  Update Status
                 </th>
               </tr>
             </thead>
@@ -422,143 +462,159 @@ const EstampBookingTable = () => {
                     key={booking.id}
                     className="hover:bg-red-50 transition-colors duration-200"
                   >
-                    <td className="p-4 whitespace-nowrap text-sm text-gray-600 font-medium w-20">
+                    {/* Serial Number */}
+                    <td className="p-3 whitespace-nowrap text-sm text-gray-600 font-medium">
                       {indexOfFirstItem + index + 1}
                     </td>
-                    <td className="p-4 w-64">
-                      <div className="flex flex-col">
-                        <span
-                          className="text-sm font-semibold text-red-900 truncate"
-                          title={booking.id}
-                        >
-                          {booking.id
-                            ? booking.id
-                            : "N/A"}
-                        </span>
-                        <div className="flex items-center text-xs text-gray-500 mt-1">
+
+                    {/* Booking ID & Date */}
+                    <td className="p-3">
+                      <div className="space-y-1">
+                        <div className="text-sm font-semibold text-red-900 break-all">
+                          {safeDisplay(booking.id)}
+                        </div>
+                        <div className="flex items-center text-xs text-gray-500">
                           <Calendar size={12} className="mr-1 flex-shrink-0" />
-                          <span className="truncate">{booking.orderDate}</span>
+                          <span>{booking.orderDate}</span>
                         </div>
                       </div>
                     </td>
-                    <td className="p-1 w-96">
-                      <div className="flex flex-col space-y-1">
+
+                    {/* Party Details - Much Wider Column */}
+                    <td className="p-3">
+                      <div className="space-y-2">
                         <div className="flex items-start">
-                          <span className="text-xs text-gray-500 mr-2 ">
+                          <span className="text-xs text-gray-500 mr-2 w-14 flex-shrink-0">
                             First:
                           </span>
                           <span
                             className="text-sm font-medium text-gray-900"
                             title={booking.firstPartyName}
                           >
-                            {booking.firstPartyName}
+                            {safeDisplay(booking.firstPartyName)}
                           </span>
                         </div>
                         <div className="flex items-start">
-                          <span className="text-xs text-gray-500 mr-2 flex-shrink-0">
+                          <span className="text-xs text-gray-500 mr-2 w-14 flex-shrink-0">
                             Second:
                           </span>
                           <span
-                            className="text-sm text-gray-600 truncate"
+                            className="text-sm text-gray-600"
                             title={booking.secondPartyName}
                           >
-                            {booking.secondPartyName}
+                            {safeDisplay(booking.secondPartyName)}
                           </span>
                         </div>
                         <div className="flex items-start">
-                          <span className="text-xs text-gray-500 mr-2 flex-shrink-0">
+                          <span className="text-xs text-gray-500 mr-2 w-14 flex-shrink-0">
                             Mobile:
                           </span>
-                          <span
-                            className="text-sm text-gray-600 truncate"
-                            title={booking.mobileNumber}
-                          >
-                            {booking.mobileNumber}
+                          <span className="text-sm text-gray-600">
+                            {safeDisplay(booking.mobileNumber)}
                           </span>
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 w-52">
-                      <div className="flex flex-col space-y-1">
-                        <span
-                          className="text-sm font-medium text-gray-900 truncate"
+
+                    {/* Document & Service Type */}
+                    <td className="p-3">
+                      <div className="space-y-1">
+                        <div
+                          className="text-sm font-medium text-gray-900"
                           title={booking.documentType}
                         >
-                          {booking.documentType}
-                        </span>
-                        <span
-                          className="text-xs text-gray-500 truncate"
+                          {safeDisplay(booking.documentType)}
+                        </div>
+                        <div
+                          className="text-xs text-gray-500"
                           title={booking.deliveryServiceName}
                         >
-                          Service: {booking.deliveryServiceName || "N/A"}
-                        </span>
-                        <span
-                          className="text-xs text-gray-500 truncate"
+                          Service: {safeDisplay(booking.deliveryServiceName)}
+                        </div>
+                        <div
+                          className="text-xs text-gray-500"
                           title={booking.deliveryType}
                         >
-                          Type: {booking.deliveryType || "N/A"}
-                        </span>
+                          Type: {safeDisplay(booking.deliveryType)}
+                        </div>
                       </div>
                     </td>
-                    <td className="p-4 whitespace-nowrap w-32">
+
+                    {/* Document Status */}
+                    <td className="p-3 whitespace-nowrap">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(
+                        className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(
                           booking.status
                         )}`}
-                        title={booking.status}
                       >
-                        {booking.status || "N/A"}
+                        {safeDisplay(booking.status)}
                       </span>
                     </td>
-                    <td className="p-4 whitespace-nowrap w-32">
+
+                    {/* Payment Status */}
+                    <td className="p-3 whitespace-nowrap">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${getPaymentStatusBadgeColor(
+                        className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusBadgeColor(
                           booking.paymentStatus
                         )}`}
-                        title={booking.paymentStatus}
                       >
-                        {booking.paymentStatus}
+                        {safeDisplay(booking.paymentStatus)}
                       </span>
                     </td>
-                    <td className="p-4 w-40">
-                      <span
-                        className="text-sm font-mono text-gray-700 truncate block"
+
+                    {/* Payment ID */}
+                    <td className="p-2">
+                      <div
+                        className="text-xs font-mono text-gray-700 break-all"
                         title={booking.paymentId}
                       >
-                        {booking.paymentId !== "N/A"
-                          ? booking.paymentId.substring(0, 15) + "..."
-                          : "N/A"}
-                      </span>
+                        {safeDisplay(booking.paymentId)}
+                      </div>
                     </td>
-                    <td className="p-4 whitespace-nowrap text-sm font-semibold text-green-600 w-32">
+
+                    {/* Total Amount */}
+                    <td className="p-3 whitespace-nowrap text-sm font-semibold text-green-600">
                       {formatAmount(booking.totalAmount)}
                     </td>
-                    <td className="p-4 whitespace-nowrap w-24">
-                      <button
-                        className="px-3 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center space-x-1"
-                        onClick={() => handleViewDetails(booking)}
-                        title="View Details"
-                      >
-                        <Eye size={14} />
-                        <span className="text-xs font-medium">View</span>
-                      </button>
-                    </td>
-                    <td className="p-4 whitespace-nowrap w-32">
-                      <button
-                        className="px-3 py-2 bg-purple-100 text-purple-600 rounded-md hover:bg-purple-200 transition-colors flex items-center space-x-1"
-                        onClick={() => handleOpenStatusModal(booking)}
-                        title="Update Status"
-                      >
-                        <Edit size={14} />
-                        <span className="text-xs font-medium">Update</span>
-                      </button>
+
+                    {/* Actions */}
+                    <td className="p-2">
+                      <div className="flex gap-2">
+                        <button
+                          className="px-2 py-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors flex items-center space-x-1 text-xs border border-blue-200"
+                          onClick={() => handleViewDetails(booking)}
+                          title="View Details"
+                        >
+                          <Eye size={12} />
+                          <span className="font-medium">View</span>
+                        </button>
+
+                        <button
+                          className="px-3 py-1.5 bg-purple-50 text-purple-600 rounded-md hover:bg-purple-100 transition-colors flex items-center space-x-1 text-xs border border-purple-200"
+                          onClick={() => handleOpenStatusModal(booking)}
+                          title="Update Status"
+                        >
+                          <Edit size={12} />
+                          <span className="font-medium">Update</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="10" className="p-6 text-center text-gray-500">
-                    No e-stamp bookings found matching your criteria
+                  <td colSpan="9" className="p-6 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                        <Search size={24} className="text-gray-400" />
+                      </div>
+                      <div className="text-gray-500 text-lg font-medium">
+                        No e-stamp bookings found
+                      </div>
+                      <div className="text-gray-400 text-sm">
+                        Try adjusting your search or filter criteria
+                      </div>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -566,78 +622,94 @@ const EstampBookingTable = () => {
           </table>
         </div>
 
+        {/* Pagination */}
         {filteredBookings.length > 0 && (
-          <Pagination
-            itemsPerPage={itemsPerPage}
-            setItemsPerPage={setItemsPerPage}
-            indexOfFirstItem={indexOfFirstItem}
-            indexOfLastItem={indexOfLastItem}
-            filteredBookings={filteredBookings}
-            paginate={paginate}
-            currentPage={currentPage}
-            totalPages={totalPages}
-          />
+          <div className="border-t border-red-100 bg-red-50/30">
+            <Pagination
+              itemsPerPage={itemsPerPage}
+              setItemsPerPage={setItemsPerPage}
+              indexOfFirstItem={indexOfFirstItem}
+              indexOfLastItem={indexOfLastItem}
+              filteredBookings={filteredBookings}
+              paginate={paginate}
+              currentPage={currentPage}
+              totalPages={totalPages}
+            />
+          </div>
         )}
       </div>
 
-      {/* Status Update Modal */}
+      {/* Status Update Modal - Optimized */}
       {isStatusModalOpen && statusUpdateBooking && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-            <div className="flex items-center justify-between mb-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h3 className="text-lg font-bold text-red-900">
-                Update E-Stamp Booking Status
+                Update E-Stamp Status
               </h3>
               <button
                 onClick={handleCloseStatusModal}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Booking ID
-                </label>
-                <div className="bg-gray-50 p-2 rounded border border-gray-200 text-sm font-medium">
-                  {statusUpdateBooking.id
-                    ? statusUpdateBooking.id.substring(0, 12) + "..."
-                    : "N/A"}
+            {/* Content */}
+            <div className="p-4 space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Booking ID
+                  </label>
+                  <div className="bg-gray-50 p-2 rounded text-sm font-medium">
+                    {statusUpdateBooking.id.length > 12
+                      ? statusUpdateBooking.id.substring(0, 12) + "..."
+                      : statusUpdateBooking.id}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    First Party
+                  </label>
+                  <div className="bg-gray-50 p-2 rounded text-sm">
+                    {statusUpdateBooking.firstPartyName}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Document Type
+                  </label>
+                  <div className="bg-gray-50 p-2 rounded text-sm">
+                    {statusUpdateBooking.documentType}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Current Status
+                  </label>
+                  <div
+                    className={`p-2 rounded text-sm font-medium ${getStatusBadgeColor(
+                      statusUpdateBooking.status
+                    )}`}
+                  >
+                    {statusUpdateBooking.status}
+                  </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Document Type
-                </label>
-                <div className="bg-gray-50 p-2 rounded border border-gray-200 text-sm">
-                  {statusUpdateBooking.documentType || "N/A"}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Current Status
-                </label>
-                <div
-                  className={`p-2 rounded text-sm font-medium ${getStatusBadgeColor(
-                    statusUpdateBooking.status
-                  )}`}
-                >
-                  {statusUpdateBooking.status || "N/A"}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Update Status
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Update Status <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 >
                   <option value="">Select new status</option>
                   <option value="Pending">Pending</option>
@@ -651,17 +723,18 @@ const EstampBookingTable = () => {
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end space-x-3">
+            {/* Footer */}
+            <div className="flex justify-end space-x-3 p-4 border-t border-gray-200">
               <button
                 onClick={handleCloseStatusModal}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleStatusUpdate}
                 disabled={!newStatus || statusUpdateLoading}
-                className={`px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center ${
+                className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center ${
                   !newStatus || statusUpdateLoading
                     ? "opacity-50 cursor-not-allowed"
                     : ""
@@ -673,37 +746,13 @@ const EstampBookingTable = () => {
                     Updating...
                   </>
                 ) : (
-                  "Update Status"
+                  "Update"
                 )}
               </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Add custom scrollbar styles */}
-      <style jsx>{`
-        .scrollbar-thin {
-          scrollbar-width: thin;
-        }
-        .scrollbar-thumb-red-300::-webkit-scrollbar-thumb {
-          background-color: #fca5a5;
-          border-radius: 6px;
-        }
-        .scrollbar-track-red-50::-webkit-scrollbar-track {
-          background-color: #fef2f2;
-        }
-        .scrollbar-thin::-webkit-scrollbar {
-          height: 6px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-          background-color: #fca5a5;
-          border-radius: 6px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-track {
-          background-color: #fef2f2;
-        }
-      `}</style>
     </div>
   );
 };

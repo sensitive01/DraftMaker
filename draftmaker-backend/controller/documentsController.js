@@ -59,11 +59,11 @@ const getDashboardStatistics = async (req, res) => {
     let totalAmount = 0;
 
     const statusData = {};
-
     statusList.forEach((status) => {
       statusData[status] = { bookings: 0, amount: 0 };
     });
 
+    // Loop through each document-related collection
     for (const collection of collections) {
       const docs = await collection.find();
 
@@ -82,6 +82,42 @@ const getDashboardStatistics = async (req, res) => {
         statusData[status].bookings += 1;
         statusData[status].amount += amount;
       }
+    }
+
+    // 🔵 Handle uploadDocument data
+    const uploadDocs = await uploadDocument.find();
+    for (const doc of uploadDocs) {
+      totalBookings += 1;
+
+      const amount = doc.paymentDetails?.paidAmount || 0;
+      totalAmount += amount;
+
+      const status = doc.doumentStatus || "Pending";
+
+      if (!statusData[status]) {
+        statusData[status] = { bookings: 0, amount: 0 };
+      }
+
+      statusData[status].bookings += 1;
+      statusData[status].amount += amount;
+    }
+
+    // 🔵 Handle eStampPaymentData
+    const eStampDocs = await eStampPaymentData.find();
+    for (const doc of eStampDocs) {
+      totalBookings += 1;
+
+      const amount = doc.paymentAmount || 0;
+      totalAmount += amount;
+
+      const status = doc.documentStatus || "Pending";
+
+      if (!statusData[status]) {
+        statusData[status] = { bookings: 0, amount: 0 };
+      }
+
+      statusData[status].bookings += 1;
+      statusData[status].amount += amount;
     }
 
     // Final structured response
@@ -384,6 +420,8 @@ const trackMyDocumentStatus = async (req, res) => {
       formId: 1,
     });
 
+    const uploadedData = await uploadedSchema.find(filter, {userName:1,userMobile:1,documentStatus:1,bookingId:1,createdAt:1,documentType:1})
+
     // Combine all arrays
     let allBookingData = [
       ...dualNameData,
@@ -405,6 +443,7 @@ const trackMyDocumentStatus = async (req, res) => {
       ...commercialData,
       ...recidentialData,
       ...eStambData,
+      ...uploadedData
     ];
 
     // Sort by createdAt descending
@@ -2956,7 +2995,7 @@ const uploadDocumentData = async (req, res) => {
     const bookingId = await generateBookingId();
 
     const newUpload = new uploadDocument({
-      username,
+      userName:username,
       userMobile,
       documentType,
       formId,

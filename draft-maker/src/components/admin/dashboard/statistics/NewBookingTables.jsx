@@ -29,6 +29,73 @@ const BookingTable = () => {
   const [newStatus, setNewStatus] = useState("");
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
 
+  // Utility function to format date in human-readable format
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      // Handle different date formats
+      let date;
+
+      // Check if it's in DD-MM-YYYY format like "28-07-2025 09:50:01 PM"
+      if (dateString.includes("-") && dateString.split("-").length === 3) {
+        const [datePart, timePart] = dateString.split(" ");
+        const [day, month, year] = datePart.split("-");
+        // Create ISO format string for proper parsing
+        const isoString = `${year}-${month}-${day}`;
+        date = new Date(isoString);
+      } else {
+        // Handle other formats
+        date = new Date(dateString);
+      }
+
+      // Format to human-readable date
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch (error) {
+      console.log("Date parsing error:", error);
+      return dateString;
+    }
+  };
+
+  // Utility function to format time in human-readable format
+  const formatTime = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      // Handle different date formats
+      let date;
+
+      // Check if it's in DD-MM-YYYY format like "28-07-2025 09:50:01 PM"
+      if (dateString.includes("-") && dateString.split("-").length === 3) {
+        const parts = dateString.split(" ");
+        const [day, month, year] = parts[0].split("-");
+        const time = parts.slice(1).join(" "); // Handle "09:50:01 PM"
+
+        // Create a proper date string
+        const dateStr = `${month}/${day}/${year} ${time}`;
+        date = new Date(dateStr);
+      } else {
+        date = new Date(dateString);
+      }
+
+      return date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+    } catch (error) {
+      console.log("Time parsing error:", error);
+      return dateString;
+    }
+  };
+
+  // Utility function to safely display values
+  const safeDisplay = (value, fallback = "N/A") => {
+    return value && value.toString().trim() !== "" ? value : fallback;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -37,19 +104,20 @@ const BookingTable = () => {
 
         const formattedBookings = response.data.data.map((booking) => ({
           _id: booking._id,
-          id: booking.bookingId || "",
-          name: booking.userName || "Unknown",
-          phoneNumber: booking.mobileNumber || "",
-          status: booking.doumentStatus || "",
-          paymentId: booking.paymentDetails?.paymentId || "",
-          paymentStatus: booking.paymentStatus || "",
-          amount: booking.paymentDetails?.paidAmount || "",
-          serviceType: booking.paymentDetails?.serviceType || "",
-          serviceName: booking.paymentDetails?.serviceName || "",
-          createdAt: booking.createdAt || "",
+          id: safeDisplay(booking.bookingId),
+          name: safeDisplay(booking.userName, "Unknown"),
+          phoneNumber: safeDisplay(booking.mobileNumber),
+          status: safeDisplay(booking.doumentStatus),
+          paymentId: safeDisplay(booking.paymentDetails?.paymentId),
+          paymentStatus: safeDisplay(booking.paymentStatus),
+          amount: safeDisplay(booking.paymentDetails?.paidAmount),
+          serviceType: safeDisplay(booking.paymentDetails?.serviceType),
+          serviceName: safeDisplay(booking.paymentDetails?.serviceName),
+          createdAt: formatDate(booking.createdAt),
+          createdTime: formatTime(booking.createdAt),
           includesNotary: booking.paymentDetails?.includesNotary || false,
-          documentType: booking.documentType || "",
-          formId: booking.formId || "",
+          documentType: safeDisplay(booking.documentType),
+          formId: safeDisplay(booking.formId),
         }));
 
         setBookings(formattedBookings);
@@ -175,21 +243,34 @@ const BookingTable = () => {
   const getStatusBadgeColor = (status) => {
     switch ((status || "").toLowerCase()) {
       case "completed":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 border border-green-200";
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-100 text-yellow-800 border border-yellow-200";
       case "cancelled":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 text-red-800 border border-red-200";
       case "processing":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 text-blue-800 border border-blue-200";
       case "processed":
-        return "bg-indigo-100 text-indigo-800";
+        return "bg-indigo-100 text-indigo-800 border border-indigo-200";
       case "approved":
-        return "bg-teal-100 text-teal-800";
+        return "bg-teal-100 text-teal-800 border border-teal-200";
       case "delivered":
-        return "bg-emerald-100 text-emerald-800";
+        return "bg-emerald-100 text-emerald-800 border border-emerald-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 border border-gray-200";
+    }
+  };
+
+  const getPaymentStatusColor = (status) => {
+    switch ((status || "").toLowerCase()) {
+      case "success":
+        return "bg-green-100 text-green-800 border border-green-200";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border border-yellow-200";
+      case "failed":
+        return "bg-red-100 text-red-800 border border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border border-gray-200";
     }
   };
 
@@ -213,22 +294,28 @@ const BookingTable = () => {
 
   return (
     <div className="space-y-6 p-6 bg-white rounded-lg shadow">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <h2 className="text-2xl font-bold text-red-900">Booking Details</h2>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+        {/* Search and Filter Controls */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+          {/* Search Input */}
           <div className="relative w-full sm:w-64">
             <input
               type="text"
               value={searchTerm}
               onChange={handleSearchChange}
               placeholder="Search bookings..."
-              className="px-4 py-2 pr-10 w-full border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="px-4 py-2 pr-10 w-full border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
             />
             <span className="absolute right-3 top-2.5 text-gray-400">
               {searchTerm ? (
-                <button onClick={clearSearch}>
-                  <X size={18} className="text-red-500" />
+                <button
+                  onClick={clearSearch}
+                  className="hover:text-red-500 transition-colors"
+                >
+                  <X size={18} />
                 </button>
               ) : (
                 <Search size={18} />
@@ -236,40 +323,37 @@ const BookingTable = () => {
             </span>
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="w-full sm:w-auto">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white"
-              >
-                <option value="all">All Statuses</option>
-                <option value="completed">Completed</option>
-                <option value="pending">Pending</option>
-                <option value="processing">Processing</option>
-                <option value="processed">Processed</option>
-                <option value="approved">Approved</option>
-                <option value="delivered">Delivered</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </div>
+          {/* Filter Controls */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm bg-white"
+            >
+              <option value="all">All Statuses</option>
+              <option value="completed">Completed</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="processed">Processed</option>
+              <option value="approved">Approved</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
 
-            <div className="w-full sm:w-auto">
-              <select
-                value={filterPaymentStatus}
-                onChange={(e) => setFilterPaymentStatus(e.target.value)}
-                className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white"
-              >
-                <option value="all">All Payments</option>
-                <option value="success">Success</option>
-                <option value="failed">Failed</option>
-                <option value="pending">Pending</option>
-              </select>
-            </div>
+            <select
+              value={filterPaymentStatus}
+              onChange={(e) => setFilterPaymentStatus(e.target.value)}
+              className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm bg-white"
+            >
+              <option value="all">All Payments</option>
+              <option value="success">Success</option>
+              <option value="failed">Failed</option>
+              <option value="pending">Pending</option>
+            </select>
 
             <button
               onClick={clearFilters}
-              className="px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm flex items-center"
+              className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm flex items-center justify-center whitespace-nowrap"
             >
               <X size={16} className="mr-1" /> Clear
             </button>
@@ -277,44 +361,71 @@ const BookingTable = () => {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 text-sm text-gray-500">
+      {/* Results Counter */}
+      <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
         <Filter size={16} />
         <span>
-          Showing {filteredBookings.length} of {bookings.length} bookings
+          Showing{" "}
+          <span className="font-semibold text-red-600">
+            {filteredBookings.length}
+          </span>{" "}
+          of <span className="font-semibold">{bookings.length}</span> bookings
         </span>
       </div>
 
-      <div className="bg-white rounded-lg border border-red-100 shadow-md overflow-hidden">
+      {/* Table Container */}
+      <div className="bg-white rounded-lg border border-red-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="min-w-[1200px] w-full">
             <thead className="bg-red-50 border-b border-red-100">
               <tr>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "60px" }}
+                >
                   Sl. No.
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "180px" }}
+                >
                   Booking ID & Date
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "160px" }}
+                >
                   Customer Details
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "220px" }}
+                >
                   Document & Service Type
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "120px" }}
+                >
                   Document Status
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "120px" }}
+                >
                   Payment Status
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "150px" }}
+                >
                   Payment ID
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "200px" }}
+                >
                   Actions
-                </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
-                  Update Status
                 </th>
               </tr>
             </thead>
@@ -325,106 +436,125 @@ const BookingTable = () => {
                     key={booking.id}
                     className="hover:bg-red-50 transition-colors duration-200"
                   >
+                    {/* Serial Number */}
                     <td className="p-3 whitespace-nowrap text-sm text-gray-600 font-medium">
                       {indexOfFirstItem + index + 1}
                     </td>
-                    <td className="p-3 whitespace-nowrap">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-red-900">
-                          {booking.id}
-                        </span>
-                        <div className="flex items-center text-xs text-gray-500 mt-1">
-                          <Calendar size={12} className="mr-1" />
-                          {booking.createdAt}
+
+                    {/* Booking Details */}
+                    <td className="p-3">
+                      <div className="space-y-1">
+                        <div className="text-sm font-semibold text-red-900">
+                          {safeDisplay(booking.id)}
+                        </div>
+                        <div className="flex items-center text-xs text-gray-500">
+                          <Calendar size={12} className="mr-1 flex-shrink-0" />
+                          <div className="flex flex-col">
+                            <span>{booking.createdAt}</span>
+                            <span className="text-xs text-gray-400">
+                              at {booking.createdTime}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </td>
+
+                    {/* Customer Info */}
                     <td className="p-3">
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-gray-900">
-                          {booking.name}
+                          {safeDisplay(booking.name)}
                         </span>
                         <span className="text-xs text-gray-500">
-                          {booking.phoneNumber}
+                          {safeDisplay(booking.phoneNumber)}
                         </span>
                       </div>
                     </td>
+
+                    {/* Service Details */}
                     <td className="p-3">
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-gray-900">
-                          {booking.documentType}
+                          {safeDisplay(booking.documentType)}
                         </span>
                         <span className="text-xs text-gray-500">
-                          {booking.serviceName || "N/A"}
+                          {safeDisplay(booking.serviceName)}
                         </span>
+                        {booking.amount !== "N/A" && (
+                          <span className="text-xs font-medium text-green-600">
+                            ₹{booking.amount}
+                          </span>
+                        )}
                       </div>
                     </td>
+
+                    {/* Document Status */}
                     <td className="p-3 whitespace-nowrap">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(
                           booking.status
                         )}`}
                       >
-                        {booking.status || "N/A"}
+                        {safeDisplay(booking.status)}
                       </span>
                     </td>
+
+                    {/* Payment Status */}
                     <td className="p-3 whitespace-nowrap">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          booking.paymentStatus === "success"
-                            ? "bg-green-100 text-green-800"
-                            : booking.paymentStatus === "pending"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(
+                          booking.paymentStatus
+                        )}`}
                       >
-                        {booking.paymentStatus}
+                        {safeDisplay(booking.paymentStatus)}
                       </span>
                     </td>
+
+                    {/* Payment ID */}
                     <td className="p-3 whitespace-nowrap text-sm font-mono text-gray-700">
-                      {booking.paymentId}
+                      {safeDisplay(booking.paymentId)}
                     </td>
+
+                    {/* Actions */}
                     <td className="p-3 whitespace-nowrap">
-                      <button
-                        className="px-2 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center space-x-1"
-                        onClick={() =>
-                          navigate(
-                            `/admin/-document-bookings-table/preview/${booking.id}`
-                          )
-                        }
-                        title="View Details"
-                      >
-                        <Eye size={14} />
-                        <span className="text-xs font-medium">
-                          View details
-                        </span>
-                      </button>
-                      <button
-                        className="px-2 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center space-x-1"
-                        onClick={() => handleViewDetails(booking)}
-                        title="View Details"
-                      >
-                        <File size={14} />
-                        <span className="text-xs font-medium">
-                          View document
-                        </span>
-                      </button>
-                    </td>
-                    <td className="p-3 whitespace-nowrap">
-                      <button
-                        className="px-2 py-1 bg-purple-100 text-purple-600 rounded-md hover:bg-purple-200 transition-colors flex items-center space-x-1"
-                        onClick={() => handleOpenStatusModal(booking)}
-                        title="Update Status"
-                      >
-                        <Edit size={14} />
-                        <span className="text-xs font-medium">Update</span>
-                      </button>
+                      <div className="flex space-x-2">
+                        <button
+                          className="px-2 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center space-x-1"
+                          onClick={() =>
+                            navigate(
+                              `/admin/-document-bookings-table/preview/${booking.id}`
+                            )
+                          }
+                          title="View Details"
+                        >
+                          <Eye size={14} />
+                          <span className="text-xs font-medium">Details</span>
+                        </button>
+
+                        <button
+                          className="px-2 py-1 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors flex items-center space-x-1"
+                          onClick={() => handleViewDetails(booking)}
+                          title="View Document"
+                        >
+                          <File size={14} />
+                          <span className="text-xs font-medium">Document</span>
+                        </button>
+
+                        <button
+                          className="px-2 py-1 bg-purple-100 text-purple-600 rounded-md hover:bg-purple-200 transition-colors flex items-center space-x-1"
+                          onClick={() => handleOpenStatusModal(booking)}
+                          title="Update Status"
+                        >
+                          <Edit size={14} />
+                          <span className="text-xs font-medium">Update</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="9" className="p-6 text-center text-gray-500">
+                  <td colSpan="8" className="p-6 text-center text-gray-500">
                     No bookings found matching your criteria
                   </td>
                 </tr>
@@ -433,85 +563,90 @@ const BookingTable = () => {
           </table>
         </div>
 
+        {/* Pagination */}
         {filteredBookings.length > 0 && (
-          <Pagination
-            itemsPerPage={itemsPerPage}
-            setItemsPerPage={setItemsPerPage}
-            indexOfFirstItem={indexOfFirstItem}
-            indexOfLastItem={indexOfLastItem}
-            filteredBookings={filteredBookings}
-            paginate={paginate}
-            currentPage={currentPage}
-            totalPages={totalPages}
-          />
+          <div className="border-t border-red-100 bg-red-50/30">
+            <Pagination
+              itemsPerPage={itemsPerPage}
+              setItemsPerPage={setItemsPerPage}
+              indexOfFirstItem={indexOfFirstItem}
+              indexOfLastItem={indexOfLastItem}
+              filteredBookings={filteredBookings}
+              paginate={paginate}
+              currentPage={currentPage}
+              totalPages={totalPages}
+            />
+          </div>
         )}
       </div>
 
       {/* Status Update Modal */}
       {isModalOpen && statusUpdateBooking && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-red-900">
-                Update Document Status
-              </h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-red-900">Update Status</h3>
               <button
                 onClick={handleCloseModal}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Booking ID
-                </label>
-                <div className="bg-gray-50 p-2 rounded border border-gray-200 text-sm font-medium">
-                  {statusUpdateBooking.id}
+            {/* Content */}
+            <div className="p-4 space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Booking ID
+                  </label>
+                  <div className="bg-gray-50 p-2 rounded text-sm font-medium">
+                    {statusUpdateBooking.id}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Customer
+                  </label>
+                  <div className="bg-gray-50 p-2 rounded text-sm">
+                    {statusUpdateBooking.name}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Document Type
+                  </label>
+                  <div className="bg-gray-50 p-2 rounded text-sm">
+                    {statusUpdateBooking.documentType}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Current Status
+                  </label>
+                  <div
+                    className={`p-2 rounded text-sm font-medium ${getStatusBadgeColor(
+                      statusUpdateBooking.status
+                    )}`}
+                  >
+                    {statusUpdateBooking.status}
+                  </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Document Type
-                </label>
-                <div className="bg-gray-50 p-2 rounded border border-gray-200 text-sm">
-                  {statusUpdateBooking.documentType || "N/A"}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Service Type
-                </label>
-                <div className="bg-gray-50 p-2 rounded border border-gray-200 text-sm">
-                  {statusUpdateBooking.serviceName || "N/A"}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Current Status
-                </label>
-                <div
-                  className={`p-2 rounded text-sm font-medium ${getStatusBadgeColor(
-                    statusUpdateBooking.status
-                  )}`}
-                >
-                  {statusUpdateBooking.status || "N/A"}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Update Status
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Update Status <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 >
                   <option value="">Select new status</option>
                   <option value="Pending">Pending</option>
@@ -525,17 +660,18 @@ const BookingTable = () => {
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end space-x-3">
+            {/* Footer */}
+            <div className="flex justify-end space-x-3 p-4 border-t border-gray-200">
               <button
                 onClick={handleCloseModal}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleStatusUpdate}
                 disabled={!newStatus || statusUpdateLoading}
-                className={`px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center ${
+                className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center ${
                   !newStatus || statusUpdateLoading
                     ? "opacity-50 cursor-not-allowed"
                     : ""
@@ -547,7 +683,7 @@ const BookingTable = () => {
                     Updating...
                   </>
                 ) : (
-                  "Update Status"
+                  "Update"
                 )}
               </button>
             </div>
