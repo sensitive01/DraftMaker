@@ -99,6 +99,15 @@ documentRouter.put("/update-uploaded-document-status/:documentId",documentContro
 
 
 
+// ...........................................................................................................................
+
+documentRouter.get("/get-document-preview-data/:bookingId",documentController.getDocumentPreviewData)
+documentRouter.put("/update-document-data/:bookingId",documentController.updateDocumentPreviewData)
+
+
+
+
+
 
 
 

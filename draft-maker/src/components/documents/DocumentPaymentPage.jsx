@@ -432,11 +432,11 @@ const DocumentPaymentPage = () => {
       }
 
       if (confirmationResponse.status === 200) {
-        const confirmationData = confirmationResponse.data.data;
-        console.log("Payment confirmation successful:", confirmationData);
+        const { bookingId, formId } = confirmationResponse.data.data;
 
         setTimeout(() => {
-          window.location.href = `/documents/name/name-correction`;
+          // window.location.href = `/documents/name/name-correction`;
+          window.location.href = `/documents/preview-page/${formId}/${bookingId}`;
         }, 3000);
       } else {
         const errorData = confirmationResponse.data.data;

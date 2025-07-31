@@ -79,6 +79,16 @@ import DocumentUpload from "./components/uploadfile/UploadDocument";
 import UploadDocumentBookings from "./components/admin/dashboard/statistics/UploadDocumentBookings";
 import ViewUploadDetails from "./components/admin/dashboard/statistics/ViewUploadDetails";
 import DocumentBookingTablePreview from "./components/admin/dashboard/statistics/DocumentBookingTablePreview";
+import PreviewAddressAffadavit from "./components/documents/preview/addressProofAffadavit/PreviewAddressAffadavit";
+import PreviewCommercialAggrement from "./components/documents/preview/commercialAggrement/PreviewCommercialAggrement";
+import PreviewRentalAgreement from "./components/documents/preview/rentalAggrement/PreviewRentalAgreement";
+import PreviewPassportNameChange from "./components/documents/preview/passportnamechange/PassportNameChange";
+import PreviewPasswordAnnaxure from "./components/documents/preview/passportannaxure/PasswordAnnaxure";
+import PreviewGapPeriod from "./components/documents/preview/gapPeriod/GapPeriod";
+import PreviewHufAgreement from "./components/documents/preview/huf/HufAggrement";
+import PreviewVehicleInsuranceClamingPage from "./components/documents/preview/vehicleinsuranceclaming/VehicleInsuranceClaming";
+import PreviewJointKhataTransfer from "./components/documents/preview/jointKhataTransfer/JointKhataTransfer";
+import PreviewMatriculationPage from "./components/documents/preview/metriculation/MatriculationPage";
 
 function MainLayout({ children }) {
   return (
@@ -222,7 +232,7 @@ function HomeLayout({ children }) {
             zIndex: "10",
           }}
         >
-          <WhatWeDo />
+          {/* <WhatWeDo /> */}
           <AboutUsHome />
         </div>
       </div>
@@ -818,6 +828,90 @@ function App() {
             </PaymentLayout>
           }
         />
+        {/* ................................... */}
+
+        <Route
+          path="/documents/preview-page/DM-RFD-18/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewRentalAgreement />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-CFD-17/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewCommercialAggrement />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-AAF-16/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewAddressAffadavit />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-PNC-15/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewPassportNameChange />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-PAF-14/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewPasswordAnnaxure />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-GP-13/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewGapPeriod />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-HUF-12/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewHufAgreement />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-VIC-11/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewVehicleInsuranceClamingPage />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-KH-10/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewJointKhataTransfer />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-MAL-9/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewMatriculationPage />
+            </PaymentLayout>
+          }
+        />
+
+        {/* ............................................. */}
 
         <Route
           path="/documents/buy-e-stamp"

@@ -598,7 +598,7 @@ export default function CommercialAggrement() {
       )}
 
       <div className="flex flex-col md:flex-row gap-6 md:items-start">
-        <div className="w-full md:w-1/2">
+        <div className="w-full ">
           <RentalForm
             formData={formData}
             handleChange={handleChange}
@@ -617,13 +617,19 @@ export default function CommercialAggrement() {
               {submissionError}
             </div>
           )}
+          <div className="text-black font-bold text-center mt-4">
+            <p>
+              🔒 Preview and editing options will be available after successful
+              payment.
+            </p>
+          </div>
         </div>
-        <div
+        {/* <div
           className="w-full md:w-1/2 bg-white shadow-lg rounded-lg"
           style={{ height: "2100px", overflowY: "scroll" }}
         >
           <CommercialPreview formData={formData} />
-        </div>
+        </div> */}
       </div>
       <div className="mt-8 flex flex-col items-center">
         <button

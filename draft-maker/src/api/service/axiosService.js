@@ -854,3 +854,29 @@ export const getBookingTablePreviewData = async (bookingId) => {
     return err;
   }
 };
+
+// ..............................................................................................................
+
+
+export const getDocumentPrviewPage = async (bookingId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/documents/get-document-preview-data/${bookingId}`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const updateAggrementData = async (formData, bookingId) => {
+  try {
+    const response = await axiosInstance.put(
+      `/documents/update-document-data/${bookingId}`,{formData}
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};

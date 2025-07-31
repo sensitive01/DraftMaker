@@ -239,7 +239,7 @@ const AddressAffidavit = () => {
         />
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
         <div>
           <AddressAffidavitForm
             formData={formData}
@@ -252,8 +252,14 @@ const AddressAffidavit = () => {
             </div>
           )}
         </div>
-        <div className="print-content">
+        {/* <div className="print-content">
           <AffidavitPreview formData={formData} />
+        </div> */}
+        <div className="text-black font-bold text-center mt-4">
+          <p>
+            🔒 Preview and editing options will be available after successful
+            payment.
+          </p>
         </div>
       </div>
 

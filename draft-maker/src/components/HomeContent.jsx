@@ -1,6 +1,6 @@
 import React from "react";
 import { ArrowRight } from "lucide-react";
-import homeImg from "../assets/images/new/slider-inner-2.png";
+import homeImg from "../assets/images/draftmaker2.png";
 import { useNavigate } from "react-router-dom";
 
 export default function HomeContent() {
@@ -10,47 +10,52 @@ export default function HomeContent() {
   };
 
   return (
-    <div className=" py-12">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-8 items-center">
+    <div className="py-8 bg-rgba(59, 130, 246, 0.5)">
+      <div className="max-w-full mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           {/* Left Content Section */}
-          <div className="space-y-6 relative z-10">
-            <div className="space-y-6">
-              <h1 className="text-2xl sm:text-3xl lg:text-3xl xl:text-3xl font-black leading-tight tracking-tight">
-                <span className="text-green-600 block font-extrabold">
-                  CITIZEN SERVICES
-                </span>
-                <span className="text-orange-500 block font-extrabold">
-                  DIGITAL PLATFORM
-                </span>
-              </h1>
+          <div className="space-y-6 pl-0 lg:pl-12">
+            <h1 className="text-4xl lg:text-4xl font-black leading-tight">
+              <span
+                style={{ color: "#e02016" }}
+                className="block font-extrabold text-red-500"
+              >
+                WELCOME TO DRAFT MAKER
+              </span>
 
-              <p className="text-gray-600 text-lg lg:text-xl leading-relaxed font-medium max-w-2xl">
-                Draft Maker is envisaged to be developed as a single platform to
-                deliver the G2C, B2C and Financial services at the doorsteps of
-                the citizens. Draft Maker will be integrated with various service
-                delivery channels of the central, state government and public
-                utility services on one platform.
+              <span className="text-black text-base">
+                YOUR TRUSTED LEGAL AGREEMENT PARTNER
+              </span>
+            </h1>
+
+            <div className="max-w-md">
+              <p className="text-gray-600 text-base leading-relaxed text-center">
+                At Draft Maker, we specialize in drafting, reviewing, and
+                managing legally binding agreements tailored to meet the needs
+                of individuals, businesses, and organizations. Whether you're
+                starting a business, renting a property, or entering into a
+                partnership, we provide clear, enforceable agreements that
+                protect your rights and define your responsibilities.
               </p>
+            </div>
 
-              <div className="w-1 h-20 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
-
+            <div>
               <button
                 onClick={handleAboutClick}
-                className="relative z-10 inline-flex items-center text-red-800 text-lg font-semibold hover:text-green-600 transition-all duration-300 group cursor-pointer"
+                className="inline-flex items-center text-red-600 text-base font-bold hover:text-red-700 transition-colors duration-200 group"
               >
-                <span className="mr-3">ABOUT MORE</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                <span className="mr-2">ABOUT MORE</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
               </button>
             </div>
           </div>
 
           {/* Right Image Section */}
-          <div className="flex justify-center lg:justify-end">
-            <div className="w-full max-w-md overflow-hidden">
+          <div className="flex justify-start lg:justify-start pr-0 lg:pr-12">
+            <div className="w-full max-w-md">
               <img
                 src={homeImg}
-                alt="Home Image"
+                alt="Legal Agreement Services"
                 className="w-full h-auto object-contain"
               />
             </div>

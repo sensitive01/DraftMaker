@@ -95,7 +95,7 @@ const WhatWeDo = () => {
     <div className="max-w-7xl mx-auto p-8 min-h-screen">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-gray-800 mb-2">
-          What We <span style={{ color: "#770000" }}>Do</span>
+          <span className="text-red-600"  >Walk In </span>Services
         </h1>
       </div>
 

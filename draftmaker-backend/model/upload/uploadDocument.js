@@ -69,7 +69,7 @@ const uploadDocumentSchema = new mongoose.Schema(
       serviceName: String,
       charge: Number,
       address: {
-        type: Object, // or define specific keys if address has a structure
+        type: Object, 
       },
     },
     payment: {
@@ -77,6 +77,7 @@ const uploadDocumentSchema = new mongoose.Schema(
       paymentId: String,
       paymentStatus: String,
       paymentDate: Date,
+      paymentStatus: { type: String, default: "Success" },
     },
   },
   {

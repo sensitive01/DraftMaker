@@ -507,7 +507,7 @@ export default function HufAgreement() {
       )}
 
       <div className="flex flex-col lg:flex-row gap-2 sm:gap-4 md:gap-6">
-        <div className="w-full lg:w-1/2">
+        <div className="w-full ml-8">
           <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6 mb-4 lg:mb-0">
             <HufForm
               formData={formData}
@@ -521,9 +521,15 @@ export default function HufAgreement() {
                 {submissionError}
               </div>
             )}
+            <div className="text-black font-bold text-center mt-4">
+              <p>
+                🔒 Preview and editing options will be available after
+                successful payment.
+              </p>
+            </div>
           </div>
         </div>
-        <div className="w-full lg:w-1/2">
+        {/* <div className="w-full lg:w-1/2">
           <div className="lg:sticky lg:top-4">
             <div className="bg-gray-50 rounded-lg p-1 sm:p-2 md:p-4">
               <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4 text-center text-gray-800 lg:hidden">
@@ -534,7 +540,7 @@ export default function HufAgreement() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
       <div className="mt-6 sm:mt-8 flex flex-col items-center px-2 sm:px-4">
         <button

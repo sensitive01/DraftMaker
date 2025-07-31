@@ -1,8 +1,6 @@
-import React, { useRef } from "react";
+import React from "react";
 
-const AffidavitPreview = ({ formData }) => {
-  const affidavitRef = useRef(null);
-
+const PassportNameChangePreview = ({ formData }) => {
   // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return "xx/xx/xxxx";
@@ -36,12 +34,13 @@ const AffidavitPreview = ({ formData }) => {
 
   // Format the relationship part of the declaration
   const formatRelationship = () => {
-    if (!formData.gender) return "D/o, S/o, W/o _______________";
+    if (!formData.gender) return "D/o, S/o, H/o, W/o _______________";
 
     const relationshipMap = {
       "S/O": "S/o",
       "D/O": "D/o",
       "W/O": "W/o",
+      "H/O": "H/o",
     };
 
     const relationshipPrefix =
@@ -52,27 +51,24 @@ const AffidavitPreview = ({ formData }) => {
   };
 
   return (
-    <div className="bg-gray-50 p-2 sm:p-6 rounded-lg shadow-lg max-w-5xl mx-auto min-h-[600px]">
+    <div className="bg-gray-50 p-2 sm:p-6 rounded-lg shadow-lg max-w-5xl mx-auto min-h-[800px]">
       <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-800 border-b pb-2 text-center">
-        Affidavit Preview
+        Passport Name Change Affidavit Preview
       </h2>
 
       {/* Document Content - This will be captured for PDF */}
-      <div
-        ref={affidavitRef}
-        className="bg-white p-3 sm:p-8 rounded-lg shadow-sm border border-gray-200 relative overflow-hidden min-h-[600px] font-serif"
-      >
+      <div className="bg-white p-4 sm:p-9 rounded-lg shadow-sm border border-gray-200 relative overflow-hidden min-h-[700px] font-serif">
         {/* Watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-gray-600 text-6xl sm:text-5xl font-bold transform rotate-45 select-none font-sans">
-            INTERNAL PURPOSE ONLY
+          <div className="text-gray-300 text-lg sm:text-3xl font-bold transform rotate-45 select-none font-sans">
+            DRAFT MAKER (INTERNAL PURPOSE ONLY)
           </div>
         </div>
 
         {/* Document Content */}
-        <div className="relative z-10">
+        <div className="relative z-10 mt-6 sm:mt-10">
           {/* Content */}
-          <div className="mb-6 sm:mb-8 leading-relaxed sm:leading-loose text-sm sm:text-base">
+          <div className="mb-4 sm:mb-6 leading-relaxed sm:leading-loose text-sm sm:text-base">
             <p className="mb-4 sm:mb-6 text-justify">
               I,{" "}
               <span className="font-bold">
@@ -90,11 +86,15 @@ const AffidavitPreview = ({ formData }) => {
               Present Address:{" "}
               <span className="font-bold">{formatPresentAddress()}</span>
             </p>
-            <p className="mb-8 sm:mb-12">
+            <p className="mb-4 sm:mb-6">
               My Aadhaar No:{" "}
               <span className="font-bold">
-                {formData.aadhaarNo || "536709665679"}
+                {formData.aadhaarNo || "0000 0000 0000"}
               </span>
+            </p>
+            <p className="mb-8 sm:mb-12">
+              My Passport No:{" "}
+              <span className="font-bold">{formData.passportNo || "0000"}</span>
               .
             </p>
             <p className="mb-4 sm:mb-5 font-semibold text-center">
@@ -109,11 +109,19 @@ const AffidavitPreview = ({ formData }) => {
                   1.
                 </span>
                 <span>
-                  I hereby declare that I am presently residing at above address
-                  since{" "}
+                  That as per My Aadhaar card my given name is{" "}
                   <span className="font-bold">
-                    {formData.currentResidenceAddress || "XX/XX/XXXX"}.
+                    {formData.currentGivenName || "NAME"}
+                  </span>{" "}
+                  and in my Expired Passport, my given name is{" "}
+                  <span className="font-bold">
+                    {formData.currentGivenName || "NAME"}
                   </span>
+                  , surname is{" "}
+                  <span className="font-bold">
+                    {formData.currentSurname || "NAME"}
+                  </span>
+                  .
                 </span>
               </div>
               <div className="flex text-justify">
@@ -121,12 +129,23 @@ const AffidavitPreview = ({ formData }) => {
                   2.
                 </span>
                 <span>
-                  I further declare that I am swearing this affidavit to produce
-                  before the concerned{" "}
+                  That I wanted to change my given name as{" "}
                   <span className="font-bold">
-                    {formData.companyName || "COMPANY NAME"}
+                    {formData.newGivenName || "NAME"}
+                  </span>{" "}
+                  and surname as{" "}
+                  <span className="font-bold">
+                    {formData.newSurname || "NAME"}
+                  </span>{" "}
+                  from given name{" "}
+                  <span className="font-bold">
+                    {formData.currentGivenName || "NAME"}
+                  </span>{" "}
+                  and surname{" "}
+                  <span className="font-bold">
+                    {formData.currentSurname || "NAME"}
                   </span>
-                  .
+                  , for getting reissue of PASSPORT.
                 </span>
               </div>
               <div className="flex text-justify">
@@ -134,25 +153,20 @@ const AffidavitPreview = ({ formData }) => {
                   3.
                 </span>
                 <span>
-                  That this affidavit is being made to serve as proof of my
-                  <span className="font-bold"> Address </span> for the purpose
-                  of{" "}
-                  <span className="font-bold">
-                    {formData.purposeOfAffidavit || "XXXX"}
-                  </span>
-                  .
+                  That I also required this affidavit for Publishing News Paper
+                  Advertisement for The Name Change.
                 </span>
               </div>
             </div>
 
-            <p className="mt-4 sm:mt-6 text-justify">
-              I do hereby verify and declare that what is stated above are true
-              and correct to the best of my knowledge, information and belief.
+            <p className="mt-4 sm:mt-5 text-justify">
+              I hereby state that whatever is stated herein above is true to the
+              best of my knowledge, information and belief.
             </p>
           </div>
 
-          {/* Space for stamp and signature */}
-          <div className="flex flex-col sm:flex-row justify-between items-start mt-12 sm:mt-18">
+          {/* Space for photo and signature */}
+          <div className="flex flex-col sm:flex-row justify-between items-start mt-8 sm:mt-10">
             <div></div>
 
             <div className="text-right w-full sm:w-auto">
@@ -162,12 +176,12 @@ const AffidavitPreview = ({ formData }) => {
                   {formData.place || "Bangalore"}
                 </span>
               </p>
-              <p className="mb-4 sm:mb-6 text-sm sm:text-base">
+              <p className="mb-4 sm:mb-5 text-sm sm:text-base">
                 Date:{" "}
                 <span className="font-bold">{formatDate(formData.date)}</span>
               </p>
 
-              <div className="mt-12 sm:mt-16 border-t-2 border-black pt-2 w-48 sm:w-56 text-center ml-auto">
+              <div className="mt-12 sm:mt-16 border-t-2 border-black pt-2 w-48 sm:w-56 text-center ml-auto mb-40 sm:mb-60">
                 <p className="font-medium text-sm sm:text-base">
                   (Signature of the Applicant)
                 </p>
@@ -181,4 +195,4 @@ const AffidavitPreview = ({ formData }) => {
   );
 };
 
-export default AffidavitPreview;
+export default PassportNameChangePreview;

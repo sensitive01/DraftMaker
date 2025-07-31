@@ -420,7 +420,17 @@ const trackMyDocumentStatus = async (req, res) => {
       formId: 1,
     });
 
-    const uploadedData = await uploadDocument.find(filter, {userName:1,userMobile:1,documentStatus:1,bookingId:1,createdAt:1,documentType:1})
+    const uploadedData = await uploadDocument.find(
+      { userMobile: mobile },
+      {
+        userName: 1,
+        userMobile: 1,
+        documentStatus: 1,
+        bookingId: 1,
+        createdAt: 1,
+        documentType: 1,
+      }
+    );
 
     // Combine all arrays
     let allBookingData = [
@@ -443,7 +453,7 @@ const trackMyDocumentStatus = async (req, res) => {
       ...commercialData,
       ...recidentialData,
       ...eStambData,
-      ...uploadedData
+      ...uploadedData,
     ];
 
     // Sort by createdAt descending
@@ -2742,7 +2752,7 @@ const updateAdressAffadavitPaymentData = async (req, res) => {
 
     res.status(200).json({
       message: "Payment details updated successfully.",
-      data: updatedData,
+      data: { bookingId, formId: updatedData?.formId },
     });
   } catch (err) {
     console.error("❌ Error in updating payment details:", err);
@@ -2995,7 +3005,7 @@ const uploadDocumentData = async (req, res) => {
     const bookingId = await generateBookingId();
 
     const newUpload = new uploadDocument({
-      userName:username,
+      userName: username,
       userMobile,
       documentType,
       formId,
@@ -3081,7 +3091,136 @@ const getUploadedBookingDetailsPreview = async (req, res) => {
     });
   }
 };
+
+// ..............................................................................
+
+const getDocumentPreviewData = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+
+    const collections = [
+      dualNameCorrection,
+      nameCorrection,
+      dobCorrection,
+      GasFormData,
+      documentLost,
+      dobParentNameCorrection,
+      birthCertificateNameCorrection,
+      gstSchema,
+      metriculationLost,
+      khataCorrection,
+      vehicleInsurence,
+      hufSchema,
+      gapPeriodSchema,
+      passportAnnaxure,
+      passportNameChange,
+      adressAffadavit,
+      commercialSchema,
+      recidentialSchema,
+    ];
+
+    let foundData = null;
+    let foundInCollection = "";
+
+    for (const collection of collections) {
+      const data = await collection.findOne({ bookingId });
+      if (data) {
+        foundData = data;
+        foundInCollection = collection.modelName; // Optional: returns model name
+        break; // Stop searching once found
+      }
+    }
+
+    if (foundData) {
+      return res.status(200).json({
+        success: true,
+        message: "Document found",
+        collection: foundInCollection,
+        data: foundData,
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: "No document found for this booking ID",
+      });
+    }
+  } catch (err) {
+    console.error("Error in getting the document preview", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const updateDocumentPreviewData = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const { formData } = req.body;
+
+    const collections = [
+      dualNameCorrection,
+      nameCorrection,
+      dobCorrection,
+      GasFormData,
+      documentLost,
+      dobParentNameCorrection,
+      birthCertificateNameCorrection,
+      gstSchema,
+      metriculationLost,
+      khataCorrection,
+      vehicleInsurence,
+      hufSchema,
+      gapPeriodSchema,
+      passportAnnaxure,
+      passportNameChange,
+      adressAffadavit,
+      commercialSchema,
+      recidentialSchema,
+    ];
+
+    let updatedData = null;
+    let updatedCollection = "";
+
+    for (const collection of collections) {
+      const existingDoc = await collection.findOne({ bookingId });
+
+      if (existingDoc) {
+        const updatedDoc = await collection.findOneAndUpdate(
+          { bookingId },
+          { $set: formData },
+          { new: true }
+        );
+
+        updatedData = updatedDoc;
+        updatedCollection = collection.modelName;
+        break;
+      }
+    }
+
+    if (updatedData) {
+      return res.status(200).json({
+        success: true,
+        message: "Document updated successfully",
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: "No document found with this booking ID",
+      });
+    }
+  } catch (err) {
+    console.error("Error updating document preview:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
+  updateDocumentPreviewData,
+  getDocumentPreviewData,
   getBookingDataPreview,
   getUploadedBookingDetailsPreview,
   updateUploadedDocumentStatus,

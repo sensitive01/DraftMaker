@@ -437,7 +437,7 @@ const VehicleInsuranceClaming = () => {
         />
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 sm:gap-6 lg:gap-8">
         {/* Left column: Form */}
         <div className="print:hidden w-full">
           <VehicleInsuranceClamingForm
@@ -449,12 +449,18 @@ const VehicleInsuranceClaming = () => {
               {submissionError}
             </div>
           )}
+          <div className="text-black font-bold text-center mt-4">
+            <p>
+              🔒 Preview and editing options will be available after successful
+              payment.
+            </p>
+          </div>
         </div>
 
         {/* Right column: Preview */}
-        <div className="w-full">
+        {/* <div className="w-full">
           <VehicleInsuranceClamingPreview formData={formData} />
-        </div>
+        </div> */}
       </div>
 
       <div className="mt-6 sm:mt-8 flex flex-col items-center px-2 sm:px-4">

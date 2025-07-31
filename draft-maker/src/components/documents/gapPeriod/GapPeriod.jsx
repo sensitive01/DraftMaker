@@ -445,7 +445,7 @@ export default function GapPeriod() {
         />
       )}
 
-      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-2 sm:gap-4 md:gap-6 lg:gap-8">
+      <div className="flex flex-col lg:grid lg:grid-cols-1 gap-2 sm:gap-4 md:gap-6 lg:gap-8">
         {/* Left column: Form */}
         <div className="print:hidden w-full">
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 md:p-8 mb-4 lg:mb-0">
@@ -461,11 +461,17 @@ export default function GapPeriod() {
                 {submissionError}
               </div>
             )}
+            <div className="text-black font-bold text-center mt-4">
+              <p>
+                🔒 Preview and editing options will be available after
+                successful payment.
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Right column: Preview */}
-        <div className="w-full">
+        {/* <div className="w-full">
           <div className="bg-gray-50 rounded-lg p-1 sm:p-2 md:p-4 lg:p-6">
             <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4 text-center text-gray-800 lg:hidden">
               Preview
@@ -474,7 +480,7 @@ export default function GapPeriod() {
               <AffidavitDisplay data={formData} />
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className="mt-6 sm:mt-8 flex flex-col items-center px-2 sm:px-4">
