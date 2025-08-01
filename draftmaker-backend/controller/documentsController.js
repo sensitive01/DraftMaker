@@ -786,22 +786,35 @@ const getAllBookingData = async (req, res) => {
 
     const formattedData = allBookingData.map((item) => {
       const date = new Date(item.createdAt);
-      const day = String(date.getDate()).padStart(2, "0");
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const year = date.getFullYear();
 
-      let hours = date.getHours();
-      const minutes = String(date.getMinutes()).padStart(2, "0");
-      const seconds = String(date.getSeconds()).padStart(2, "0");
-      const ampm = hours >= 12 ? "PM" : "AM";
+      // Format in Asia/Kolkata timezone
+      const options = {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      };
 
-      hours = hours % 12;
-      hours = hours ? hours : 12; // the hour '0' should be '12'
-      const formattedHours = String(hours).padStart(2, "0");
+      const formatter = new Intl.DateTimeFormat("en-IN", options);
+      const parts = formatter.formatToParts(date);
+
+      const getPart = (type) => parts.find((p) => p.type === type)?.value || "";
+
+      const day = getPart("day");
+      const month = getPart("month");
+      const year = getPart("year");
+      const hour = getPart("hour");
+      const minute = getPart("minute");
+      const second = getPart("second");
+      const dayPeriod = getPart("dayPeriod");
 
       return {
         ...item._doc,
-        createdAt: `${day}-${month}-${year} ${formattedHours}:${minutes}:${seconds} ${ampm}`,
+        createdAt: `${day}-${month}-${year} ${hour}:${minute}:${second} ${dayPeriod}`,
       };
     });
 
