@@ -809,7 +809,7 @@ const getAllBookingData = async (req, res) => {
 
     res.status(200).json({
       message: "Booking data fetched successfully",
-      data: formattedData,
+      data: allBookingData,
     });
   } catch (err) {
     console.log("Error in getting all booking data", err);
