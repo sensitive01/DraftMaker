@@ -2,189 +2,215 @@ import React from "react";
 
 const NameCorrectionForm = ({ formData, handleChange }) => {
   return (
-    <div className="p-3 sm:p-5 max-w-4xl mx-auto bg-gray-50 rounded-lg shadow">
-      <h1 className="text-xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center text-blue-600">
-        Name Change Affidavit Form
-      </h1>
-
-      <div className="space-y-6 sm:space-y-8">
-        {/* Personal Information Section */}
-        <div className="bg-white p-3 sm:p-5 rounded-md shadow-sm">
-          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-800">
-            Personal Information
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <div>
-              <label className="block text-sm font-medium text-red-600 mb-1">
-                Full Name (New Name)
-              </label>
-              <input
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 sm:p-2.5 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-red-600 mb-1">
-                Relation
-              </label>
-              <select
-                name="relation"
-                value={formData.relation}
-                onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 sm:p-2.5 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-              >
-                <option value="S/o">Son of</option>
-                <option value="D/o">Daughter of</option>
-                <option value="W/o">Wife of</option>
-                <option value="H/o">Husband of</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-red-600 mb-1">
-                Relation's Name
-              </label>
-              <input
-                type="text"
-                name="relationName"
-                value={formData.relationName}
-                onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 sm:p-2.5 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-red-600 mb-1">
-                Age
-              </label>
-              <input
-                type="number"
-                name="age"
-                value={formData.age}
-                onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 sm:p-2.5 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="mt-4 sm:mt-6">
-            <label className="block text-sm font-medium text-red-600 mb-1">
-              Permanent Address
-            </label>
-            <textarea
-              name="permanentAddress"
-              value={formData.permanentAddress}
-              onChange={handleChange}
-              className="block w-full border border-gray-300 rounded-md shadow-sm p-2 sm:p-2.5 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-              rows="3"
-              required
-            />
-          </div>
-
-          <div className="mt-4 sm:mt-6">
-            <label className="block text-sm font-medium text-red-600 mb-1">
-              Aadhaar Number
-            </label>
-            <input
-              type="text"
-              name="aadhaarNo"
-              value={formData.aadhaarNo}
-              onChange={handleChange}
-              className="block w-full border border-gray-300 rounded-md shadow-sm p-2 sm:p-2.5 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-              required
-            />
+    <div className="bg-gradient-to-br from-gray-50 to-gray-100 py-3 px-3 sm:px-4 lg:px-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header - Compact */}
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 mb-5 border-t-3 border-red-500">
+          <div className="text-center">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+              Name Change Affidavit Form
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600">
+              Fill the details below to generate your document in realtime
+            </p>
           </div>
         </div>
 
-        {/* Name Change Details Section */}
-        <div className="bg-white p-3 sm:p-5 rounded-md shadow-sm">
-          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-800">
-            Name Change Details
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <div>
-              <label className="block text-sm font-medium text-red-600 mb-1">
-                Old Name
-              </label>
-              <input
-                type="text"
-                name="oldName"
-                value={formData.oldName}
-                onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 sm:p-2.5 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-                required
-              />
-            </div>
+        <div className="space-y-5">
+          {/* Personal Information Section - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                1
+              </span>
+              Personal Information
+            </h2>
 
-            <div>
-              <label className="block text-sm font-medium text-red-600 mb-1">
-                New Name
-              </label>
-              <input
-                type="text"
-                name="newName"
-                value={formData.newName}
-                onChange={handleChange}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 sm:p-2.5 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-                required
-              />
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Full Name (New Name) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={formData?.fullName}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Relation <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="relation"
+                    value={formData?.relation}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  >
+                    <option value="S/o">Son of</option>
+                    <option value="D/o">Daughter of</option>
+                    <option value="W/o">Wife of</option>
+                    <option value="H/o">Husband of</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Relation's Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="relationName"
+                    value={formData?.relationName}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Age <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="age"
+                    value={formData?.age}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Aadhaar Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="aadhaarNo"
+                    value={formData?.aadhaarNo}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                    placeholder="0000 0000 0000"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Permanent Address <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="permanentAddress"
+                  value={formData?.permanentAddress}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200 resize-none"
+                  rows="3"
+                  placeholder="Enter complete permanent address"
+                  required
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Verification Section */}
-        <div className="bg-white p-3 sm:p-5 rounded-md shadow-sm">
-          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-800 border-b-2 border-red-200 pb-2">
-            Verification Details
-          </h2>
-          <div className="flex flex-wrap">
-            <div className="w-full md:w-1/3 pr-0 md:pr-3 mb-4 md:mb-0">
-              <label className="block text-sm font-medium text-red-600 mb-1">
-                Place of Verification
-              </label>
-              <input
-                type="text"
-                name="place"
-                value={formData.place}
-                onChange={handleChange}
-                className="block w-full border border-red-300 rounded-md shadow-sm p-2 focus:ring-red-500 focus:border-red-500 text-sm sm:text-base"
-                required
-              />
+          {/* Name Change Details Section - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                2
+              </span>
+              Name Change Details
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Old Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="oldName"
+                  value={formData?.oldName}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  placeholder="Enter your old name"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  New Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="newName"
+                  value={formData?.newName}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  placeholder="Enter your new name"
+                  required
+                />
+              </div>
             </div>
+          </div>
 
-            <div className="flex w-full md:w-2/3 gap-2">
-              <div className="w-1/3">
-                <label className="block text-sm font-medium text-red-600 mb-1">
-                  Day
+          {/* Verification Details Section - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                3
+              </span>
+              Verification Details
+            </h2>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Place <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="place"
+                  value={formData?.place}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  placeholder="Place"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Day <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
                   name="day"
                   min="1"
                   max="31"
-                  value={formData.day}
+                  value={formData?.day}
                   onChange={handleChange}
-                  className="block w-full border border-red-300 rounded-md shadow-sm p-2 focus:ring-red-500 focus:border-red-500 text-sm sm:text-base"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  placeholder="DD"
                   required
                 />
               </div>
-
-              <div className="w-1/3">
-                <label className="block text-sm font-medium text-red-600 mb-1">
-                  Month
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Month <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="month"
-                  value={formData.month}
+                  value={formData?.month}
                   onChange={handleChange}
-                  className="block w-full border border-red-300 rounded-md shadow-sm p-2 focus:ring-red-500 focus:border-red-500 text-sm sm:text-base"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                   required
                 >
                   <option value="">Select Month</option>
@@ -202,17 +228,17 @@ const NameCorrectionForm = ({ formData, handleChange }) => {
                   <option value="December">December</option>
                 </select>
               </div>
-
-              <div className="w-1/3">
-                <label className="block text-sm font-medium text-red-600 mb-1">
-                  Year
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Year <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
                   name="year"
-                  value={formData.year}
+                  value={formData?.year}
                   onChange={handleChange}
-                  className="block w-full border border-red-300 rounded-md shadow-sm p-2 focus:ring-red-500 focus:border-red-500 text-sm sm:text-base"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  placeholder="YYYY"
                   required
                 />
               </div>

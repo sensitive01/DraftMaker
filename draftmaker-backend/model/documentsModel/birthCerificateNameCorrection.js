@@ -57,8 +57,6 @@ const nameCorrectionFormSchema = new mongoose.Schema(
     spouseAadhaar: { type: String },
     childRelation: {
       type: String,
-      enum: ["Daughter", "Son", "Child"],
-      default: "Daughter",
     },
     childName: { type: String },
     certificateNumber: { type: String },

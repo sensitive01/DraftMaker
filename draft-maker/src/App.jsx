@@ -89,6 +89,14 @@ import PreviewHufAgreement from "./components/documents/preview/huf/HufAggrement
 import PreviewVehicleInsuranceClamingPage from "./components/documents/preview/vehicleinsuranceclaming/VehicleInsuranceClaming";
 import PreviewJointKhataTransfer from "./components/documents/preview/jointKhataTransfer/JointKhataTransfer";
 import PreviewMatriculationPage from "./components/documents/preview/metriculation/MatriculationPage";
+import PreviewGstPage from "./components/documents/preview/gst/GstPage";
+import PreviewBirthCertificatePage from "./components/documents/preview/birtCertificate/BirthCertificatePage";
+import PreviewBirthCertificateParentNameCorrectionPage from "./components/documents/preview/birtCeritificateParentName/BirthCertificateParentNameCorrectionPage";
+import PreviewDocumentLostPage from "./components/documents/preview/documentLost/DocumentLostPage";
+import PreviewGasAffidavitForm from "./components/documents/preview/gasaffadavit/GasAffadavitPage";
+import PreviewDobCorrectionPage from "./components/documents/preview/dobCorrection/DobCorrectionPage";
+import PreviewNameCorrectionChange from "./components/documents/preview/namechangecorrection/NameCorrectionChange";
+import PreviewDualNameChange from "./components/documents/preview/dualNameChange/DualNameChange";
 
 function MainLayout({ children }) {
   return (
@@ -907,6 +915,70 @@ function App() {
           element={
             <PaymentLayout>
               <PreviewMatriculationPage />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-GST-8/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewGstPage />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-BC-MNC-7/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewBirthCertificatePage />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-BCNCP-6/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewBirthCertificateParentNameCorrectionPage />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-DOC-LOST-5/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewDocumentLostPage />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-GAS-5/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewGasAffidavitForm />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-DOBC-3/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewDobCorrectionPage />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-NC-2/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewNameCorrectionChange />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/preview-page/DM-DNC-1/:bookingId"
+          element={
+            <PaymentLayout>
+              <PreviewDualNameChange />
             </PaymentLayout>
           }
         />

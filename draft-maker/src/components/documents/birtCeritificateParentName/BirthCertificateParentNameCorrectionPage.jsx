@@ -414,7 +414,7 @@ export default function BirthCertificateParentNameCorrectionPage() {
         />
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-4 sm:gap-6 md:gap-8">
         <div className="print:hidden">
           <BirthCertificateParentNameCorrectionForm
             formData={formData}
@@ -425,11 +425,17 @@ export default function BirthCertificateParentNameCorrectionPage() {
               {submissionError}
             </div>
           )}
+          <div className="text-black font-bold text-center mt-4">
+            <p>
+              🔒 Preview and editing options will be available after successful
+              payment.
+            </p>
+          </div>
         </div>
 
-        <div className="w-full overflow-x-auto">
+        {/* <div className="w-full overflow-x-auto">
           <BirtCertificateParentNameCorrectionPreview formData={formData} />
-        </div>
+        </div> */}
       </div>
 
       <div className="mt-6 sm:mt-8 flex flex-col items-center">

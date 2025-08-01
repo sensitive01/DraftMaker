@@ -400,7 +400,7 @@ export default function NameCorrectionChange() {
         />
       )}
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-1 gap-8">
         {/* Left column: Form */}
         <div className="print:hidden">
           <NameCorrectionForm formData={formData} handleChange={handleChange} />
@@ -409,10 +409,12 @@ export default function NameCorrectionChange() {
               {submissionError}
             </div>
           )}
-        </div>
-
-        <div>
-          <NameCorrectionPreview formData={formData} />
+          <div className="text-black font-bold text-center mt-4">
+            <p>
+              🔒 Preview and editing options will be available after successful
+              payment.
+            </p>
+          </div>
         </div>
       </div>
       <div className="mt-8 flex flex-col items-center">

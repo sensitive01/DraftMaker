@@ -417,8 +417,7 @@ export default function DualNameChange() {
         />
       )}
 
- 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-1 gap-8">
         <div className="print:hidden">
           <DualNameChangeForm formData={formData} handleChange={handleChange} />
 
@@ -427,10 +426,12 @@ export default function DualNameChange() {
               {submissionError}
             </div>
           )}
-        </div>
-
-        <div>
-          <DualNameChangePreview formData={formData} ref={previewRef} />
+          <div className="text-black font-bold text-center mt-4">
+            <p>
+              🔒 Preview and editing options will be available after successful
+              payment.
+            </p>
+          </div>
         </div>
       </div>
 

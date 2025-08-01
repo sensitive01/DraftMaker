@@ -252,9 +252,7 @@ const AddressAffidavit = () => {
             </div>
           )}
         </div>
-        {/* <div className="print-content">
-          <AffidavitPreview formData={formData} />
-        </div> */}
+
         <div className="text-black font-bold text-center mt-4">
           <p>
             🔒 Preview and editing options will be available after successful

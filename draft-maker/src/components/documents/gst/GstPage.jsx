@@ -393,7 +393,7 @@ export default function GstPage() {
         />
       )}
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-1 gap-8">
         {/* Left column: Form */}
         <div className="print:hidden">
           <GstForm formData={formData} handleChange={handleChange} />
@@ -402,12 +402,18 @@ export default function GstPage() {
               {submissionError}
             </div>
           )}
+          <div className="text-black font-bold text-center mt-4">
+            <p>
+              🔒 Preview and editing options will be available after successful
+              payment.
+            </p>
+          </div>
         </div>
 
         {/* Right column: Preview */}
-        <div>
+        {/* <div>
           <GstPreview formData={formData} />
-        </div>
+        </div> */}
       </div>
       <div className="mt-8 flex flex-col items-center">
         <button

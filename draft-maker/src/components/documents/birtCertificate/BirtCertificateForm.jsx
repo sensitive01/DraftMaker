@@ -1,246 +1,315 @@
-import React from 'react'
+import React from "react";
 
-const BirtCertificateForm = ({formData,handleChange}) => {
+const BirtCertificateForm = ({ formData, handleChange }) => {
   return (
-    <div className="border p-4 sm:p-6 bg-white shadow-md max-w-4xl mx-auto">
-    <h2 className="text-lg sm:text-xl font-bold mb-4">
-      Birth Certificate Correction Form
-    </h2>
-    <div className="space-y-4">
-      <div>
-        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
-          Parent Title & Name
-        </label>
-        <div className="flex gap-2">
-          <select
-            name="parentTitle"
-            value={formData.parentTitle}
-            onChange={handleChange}
-            className="border p-2 w-20 sm:w-24 text-sm sm:text-base"
-          >
-            <option>Mr.</option>
-            <option>Mrs.</option>
-            <option>Dr.</option>
-          </select>
-          <input
-            type="text"
-            name="parentName"
-            value={formData.parentName}
-            onChange={handleChange}
-            placeholder="Parent's Full Name"
-            className="border p-2 flex-1 text-sm sm:text-base"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
-          Spouse Title & Name
-        </label>
-        <div className="flex gap-2">
-          <select
-            name="spouseTitle"
-            value={formData.spouseTitle}
-            onChange={handleChange}
-            className="border p-2 w-20 sm:w-24 text-sm sm:text-base"
-          >
-            <option>Mrs.</option>
-            <option>Mr.</option>
-            <option>Dr.</option>
-          </select>
-          <input
-            type="text"
-            name="spouseName"
-            value={formData.spouseName}
-            onChange={handleChange}
-            placeholder="Spouse's Full Name"
-            className="border p-2 flex-1 text-sm sm:text-base"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
-          Permanent Address
-        </label>
-        <textarea
-          name="address"
-          value={formData.address}
-          onChange={handleChange}
-          placeholder="Complete Address with Pin Code"
-          className="border p-2 w-full text-sm sm:text-base"
-          rows="3"
-        ></textarea>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
-            Parent's Aadhaar No.
-          </label>
-          <input
-            type="text"
-            name="parentAadhaar"
-            value={formData.parentAadhaar}
-            onChange={handleChange}
-            placeholder="0000 0000 0000"
-            className="border p-2 w-full text-sm sm:text-base"
-          />
+    <div className="bg-gradient-to-br from-gray-50 to-gray-100 py-3 px-3 sm:px-4 lg:px-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header - Compact */}
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 mb-5 border-t-3 border-red-500">
+          <div className="text-center">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+              Birth Certificate Correction Form
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600">
+              Fill the details below to generate your document in realtime
+            </p>
+          </div>
         </div>
 
-        <div>
-          <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
-            Spouse's Aadhaar No.
-          </label>
-          <input
-            type="text"
-            name="spouseAadhaar"
-            value={formData.spouseAadhaar}
-            onChange={handleChange}
-            placeholder="0000 0000 0000"
-            className="border p-2 w-full text-sm sm:text-base"
-          />
-        </div>
-      </div>
+        <div className="space-y-5">
+          {/* Parent Details Section - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                1
+              </span>
+              Parent Details
+            </h2>
 
-      <div>
-        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
-          Child Relation
-        </label>
-        <select
-          name="childRelation"
-          value={formData.childRelation}
-          onChange={handleChange}
-          className="border p-2 w-full text-sm sm:text-base"
-        >
-          <option>Daughter</option>
-          <option>Son</option>
-        </select>
-      </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Parent Title & Name <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    name="parentTitle"
+                    value={formData.parentTitle}
+                    onChange={handleChange}
+                    className="px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200 w-24"
+                  >
+                    <option>Mr.</option>
+                    <option>Mrs.</option>
+                    <option>Dr.</option>
+                  </select>
+                  <input
+                    type="text"
+                    name="parentName"
+                    value={formData.parentName}
+                    onChange={handleChange}
+                    placeholder="Parent's Full Name"
+                    className="flex-1 px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  />
+                </div>
+              </div>
 
-      <div>
-        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
-          Child's Name
-        </label>
-        <input
-          type="text"
-          name="childName"
-          value={formData.childName}
-          onChange={handleChange}
-          placeholder="Child's Name"
-          className="border p-2 w-full text-sm sm:text-base"
-        />
-      </div>
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Spouse Title & Name <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    name="spouseTitle"
+                    value={formData.spouseTitle}
+                    onChange={handleChange}
+                    className="px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200 w-24"
+                  >
+                    <option>Mrs.</option>
+                    <option>Mr.</option>
+                    <option>Dr.</option>
+                  </select>
+                  <input
+                    type="text"
+                    name="spouseName"
+                    value={formData.spouseName}
+                    onChange={handleChange}
+                    placeholder="Spouse's Full Name"
+                    className="flex-1 px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  />
+                </div>
+              </div>
 
-      <div>
-        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
-          Certificate Number
-        </label>
-        <input
-          type="text"
-          name="certificateNumber"
-          value={formData.certificateNumber}
-          onChange={handleChange}
-          placeholder="Birth Certificate Number"
-          className="border p-2 w-full text-sm sm:text-base"
-        />
-      </div>
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Permanent Address <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="Complete Address with Pin Code"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200 resize-none"
+                  rows="3"
+                />
+              </div>
 
-      <div>
-        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
-          Incorrect Name (as per Birth Certificate)
-        </label>
-        <input
-          type="text"
-          name="incorrectName"
-          value={formData.incorrectName}
-          onChange={handleChange}
-          placeholder="Incorrect Name"
-          className="border p-2 w-full text-sm sm:text-base"
-        />
-      </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Parent's Aadhaar No. <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="parentAadhaar"
+                    value={formData.parentAadhaar}
+                    onChange={handleChange}
+                    placeholder="0000 0000 0000"
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  />
+                </div>
 
-      <div>
-        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
-          Correct Name (as per Aadhaar)
-        </label>
-        <input
-          type="text"
-          name="correctName"
-          value={formData.correctName}
-          onChange={handleChange}
-          placeholder="Correct Name"
-          className="border p-2 w-full text-sm sm:text-base"
-        />
-      </div>
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Spouse's Aadhaar No. <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="spouseAadhaar"
+                    value={formData.spouseAadhaar}
+                    onChange={handleChange}
+                    placeholder="0000 0000 0000"
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <div>
-        <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">
-          Place of Verification
-        </label>
-        <input
-          type="text"
-          name="place"
-          value={formData.place}
-          onChange={handleChange}
-          placeholder="City/Town"
-          className="border p-2 w-full text-sm sm:text-base"
-        />
-      </div>
+          {/* Child Details Section - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                2
+              </span>
+              Child Details
+            </h2>
 
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <div>
-          <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">Day</label>
-          <input
-            type="number"
-            name="day"
-            value={formData.day}
-            onChange={handleChange}
-            min="1"
-            max="31"
-            placeholder="DD"
-            className="border p-2 w-full text-sm sm:text-base"
-          />
-        </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Child Relation <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="childRelation"
+                    value={formData.childRelation}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  >
+                    <option>Daughter</option>
+                    <option>Son</option>
+                  </select>
+                </div>
 
-        <div>
-          <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">Month</label>
-          <select
-            name="month"
-            value={formData.month}
-            onChange={handleChange}
-            className="border p-2 w-full text-sm sm:text-base"
-          >
-            <option>January</option>
-            <option>February</option>
-            <option>March</option>
-            <option>April</option>
-            <option>May</option>
-            <option>June</option>
-            <option>July</option>
-            <option>August</option>
-            <option>September</option>
-            <option>October</option>
-            <option>November</option>
-            <option>December</option>
-          </select>
-        </div>
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Child's Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="childName"
+                    value={formData.childName}
+                    onChange={handleChange}
+                    placeholder="Child's Name"
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  />
+                </div>
+              </div>
 
-        <div>
-          <label className="block text-red-600 font-medium mb-1 text-sm sm:text-base">Year</label>
-          <input
-            type="number"
-            name="year"
-            value={formData.year}
-            onChange={handleChange}
-            placeholder="YYYY"
-            className="border p-2 w-full text-sm sm:text-base"
-          />
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Certificate Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="certificateNumber"
+                  value={formData.certificateNumber}
+                  onChange={handleChange}
+                  placeholder="Birth Certificate Number"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Name Correction Details Section - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                3
+              </span>
+              Name Correction Details
+            </h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Incorrect Name (as per Birth Certificate){" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="incorrectName"
+                  value={formData.incorrectName}
+                  onChange={handleChange}
+                  placeholder="Incorrect Name"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Correct Name (as per Aadhaar){" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="correctName"
+                  value={formData.correctName}
+                  onChange={handleChange}
+                  placeholder="Correct Name"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Verification Details Section - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                4
+              </span>
+              Verification Details
+            </h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Place of Verification <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="place"
+                  value={formData.place}
+                  onChange={handleChange}
+                  placeholder="City/Town"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Day <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="day"
+                    value={formData.day}
+                    onChange={handleChange}
+                    min="1"
+                    max="31"
+                    placeholder="DD"
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Month <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="month"
+                    value={formData.month}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  >
+                    <option>January</option>
+                    <option>February</option>
+                    <option>March</option>
+                    <option>April</option>
+                    <option>May</option>
+                    <option>June</option>
+                    <option>July</option>
+                    <option>August</option>
+                    <option>September</option>
+                    <option>October</option>
+                    <option>November</option>
+                    <option>December</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Year <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="year"
+                    value={formData.year}
+                    onChange={handleChange}
+                    placeholder="YYYY"
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  )
-}
+  );
+};
 
-export default BirtCertificateForm
+export default BirtCertificateForm;

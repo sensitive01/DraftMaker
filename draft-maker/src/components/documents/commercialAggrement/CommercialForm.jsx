@@ -14,363 +14,371 @@ const CommercialForm = ({
   handleLesseeChange,
 }) => {
   return (
-    <div className="w-full max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 bg-white rounded-lg shadow-sm">
-      <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-center mb-3 sm:mb-4 px-2">
-        Realtime Document Drafting - Commercial Agreement
-      </h1>
-      <p className="text-xs sm:text-sm text-center text-gray-600 mb-4 sm:mb-6 px-2">
-        Fill the details below to generate your document in realtime.
-      </p>
+    <div className="bg-gradient-to-br from-gray-50 to-gray-100 py-3 px-3 sm:px-4 lg:px-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header - Compact */}
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 mb-5 border-t-3 border-red-500">
+          <div className="text-center">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+              Commercial Agreement
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600">
+              Fill the details below to generate your document in realtime
+            </p>
+          </div>
+        </div>
 
-      <div className="space-y-4 sm:space-y-6">
-        {/* Multi-tab Navigation */}
-        <div className="bg-gray-50 rounded-lg p-3 sm:p-4 lg:p-6">
-          {/* Agreement Details */}
-          <div id="agreement" className="mb-6 sm:mb-8">
-            <h2 className="text-base sm:text-lg font-medium text-gray-800 mb-3 sm:mb-4 pb-2 border-b">
+        <div className="space-y-5">
+          {/* Agreement Details - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">1</span>
               Agreement Details
             </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                  Agreement Date
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Agreement Date <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
                   name="agreementDate"
                   value={formData.agreementDate || ""}
                   onChange={handleChange}
-                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                  Start Date
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Start Date <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
                   name="agreementStartDate"
                   value={formData.agreementStartDate || ""}
                   onChange={handleChange}
-                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                 />
               </div>
             </div>
           </div>
 
-          {/* Lessor Details */}
-          <div id="lessor" className="mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 pb-2 border-b gap-3 sm:gap-0">
-              <h2 className="text-base sm:text-lg font-medium text-gray-800">
+          {/* Lessor Details - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-3 sm:mb-0 flex items-center">
+                <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">2</span>
                 Lessor (Owner) Details
               </h2>
               <button
                 type="button"
                 onClick={addLessor}
-                className="px-3 py-2 bg-red-500 text-white text-xs sm:text-sm rounded hover:bg-red-600 w-full sm:w-auto"
+                className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-md hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-red-500 transform hover:scale-105 transition-all duration-200 shadow-sm"
               >
-                Add Lessor
+                + Add Lessor
               </button>
             </div>
 
-            {formData.lessors.map((lessor, index) => (
-              <div
-                key={index}
-                className="mb-4 sm:mb-6 p-3 sm:p-4 border border-gray-200 rounded-lg bg-white"
-              >
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3 sm:gap-0">
-                  <h3 className="font-medium text-gray-700 text-sm sm:text-base">
-                    Lessor {index + 1}
-                  </h3>
-                  {index > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => removeLessor(index)}
-                      className="p-2 bg-red-100 text-red-600 rounded hover:bg-red-200 w-full sm:w-auto text-xs sm:text-sm"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
+            <div className="space-y-4">
+              {formData.lessors.map((lessor, index) => (
+                <div
+                  key={index}
+                  className="border border-red-200 rounded-lg p-4 bg-gradient-to-r from-red-50 to-pink-50"
+                >
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3">
+                    <h3 className="text-base font-bold text-red-700 mb-2 sm:mb-0">
+                      Lessor {index + 1}
+                    </h3>
+                    {index > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => removeLessor(index)}
+                        className="px-3 py-1 bg-red-100 text-red-700 text-sm font-semibold rounded-md hover:bg-red-200 focus:outline-none transition-all duration-200"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                        Lessor Name
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    <div className="md:col-span-2 xl:col-span-3">
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        Full Name <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         name="name"
                         value={lessor.name || ""}
                         onChange={(e) => handleLessorChange(index, e)}
-                        className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-red-500"
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                       />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                          City
-                        </label>
-                        <input
-                          type="text"
-                          name="city"
-                          value={lessor.city || ""}
-                          onChange={(e) => handleLessorChange(index, e)}
-                          className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-red-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                          State
-                        </label>
-                        <input
-                          type="text"
-                          name="state"
-                          value={lessor.state || ""}
-                          onChange={(e) => handleLessorChange(index, e)}
-                          className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-red-500"
-                        />
-                      </div>
-                    </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6">
-                    <div className="sm:col-span-3">
-                      <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                        Address Line 1
+                    <div>
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        City <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
-                        name="addressLine1"
-                        value={lessor.addressLine1 || ""}
+                        name="city"
+                        value={lessor.city || ""}
                         onChange={(e) => handleLessorChange(index, e)}
-                        className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-red-500"
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                       />
                     </div>
+
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                        Pin Code
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        State <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="state"
+                        value={lessor.state || ""}
+                        onChange={(e) => handleLessorChange(index, e)}
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        Pin Code <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         name="pinCode"
                         value={lessor.pinCode || ""}
                         onChange={(e) => handleLessorChange(index, e)}
-                        className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-red-500"
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        Address Line 1 <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="addressLine1"
+                        value={lessor.addressLine1 || ""}
+                        onChange={(e) => handleLessorChange(index, e)}
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        Address Line 2 (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        name="addressLine2"
+                        value={lessor.addressLine2 || ""}
+                        onChange={(e) => handleLessorChange(index, e)}
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                       />
                     </div>
                   </div>
-
-                  <div>
-                    <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                      Address Line 2
-                    </label>
-                    <input
-                      type="text"
-                      name="addressLine2"
-                      value={lessor.addressLine2 || ""}
-                      onChange={(e) => handleLessorChange(index, e)}
-                      className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-red-500"
-                    />
-                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Lessee Details */}
-          <div id="lessee" className="mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 pb-2 border-b gap-3 sm:gap-0">
-              <h2 className="text-base sm:text-lg font-medium text-gray-800">
+          {/* Lessee Details - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-3 sm:mb-0 flex items-center">
+                <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">3</span>
                 Lessee (Tenant) Details
               </h2>
               <button
                 type="button"
                 onClick={addLessee}
-                className="px-3 py-2 bg-red-500 text-white text-xs sm:text-sm rounded hover:bg-red-600 w-full sm:w-auto"
+                className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-md hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-red-500 transform hover:scale-105 transition-all duration-200 shadow-sm"
               >
-                Add Lessee
+                + Add Lessee
               </button>
             </div>
 
-            {formData.lessees.map((lessee, index) => (
-              <div
-                key={index}
-                className="mb-4 sm:mb-6 p-3 sm:p-4 border border-gray-200 rounded-lg bg-white"
-              >
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3 sm:gap-0">
-                  <h3 className="font-medium text-gray-700 text-sm sm:text-base">
-                    Lessee {index + 1}
-                  </h3>
-                  {index > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => removeLessee(index)}
-                      className="p-2 bg-red-100 text-red-600 rounded hover:bg-red-200 w-full sm:w-auto text-xs sm:text-sm"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
+            <div className="space-y-4">
+              {formData.lessees.map((lessee, index) => (
+                <div
+                  key={index}
+                  className="border border-red-200 rounded-lg p-4 bg-gradient-to-r from-red-50 to-pink-50"
+                >
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3">
+                    <h3 className="text-base font-bold text-red-700 mb-2 sm:mb-0">
+                      Lessee {index + 1}
+                    </h3>
+                    {index > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => removeLessee(index)}
+                        className="px-3 py-1 bg-red-100 text-red-700 text-sm font-semibold rounded-md hover:bg-red-200 focus:outline-none transition-all duration-200"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                        Lessee Name
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        Full Name <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         name="name"
                         value={lessee.name || ""}
                         onChange={(e) => handleLesseeChange(index, e)}
-                        className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-red-500"
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                       />
                     </div>
+
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                        Aadhaar Number
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        Aadhaar Number <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         name="aadhaar"
                         value={lessee.aadhaar || ""}
                         onChange={(e) => handleLesseeChange(index, e)}
-                        className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-red-500"
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                       />
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6">
-                    <div className="sm:col-span-3">
-                      <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                        Permanent Address Line 1
-                      </label>
-                      <input
-                        type="text"
-                        name="permanentAddressLine1"
-                        value={lessee.permanentAddressLine1 || ""}
-                        onChange={(e) => handleLesseeChange(index, e)}
-                        className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-red-500"
-                      />
-                    </div>
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                        Pin Code
-                      </label>
-                      <input
-                        type="text"
-                        name="permanentPinCode"
-                        value={lessee.permanentPinCode || ""}
-                        onChange={(e) => handleLesseeChange(index, e)}
-                        className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-red-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                        City
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        City <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         name="permanentCity"
                         value={lessee.permanentCity || ""}
                         onChange={(e) => handleLesseeChange(index, e)}
-                        className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-red-500"
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                       />
                     </div>
+
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                        State
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        State <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         name="permanentState"
                         value={lessee.permanentState || ""}
                         onChange={(e) => handleLesseeChange(index, e)}
-                        className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-red-500"
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                       />
                     </div>
-                    <div className="sm:col-span-2 lg:col-span-1">
-                      <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                        Line 2 (Optional)
+
+                    <div>
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        Pin Code <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="permanentPinCode"
+                        value={lessee.permanentPinCode || ""}
+                        onChange={(e) => handleLesseeChange(index, e)}
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        Address Line 1 <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="permanentAddressLine1"
+                        value={lessee.permanentAddressLine1 || ""}
+                        onChange={(e) => handleLesseeChange(index, e)}
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2 xl:col-span-3">
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        Address Line 2 (Optional)
                       </label>
                       <input
                         type="text"
                         name="permanentAddressLine2"
                         value={lessee.permanentAddressLine2 || ""}
                         onChange={(e) => handleLesseeChange(index, e)}
-                        className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-red-500"
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                       />
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Rent & Deposit Details */}
-          <div id="rent" className="mb-6 sm:mb-8">
-            <h2 className="text-base sm:text-lg font-medium text-gray-800 mb-3 sm:mb-4 pb-2 border-b">
+          {/* Rent & Deposit Details - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">4</span>
               Rent & Deposit
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                  Rent Amount (₹)
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Rent Amount (₹) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   name="rentAmount"
                   value={formData.rentAmount || ""}
                   onChange={handleChange}
-                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                  In Words
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Rent in Words <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   name="rentAmountWords"
                   value={formData.rentAmountWords || ""}
                   onChange={handleChange}
-                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                  Deposit (₹)
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Deposit Amount (₹) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   name="depositAmount"
                   value={formData.depositAmount || ""}
                   onChange={handleChange}
-                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                  In Words
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Deposit in Words <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   name="depositAmountWords"
                   value={formData.depositAmountWords || ""}
                   onChange={handleChange}
-                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-4 sm:mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
+                <label className="block text-sm font-semibold text-red-600 mb-1">
                   Rent Increase (%)
                 </label>
                 <input
@@ -378,11 +386,11 @@ const CommercialForm = ({
                   name="rentIncreasePercentage"
                   value={formData.rentIncreasePercentage || ""}
                   onChange={handleChange}
-                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
+                <label className="block text-sm font-semibold text-red-600 mb-1">
                   Notice Period (months)
                 </label>
                 <input
@@ -390,11 +398,11 @@ const CommercialForm = ({
                   name="noticePeriod"
                   value={formData.noticePeriod || ""}
                   onChange={handleChange}
-                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                 />
               </div>
-              <div className="sm:col-span-2 lg:col-span-1">
-                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
                   Painting Charges (₹)
                 </label>
                 <input
@@ -402,118 +410,133 @@ const CommercialForm = ({
                   name="paintingCharges"
                   value={formData.paintingCharges || ""}
                   onChange={handleChange}
-                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                 />
               </div>
             </div>
           </div>
 
-          {/* Property Details */}
-          <div id="property" className="mb-6 sm:mb-8">
-            <h2 className="text-base sm:text-lg font-medium text-gray-800 mb-3 sm:mb-4 pb-2 border-b">
+          {/* Property Details - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">5</span>
               Property Details
             </h2>
-            <div className="grid grid-cols-1 gap-4 sm:gap-6">
-              {/* First Row - Agreement Field */}
+            
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                  Agreement
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Property Address <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   name="propertyAddress"
                   value={formData.propertyAddress || ""}
                   onChange={handleChange}
                   placeholder="Complete property address"
-                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 h-20 sm:h-24"
-                ></textarea>
+                  rows="3"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200 resize-none"
+                />
               </div>
+
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
+                <label className="block text-sm font-semibold text-red-600 mb-1">
                   Additional Details
                 </label>
                 <textarea
                   name="additionaldetails"
                   value={formData.additionaldetails || ""}
                   onChange={handleChange}
-                  placeholder="Additional Details"
-                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 h-20 sm:h-24"
-                ></textarea>
+                  placeholder="Additional property details"
+                  rows="3"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200 resize-none"
+                />
               </div>
 
-              {/* Second Row - Configuration */}
-              <div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                      Commercial Type
-                    </label>
-                    <select
-                      name="commercialType"
-                      value={formData.commercialType || ""}
-                      onChange={handleChange}
-                      className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                    >
-                      <option value="">Select Type</option>
-                      <option value="shop">Shop</option>
-                      <option value="office">Office</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                      Square Feet
-                    </label>
-                    <input
-                      type="number"
-                      name="squareFeet"
-                      value={formData.squareFeet || ""}
-                      onChange={handleChange}
-                      placeholder="Enter area in sq ft"
-                      className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Commercial Type <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="commercialType"
+                    value={formData.commercialType || ""}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  >
+                    <option value="">Select Type</option>
+                    <option value="shop">Shop</option>
+                    <option value="office">Office</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-red-600 mb-1">
+                    Area (Square Feet) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="squareFeet"
+                    value={formData.squareFeet || ""}
+                    onChange={handleChange}
+                    placeholder="Enter area in sq ft"
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Fixtures */}
-          <div id="fixtures" className="mb-6 sm:mb-8">
-            <h2 className="text-base sm:text-lg font-medium text-gray-800 mb-3 sm:mb-4 pb-2 border-b">
+          {/* Fixtures - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">6</span>
               Fixtures and Fittings
             </h2>
-            <div className="space-y-3 sm:space-y-4">
+            
+            <div className="space-y-3">
               {formData.fixtures &&
                 formData.fixtures.map((fixture, index) => (
                   <div
                     key={index}
-                    className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4"
+                    className="bg-red-50 border border-red-200 rounded-md p-3"
                   >
-                    <input
-                      type="text"
-                      value={fixture.item}
-                      onChange={(e) =>
-                        handleFixtureChange(index, "item", e.target.value)
-                      }
-                      placeholder="Item name"
-                      className="w-full flex-grow p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                    />
-                    <div className="flex w-full sm:w-auto space-x-2">
-                      <input
-                        type="text"
-                        value={fixture.quantity}
-                        onChange={(e) =>
-                          handleFixtureChange(index, "quantity", e.target.value)
-                        }
-                        placeholder="Qty"
-                        className="w-20 sm:w-16 p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeFixture(index)}
-                        className="p-2 sm:p-3 bg-red-100 text-red-600 rounded hover:bg-red-200 focus:outline-none text-sm sm:text-base"
-                      >
-                        ✕
-                      </button>
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                      <div className="sm:col-span-7">
+                        <label className="block text-sm font-semibold text-red-600 mb-1">
+                          Item Name
+                        </label>
+                        <input
+                          type="text"
+                          value={fixture.item}
+                          onChange={(e) =>
+                            handleFixtureChange(index, "item", e.target.value)
+                          }
+                          placeholder="Enter item name"
+                          className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                        />
+                      </div>
+                      <div className="sm:col-span-3">
+                        <label className="block text-sm font-semibold text-red-600 mb-1">
+                          Quantity
+                        </label>
+                        <input
+                          type="text"
+                          value={fixture.quantity}
+                          onChange={(e) =>
+                            handleFixtureChange(index, "quantity", e.target.value)
+                          }
+                          placeholder="Qty"
+                          className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <button
+                          type="button"
+                          onClick={() => removeFixture(index)}
+                          className="w-full px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all duration-200 font-semibold text-sm"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -521,16 +544,16 @@ const CommercialForm = ({
               <button
                 type="button"
                 onClick={addFixture}
-                className="w-full sm:w-auto px-4 py-2 sm:py-3 bg-red-500 text-white text-sm sm:text-base rounded hover:bg-red-600 focus:outline-none transition-colors duration-200"
+                className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-md hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-red-500 transform hover:scale-105 transition-all duration-200 shadow-sm"
               >
-                Add Item
+                + Add Item
               </button>
             </div>
           </div>
 
-          {/* Terms and Conditions */}
-          <div className="mt-6 sm:mt-8">
-            <div className="flex items-start sm:items-center mb-2">
+          {/* Terms and Conditions - Compact */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <div className="flex items-start space-x-3">
               <input
                 type="checkbox"
                 name="agreeTerms"
@@ -543,10 +566,12 @@ const CommercialForm = ({
                     },
                   })
                 }
-                className="h-4 w-4 text-blue-600 mt-0.5 sm:mt-0 flex-shrink-0"
+                className="h-5 w-5 text-red-600 border-2 border-gray-300 rounded focus:ring-1 focus:ring-red-500 mt-1"
               />
-              <label className="ml-3 text-xs sm:text-sm text-red-600 font-medium leading-relaxed">
-                I agree to the terms and conditions of this rental agreement
+              <label className="text-sm text-gray-700 leading-relaxed font-medium">
+                I agree to the terms and conditions of this rental agreement and
+                confirm that all the information provided is accurate and
+                complete.
               </label>
             </div>
           </div>
