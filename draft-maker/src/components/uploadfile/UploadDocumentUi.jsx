@@ -53,6 +53,9 @@ const UploadDocumentUi = ({
   submitting,
   uploading,
   handleSubmit,
+  emailAddress,
+  setEmailAddress,
+  isValidEmail,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeliveryDropdownOpen, setIsDeliveryDropdownOpen] = useState(false);
@@ -72,6 +75,7 @@ const UploadDocumentUi = ({
     setSelectedDeliveryCharge(deliveryCharge || null);
     setIsDeliveryDropdownOpen(false);
   };
+
   return (
     <div
       className="min-h-screen bg-gray-50"
@@ -364,9 +368,16 @@ const UploadDocumentUi = ({
                       )}
                       <div className="flex items-center mb-2">
                         <FileText className="h-4 w-4 text-red-500 mr-2" />
-                        <h3 className="font-semibold text-sm">
-                          {service.name}
-                        </h3>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-sm">
+                            {service.name}
+                          </h3>
+                          {service.requiresEmail && (
+                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full mt-1 inline-block">
+                              Email Required
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <p className="text-xs text-gray-600 mb-2">
                         {service.description}
@@ -391,6 +402,74 @@ const UploadDocumentUi = ({
                 {errors.service && (
                   <p className="text-red-500 text-xs">{errors.service}</p>
                 )}
+              </div>
+            )}
+
+            {/* Email Address Input - Show when service requires email */}
+            {selectedService?.requiresEmail && (
+              <div className="p-3 bg-blue-50 rounded-md border border-blue-200">
+                <h3 className="text-base font-semibold text-gray-800 mb-2 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-2 text-blue-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                  Email Address
+                  <span className="text-red-500 ml-1">*</span>
+                </h3>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Enter your email address to receive the document
+                  </label>
+                  <input
+                    type="email"
+                    value={emailAddress}
+                    onChange={(e) => setEmailAddress(e.target.value)}
+                    className={`w-full px-2 py-1.5 text-sm border-2 ${
+                      emailAddress && !isValidEmail(emailAddress)
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                        : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
+                    } rounded focus:ring-1 transition-all`}
+                    placeholder="your.email@example.com"
+                    required
+                  />
+                  {emailAddress && !isValidEmail(emailAddress) && (
+                    <p className="text-red-600 text-xs mt-1">
+                      Please enter a valid email address
+                    </p>
+                  )}
+                  {emailAddress && isValidEmail(emailAddress) && (
+                    <p className="text-green-600 text-xs mt-1 flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-3 w-3 mr-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      Valid email address
+                    </p>
+                  )}
+                  {errors.email && (
+                    <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                  )}
+                </div>
               </div>
             )}
 

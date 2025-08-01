@@ -38,6 +38,7 @@ const DocumentUpload = () => {
   const [selectedStampDuty, setSelectedStampDuty] = useState(null);
   const [selectedDeliveryCharge, setSelectedDeliveryCharge] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
+  const [emailAddress, setEmailAddress] = useState(""); // New state for email
 
   // E-stamp logic states
   const [considerationAmount, setConsiderationAmount] = useState("");
@@ -103,9 +104,20 @@ const DocumentUpload = () => {
     fetchData();
   }, []);
 
-  // Auto-select stamp duty based on selected document type
+  // Auto-select stamp duty based on selected document type AND selected service
   useEffect(() => {
-    if (stampDutyOptions?.length > 0 && selectedDocumentType?.formId) {
+    console.log("Stamp duty effect triggered", {
+      stampDutyOptionsLength: stampDutyOptions?.length,
+      formId: selectedDocumentType?.formId,
+      selectedServiceRequiresStamp: selectedService?.requiresStamp,
+      currentSelectedStampDuty: selectedStampDuty,
+    });
+
+    if (
+      stampDutyOptions?.length > 0 &&
+      selectedDocumentType?.formId &&
+      selectedService?.requiresStamp
+    ) {
       let stampDutyId;
 
       switch (selectedDocumentType?.formId) {
@@ -123,10 +135,14 @@ const DocumentUpload = () => {
       const selectedStamp = stampDutyOptions.find(
         (sd) => sd._id === stampDutyId
       );
-      console.log("selectedStamp", selectedStamp);
+      console.log("Auto-selecting stamp duty:", selectedStamp);
       setSelectedStampDuty(selectedStamp || null);
+    } else if (selectedService && !selectedService.requiresStamp) {
+      // Only clear stamp duty if service doesn't require it
+      console.log("Clearing stamp duty - service doesn't require it");
+      setSelectedStampDuty(null);
     }
-  }, [stampDutyOptions, selectedDocumentType]);
+  }, [stampDutyOptions, selectedDocumentType, selectedService]); // Added selectedService dependency
 
   const ALLOWED_TYPES = {
     "image/jpeg": ".jpg, .jpeg",
@@ -152,6 +168,7 @@ const DocumentUpload = () => {
         notaryCharge: selectedDocumentType.draftNotaryCharge || 0,
         requiresStamp: false,
         requiresDelivery: false,
+        requiresEmail: true, // Requires email
       },
       {
         id: "draft_estamp",
@@ -162,6 +179,7 @@ const DocumentUpload = () => {
         notaryCharge: selectedDocumentType.draftNotaryCharge || 0,
         requiresStamp: true,
         requiresDelivery: false,
+        requiresEmail: true, // Requires email
       },
       {
         id: "draft_estamp_delivery",
@@ -172,6 +190,7 @@ const DocumentUpload = () => {
         notaryCharge: selectedDocumentType.draftNotaryCharge || 0,
         requiresStamp: true,
         requiresDelivery: true,
+        requiresEmail: true, // Email required for delivery option too
       },
     ];
   };
@@ -229,6 +248,14 @@ const DocumentUpload = () => {
     if (!formData.userName.trim() || !formData.contactNumber.trim())
       return false;
 
+    // Check email requirement
+    if (
+      selectedService.requiresEmail &&
+      (!emailAddress || !isValidEmail(emailAddress))
+    ) {
+      return false;
+    }
+
     if (selectedService.requiresStamp && !selectedStampDuty) return false;
     if (selectedService.requiresDelivery && !selectedDeliveryCharge)
       return false;
@@ -280,6 +307,14 @@ const DocumentUpload = () => {
       newErrors.files = "Please upload at least one document";
     }
 
+    // Check email validation
+    if (
+      selectedService?.requiresEmail &&
+      (!emailAddress || !isValidEmail(emailAddress))
+    ) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -320,6 +355,7 @@ const DocumentUpload = () => {
     console.log("Found docType:", docType);
     setSelectedDocumentType(docType || null);
     setSelectedService(null); // Reset service selection
+    setSelectedStampDuty(null); // Reset stamp duty selection
 
     if (errors.documentType) {
       setErrors((prev) => ({
@@ -330,13 +366,19 @@ const DocumentUpload = () => {
   };
 
   const handleServiceSelect = (service) => {
+    console.log("Service selected:", service);
     setSelectedService(service);
-    if (!service.requiresStamp) {
-      setSelectedStampDuty(null);
-    }
+
+    // Don't reset stamp duty here - let the useEffect handle it
+    // Only reset delivery charge if not required
     if (!service.requiresDelivery) {
       setSelectedDeliveryCharge(null);
     }
+
+    // Don't reset email - keep it if user has already entered it
+    // if (!service.requiresEmail) {
+    //   setEmailAddress("");
+    // }
 
     if (errors.service) {
       setErrors((prev) => ({
@@ -351,6 +393,12 @@ const DocumentUpload = () => {
       ...prev,
       [field]: value,
     }));
+  };
+
+  // Email validation function
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   // File handling functions
@@ -539,6 +587,7 @@ const DocumentUpload = () => {
             amount: totalPrice,
             includesNotary: service.hasNotary,
             userName: formData.userName,
+            emailAddress: emailAddress, // Include email in payment data
             uploadedDocuments: uploadedDocuments,
             selectedStampDuty: selectedStampDuty,
             selectedDeliveryCharge: selectedDeliveryCharge,
@@ -558,6 +607,7 @@ const DocumentUpload = () => {
                 : null,
               considerationAmount: considerationAmount,
               quantity: quantity,
+              emailAddress,
               serviceCharge: SERVICE_CHARGE_PER_DOCUMENT * (quantity || 1),
             },
           });
@@ -565,6 +615,7 @@ const DocumentUpload = () => {
         prefill: {
           name: formData.userName || "",
           contact: formData.contactNumber || "",
+          email: emailAddress, // Prefill email if provided
         },
         notes: {
           bookingId: bookingId,
@@ -573,6 +624,7 @@ const DocumentUpload = () => {
           stampDutyId: selectedStampDuty?._id || null,
           deliveryChargeId: selectedDeliveryCharge?._id || null,
           documentType: selectedDocumentType?.documentType,
+          emailAddress: emailAddress,
         },
         theme: {
           color: "#dc2626",
@@ -619,6 +671,7 @@ const DocumentUpload = () => {
         includesNotary: paymentData.includesNotary,
         status: "success",
         userName: formData.userName,
+        emailAddress: paymentData.emailAddress, // Include email
         uploadedDocuments: paymentData.uploadedDocuments,
         selectedStampDuty: paymentData.selectedStampDuty,
         selectedDeliveryCharge: paymentData.selectedDeliveryCharge,
@@ -634,79 +687,79 @@ const DocumentUpload = () => {
         totalDocuments: files.length,
       };
 
+      // Fallback to original document submission
+      const documentUrls = paymentData?.uploadedDocuments?.map(
+        (file) => file.cloudinaryUrl
+      );
+      const submitData = {
+        username: formData.userName,
+        userMobile: formData.contactNumber,
+        documentType: selectedDocumentType?.documentType,
+        formId: selectedDocumentType?.formId,
+        documents: documentUrls,
+        totalDocuments: files.length,
+        emailAddress: emailAddress, // Include email in submit data
+        selectedService: {
+          serviceId: selectedService.id,
+          serviceName: selectedService.name,
+          basePrice: selectedService.price,
+          hasNotary: selectedService.hasNotary,
+          notaryCharge: selectedService.notaryCharge,
+          requiresStamp: selectedService.requiresStamp,
+          requiresDelivery: selectedService.requiresDelivery,
+          requiresEmail: selectedService.requiresEmail,
+        },
+        stampDuty: selectedStampDuty
+          ? {
+              stampDutyId: selectedStampDuty._id,
+              documentType: selectedStampDuty.documentType,
+              articleNo: selectedStampDuty.articleNo,
+              calculationType: selectedStampDuty.calculationType,
+              fixedAmount: selectedStampDuty.fixedAmount,
+              percentage: selectedStampDuty.percentage,
+              quantity: quantity,
+              considerationAmount: parseFloat(considerationAmount) || 0,
+              calculatedAmount: calculateStampDutyAmount(selectedStampDuty),
+              serviceCharge: SERVICE_CHARGE_PER_DOCUMENT * quantity,
+            }
+          : null,
+        delivery: selectedDeliveryCharge
+          ? {
+              deliveryChargeId: selectedDeliveryCharge._id,
+              serviceName: selectedDeliveryCharge.serviceName,
+              charge: selectedDeliveryCharge.charge,
+              address: deliveryAddress,
+            }
+          : null,
+        payment: {
+          totalAmount: paymentData.amount,
+          paymentId: paymentData.razorpay_payment_id,
+          orderId: paymentData.razorpay_order_id,
+          signature: paymentData.razorpay_signature,
+          paymentStatus: "completed",
+          paymentDate: new Date(),
+        },
+        bookingId: paymentData.bookingId,
+        submittedAt: new Date().toISOString(),
+      };
 
-   
-        // Fallback to original document submission
-        const documentUrls = paymentData?.uploadedDocuments?.map(
-          (file) => file.cloudinaryUrl
-        );
-        const submitData = {
-          username: formData.userName,
-          userMobile: formData.contactNumber,
-          documentType: selectedDocumentType?.documentType,
-          formId: selectedDocumentType?.formId,
-          documents: documentUrls,
-          totalDocuments: files.length,
-          selectedService: {
-            serviceId: selectedService.id,
-            serviceName: selectedService.name,
-            basePrice: selectedService.price,
-            hasNotary: selectedService.hasNotary,
-            notaryCharge: selectedService.notaryCharge,
-            requiresStamp: selectedService.requiresStamp,
-            requiresDelivery: selectedService.requiresDelivery,
-          },
-          stampDuty: selectedStampDuty
-            ? {
-                stampDutyId: selectedStampDuty._id,
-                documentType: selectedStampDuty.documentType,
-                articleNo: selectedStampDuty.articleNo,
-                calculationType: selectedStampDuty.calculationType,
-                fixedAmount: selectedStampDuty.fixedAmount,
-                percentage: selectedStampDuty.percentage,
-                quantity: quantity,
-                considerationAmount: parseFloat(considerationAmount) || 0,
-                calculatedAmount: calculateStampDutyAmount(selectedStampDuty),
-                serviceCharge: SERVICE_CHARGE_PER_DOCUMENT * quantity,
-              }
-            : null,
-          delivery: selectedDeliveryCharge
-            ? {
-                deliveryChargeId: selectedDeliveryCharge._id,
-                serviceName: selectedDeliveryCharge.serviceName,
-                charge: selectedDeliveryCharge.charge,
-                address: deliveryAddress,
-              }
-            : null,
-          payment: {
-            totalAmount: paymentData.amount,
-            paymentId: paymentData.razorpay_payment_id,
-            orderId: paymentData.razorpay_order_id,
-            signature: paymentData.razorpay_signature,
-            paymentStatus: "completed",
-            paymentDate: new Date(),
-          },
-          bookingId: paymentData.bookingId,
-          submittedAt: new Date().toISOString(),
-        };
+      const response = await sendDocumentsToBackend(submitData);
 
-        const response = await sendDocumentsToBackend(submitData);
+      if (response.status === 201 || response.status === 200) {
+        setSuccess(true);
+        setSuccessMessage("Payment and document submission successful!");
 
-        if (response.status === 201 || response.status === 200) {
-          setSuccess(true);
-          setSuccessMessage("Payment and document submission successful!");
+        // Reset form
+        setFormData({ userName: "", contactNumber: "" });
+        setFiles([]);
+        setSelectedDocumentType(null);
+        setSelectedService(null);
+        setEmailAddress("");
 
-          // Reset form
-          setFormData({ userName: "", contactNumber: "" });
-          setFiles([]);
-          setSelectedDocumentType(null);
-          setSelectedService(null);
-
-          setTimeout(() => {
-            setSuccess(false);
-          }, 5000);
-        }
-     
+        setTimeout(() => {
+          setSuccess(false);
+        }, 5000);
+      }
     } catch (error) {
       console.error("Error confirming payment:", error);
       alert(
@@ -724,9 +777,17 @@ const DocumentUpload = () => {
     }
 
     if (!canProceedToPayment()) {
-      alert(
-        "Please complete all required selections before proceeding to payment."
-      );
+      let errorMessage =
+        "Please complete all required selections before proceeding to payment.";
+
+      if (
+        selectedService?.requiresEmail &&
+        (!emailAddress || !isValidEmail(emailAddress))
+      ) {
+        errorMessage = "Please enter a valid email address to continue.";
+      }
+
+      alert(errorMessage);
       return;
     }
 
@@ -846,6 +907,9 @@ const DocumentUpload = () => {
       submitting={submitting}
       uploading={uploading}
       handleSubmit={handleSubmit}
+      emailAddress={emailAddress}
+      setEmailAddress={setEmailAddress}
+      isValidEmail={isValidEmail}
     />
   );
 };

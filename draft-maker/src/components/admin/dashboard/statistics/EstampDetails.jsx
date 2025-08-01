@@ -363,6 +363,14 @@ const EstampDetails = () => {
               {formatCurrency(estampData.stampDutyAmount)}
             </p>
           </div>
+           <div>
+            <label className="text-sm font-medium text-gray-600">
+              Quantity
+            </label>
+            <p className="text-lg font-bold text-red-600">
+              {estampData.quantity}
+            </p>
+          </div>
           <div>
             <label className="text-sm font-medium text-gray-600">
               Total Amount

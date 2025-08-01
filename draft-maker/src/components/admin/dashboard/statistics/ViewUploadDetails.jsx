@@ -20,6 +20,7 @@ import {
   AlertCircle,
   Edit,
   X,
+  Mail,
 } from "lucide-react";
 import {
   getUploadBookingDetails,
@@ -334,7 +335,7 @@ const ViewUploadDetails = () => {
                   </label>
                   <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm flex items-center">
                     <Calendar size={14} className="mr-2" />
-                    {booking.submittedAt} at {booking.submittedTime}
+                    {booking.submittedAt}
                   </div>
                 </div>
               </div>
@@ -352,7 +353,7 @@ const ViewUploadDetails = () => {
                     User Name
                   </label>
                   <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
-                    {booking.username}
+                    {booking.userName}
                   </div>
                 </div>
 
@@ -363,6 +364,15 @@ const ViewUploadDetails = () => {
                   <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm flex items-center">
                     <Smartphone size={14} className="mr-2" />
                     {booking.userMobile}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                   Email Address
+                  </label>
+                  <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm flex items-center">
+                    <Mail size={14} className="mr-2" />
+                    {booking.emailAddress}
                   </div>
                 </div>
               </div>

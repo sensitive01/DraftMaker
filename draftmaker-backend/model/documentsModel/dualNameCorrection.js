@@ -34,6 +34,9 @@ const serviceDetailsSchema = new mongoose.Schema(
     deliveryCharge: Number,
     requiresStamp: Boolean,
     requiresDelivery: Boolean,
+    considerationAmount: Number,
+    quantity: Number,
+    serviceCharge: Number,
   },
   { _id: false }
 );
@@ -178,7 +181,9 @@ const dualNameCorrection = new mongoose.Schema(
       state: { type: String },
       pincode: { type: String },
       landmark: { type: String },
+      email: { type: String },
     },
+    email: { type: String },
   },
   {
     timestamps: true,

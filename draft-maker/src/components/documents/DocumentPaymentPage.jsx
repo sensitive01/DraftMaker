@@ -22,6 +22,8 @@ import {
   createVehicleInsurencePaymentData,
 } from "../../api/service/axiosService";
 import DocumentDelivaryAddress from "./DocumentDelivaryAddress";
+import SuccessNotification from "./serviceNotification/SuccessNotification";
+import ErrorNoification from "./serviceNotification/ErrorNoification";
 
 const DocumentPaymentPage = () => {
   const location = useLocation();
@@ -42,6 +44,7 @@ const DocumentPaymentPage = () => {
   const [deliveryChargeOptions, setDeliveryChargeOptions] = useState([]);
   const [selectedStampDuty, setSelectedStampDuty] = useState(null);
   const [selectedDeliveryCharge, setSelectedDeliveryCharge] = useState(null);
+  const [emailAddress, setEmailAddress] = useState(""); // New state for email
   const [deliveryAddress, setDeliveryAddress] = useState({
     addressLine1: "",
     addressLine2: "",
@@ -49,6 +52,10 @@ const DocumentPaymentPage = () => {
     state: "",
     pincode: "",
   });
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const [errorMessage, setErrorMessage] = useState();
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [successNotification, setSuccessNotification] = useState();
 
   // New state variables for e-stamp logic
   const [considerationAmount, setConsiderationAmount] = useState("");
@@ -68,9 +75,13 @@ const DocumentPaymentPage = () => {
     fetchData();
   }, []);
 
-  // Auto-select stamp duty based on formId
+  // Auto-select stamp duty based on formId - Updated to trigger when service is selected
   useEffect(() => {
-    if (stampDutyOptions.length > 0 && formId) {
+    if (
+      stampDutyOptions.length > 0 &&
+      formId &&
+      selectedService?.requiresStamp
+    ) {
       let stampDutyId;
 
       if (formId === "DM-CFD-17") {
@@ -86,7 +97,7 @@ const DocumentPaymentPage = () => {
       );
       setSelectedStampDuty(selectedStamp || null);
     }
-  }, [stampDutyOptions, formId]);
+  }, [stampDutyOptions, formId, selectedService]); // Added selectedService dependency
 
   const getServiceOptions = () => [
     {
@@ -98,6 +109,7 @@ const DocumentPaymentPage = () => {
       notaryCharge: documentDetails?.draftNotaryCharge || 0,
       requiresStamp: false,
       requiresDelivery: false,
+      requiresEmail: true, // Requires email
     },
     {
       id: "draft_estamp",
@@ -108,6 +120,7 @@ const DocumentPaymentPage = () => {
       notaryCharge: documentDetails?.draftNotaryCharge || 0,
       requiresStamp: true,
       requiresDelivery: false,
+      requiresEmail: true, // Requires email
     },
     {
       id: "draft_estamp_delivery",
@@ -118,17 +131,27 @@ const DocumentPaymentPage = () => {
       notaryCharge: documentDetails?.draftNotaryCharge || 0,
       requiresStamp: true,
       requiresDelivery: true,
+      requiresEmail: false, // Email not required for delivery option
     },
   ];
 
   const handlePackageSelect = (service) => {
     console.log("Selected Service:", service);
     setSelectedService(service);
+
+    // Reset stamp duty when not required
     if (!service.requiresStamp) {
       setSelectedStampDuty(null);
     }
+
+    // Reset delivery charge when not required
     if (!service.requiresDelivery) {
       setSelectedDeliveryCharge(null);
+    }
+
+    // Reset email when not required
+    if (!service.requiresEmail) {
+      setEmailAddress("");
     }
   };
 
@@ -137,6 +160,12 @@ const DocumentPaymentPage = () => {
       ...prev,
       [field]: value,
     }));
+  };
+
+  // Email validation function
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   const calculateStampDutyAmount = (stampDuty, baseAmount = 1000) => {
@@ -187,6 +216,14 @@ const DocumentPaymentPage = () => {
   const canProceedToPayment = () => {
     if (!selectedService) return false;
 
+    // Check email requirement
+    if (
+      selectedService.requiresEmail &&
+      (!emailAddress || !isValidEmail(emailAddress))
+    ) {
+      return false;
+    }
+
     if (selectedService.requiresStamp && !selectedStampDuty) return false;
     if (selectedService.requiresDelivery && !selectedDeliveryCharge)
       return false;
@@ -236,6 +273,7 @@ const DocumentPaymentPage = () => {
             amount: totalPrice,
             includesNotary: service.hasNotary,
             userName: userName,
+            emailAddress: emailAddress, // Include email in payment data
             // Additional selected service details
             selectedStampDuty: selectedStampDuty,
             selectedDeliveryCharge: selectedDeliveryCharge,
@@ -262,6 +300,7 @@ const DocumentPaymentPage = () => {
         prefill: {
           name: userName,
           contact: mobileNumber,
+          email: emailAddress, // Prefill email if provided
         },
         notes: {
           bookingId: bookingId,
@@ -270,6 +309,7 @@ const DocumentPaymentPage = () => {
           stampDutyId: selectedStampDuty?._id || null,
           deliveryChargeId: selectedDeliveryCharge?._id || null,
           documentType: documentDetails.documentType,
+          emailAddress: emailAddress,
         },
         theme: {
           color: "#dc2626",
@@ -297,6 +337,7 @@ const DocumentPaymentPage = () => {
             serviceType: service.id,
             serviceName: service.name,
             userName: userName,
+            emailAddress: emailAddress,
             status: "failed",
             selectedStampDuty: selectedStampDuty,
             selectedDeliveryCharge: selectedDeliveryCharge,
@@ -330,6 +371,7 @@ const DocumentPaymentPage = () => {
         includesNotary: paymentData.includesNotary,
         status: "success",
         userName: userName,
+        emailAddress: paymentData.emailAddress, // Include email
         // Additional service details
         selectedStampDuty: paymentData.selectedStampDuty,
         selectedDeliveryCharge: paymentData.selectedDeliveryCharge,
@@ -433,28 +475,39 @@ const DocumentPaymentPage = () => {
 
       if (confirmationResponse.status === 200) {
         const { bookingId, formId } = confirmationResponse.data.data;
+        setShowSuccessNotification(true);
+        setSuccessNotification(confirmationResponse.data.message);
 
         setTimeout(() => {
           // window.location.href = `/documents/name/name-correction`;
           window.location.href = `/documents/preview-page/${formId}/${bookingId}`;
-        }, 3000);
+        }, 1500);
       } else {
         const errorData = confirmationResponse.data.data;
         throw new Error(errorData.message || "Failed to confirm payment");
       }
     } catch (error) {
       console.error("Error confirming payment:", error);
-      alert(
-        "Payment was processed but we couldn't update your booking. Our team will contact you shortly."
+      setErrorMessage(true);
+      setShowErrorNotification(
+        error.response.data.message || "Failed to confirm payment"
       );
     }
   };
 
   const handlePayment = async () => {
     if (!canProceedToPayment()) {
-      alert(
-        "Please complete all required selections before proceeding to payment."
-      );
+      let errorMessage =
+        "Please complete all required selections before proceeding to payment.";
+
+      if (
+        selectedService?.requiresEmail &&
+        (!emailAddress || !isValidEmail(emailAddress))
+      ) {
+        errorMessage = "Please enter a valid email address to continue.";
+      }
+
+      alert(errorMessage);
       return;
     }
 
@@ -490,6 +543,18 @@ const DocumentPaymentPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      {showErrorNotification && (
+        <ErrorNoification
+          validationError={errorMessage}
+          setShowErrorNotification={setShowErrorNotification}
+        />
+      )}
+      {showSuccessNotification && (
+        <SuccessNotification
+          successMessage={successNotification}
+          setSuccess={setShowSuccessNotification}
+        />
+      )}
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Page Header */}
         <div className="mb-8">
@@ -627,6 +692,11 @@ const DocumentPaymentPage = () => {
                       <h3 className="font-bold text-lg text-gray-800 mb-1">
                         {service.name}
                       </h3>
+                      {service.requiresEmail && (
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                          Email Required
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -677,6 +747,70 @@ const DocumentPaymentPage = () => {
                 </button>
               ))}
             </div>
+
+            {/* Email Address Input - Show for Draft and Draft+eStamp */}
+            {selectedService?.requiresEmail && (
+              <div className="mb-6 p-6 bg-blue-50 rounded-xl border border-blue-200">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-2 text-blue-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                  Email Address
+                  <span className="text-red-500 ml-1">*</span>
+                </h3>
+                <div className="max-w-md">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Enter your email address to receive the document
+                  </label>
+                  <input
+                    type="email"
+                    value={emailAddress}
+                    onChange={(e) => setEmailAddress(e.target.value)}
+                    className={`w-full px-4 py-3 border-2 ${
+                      emailAddress && !isValidEmail(emailAddress)
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                        : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
+                    } rounded-lg focus:ring-4 transition-all text-md`}
+                    placeholder="your.email@example.com"
+                  />
+                  {emailAddress && !isValidEmail(emailAddress) && (
+                    <p className="text-red-600 text-sm mt-2">
+                      Please enter a valid email address
+                    </p>
+                  )}
+                  {emailAddress && isValidEmail(emailAddress) && (
+                    <p className="text-green-600 text-sm mt-2 flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      Valid email address
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Document Details Section */}
             {selectedService?.requiresStamp && selectedStampDuty && (
@@ -921,6 +1055,9 @@ const DocumentPaymentPage = () => {
                 <div className="text-gray-500 text-sm bg-gray-100 px-6 py-3 rounded-lg">
                   {!selectedService
                     ? "Please select a service package to continue"
+                    : selectedService.requiresEmail &&
+                      (!emailAddress || !isValidEmail(emailAddress))
+                    ? "Please enter a valid email address"
                     : "Please complete all required selections"}
                 </div>
               )}

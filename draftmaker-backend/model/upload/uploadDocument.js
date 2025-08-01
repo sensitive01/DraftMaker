@@ -13,6 +13,7 @@ const uploadDocumentSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    emailAddress: { type: String },
     documentType: {
       type: String,
       required: true,
@@ -69,7 +70,7 @@ const uploadDocumentSchema = new mongoose.Schema(
       serviceName: String,
       charge: Number,
       address: {
-        type: Object, 
+        type: Object,
       },
     },
     payment: {

@@ -1115,6 +1115,8 @@ const updateDualNamePaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     const updatedData = await dualNameCorrection.findOneAndUpdate(
@@ -1133,6 +1135,8 @@ const updateDualNamePaymentData = async (req, res) => {
         selectedStampDuty,
         selectedDeliveryCharge,
         serviceDetails,
+        email: emailAddress,
+        deliveryAddress,
       },
       { new: true }
     );
@@ -1269,6 +1273,8 @@ const saveNameCorrectionPaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1292,6 +1298,8 @@ const saveNameCorrectionPaymentData = async (req, res) => {
           selectedStampDuty,
           selectedDeliveryCharge,
           serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -1375,6 +1383,8 @@ const saveDobCorrectionPaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1398,6 +1408,8 @@ const saveDobCorrectionPaymentData = async (req, res) => {
           selectedStampDuty,
           selectedDeliveryCharge,
           serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -1481,6 +1493,8 @@ const saveGasCorrectionPaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1504,6 +1518,8 @@ const saveGasCorrectionPaymentData = async (req, res) => {
           selectedStampDuty,
           selectedDeliveryCharge,
           serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -1587,6 +1603,8 @@ const saveDocumentLostPaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1610,6 +1628,8 @@ const saveDocumentLostPaymentData = async (req, res) => {
           selectedStampDuty,
           selectedDeliveryCharge,
           serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -1688,6 +1708,11 @@ const saveDobParentNameCorrection = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1708,6 +1733,11 @@ const saveDobParentNameCorrection = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -1788,6 +1818,11 @@ const saveBirthCertificateNameCorrection = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1808,6 +1843,11 @@ const saveBirthCertificateNameCorrection = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -1891,6 +1931,8 @@ const saveGstPaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -1914,6 +1956,8 @@ const saveGstPaymentData = async (req, res) => {
           selectedStampDuty,
           selectedDeliveryCharge,
           serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -1997,6 +2041,8 @@ const updateMetriculationLostPaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -2020,6 +2066,8 @@ const updateMetriculationLostPaymentData = async (req, res) => {
           selectedStampDuty,
           selectedDeliveryCharge,
           serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -2103,6 +2151,8 @@ const updateKhataCorrectionPaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -2126,6 +2176,8 @@ const updateKhataCorrectionPaymentData = async (req, res) => {
           selectedStampDuty,
           selectedDeliveryCharge,
           serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -2209,6 +2261,8 @@ const updateVehicleInsurencePaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -2232,6 +2286,8 @@ const updateVehicleInsurencePaymentData = async (req, res) => {
           selectedStampDuty,
           selectedDeliveryCharge,
           serviceDetails,
+          email: emailAddress,
+          deliveryAddress
         },
       },
       { new: true }
@@ -2315,6 +2371,8 @@ const updateHufPaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -2338,6 +2396,8 @@ const updateHufPaymentData = async (req, res) => {
           selectedStampDuty,
           selectedDeliveryCharge,
           serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -2418,6 +2478,11 @@ const updateGapPeriodData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -2438,6 +2503,11 @@ const updateGapPeriodData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -2518,6 +2588,11 @@ const updatePasswordAnnaxureData = async (req, res) => {
       status,
       documentType,
       formId,
+      selectedStampDuty,
+      selectedDeliveryCharge,
+      serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -2538,6 +2613,11 @@ const updatePasswordAnnaxureData = async (req, res) => {
           "paymentDetails.serviceType": serviceType,
           "paymentDetails.serviceName": serviceName,
           "paymentDetails.includesNotary": includesNotary,
+          selectedStampDuty,
+          selectedDeliveryCharge,
+          serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -2621,6 +2701,8 @@ const updatePassportNameChangePaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -2644,6 +2726,8 @@ const updatePassportNameChangePaymentData = async (req, res) => {
           selectedStampDuty,
           selectedDeliveryCharge,
           serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -2727,6 +2811,8 @@ const updateAdressAffadavitPaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -2750,6 +2836,8 @@ const updateAdressAffadavitPaymentData = async (req, res) => {
           selectedDeliveryCharge,
           serviceDetails,
           selectedStampDuty,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -2820,6 +2908,8 @@ const updateCommercialPaymentData = async (req, res) => {
       return res.status(400).json({ message: "Invalid request data." });
     }
 
+    console.log("req.body",req.body)
+
     const {
       bookingId,
       paymentId,
@@ -2832,6 +2922,8 @@ const updateCommercialPaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
     // ✅ Check if bookingId exists
@@ -2865,6 +2957,8 @@ const updateCommercialPaymentData = async (req, res) => {
           selectedStampDuty,
           selectedDeliveryCharge,
           serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -2934,6 +3028,7 @@ const updateRecidentialPaymentData = async (req, res) => {
     if (!req.body || !req.body.data) {
       return res.status(400).json({ message: "Invalid request data." });
     }
+    console.log(req.body);
 
     const {
       bookingId,
@@ -2948,9 +3043,10 @@ const updateRecidentialPaymentData = async (req, res) => {
       selectedStampDuty,
       selectedDeliveryCharge,
       serviceDetails,
+      emailAddress,
+      deliveryAddress,
     } = req.body.data;
 
-    // ✅ Check if bookingId exists
     if (!bookingId) {
       return res.status(400).json({ message: "Booking ID is required." });
     }
@@ -2971,6 +3067,8 @@ const updateRecidentialPaymentData = async (req, res) => {
           selectedStampDuty,
           selectedDeliveryCharge,
           serviceDetails,
+          email: emailAddress,
+          deliveryAddress,
         },
       },
       { new: true }
@@ -3013,6 +3111,7 @@ const uploadDocumentData = async (req, res) => {
       stampDuty,
       delivery,
       payment,
+      emailAddress,
     } = req.body.documentData;
 
     const bookingId = await generateBookingId();
@@ -3030,6 +3129,7 @@ const uploadDocumentData = async (req, res) => {
       stampDuty,
       delivery,
       payment,
+      emailAddress,
     });
 
     await newUpload.save();

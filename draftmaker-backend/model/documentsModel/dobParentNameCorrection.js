@@ -34,6 +34,9 @@ const serviceDetailsSchema = new mongoose.Schema(
     deliveryCharge: Number,
     requiresStamp: Boolean,
     requiresDelivery: Boolean,
+    considerationAmount: Number,
+    quantity: Number,
+    serviceCharge: Number,
   },
   { _id: false }
 );
@@ -49,7 +52,6 @@ const parentCorrectionFormSchema = new mongoose.Schema(
     motherAadhaar: { type: String },
     childRelation: {
       type: String,
-
     },
     childName: { type: String },
     certificateNumber: { type: String },
@@ -96,7 +98,9 @@ const parentCorrectionFormSchema = new mongoose.Schema(
       state: { type: String },
       pincode: { type: String },
       landmark: { type: String },
+      email: { type: String },
     },
+    email: { type: String },
   },
   {
     timestamps: true,
