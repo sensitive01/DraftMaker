@@ -33,23 +33,19 @@ const BookingTable = () => {
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
-      // Handle different date formats
       let date;
 
-      // Check if it's in DD-MM-YYYY format like "28-07-2025 09:50:01 PM"
       if (dateString.includes("-") && dateString.split("-").length === 3) {
         const [datePart, timePart] = dateString.split(" ");
         const [day, month, year] = datePart.split("-");
-        // Create ISO format string for proper parsing
-        const isoString = `${year}-${month}-${day}`;
-        date = new Date(isoString);
+        const fullDateStr = `${month}/${day}/${year} ${timePart || ""}`;
+        date = new Date(fullDateStr);
       } else {
-        // Handle other formats
         date = new Date(dateString);
       }
 
-      // Format to human-readable date
-      return date.toLocaleDateString("en-US", {
+      return date.toLocaleDateString("en-IN", {
+        timeZone: "Asia/Kolkata",
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -61,35 +57,33 @@ const BookingTable = () => {
   };
 
   // Utility function to format time in human-readable format
-  const formatTime = (dateString) => {
-    if (!dateString) return "N/A";
-    try {
-      // Handle different date formats
-      let date;
+ const formatTime = (dateString) => {
+  if (!dateString) return "N/A";
+  try {
+    let date;
 
-      // Check if it's in DD-MM-YYYY format like "28-07-2025 09:50:01 PM"
-      if (dateString.includes("-") && dateString.split("-").length === 3) {
-        const parts = dateString.split(" ");
-        const [day, month, year] = parts[0].split("-");
-        const time = parts.slice(1).join(" "); // Handle "09:50:01 PM"
-
-        // Create a proper date string
-        const dateStr = `${month}/${day}/${year} ${time}`;
-        date = new Date(dateStr);
-      } else {
-        date = new Date(dateString);
-      }
-
-      return date.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      });
-    } catch (error) {
-      console.log("Time parsing error:", error);
-      return dateString;
+    if (dateString.includes("-") && dateString.split("-").length === 3) {
+      const parts = dateString.split(" ");
+      const [day, month, year] = parts[0].split("-");
+      const time = parts.slice(1).join(" "); // Handle "09:50:01 PM"
+      const fullDateStr = `${month}/${day}/${year} ${time}`;
+      date = new Date(fullDateStr);
+    } else {
+      date = new Date(dateString);
     }
-  };
+
+    return date.toLocaleTimeString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+  } catch (error) {
+    console.log("Time parsing error:", error);
+    return dateString;
+  }
+};
+
 
   // Utility function to safely display values
   const safeDisplay = (value, fallback = "N/A") => {
