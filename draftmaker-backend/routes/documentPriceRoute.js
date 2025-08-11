@@ -15,7 +15,7 @@ documentPriceRouter.put("/update-stamp-duty-status/:documentId",documentPriceCon
 
 documentPriceRouter.post("/create-delivery-charge-price",documentPriceController.addServiceItem)
 documentPriceRouter.get("/get-delivery-charge-price",documentPriceController.getAllServiceItems)
-documentPriceRouter.put("/update-delivery-charge-price/:documentId",documentPriceController.updateServiceItem)
+documentPriceRouter.put("/update-delivery-charge-price/:serviceId",documentPriceController.updateServiceItem)
 documentPriceRouter.put("/update-delivery-charge-status/:documentId",documentPriceController.updateServiceItemStatus)
 
 

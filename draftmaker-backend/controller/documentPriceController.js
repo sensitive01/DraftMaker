@@ -73,7 +73,7 @@ const updateDocumentPrice = async (req, res) => {
   try {
     console.log("Welcome to update the data", req.body);
     const { id } = req.params;
-    const documentData = req.body.documents;
+    const updatedData = req.body.documents;
 
     if (updatedData.documentType) {
       updatedData.documentType = updatedData.documentType
@@ -82,6 +82,8 @@ const updateDocumentPrice = async (req, res) => {
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ");
     }
+
+    console.log("updatedData", updatedData);
 
     const updatedPrice = await DocumentPrice.findByIdAndUpdate(
       id,
@@ -285,7 +287,7 @@ const updateServiceItem = async (req, res) => {
   try {
     const { serviceId } = req.params;
     const { documentData } = req.body;
-    console.log(documentData);
+    console.log("serviceId", serviceId, "documentData", documentData);
     const updatedService = await deliveryChargeModel.findByIdAndUpdate(
       serviceId,
       {

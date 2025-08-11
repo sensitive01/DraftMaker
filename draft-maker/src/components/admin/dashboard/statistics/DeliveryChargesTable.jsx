@@ -181,7 +181,7 @@ const DeliveryChargesTable = () => {
         status: newItem.status,
       };
 
-      console.log("Formatted item for API:", formattedItem); // Debug log
+      console.log("Formatted item for API:", formattedItem,currentEditId); // Debug log
 
       if (isEditMode) {
         const response = await updateDelivaryCharge(
