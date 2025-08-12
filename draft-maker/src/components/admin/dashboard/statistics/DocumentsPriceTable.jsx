@@ -3,7 +3,7 @@ import { Plus, Edit, X, Check, AlertCircle, Trash2 } from "lucide-react";
 import {
   createDocumentPrice,
   deleteDocumentPrice,
-  getDocumentsPriceData,
+  getDocumentsPriceDataAdmin,
   updateDocumentPrice,
 } from "../../../../api/service/axiosService";
 
@@ -53,7 +53,7 @@ const DocumentPriceTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getDocumentsPriceData();
+        const response = await getDocumentsPriceDataAdmin();
         if (response.status === 200) {
           const formattedData = response.data.map((item) => ({
             ...item,

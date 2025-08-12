@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Plus, Edit, X, Check, AlertCircle, Trash2 } from "lucide-react";
 import {
   createDelivaryCharge,
-  getDeliveryChargeData,
+  getDeliveryChargeDataAdmin,
   updateDelivaryCharge,
   updateDeliveryPriceStatus,
 } from "../../../../api/service/axiosService";
@@ -48,7 +48,7 @@ const DeliveryChargesTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getDeliveryChargeData();
+        const response = await getDeliveryChargeDataAdmin();
         console.log("API Response:", response); // Debug log
 
         if (response.status == 200) {

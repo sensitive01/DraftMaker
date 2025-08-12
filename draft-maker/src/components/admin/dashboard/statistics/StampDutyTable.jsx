@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Plus, Edit, X, Check, AlertCircle, Trash2 } from "lucide-react";
 import {
   createStampDuty,
-  getStamDocumentData,
+  getStamDocumentDataAdmin,
   updateStampDutyData,
   updateStampStatus,
 } from "../../../../api/service/axiosService";
@@ -54,7 +54,7 @@ const StampDutyTable = () => {
     const fetchStampData = async () => {
       try {
         setLoading(true);
-        const response = await getStamDocumentData();
+        const response = await getStamDocumentDataAdmin();
         console.log("response", response);
 
         if (response?.data?.data) {
@@ -366,7 +366,7 @@ const StampDutyTable = () => {
         }
         return item;
       });
-      const response = await updateStampStatus(id, currentStatus);
+      const response = await updateStampStatus(id, updatedStatus);
       if (response.status === 200) {
         setStampDutyData(updatedItems);
         showNotification(

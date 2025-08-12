@@ -1,11 +1,152 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import draftMakerLogo from "../assets/images/logo.png";
+import { getDocumentName } from "../api/service/axiosService";
 
 const Header = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [visibleDocuments, setVisibleDocuments] = useState([]);
+
+  // Static document configuration with API mapping
+  const documentConfig = [
+    {
+      id: 1,
+      title: "Residential Rental/Lease Agreement",
+      path: "/documents/rental/residential-lease",
+      apiTitle: "Rental Agreement (residential)",
+    },
+    {
+      id: 2,
+      title: "Commercial Rental/Lease Agreement",
+      path: "/documents/commercial/commercial-lease",
+      apiTitle: "Rental Agreement  (commercial)",
+    },
+    {
+      id: 3,
+      title: "Address Proof Affidavit",
+      path: "/documents/address/addressaffadavit",
+      apiTitle: "Address Proof Affidavit",
+    },
+    {
+      id: 4,
+      title: "Dual Name/ One and the Same",
+      path: "/documents/dual-name/dual-name-correction",
+      apiTitle: "Dual Name Change",
+    },
+    {
+      id: 5,
+      title: "Name Change",
+      path: "/documents/name/name-correction",
+      apiTitle: "Name Correction Change",
+    },
+    {
+      id: 6,
+      title: "DOB Mismatch",
+      path: "/documents/dob/dob-correction",
+      apiTitle: "Date Of Birth Correction",
+    },
+    {
+      id: 7,
+      title: "Gas Voucher Lost",
+      path: "/documents/gas/gas-document",
+      apiTitle: "Gas",
+    },
+    {
+      id: 8,
+      title: "Document Lost Declaration",
+      path: "/documents/document-lost/document-lost-correction",
+      apiTitle: "Document Lost",
+    },
+    {
+      id: 9,
+      title: "Birth Certificate Parent's Name Correction",
+      path: "/documents/birth-certificate-parent/birth-certificate-parent-name-correction",
+      apiTitle: "Birth Cert Name Correction Minor Parents",
+    },
+    {
+      id: 10,
+      title: "Birth Certificate Name Change",
+      path: "/documents/birth-certificate/birth-certificate-correction",
+      apiTitle: "Birth Cert Minor Name Correction",
+    },
+    {
+      id: 11,
+      title: "GST NOC Premises by Owner",
+      path: "/documents/gst/gst-document",
+      apiTitle: "Gst Noc By Owner",
+    },
+    {
+      id: 12,
+      title: "Matriculation Certificate Lost",
+      path: "/documents/metriculation/metriculation-document",
+      apiTitle: "Matriculation Certificate Lost",
+    },
+    {
+      id: 13,
+      title: "Khata Transfer",
+      path: "/documents/khata-transfer/khata-transfer-document",
+      apiTitle: "Joint Khata Transfer",
+    },
+    {
+      id: 14,
+      title: "Vehicle Insurance Claiming",
+      path: "/documents/vehicle-insurance/vehicle-insurance-claiming",
+      apiTitle: "Vehicle Insurance Claiming",
+    },
+    {
+      id: 15,
+      title: "HUF PAN Deed",
+      path: "/documents/huf/huf-aggrement",
+      apiTitle: "Huf Correction",
+    },
+    {
+      id: 16,
+      title: "Gap Period Tata",
+      path: "/documents/gap-period/gap-period",
+      apiTitle: "Gap Period",
+    },
+    {
+      id: 17,
+      title: "Passport Annexure-F",
+      path: "/documents/passport-annaxure/passport-annaxure",
+      apiTitle: "Passport Annexure F",
+    },
+    {
+      id: 18,
+      title: "Passport Name Change",
+      path: "/documents/passport-name/passport-name-change",
+      apiTitle: "Passport Name Change",
+    },
+  ];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getDocumentName();
+        console.log("Response documents service", response.data.data);
+
+        if (response.status === 200) {
+          const visibleDocs = documentConfig.filter((doc) => {
+            const apiDoc = response.data.data.find(
+              (apiItem) =>
+                apiItem.documentType === doc.apiTitle && apiItem.status === true
+            );
+            return apiDoc !== undefined;
+          });
+
+          setVisibleDocuments(visibleDocs);
+        }
+      } catch (error) {
+        console.error("Error fetching document data:", error);
+        // Fallback to show all documents if API fails
+        setVisibleDocuments(documentConfig);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -20,6 +161,17 @@ const Header = () => {
 
   const toggleDropdown = (dropdownName) => {
     setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
+  };
+
+  // Function to render visible document links
+  const renderDocumentLinks = () => {
+    return visibleDocuments.map((doc) => (
+      <li key={doc.id}>
+        <Link to={doc.path} onClick={closeMenu}>
+          {doc.title}
+        </Link>
+      </li>
+    ));
   };
 
   return (
@@ -102,150 +254,21 @@ const Header = () => {
                   >
                     <div className="submenu-scroll-container">
                       <ul>
-                        <li>
-                          <Link
-                            to="/documents/rental/residential-lease"
-                            onClick={closeMenu}
-                          >
-                            Residential Rental/Lease Agreement
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/commercial/commercial-lease"
-                            onClick={closeMenu}
-                          >
-                            Commercial Rental/Lease Agreement
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/address/addressaffadavit"
-                            onClick={closeMenu}
-                          >
-                            Address Proof Affidavit
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/dual-name/dual-name-correction"
-                            onClick={closeMenu}
-                          >
-                            Dual Name/ One and the Same
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/name/name-correction"
-                            onClick={closeMenu}
-                          >
-                            Name Change
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/dob/dob-correction"
-                            onClick={closeMenu}
-                          >
-                            DOB Mismatch
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/gas/gas-document"
-                            onClick={closeMenu}
-                          >
-                            Gas Voucher Lost
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/document-lost/document-lost-correction"
-                            onClick={closeMenu}
-                          >
-                            Document Lost Declaration
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/birth-certificate-parent/birth-certificate-parent-name-correction"
-                            onClick={closeMenu}
-                          >
-                            Birth Certificate Parent's Name Correction
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/birth-certificate/birth-certificate-correction"
-                            onClick={closeMenu}
-                          >
-                            Birth Certificate Name Change
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/gst/gst-document"
-                            onClick={closeMenu}
-                          >
-                            GST NOC Premises by Owner
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/metriculation/metriculation-document"
-                            onClick={closeMenu}
-                          >
-                            Matriculation Certificate Lost
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/khata-transfer/khata-transfer-document"
-                            onClick={closeMenu}
-                          >
-                            Khata Transfer
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/vehicle-insurance/vehicle-insurance-claiming"
-                            onClick={closeMenu}
-                          >
-                            Vehicle Insurance Claiming
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/huf/huf-aggrement"
-                            onClick={closeMenu}
-                          >
-                            HUF PAN Deed
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/gap-period/gap-period"
-                            onClick={closeMenu}
-                          >
-                            Gap Period Tata
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/passport-annaxure/passport-annaxure"
-                            onClick={closeMenu}
-                          >
-                            Passport Annexure-F
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/documents/passport-name/passport-name-change"
-                            onClick={closeMenu}
-                          >
-                            Passport Name Change
-                          </Link>
-                        </li>
+                        {visibleDocuments.length > 0 ? (
+                          renderDocumentLinks()
+                        ) : (
+                          <li>
+                            <span
+                              style={{
+                                padding: "12px 16px",
+                                display: "block",
+                                color: "#666",
+                              }}
+                            >
+                              Loading documents...
+                            </span>
+                          </li>
+                        )}
                       </ul>
                     </div>
                   </div>
@@ -289,14 +312,19 @@ const Header = () => {
                     }`}
                   >
                     <ul>
-                      <li>
-                        <Link
-                          to="/documents/passport-name/passport-name-change"
-                          onClick={closeMenu}
-                        >
-                          Passport Name Change
-                        </Link>
-                      </li>
+                      {/* Only show Passport Name Change if it's visible */}
+                      {visibleDocuments.find(
+                        (doc) => doc.apiTitle === "Passport Name Change"
+                      ) && (
+                        <li>
+                          <Link
+                            to="/documents/passport-name/passport-name-change"
+                            onClick={closeMenu}
+                          >
+                            Passport Name Change
+                          </Link>
+                        </li>
+                      )}
                       <li>
                         <Link to="#" onClick={closeMenu}>
                           Others

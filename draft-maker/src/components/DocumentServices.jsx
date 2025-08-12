@@ -1,4 +1,3 @@
-
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getDocumentName } from "../api/service/axiosService";
@@ -10,6 +9,7 @@ export default function DocumentServices() {
   const [direction, setDirection] = useState("");
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [autoNavigationEnabled, setAutoNavigationEnabled] = useState(true);
+  const [visibleDocumentTypes, setVisibleDocumentTypes] = useState([]);
 
   const documentTypes = [
     {
@@ -18,6 +18,7 @@ export default function DocumentServices() {
       subtitle: "Lease for business properties",
       type: "agreement",
       path: "/documents/commercial/commercial-lease",
+      apiTitle: "Rental Agreement  (commercial)", // Match with API
       icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
     },
     {
@@ -26,6 +27,7 @@ export default function DocumentServices() {
       subtitle: "Home rental agreements",
       type: "agreement",
       path: "/documents/rental/residential-lease",
+      apiTitle: "Rental Agreement (residential)", // Match with API
       icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
     },
     {
@@ -34,6 +36,7 @@ export default function DocumentServices() {
       subtitle: "Proof of residence document",
       type: "Address-Affadavit",
       path: "/documents/address/addressaffadavit",
+      apiTitle: "Address Proof Affidavit", // Match with API
       icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z",
     },
     {
@@ -42,6 +45,7 @@ export default function DocumentServices() {
       subtitle: "Official name modification",
       type: "Passport Name change",
       path: "/documents/passport-name/passport-name-change",
+      apiTitle: "Passport Name Change", // Match with API
       icon: "M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2",
     },
     {
@@ -50,6 +54,7 @@ export default function DocumentServices() {
       subtitle: "Supporting documentation",
       type: "affidavit",
       path: "/documents/passport-annaxure/passport-annaxure",
+      apiTitle: "Passport Annexure F", // Match with API
       icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
     },
     {
@@ -58,6 +63,7 @@ export default function DocumentServices() {
       subtitle: "Verification for timeline gaps",
       type: "affidavit",
       path: "/documents/gap-period/gap-period",
+      apiTitle: "Gap Period", // Match with API
       icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
     },
     {
@@ -66,6 +72,7 @@ export default function DocumentServices() {
       subtitle: "Hindu Undivided Family docs",
       type: "affidavit",
       path: "/documents/huf/huf-aggrement",
+      apiTitle: "Huf Correction", // Match with API
       icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
     },
     {
@@ -74,46 +81,52 @@ export default function DocumentServices() {
       subtitle: "Claim Your Vehicle insurance",
       type: "affidavit",
       path: "/documents/vehicle-insurance/vehicle-insurance-claiming",
+      apiTitle: "Vehicle Insurance Claiming", // Match with API
       icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
     },
     {
       id: 9,
       title: "Khata Transfer Document",
-      subtitle: "Claim Your Vehicle insurance",
+      subtitle: "Property transfer document",
       type: "affidavit",
       path: "/documents/khata-transfer/khata-transfer-document",
+      apiTitle: "Joint Khata Transfer", // Match with API
       icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
     },
     {
       id: 10,
       title: "Metriculation",
-      subtitle: "Metriculation",
+      subtitle: "Metriculation certificate",
       type: "affidavit",
       path: "/documents/metriculation/metriculation-document",
+      apiTitle: "Matriculation Certificate Lost", // Match with API
       icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
     },
     {
       id: 11,
       title: "GST",
-      subtitle: "GST",
+      subtitle: "GST document",
       type: "affidavit",
       path: "/documents/gst/gst-document",
+      apiTitle: "Gst Noc By Owner", // Match with API
       icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
     },
     {
       id: 12,
       title: "Birth Certificate Correction",
-      subtitle: "Birth Certificvate Correction",
+      subtitle: "Birth Certificate Correction",
       type: "affidavit",
       path: "/documents/birth-certificate/birth-certificate-correction",
+      apiTitle: "Birth Cert Minor Name Correction", // Match with API
       icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
     },
     {
       id: 13,
       title: "Birth Certificate Parent Name Correction",
-      subtitle: "Birth Certificvate Correction",
+      subtitle: "Birth Certificate Parent Name Correction",
       type: "affidavit",
       path: "/documents/birth-certificate-parent/birth-certificate-parent-name-correction",
+      apiTitle: "Birth Cert Name Correction Minor Parents", // Match with API
       icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
     },
     {
@@ -122,117 +135,143 @@ export default function DocumentServices() {
       subtitle: "Document Lost",
       type: "affidavit",
       path: "/documents/document-lost/document-lost-correction",
+      apiTitle: "Document Lost", // Match with API
       icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
     },
     {
       id: 15,
       title: "Gas Document",
-      subtitle: "Gas",
+      subtitle: "Gas document",
       type: "affidavit",
       path: "/documents/gas/gas-document",
+      apiTitle: "Gas", // Match with API
       icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
     },
     {
       id: 16,
       title: "DOB Correction",
-      subtitle: "DOB",
+      subtitle: "Date of Birth correction",
       type: "affidavit",
       path: "/documents/dob/dob-correction",
+      apiTitle: "Date Of Birth Correction", // Match with API
       icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
     },
     {
       id: 17,
       title: "Name Correction",
-      subtitle: "name",
+      subtitle: "Name correction document",
       type: "affidavit",
       path: "/documents/name/name-correction",
+      apiTitle: "Name Correction Change", // Match with API
       icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
     },
     {
       id: 18,
       title: "Dual Name Correction",
-      subtitle: "Dual name",
+      subtitle: "Dual name correction",
       type: "affidavit",
       path: "/documents/dual-name/dual-name-correction",
+      apiTitle: "Dual Name Change", // Match with API
       icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
     },
   ];
 
-  
   useEffect(() => {
-    const fetchData = async() => {
-      const response = await getDocumentName();
-      console.log("Response documents service", response.data.data);
+    const fetchData = async () => {
+      try {
+        const response = await getDocumentName();
+
+        if (response.status === 200) {
+          // Filter documentTypes based on API visibility
+          const visibleDocs = documentTypes.filter((doc) => {
+            const apiDoc = response.data.data.find(
+              (apiItem) =>
+                apiItem.documentType === doc.apiTitle && apiItem.status === true
+            );
+            return apiDoc !== undefined;
+          });
+
+          setVisibleDocumentTypes(visibleDocs);
+
+          // Reset activeIndex if current index is out of bounds
+          if (visibleDocs.length > 0 && activeIndex >= visibleDocs.length) {
+            setActiveIndex(0);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching document data:", error);
+        // Fallback to show all documents if API fails
+        setVisibleDocumentTypes(documentTypes);
+      }
     };
+
     fetchData();
   }, []);
 
-  // Find the matching document type based on current location path
   useEffect(() => {
-    // Only set active index based on URL when component first mounts
-    // This prevents auto-navigation from changing the URL repeatedly
+    if (visibleDocumentTypes.length === 0) return;
+
     const currentPath = location.pathname;
-    const foundIndex = documentTypes.findIndex(doc => doc.path === currentPath);
-    
+    const foundIndex = visibleDocumentTypes.findIndex(
+      (doc) => doc.path === currentPath
+    );
+
     if (foundIndex !== -1) {
       setActiveIndex(foundIndex);
     }
-  }, [location.pathname]);
+  }, [location.pathname, visibleDocumentTypes]);
 
   // Modified to only navigate when user explicitly clicks on a carousel item
   const handleDocumentClick = (index) => {
     setActiveIndex(index);
-    const path = documentTypes[index].path;
+    const path = visibleDocumentTypes[index].path;
     navigate(path);
   };
 
   // Navigation functions with sliding animation for arrows
   const moveLeft = () => {
+    if (visibleDocumentTypes.length === 0) return;
+
     const arrowLeft = document.querySelector(".arrow-left");
     if (arrowLeft) {
-      // Add slide animation class
       arrowLeft.classList.add("arrow-slide");
-
-      // Remove the class after animation completes
       setTimeout(() => {
         arrowLeft.classList.remove("arrow-slide");
       }, 300);
     }
 
     const newActive = activeIndex - 1;
-    const newIndex = newActive < 0 ? documentTypes.length - 1 : newActive;
-    
+    const newIndex =
+      newActive < 0 ? visibleDocumentTypes.length - 1 : newActive;
+
     setActiveIndex(newIndex);
     setDirection("left");
-    
-    // Only navigate when arrows are clicked
-    const path = documentTypes[newIndex].path;
+
+    const path = visibleDocumentTypes[newIndex].path;
     navigate(path);
   };
 
   const moveRight = () => {
+    if (visibleDocumentTypes.length === 0) return;
+
     const arrowRight = document.querySelector(".arrow-right");
     if (arrowRight) {
-      // Add slide animation class
       arrowRight.classList.add("arrow-slide");
-
-      // Remove the class after animation completes
       setTimeout(() => {
         arrowRight.classList.remove("arrow-slide");
       }, 300);
     }
 
-    const newIndex = (activeIndex + 1) % documentTypes.length;
-    
+    const newIndex = (activeIndex + 1) % visibleDocumentTypes.length;
+
     setActiveIndex(newIndex);
     setDirection("right");
-    
-    // Only navigate when arrows are clicked
-    const path = documentTypes[newIndex].path;
+
+    const path = visibleDocumentTypes[newIndex].path;
     navigate(path);
   };
 
-  // Generate carousel items
+  // Generate carousel items - now using visibleDocumentTypes
   const generateCarouselItems = () => {
     const items = [];
 
@@ -242,16 +281,16 @@ export default function DocumentServices() {
 
       // Handle wrap-around for indices
       if (i < 0) {
-        index = documentTypes.length + i;
-      } else if (i >= documentTypes.length) {
-        index = i % documentTypes.length;
+        index = visibleDocumentTypes.length + i;
+      } else if (i >= visibleDocumentTypes.length) {
+        index = i % visibleDocumentTypes.length;
       }
 
       // Calculate level (-2, -1, 0, 1, 2)
       const level = i - activeIndex;
 
-      if (index >= 0 && index < documentTypes.length) {
-        const doc = documentTypes[index];
+      if (index >= 0 && index < visibleDocumentTypes.length) {
+        const doc = visibleDocumentTypes[index];
         items.push(
           <CarouselItem
             key={doc.id}
@@ -260,7 +299,7 @@ export default function DocumentServices() {
             isHovered={hoveredIndex === doc.id}
             onMouseEnter={() => setHoveredIndex(doc.id)}
             onMouseLeave={() => setHoveredIndex(null)}
-            onClick={() => handleDocumentClick(index)} // Use the explicit navigation handler
+            onClick={() => handleDocumentClick(index)}
           />
         );
       }
@@ -269,11 +308,24 @@ export default function DocumentServices() {
     return items;
   };
 
+  // Show loading or empty state if no visible documents
+  if (visibleDocumentTypes.length === 0) {
+    return (
+      <div className="py-4">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center py-20">
+            <p className="text-gray-500">Loading documents...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className=" py-4">
+    <div className="py-4">
       <div className="max-w-6xl mx-auto px-4">
         <div className="relative h-80">
-          {/* Left Navigation Arrow with Slide Effect */}
+          {/* Left Navigation Arrow */}
           <button
             onClick={moveLeft}
             className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg border border-gray-100 transition-all duration-300 hover:bg-red-50 arrow-left"
@@ -302,7 +354,7 @@ export default function DocumentServices() {
             </div>
           </div>
 
-          {/* Right Navigation Arrow with Slide Effect */}
+          {/* Right Navigation Arrow */}
           <button
             onClick={moveRight}
             className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg border border-gray-100 transition-all duration-300 hover:bg-red-50 arrow-right"
@@ -325,9 +377,9 @@ export default function DocumentServices() {
           </button>
         </div>
 
-        {/* Dots Indicator */}
+        {/* Dots Indicator - now using visibleDocumentTypes */}
         <div className="flex justify-center mt-6 gap-2">
-          {documentTypes.map((doc, index) => (
+          {visibleDocumentTypes.map((doc, index) => (
             <button
               key={doc.id}
               className={`h-2 rounded-full transition-all ${
@@ -338,7 +390,6 @@ export default function DocumentServices() {
               onClick={() => {
                 setDirection(index > activeIndex ? "right" : "left");
                 setActiveIndex(index);
-                // Explicit navigation
                 navigate(doc.path);
               }}
               aria-label={`Go to ${doc.title}`}
@@ -350,7 +401,7 @@ export default function DocumentServices() {
   );
 }
 
-// Carousel Item Component
+// Carousel Item Component remains the same
 const CarouselItem = ({
   doc,
   level,
@@ -359,7 +410,6 @@ const CarouselItem = ({
   onMouseLeave,
   onClick,
 }) => {
-  // Define style properties based on level and hover state
   const getItemStyles = () => {
     const styles = {
       position: "absolute",
@@ -370,14 +420,11 @@ const CarouselItem = ({
       boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
     };
 
-    // Center position
     const centerX = "50%";
     const centerY = "50%";
 
-    // Base styles for each position
     const positionStyles = {
       "-2": {
-        // Far left
         transform: "translate(-180%, -50%) scale(0.6)",
         left: centerX,
         top: centerY,
@@ -385,7 +432,6 @@ const CarouselItem = ({
         opacity: 0.6,
       },
       "-1": {
-        // Left
         transform: "translate(-100%, -50%) scale(0.8)",
         left: centerX,
         top: centerY,
@@ -393,7 +439,6 @@ const CarouselItem = ({
         opacity: 0.8,
       },
       0: {
-        // Center
         transform: "translate(-50%, -50%) scale(1)",
         left: centerX,
         top: centerY,
@@ -402,7 +447,6 @@ const CarouselItem = ({
         boxShadow: "0 10px 15px rgba(0, 0, 0, 0.2)",
       },
       1: {
-        // Right
         transform: "translate(0%, -50%) scale(0.8)",
         left: centerX,
         top: centerY,
@@ -410,7 +454,6 @@ const CarouselItem = ({
         opacity: 0.8,
       },
       2: {
-        // Far right
         transform: "translate(80%, -50%) scale(0.6)",
         left: centerX,
         top: centerY,
@@ -419,12 +462,9 @@ const CarouselItem = ({
       },
     };
 
-    // Get base style for current level
     const baseStyle = positionStyles[level.toString()] || { display: "none" };
 
-    // Apply hover effect for side items (but not the center item which is already at max scale)
     if (isHovered && level !== 0) {
-      // Enhance the item on hover
       const hoverStyle = {
         ...baseStyle,
         transform: baseStyle.transform.replace(
@@ -432,13 +472,12 @@ const CarouselItem = ({
           level < 0 ? "scale(0.9)" : "scale(0.9)"
         ),
         opacity: 0.95,
-        zIndex: baseStyle.zIndex + 2, // Elevate z-index
+        zIndex: baseStyle.zIndex + 2,
         boxShadow: "0 8px 20px rgba(0, 0, 0, 0.2)",
       };
       return { ...styles, ...hoverStyle };
     }
 
-    // Center item hover effect
     if (isHovered && level === 0) {
       return {
         ...styles,

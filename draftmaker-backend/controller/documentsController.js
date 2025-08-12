@@ -22,6 +22,28 @@ const eStampPaymentData = require("../model/eStampPaymentSchema");
 const uploadDocument = require("../model/upload/uploadDocument");
 const BookingIdRegistry = require("../model/documentsModel/bookingId");
 
+const getDocumentNameData = async (req, res) => {
+  try {
+    const documentDataName = await documentPriceData.find(
+      { status: true },
+      { documentType: 1, status: 1 }
+    );
+
+    console.log("documentDataName", documentDataName);
+
+    return res.status(200).json({
+      success: true,
+      data: documentDataName,
+    });
+  } catch (err) {
+    console.error("Error fetching document name data:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while fetching document data",
+    });
+  }
+};
+
 const getDashboardStatistics = async (req, res) => {
   try {
     const collections = [
@@ -145,7 +167,7 @@ const getDashboardStatistics = async (req, res) => {
 const getDocumentNames = async (req, res) => {
   try {
     const documentsData = await documentPriceData.find(
-      {},
+      {status:true},
       { documentType: 1, formId: 1, draftCharge: 1, draftNotaryCharge: 1 }
     );
 
@@ -2287,7 +2309,7 @@ const updateVehicleInsurencePaymentData = async (req, res) => {
           selectedDeliveryCharge,
           serviceDetails,
           email: emailAddress,
-          deliveryAddress
+          deliveryAddress,
         },
       },
       { new: true }
@@ -2908,7 +2930,7 @@ const updateCommercialPaymentData = async (req, res) => {
       return res.status(400).json({ message: "Invalid request data." });
     }
 
-    console.log("req.body",req.body)
+    console.log("req.body", req.body);
 
     const {
       bookingId,
@@ -3381,4 +3403,5 @@ module.exports = {
   updateBookingStatus,
   getDashboardStatistics,
   getUploadedDocumentData,
+  getDocumentNameData,
 };

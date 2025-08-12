@@ -23,6 +23,18 @@ export const getDocumentsPriceData = async () => {
   }
 };
 
+
+export const getDocumentsPriceDataAdmin = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/document-price/admin/get-all-document-price`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
 export const createDocumentPrice = async (documents) => {
   try {
     const response = await axiosInstance.post(
@@ -586,6 +598,17 @@ export const getStamDocumentData = async () => {
   }
 };
 
+export const getStamDocumentDataAdmin = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/document-price/admin/get-stamp-duty-price`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
 export const updateStampDutyData = async (documentData, documentId) => {
   try {
     const response = await axiosInstance.put(
@@ -613,6 +636,17 @@ export const getDeliveryChargeData = async () => {
   try {
     const response = await axiosInstance.get(
       `/document-price/get-delivery-charge-price`
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getDeliveryChargeDataAdmin= async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/document-price/admin/get-delivery-charge-price`
     );
     return response;
   } catch (err) {

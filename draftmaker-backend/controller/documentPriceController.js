@@ -12,6 +12,15 @@ const getAllDocumentPrices = async (req, res) => {
   }
 };
 
+const getAllDocumentPricesAdmin = async (req, res) => {
+  try {
+    const prices = await DocumentPrice.find();
+    res.status(200).json(prices);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
 function generateBookingId() {
   const prefix = "DMSD";
   const randomNumber = Math.floor(1000000 + Math.random() * 9000000);
@@ -175,6 +184,24 @@ const getStampDocumentPrice = async (req, res) => {
   }
 };
 
+const getStampDocumentPriceAdmin = async (req, res) => {
+  try {
+    const stampPriceData = await stampDutySchema.find();
+    console.log("stampPriceData", stampPriceData);
+
+    res.status(200).json({
+      message: "Stamp duty documents fetched successfully",
+      data: stampPriceData,
+    });
+  } catch (err) {
+    console.error("Error in getting the stamp Price data", err);
+    res.status(500).json({
+      message: "Failed to fetch stamp duty documents",
+      error: err.message,
+    });
+  }
+};
+
 const updateStampDocumentPrice = async (req, res) => {
   try {
     const { documentData } = req.body;
@@ -283,6 +310,19 @@ const getAllServiceItems = async (req, res) => {
   }
 };
 
+const getAllServiceItemsAdmin = async (req, res) => {
+  try {
+    const services = await deliveryChargeModel.find();
+    res
+      .status(200)
+      .json({ message: "Services fetched successfully", data: services });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch services", error: err.message });
+  }
+};
+
 const updateServiceItem = async (req, res) => {
   try {
     const { serviceId } = req.params;
@@ -341,8 +381,8 @@ const updateServiceItemStatus = async (req, res) => {
 
 const getStampDeiveryChargeData = async (req, res) => {
   try {
-    const stampData = await stampDutySchema.find();
-    const deliveryChargeData = await deliveryChargeModel.find();
+    const stampData = await stampDutySchema.find({ status: true });
+    const deliveryChargeData = await deliveryChargeModel.find({ status: true });
 
     res.status(200).json({
       message: "Stamp duty and delivery charge data fetched successfully",
@@ -473,4 +513,7 @@ module.exports = {
   updateDocumentPrice,
   deleteDocumentPrice,
   saveTheEstampData,
+  getAllDocumentPricesAdmin,
+  getStampDocumentPriceAdmin,
+  getAllServiceItemsAdmin,
 };
