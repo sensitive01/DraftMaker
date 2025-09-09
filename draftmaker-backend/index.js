@@ -14,7 +14,9 @@ const messageRouter = require("./routes/messageRoutes");
 const allowedOrigins = [
   "http://localhost:5173",
   "https://draft-maker.vercel.app",
- " https://draft-maker.vercel.app/admin/login"
+ " https://draft-maker.vercel.app/admin/login",
+  "http://draftmaker.in",
+  "https://draftmaker.in"
 ];
 
 // ✅ CORS Middleware
