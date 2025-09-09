@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Eye, X, Search, Filter, Calendar, Edit } from "lucide-react";
+import { Eye, X, Search, Filter, Calendar, Clock, Edit } from "lucide-react";
 import {
   getBookedEstampData,
   updateEstampBookingStatus,
@@ -33,7 +33,7 @@ const EstampBookingTable = () => {
     return value && value.toString().trim() !== "" ? value : fallback;
   };
 
-  // Utility function to format date
+  // Updated utility function to format date only
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -42,6 +42,39 @@ const EstampBookingTable = () => {
         year: "numeric",
         month: "short",
         day: "2-digit",
+      });
+    } catch (error) {
+      return dateString;
+    }
+  };
+
+  // New utility function to format time only
+  const formatTime = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+    } catch (error) {
+      return "N/A";
+    }
+  };
+
+  // New utility function to format date and time together
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
       });
     } catch (error) {
       return dateString;
@@ -66,6 +99,8 @@ const EstampBookingTable = () => {
             mobileNumber: safeDisplay(booking.mobileNumber),
             totalAmount: booking.totalAmount || 0,
             orderDate: formatDate(booking.orderDate),
+            orderTime: formatTime(booking.createdAt), // Added time from createdAt
+            createdDateTime: formatDateTime(booking.createdAt), // Added full datetime
             status: safeDisplay(booking.documentStatus, "Pending"),
             paymentStatus: safeDisplay(booking.paymentStatus, "Pending"),
             paymentId: safeDisplay(booking.razorpayPaymentId),
@@ -407,9 +442,9 @@ const EstampBookingTable = () => {
                 </th>
                 <th
                   className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
-                  style={{ minWidth: "180px" }}
+                  style={{ minWidth: "200px" }}
                 >
-                  Booking ID & Date
+                  Booking ID & Date/Time
                 </th>
                 <th
                   className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
@@ -467,7 +502,7 @@ const EstampBookingTable = () => {
                       {indexOfFirstItem + index + 1}
                     </td>
 
-                    {/* Booking ID & Date */}
+                    {/* Booking ID & Date/Time - Updated */}
                     <td className="p-3">
                       <div className="space-y-1">
                         <div className="text-sm font-semibold text-red-900 break-all">
@@ -476,6 +511,10 @@ const EstampBookingTable = () => {
                         <div className="flex items-center text-xs text-gray-500">
                           <Calendar size={12} className="mr-1 flex-shrink-0" />
                           <span>{booking.orderDate}</span>
+                        </div>
+                        <div className="flex items-center text-xs text-blue-600">
+                          <Clock size={12} className="mr-1 flex-shrink-0" />
+                          <span>{booking.orderTime}</span>
                         </div>
                       </div>
                     </td>

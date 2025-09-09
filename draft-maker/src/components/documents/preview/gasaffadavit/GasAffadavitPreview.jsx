@@ -81,7 +81,7 @@ const GasAffadavitPreview = ({ formData }) => {
               </span>
               <div className="text-justify">
                 That I was given the gas cylinder and a regulator when I was
-                residing in <strong>{formData.previousAddress}</strong>.
+                residing in <strong>{formData.serviceAddress}</strong>.
                 Thereafter, I shifted to my above-mentioned residence.
               </div>
             </div>

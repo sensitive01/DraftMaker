@@ -47,6 +47,7 @@ const StampDutyTable = () => {
     minAmount: "",
     maxAmount: "",
     specialNote: "",
+    serviceCharge: "",
     status: true,
   });
 
@@ -67,7 +68,8 @@ const StampDutyTable = () => {
             percentage: item.percentage,
             minAmount: item.minAmount,
             maxAmount: item.maxAmount,
-            specialNote: "",
+            specialNote: item.specialNote || "",
+            serviceCharge: item.serviceCharge || 0,
             status: item.status,
             amount: generateAmountFromApiData(item),
           }));
@@ -148,24 +150,12 @@ const StampDutyTable = () => {
       .join(" ");
   };
 
-  // New function to format document type with article number
-  const formatDocumentTypeWithArticle = (documentType, articleNo) => {
-    const formattedType = formatDocumentType(documentType);
-
-    // Check if the document type already contains the article number
-    if (
-      formattedType.toLowerCase().includes(articleNo.toLowerCase()) ||
-      formattedType.includes(`(${articleNo})`) ||
-      formattedType.includes(`(Article`) ||
-      formattedType.includes(`Article ${articleNo}`)
-    ) {
-      return formattedType;
-    }
-
-    const articlePrefix = articleNo.includes("(")
-      ? "Article no."
-      : "Article No.";
-    return `${formattedType} (${articlePrefix} ${articleNo})`;
+  // Clean document type by removing article number references
+  const cleanDocumentType = (documentType) => {
+    return documentType
+      .replace(/\s*\(Article\s+(No\.|no\.)\s*[^)]+\)/gi, "")
+      .replace(/\s*Article\s+(No\.|no\.)\s*[^\s,]+/gi, "")
+      .trim();
   };
 
   const showNotification = (message, type = "success") => {
@@ -199,6 +189,7 @@ const StampDutyTable = () => {
       minAmount: "",
       maxAmount: "",
       specialNote: "",
+      serviceCharge: "",
       status: true,
     });
     setShowModal(true);
@@ -208,15 +199,10 @@ const StampDutyTable = () => {
     setIsEditMode(true);
     setCurrentEditId(item.documentId);
 
-    let cleanDocumentType = item.documentType;
-
-    cleanDocumentType = cleanDocumentType
-      .replace(/\s*\(Article\s+(No\.|no\.)\s*[^)]+\)/gi, "")
-      .replace(/\s*Article\s+(No\.|no\.)\s*[^\s,]+/gi, "")
-      .trim();
+    let cleanDocType = cleanDocumentType(item.documentType);
 
     setNewItem({
-      documentType: cleanDocumentType,
+      documentType: cleanDocType,
       articleNo: item.articleNo,
       calculationType: item.calculationType,
       fixedAmount: item.fixedAmount ? item.fixedAmount.toString() : "",
@@ -224,6 +210,7 @@ const StampDutyTable = () => {
       minAmount: item.minAmount ? item.minAmount.toString() : "",
       maxAmount: item.maxAmount ? item.maxAmount.toString() : "",
       specialNote: item.specialNote || "",
+      serviceCharge: item.serviceCharge ? item.serviceCharge.toString() : "",
       status: item.status !== undefined ? item.status : true,
     });
     setShowModal(true);
@@ -242,6 +229,7 @@ const StampDutyTable = () => {
       minAmount: "",
       maxAmount: "",
       specialNote: "",
+      serviceCharge: "",
       status: true,
     });
   };
@@ -290,10 +278,7 @@ const StampDutyTable = () => {
 
     try {
       const formattedItem = {
-        documentType: formatDocumentTypeWithArticle(
-          newItem.documentType,
-          newItem.articleNo
-        ),
+        documentType: formatDocumentType(newItem.documentType),
         articleNo: newItem.articleNo,
         calculationType: newItem.calculationType,
         fixedAmount:
@@ -305,6 +290,9 @@ const StampDutyTable = () => {
         minAmount: newItem.minAmount ? Number(newItem.minAmount) : 0,
         maxAmount: newItem.maxAmount ? Number(newItem.maxAmount) : 0,
         specialNote: newItem.specialNote || "",
+        serviceCharge: newItem.serviceCharge
+          ? Number(newItem.serviceCharge)
+          : 0,
         status: newItem.status,
         documentId: newItem.documentId,
       };
@@ -501,7 +489,13 @@ const StampDutyTable = () => {
                   Document Type
                 </th>
                 <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                  Article No.
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Amount
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                  Service Charge (₹)
                 </th>
                 <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Status
@@ -524,9 +518,15 @@ const StampDutyTable = () => {
                       {index + 1}
                     </td>
                     <td className="p-3 text-sm text-red-900">
-                      {duty.documentType}
+                      {cleanDocumentType(duty.documentType)}
+                    </td>
+                    <td className="p-3 text-sm text-red-900 font-medium">
+                      {duty.articleNo}
                     </td>
                     <td className="p-3 text-sm text-red-900">{duty.amount}</td>
+                    <td className="p-3 text-sm text-red-900">
+                      ₹{duty.serviceCharge || 0}
+                    </td>
                     <td className="p-3 whitespace-nowrap text-sm">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -573,7 +573,7 @@ const StampDutyTable = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="p-3 text-center text-red-500">
+                  <td colSpan="7" className="p-3 text-center text-red-500">
                     No stamp duty information available
                   </td>
                 </tr>
@@ -755,7 +755,22 @@ const StampDutyTable = () => {
                   </div>
                 )}
 
-          
+                <div>
+                  <label className="block text-sm font-medium text-red-600 mb-1">
+                    Service Charge (₹)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={newItem.serviceCharge}
+                    onChange={(e) =>
+                      handleInputChange("serviceCharge", e.target.value)
+                    }
+                    className="w-full p-2 border border-red-200 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    placeholder="Enter service charge amount"
+                  />
+                </div>
               </div>
 
               <div className="flex justify-end space-x-3 mt-6">

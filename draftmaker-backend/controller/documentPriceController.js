@@ -149,6 +149,7 @@ const createStampDocumentPrice = async (req, res) => {
       minAmount: document.minAmount || 0,
       maxAmount: document.maxAmount || 0,
       status: document.status !== undefined ? document.status : true,
+      serviceCharge: document.serviceCharge,
     };
 
     const createdDoc = await stampDutySchema.create(cleanedData);
@@ -219,6 +220,7 @@ const updateStampDocumentPrice = async (req, res) => {
         ...documentData,
         documentType: documentData.documentType?.trim(),
         articleNo: documentData.articleNo?.trim(),
+        serviceCharge: documentData.serviceCharge,
       },
       { new: true, runValidators: true }
     );

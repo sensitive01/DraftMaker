@@ -11,8 +11,7 @@ const Footer = () => {
   return (
     <footer>
       <div className="top_footer" id="contact">
-        <div className="container">
-          {/* vertical line animation */}
+        {/* <div className="container">
           <div className="anim_line dark_bg">
             {[...Array(9)].map((_, index) => (
               <span key={index}>
@@ -20,7 +19,7 @@ const Footer = () => {
               </span>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* container start */}
         <div className="container">

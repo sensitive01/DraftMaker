@@ -61,6 +61,7 @@ const documentPriceSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    serviceCharge:{type:Number}
   },
   {
     timestamps: true,

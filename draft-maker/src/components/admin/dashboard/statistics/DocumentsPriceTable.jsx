@@ -41,6 +41,7 @@ const DocumentPriceTable = () => {
     draftCharge: "",
     pdfCharge: "",
     homeDropCharge: "",
+    serviceCharge: "", // Added service charge
     hasDraftNotaryCharge: false,
     draftNotaryCharge: "",
     hasPdfNotaryCharge: false,
@@ -58,6 +59,7 @@ const DocumentPriceTable = () => {
           const formattedData = response.data.map((item) => ({
             ...item,
             status: item.status !== undefined ? item.status : true,
+            serviceCharge: item.serviceCharge || 0, // Added service charge with default value
             hasDraftNotaryCharge: item.hasDraftNotaryCharge || false,
             draftNotaryCharge: item.draftNotaryCharge || 0,
             hasPdfNotaryCharge: item.hasPdfNotaryCharge || false,
@@ -109,6 +111,7 @@ const DocumentPriceTable = () => {
       draftCharge: "",
       pdfCharge: "",
       homeDropCharge: "",
+      serviceCharge: "", // Reset service charge
       hasDraftNotaryCharge: false,
       draftNotaryCharge: "",
       hasPdfNotaryCharge: false,
@@ -128,6 +131,7 @@ const DocumentPriceTable = () => {
       draftCharge: item.draftCharge.toString(),
       pdfCharge: item.pdfCharge.toString(),
       homeDropCharge: item.homeDropCharge.toString(),
+      serviceCharge: item.serviceCharge ? item.serviceCharge.toString() : "", // Added service charge
       hasDraftNotaryCharge: item.hasDraftNotaryCharge || false,
       draftNotaryCharge: item.draftNotaryCharge
         ? item.draftNotaryCharge.toString()
@@ -154,6 +158,7 @@ const DocumentPriceTable = () => {
       draftCharge: "",
       pdfCharge: "",
       homeDropCharge: "",
+      serviceCharge: "", // Reset service charge
       hasDraftNotaryCharge: false,
       draftNotaryCharge: "",
       hasPdfNotaryCharge: false,
@@ -195,28 +200,14 @@ const DocumentPriceTable = () => {
   };
 
   const handleSubmit = async () => {
-    if (newItem.documentType.trim() === "" || newItem.draftCharge === "") {
+    if (
+      newItem.documentType.trim() === "" ||
+      newItem.draftCharge === "" ||
+      newItem.serviceCharge === ""
+    ) {
       showNotification("Please fill in all required fields", "error");
       return;
     }
-
-    // if (newItem.hasDraftNotaryCharge && newItem.draftNotaryCharge === "") {
-    //   showNotification("Please enter draft notary charge amount", "error");
-    //   return;
-    // }
-
-    // if (newItem.hasPdfNotaryCharge && newItem.pdfNotaryCharge === "") {
-    //   showNotification("Please enter PDF notary charge amount", "error");
-    //   return;
-    // }
-
-    // if (
-    //   newItem.hasHomeDropNotaryCharge &&
-    //   newItem.homeDropNotaryCharge === ""
-    // ) {
-    //   showNotification("Please enter home drop notary charge amount", "error");
-    //   return;
-    // }
 
     try {
       const formattedItem = {
@@ -225,6 +216,7 @@ const DocumentPriceTable = () => {
         draftCharge: Number(newItem.draftCharge),
         pdfCharge: Number(newItem.pdfCharge),
         homeDropCharge: Number(newItem.homeDropCharge),
+        serviceCharge: Number(newItem.serviceCharge), // Added service charge formatting
         draftNotaryCharge: newItem.hasDraftNotaryCharge
           ? Number(newItem.draftNotaryCharge)
           : 0,
@@ -416,16 +408,9 @@ const DocumentPriceTable = () => {
                   <br />
                   (No E-Stamp Printed)
                 </th>
-                {/* <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
-                  Charges for PDF
-                  <br />
-                  (E-Stamp Printed)
-                </th>
                 <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
-                  Charges for Home Drop
-                  <br />
-                  (E-Stamp Printed)
-                </th> */}
+                  Service Charge
+                </th>
                 <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Status
                 </th>
@@ -462,32 +447,9 @@ const DocumentPriceTable = () => {
                         )}
                       </div>
                     </td>
-                    {/* <td className="p-3 whitespace-nowrap text-sm text-red-900">
-                      <div>
-                        {price.pdfCharge.toFixed(2)}
-                        {price.hasPdfNotaryCharge && (
-                          <div className="mt-1 flex items-center">
-                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full mr-2">
-                              + Notary
-                            </span>
-                            {price.pdfNotaryCharge.toFixed(2)}
-                          </div>
-                        )}
-                      </div>
-                    </td>
                     <td className="p-3 whitespace-nowrap text-sm text-red-900">
-                      <div>
-                        {price.homeDropCharge.toFixed(2)}
-                        {price.hasHomeDropNotaryCharge && (
-                          <div className="mt-1 flex items-center">
-                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full mr-2">
-                              + Notary
-                            </span>
-                            {price.homeDropNotaryCharge.toFixed(2)}
-                          </div>
-                        )}
-                      </div>
-                    </td> */}
+                      ₹{(price.serviceCharge || 0).toFixed(2)}
+                    </td>
                     <td className="p-3 whitespace-nowrap text-sm">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -519,20 +481,13 @@ const DocumentPriceTable = () => {
                         >
                           {price.status ? <X size={16} /> : <Check size={16} />}
                         </button>
-                        {/* <button
-                          className="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors"
-                          onClick={() => openDeleteConfirm(price._id)}
-                          title="Delete"
-                        >
-                          <Trash2 size={16} />
-                        </button> */}
                       </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="p-3 text-center text-red-500">
+                  <td colSpan="6" className="p-3 text-center text-red-500">
                     No document prices available
                   </td>
                 </tr>
@@ -544,7 +499,7 @@ const DocumentPriceTable = () => {
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-md w-full max-w-lg mx-4">
+          <div className="bg-white rounded-lg shadow-md w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-4 border-b border-red-100">
               <h3 className="text-xl font-bold text-red-900">
                 {isEditMode ? "Edit Document Price" : "Add New Document Price"}
@@ -561,7 +516,7 @@ const DocumentPriceTable = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-red-600 mb-1">
-                    Document Type
+                    Document Type *
                   </label>
                   <div className="relative">
                     <input
@@ -578,7 +533,7 @@ const DocumentPriceTable = () => {
 
                 <div className="border-t border-red-100 pt-4">
                   <label className="block text-sm font-medium text-red-600 mb-1">
-                    Charges for Draft (No E-Stamp Printed)
+                    Charges for Draft (No E-Stamp Printed) *
                   </label>
                   <div className="flex items-center space-x-2">
                     <div className="flex-1">
@@ -637,124 +592,24 @@ const DocumentPriceTable = () => {
                   </div>
                 </div>
 
-                {/* <div className="border-t border-red-100 pt-4">
+                <div className="border-t border-red-100 pt-4">
                   <label className="block text-sm font-medium text-red-600 mb-1">
-                    Charges for PDF (E-Stamp Printed)
+                    Service Charge *
                   </label>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex-1">
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={newItem.pdfCharge}
-                        onChange={(e) =>
-                          handleInputChange("pdfCharge", e.target.value)
-                        }
-                        className="w-full p-2 border border-red-200 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                        placeholder="0.00"
-                      />
-                    </div>
-
-                    <div className="flex items-center ml-2">
-                      <input
-                        id="hasPdfNotaryCharge"
-                        type="checkbox"
-                        checked={newItem.hasPdfNotaryCharge}
-                        onChange={(e) =>
-                          handleInputChange(
-                            "hasPdfNotaryCharge",
-                            e.target.checked
-                          )
-                        }
-                        className="h-4 w-4 text-red-600 focus:ring-red-500"
-                      />
-                      <label
-                        htmlFor="hasPdfNotaryCharge"
-                        className="ml-2 whitespace-nowrap text-sm font-medium text-red-600"
-                      >
-                        Add Notary Charge for PDF
-                      </label>
-                    </div>
-
-                    {newItem.hasPdfNotaryCharge && (
-                      <div className="w-24">
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={newItem.pdfNotaryCharge}
-                          onChange={(e) =>
-                            handleInputChange("pdfNotaryCharge", e.target.value)
-                          }
-                          className="w-full p-2 border border-red-200 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                          placeholder="0.00"
-                        />
-                      </div>
-                    )}
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={newItem.serviceCharge}
+                      onChange={(e) =>
+                        handleInputChange("serviceCharge", e.target.value)
+                      }
+                      className="w-full p-2 border border-red-200 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      placeholder="0.00"
+                    />
                   </div>
-                </div> */}
-
-                {/* <div className="border-t border-red-100 pt-4">
-                  <label className="block text-sm font-medium text-red-600 mb-1">
-                    Charges for Home Drop (E-Stamp Printed)
-                  </label>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex-1">
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={newItem.homeDropCharge}
-                        onChange={(e) =>
-                          handleInputChange("homeDropCharge", e.target.value)
-                        }
-                        className="w-full p-2 border border-red-200 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                        placeholder="0.00"
-                      />
-                    </div>
-
-                    <div className="flex items-center ml-2">
-                      <input
-                        id="hasHomeDropNotaryCharge"
-                        type="checkbox"
-                        checked={newItem.hasHomeDropNotaryCharge}
-                        onChange={(e) =>
-                          handleInputChange(
-                            "hasHomeDropNotaryCharge",
-                            e.target.checked
-                          )
-                        }
-                        className="h-4 w-4 text-red-600 focus:ring-red-500"
-                      />
-                      <label
-                        htmlFor="hasHomeDropNotaryCharge"
-                        className="ml-2 whitespace-nowrap text-sm font-medium text-red-600"
-                      >
-                        Add Notary Charge for Home Drop
-                      </label>
-                    </div>
-
-                    {newItem.hasHomeDropNotaryCharge && (
-                      <div className="w-24">
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={newItem.homeDropNotaryCharge}
-                          onChange={(e) =>
-                            handleInputChange(
-                              "homeDropNotaryCharge",
-                              e.target.value
-                            )
-                          }
-                          className="w-full p-2 border border-red-200 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                          placeholder="0.00"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div> */}
+                </div>
               </div>
 
               <div className="flex justify-end space-x-3 mt-6">

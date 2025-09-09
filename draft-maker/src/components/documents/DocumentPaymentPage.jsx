@@ -61,7 +61,7 @@ const DocumentPaymentPage = () => {
   // New state variables for e-stamp logic
   const [considerationAmount, setConsiderationAmount] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const SERVICE_CHARGE_PER_DOCUMENT = 210;
+  const SERVICE_CHARGE_PER_DOCUMENT = documentDetails?.serviceCharge || 210;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -196,27 +196,29 @@ const DocumentPaymentPage = () => {
     return 0;
   };
 
-  const calculateTotalAmount = () => {
-    if (!selectedService) return 0;
+ const calculateTotalAmount = () => {
+  if (!selectedService) return 0;
 
-    let total = selectedService.price;
+  let total = selectedService.price; // 1. Base Draft Charge
 
-    // MODIFIED: Only add notary if checkbox is checked
-    if (selectedService.hasNotary && includeNotary) {
-      total += selectedService.notaryCharge;
-    }
+  // 2. Notary Charge (Optional)
+  if (selectedService.hasNotary && includeNotary) {
+    total += selectedService.notaryCharge;
+  }
 
-    if (selectedService.requiresStamp && selectedStampDuty) {
-      total += calculateStampDutyAmount(selectedStampDuty);
-      total += SERVICE_CHARGE_PER_DOCUMENT * quantity; // Add service charge
-    }
+  // 3. Stamp Duty + Service Charge (if stamp required)
+  if (selectedService.requiresStamp && selectedStampDuty) {
+    total += calculateStampDutyAmount(selectedStampDuty); // 3a. Stamp Duty Amount
+    total += SERVICE_CHARGE_PER_DOCUMENT * quantity;      // 3b. Service Charge (₹210 per doc)
+  }
 
-    if (selectedService.requiresDelivery && selectedDeliveryCharge) {
-      total += selectedDeliveryCharge.charge;
-    }
+  // 4. Delivery Charge (if delivery required)
+  if (selectedService.requiresDelivery && selectedDeliveryCharge) {
+    total += selectedDeliveryCharge.charge;
+  }
 
-    return total;
-  };
+  return total;
+};
 
   const canProceedToPayment = () => {
     if (!selectedService) return false;
@@ -979,25 +981,50 @@ const DocumentPaymentPage = () => {
             )}
 
             {selectedStampDuty && (
+              // Complete breakdown display
               <div className="bg-white p-3 rounded-md border border-red-200 mt-2 mb-4">
                 <h4 className="font-medium text-gray-800 mb-2 text-sm">
-                  Calculation Details
+                  Complete Calculation Breakdown
                 </h4>
                 <div className="space-y-1 text-xs">
                   <p>
-                    <span className="text-gray-600">Stamp Duty:</span> ₹
-                    {calculateStampDutyAmount(selectedStampDuty)}
+                    <span className="text-gray-600">Draft Charge:</span> ₹
+                    {selectedService.price}
                   </p>
-                  <p>
-                    <span className="text-gray-600">Service Charge:</span> ₹
-                    {SERVICE_CHARGE_PER_DOCUMENT * quantity}
-                  </p>
-                  {selectedStampDuty.calculationType === "percentage" && (
-                    <p className="text-gray-600 italic">
-                      {selectedStampDuty.percentage}% of ₹
-                      {considerationAmount || "0"} × {quantity}
+
+                  {selectedService.hasNotary && includeNotary && (
+                    <p>
+                      <span className="text-gray-600">Notary Charge:</span> ₹
+                      {selectedService.notaryCharge}
                     </p>
                   )}
+
+                  {selectedService.requiresStamp && selectedStampDuty && (
+                    <>
+                      <p>
+                        <span className="text-gray-600">Stamp Duty:</span> ₹
+                        {calculateStampDutyAmount(selectedStampDuty)}
+                      </p>
+                      <p>
+                        <span className="text-gray-600">Service Charge:</span> ₹
+                        {SERVICE_CHARGE_PER_DOCUMENT * quantity}
+                      </p>
+                    </>
+                  )}
+
+                  {selectedService.requiresDelivery &&
+                    selectedDeliveryCharge && (
+                      <p>
+                        <span className="text-gray-600">Delivery Charge:</span>{" "}
+                        ₹{selectedDeliveryCharge.charge}
+                      </p>
+                    )}
+
+                  <hr className="my-2" />
+                  <p className="font-bold text-red-600">
+                    <span className="text-gray-600">Total Amount:</span> ₹
+                    {calculateTotalAmount()}
+                  </p>
                 </div>
               </div>
             )}

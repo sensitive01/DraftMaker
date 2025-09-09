@@ -4,6 +4,8 @@ import {
   sendTheEstampData,
 } from "../../api/service/axiosService";
 import { useNavigate } from "react-router-dom";
+import AddressLineSection from "./AddressLineSection";
+import PaymentModal from "./PaymentModal";
 
 const BuyEStampDocuments = () => {
   const navigate = useNavigate();
@@ -11,8 +13,8 @@ const BuyEStampDocuments = () => {
   const [deliveryCharges, setDeliveryCharges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [serviceChrge, setServiceCharge] = useState(0);
 
-  // Form states
   const [firstPartyName, setFirstPartyName] = useState("");
   const [secondPartyName, setSecondPartyName] = useState("");
   const [stampDutyPayer, setStampDutyPayer] = useState("");
@@ -33,23 +35,19 @@ const BuyEStampDocuments = () => {
     email: "",
   });
 
-  // Modal states
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [requestorName, setRequestorName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
 
-  // Error states
   const [formErrors, setFormErrors] = useState({});
   const [paymentErrors, setPaymentErrors] = useState({});
-
-  // Service charge including GST (fixed per document)
-  const SERVICE_CHARGE_PER_DOCUMENT = 210;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const response = await getStampAndDeliveryCharges();
+        console.log("--->", response.data.stampDuty);
         setStampDutyData(response.data.stampDuty || []);
         setDeliveryCharges(response.data.deliveryCharges || []);
         setError(null);
@@ -63,35 +61,29 @@ const BuyEStampDocuments = () => {
     fetchData();
   }, []);
 
-  // Calculate progress percentage
   const calculateProgress = () => {
     const selectedDocumentData = getSelectedDocumentData();
     const isFixedType = selectedDocumentData?.calculationType === "fixed";
     const isSpecialDocument = selectedDocument === "684143fdb333b68bfef00574";
 
     let completedSteps = 0;
-    let totalSteps = isFixedType && !isSpecialDocument ? 5 : 6; // Base steps
+    let totalSteps = isFixedType && !isSpecialDocument ? 5 : 6;
 
-    // Add delivery address steps if delivery is selected
     if (deliveryType === "delivery") {
-      totalSteps += 6; // fullName, phoneNumber, addressLine1, city, state, pincode
+      totalSteps += 6;
     }
 
-    // Count completed base steps
     if (firstPartyName.trim()) completedSteps++;
     if (secondPartyName.trim()) completedSteps++;
     if (stampDutyPayer) completedSteps++;
     if (selectedDocument) completedSteps++;
     if (description.trim()) completedSteps++;
 
-    // Count consideration amount for percentage type or special document
     if ((!isFixedType || isSpecialDocument) && considerationAmount.trim())
       completedSteps++;
 
-    // Count quantity field
     if (quantity > 0) completedSteps++;
 
-    // Count delivery address steps if applicable
     if (deliveryType === "delivery") {
       if (deliveryAddress.addressLine1.trim()) completedSteps++;
       if (deliveryAddress.city.trim()) completedSteps++;
@@ -149,7 +141,6 @@ const BuyEStampDocuments = () => {
       }
     }
 
-    // Validate consideration amount for percentage type or special document
     if (!isFixedType || isSpecialDocument) {
       if (!considerationAmount.trim()) {
         errors.considerationAmount = "Consideration amount is required";
@@ -213,30 +204,24 @@ const BuyEStampDocuments = () => {
 
       let stampDuty = 0;
 
-      // If minAmount and maxAmount are both 0, use the custom 1%/2% logic
       if (minAmount === 0 && maxAmount === 0) {
         if (amount <= 100000) {
-          stampDuty = (amount * selectedDocumentData.percentage) / 100; // 1% for amounts up to 1 lakh
+          stampDuty = (amount * selectedDocumentData.percentage) / 100;
         } else {
-          stampDuty = (amount * selectedDocumentData.percentage) / 100; // 2% for amounts above 1 lakh
+          stampDuty = (amount * selectedDocumentData.percentage) / 100;
         }
-        // Minimum stamp duty is ₹100
         stampDuty = Math.max(stampDuty, 100);
       } else {
-        // Use the percentage from the document data
         if (amount <= 100000) {
           stampDuty = (amount * percentage) / 100;
-          // Apply minimum amount if specified
           if (minAmount > 0) {
             stampDuty = Math.max(stampDuty, minAmount);
           }
         } else {
-          // For amounts above 1 lakh, if maxAmount is specified, use it as fixed amount
           if (maxAmount > 0) {
             stampDuty = maxAmount;
           } else {
             stampDuty = (amount * percentage) / 100;
-            // Apply minimum amount if specified
             if (minAmount > 0) {
               stampDuty = Math.max(stampDuty, minAmount);
             }
@@ -250,9 +235,11 @@ const BuyEStampDocuments = () => {
     return 0;
   };
 
-  // Calculate total service charge based on quantity
   const calculateServiceCharge = () => {
-    return SERVICE_CHARGE_PER_DOCUMENT * quantity;
+    const selectedDocumentData = getSelectedDocumentData();
+    if (!selectedDocumentData) return 0;
+
+    return selectedDocumentData.serviceCharge * quantity;
   };
 
   const getTotalAmount = () => {
@@ -312,12 +299,10 @@ const BuyEStampDocuments = () => {
       const selectedDeliveryData = getSelectedDeliveryData();
 
       const paymentData = {
-        // Party Information
         firstPartyName: firstPartyName.trim(),
         secondPartyName: secondPartyName.trim(),
         stampDutyPayer: stampDutyPayer,
 
-        // Document Information
         selectedDocumentId: selectedDocument,
         documentType: selectedDocumentData?.documentType,
         calculationType: selectedDocumentData?.calculationType,
@@ -329,11 +314,9 @@ const BuyEStampDocuments = () => {
         description: description.trim(),
         quantity: quantity,
 
-        // Calculated Amounts
         stampDutyAmount: calculateStampAmount(),
         serviceCharge: calculateServiceCharge(),
 
-        // Delivery Information
         deliveryType: deliveryType,
         selectedDeliveryServiceId: selectedDeliveryService || null,
         deliveryServiceName: selectedDeliveryData?.serviceName || null,
@@ -343,15 +326,12 @@ const BuyEStampDocuments = () => {
             : 0,
         deliveryDescription: selectedDeliveryData?.description || null,
 
-        // Payment Information
         requestorName: requestorName.trim(),
         mobileNumber: mobileNumber.trim(),
         totalAmount: getTotalAmount(),
 
-        // Timestamp
         orderDate: new Date().toISOString(),
 
-        // Additional metadata
         paymentMethod: "razorpay",
         currency: "INR",
 
@@ -454,7 +434,6 @@ const BuyEStampDocuments = () => {
     }
   };
 
-  // Helper function to get calculation explanation
   const getCalculationExplanation = () => {
     const selectedDocumentData = getSelectedDocumentData();
     if (!selectedDocumentData) return null;
@@ -559,7 +538,6 @@ const BuyEStampDocuments = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-xl shadow-lg border-t-4 border-red-600 overflow-hidden">
-          {/* Header */}
           <div className="bg-white px-6 py-4 border-b border-gray-200">
             <h1 className="text-2xl font-bold text-gray-800 flex items-center">
               <svg
@@ -582,7 +560,6 @@ const BuyEStampDocuments = () => {
               Complete the form below to purchase your e-stamp document
             </p>
 
-            {/* Progress Bar */}
             <div className="mt-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium text-gray-700">
@@ -602,7 +579,6 @@ const BuyEStampDocuments = () => {
           </div>
 
           <div className="p-6">
-            {/* Party Names Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label
@@ -657,7 +633,6 @@ const BuyEStampDocuments = () => {
               </div>
             </div>
 
-            {/* Stamp Duty Payer Selection */}
             <div className="mb-6">
               <label
                 htmlFor="stampDutyPayer"
@@ -705,7 +680,6 @@ const BuyEStampDocuments = () => {
               )}
             </div>
 
-            {/* Document Type Selection */}
             <div className="mb-6">
               <label
                 htmlFor="documentType"
@@ -719,7 +693,7 @@ const BuyEStampDocuments = () => {
                   value={selectedDocument}
                   onChange={(e) => {
                     setSelectedDocument(e.target.value);
-                    setConsiderationAmount(""); // Reset consideration amount when document changes
+                    setConsiderationAmount("");
                   }}
                   className={`w-full px-4 py-2.5 border ${
                     formErrors.selectedDocument
@@ -732,10 +706,7 @@ const BuyEStampDocuments = () => {
                   </option>
                   {stampDutyData.map((doc) => (
                     <option key={doc._id} value={doc._id} className="py-2">
-                      {doc.documentType}{" "}
-                      {doc.calculationType === "fixed"
-                        ? "(Fixed)"
-                        : "(Percentage)"}
+                      {doc.documentType}
                     </option>
                   ))}
                 </select>
@@ -762,7 +733,6 @@ const BuyEStampDocuments = () => {
               )}
             </div>
 
-            {/* Consideration Amount - Show for percentage calculation type or special document */}
             {selectedDocument &&
               (getSelectedDocumentData()?.calculationType === "percentage" ||
                 selectedDocument === "684143fdb333b68bfef00574") && (
@@ -771,7 +741,8 @@ const BuyEStampDocuments = () => {
                     htmlFor="considerationAmount"
                     className="block text-sm font-medium text-gray-700 mb-2"
                   >
-                    Consideration Amount (₹) *
+                    Consideration Amount (₹) * (0.5% on ARR, fine, Premium,
+                    Advance)
                   </label>
                   <input
                     type="number"
@@ -795,7 +766,6 @@ const BuyEStampDocuments = () => {
                 </div>
               )}
 
-            {/* Quantity Field */}
             <div className="mb-6">
               <label
                 htmlFor="quantity"
@@ -821,7 +791,6 @@ const BuyEStampDocuments = () => {
               )}
             </div>
 
-            {/* Show stamp duty calculation */}
             {selectedDocument && getCalculationExplanation() && (
               <div className="mb-6 pt-3 bg-blue-50 border border-blue-200 rounded-md">
                 <div className="flex items-start ml-2">
@@ -847,7 +816,6 @@ const BuyEStampDocuments = () => {
               </div>
             )}
 
-            {/* Description */}
             <div className="mb-6">
               <label
                 htmlFor="description"
@@ -872,7 +840,6 @@ const BuyEStampDocuments = () => {
               )}
             </div>
 
-            {/* Delivery Type Selection */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-3">
                 Delivery Type *
@@ -968,7 +935,6 @@ const BuyEStampDocuments = () => {
               </div>
             </div>
 
-            {/* Delivery Service Selection */}
             {deliveryType === "delivery" && (
               <div className="mb-6">
                 <label
@@ -1024,7 +990,6 @@ const BuyEStampDocuments = () => {
                   </p>
                 )}
 
-                {/* Show selected delivery service details */}
                 {selectedDeliveryService && (
                   <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
                     <div className="flex items-start">
@@ -1061,274 +1026,18 @@ const BuyEStampDocuments = () => {
             )}
 
             {deliveryType === "delivery" && selectedDeliveryService && (
-              <div className="mb-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                  <svg
-                    className="w-5 h-5 mr-2 text-red-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  Delivery Address
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Full Name */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={requestorName}
-                      onChange={(e) => setRequestorName(e.target.value)}
-                      placeholder="Enter full name"
-                      className={`w-full px-4 py-2.5 border ${
-                        requestorName ? "border-red-300" : "border-gray-300"
-                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-                    />
-                    {paymentErrors.requestorName && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {paymentErrors.requestorName}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Phone Number */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone Number *
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <span className="text-gray-500 text-sm font-medium">
-                          +91
-                        </span>
-                      </div>
-                      <input
-                        type="tel"
-                        id="paymentMobile"
-                        value={mobileNumber}
-                        onChange={(e) => setMobileNumber(e.target.value)}
-                        placeholder="Enter 10-digit phone number"
-                        maxLength="10"
-                        className={`w-full pl-12 pr-4 py-2.5 border ${
-                          formErrors.deliveryPhoneNumber
-                            ? "border-red-300"
-                            : "border-gray-300"
-                        } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-                      />
-                    </div>
-                  </div>
-                  {paymentErrors.mobileNumber && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {paymentErrors.mobileNumber}
-                    </p>
-                  )}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Id *
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        id="emailId"
-                        value={deliveryAddress.email}
-                        onChange={(e) =>
-                          setDeliveryAddress((prev) => ({
-                            ...prev,
-                            email: e.target.value,
-                          }))
-                        }
-                        placeholder="Enter Your Email Id"
-                        className={`w-full pl-3  py-2.5 border ${
-                          formErrors.emailId
-                            ? "border-red-300"
-                            : "border-gray-300"
-                        } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-                      />
-                    </div>
-                  </div>
-                  {paymentErrors.email && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {paymentErrors.email}
-                    </p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 mt-4">
-                  {/* Address Line 1 */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Address Line 1 *
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress.addressLine1}
-                      onChange={(e) =>
-                        setDeliveryAddress((prev) => ({
-                          ...prev,
-                          addressLine1: e.target.value,
-                        }))
-                      }
-                      placeholder="House/Flat number, Building name, Street"
-                      className={`w-full px-4 py-2.5 border ${
-                        formErrors.deliveryAddressLine1
-                          ? "border-red-300"
-                          : "border-gray-300"
-                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-                    />
-                    {formErrors.deliveryAddressLine1 && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {formErrors.deliveryAddressLine1}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Address Line 2 */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Address Line 2
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress.addressLine2}
-                      onChange={(e) =>
-                        setDeliveryAddress((prev) => ({
-                          ...prev,
-                          addressLine2: e.target.value,
-                        }))
-                      }
-                      placeholder="Area, Colony, Sector (Optional)"
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-sm"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                  {/* City */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      City *
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress.city}
-                      onChange={(e) =>
-                        setDeliveryAddress((prev) => ({
-                          ...prev,
-                          city: e.target.value,
-                        }))
-                      }
-                      placeholder="Enter city"
-                      className={`w-full px-4 py-2.5 border ${
-                        formErrors.deliveryCity
-                          ? "border-red-300"
-                          : "border-gray-300"
-                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-                    />
-                    {formErrors.deliveryCity && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {formErrors.deliveryCity}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* State */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      State *
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress.state}
-                      onChange={(e) =>
-                        setDeliveryAddress((prev) => ({
-                          ...prev,
-                          state: e.target.value,
-                        }))
-                      }
-                      placeholder="Enter state"
-                      className={`w-full px-4 py-2.5 border ${
-                        formErrors.deliveryState
-                          ? "border-red-300"
-                          : "border-gray-300"
-                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-                    />
-                    {formErrors.deliveryState && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {formErrors.deliveryState}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Pincode */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Pincode *
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress.pincode}
-                      onChange={(e) =>
-                        setDeliveryAddress((prev) => ({
-                          ...prev,
-                          pincode: e.target.value,
-                        }))
-                      }
-                      placeholder="Enter 6-digit pincode"
-                      maxLength="6"
-                      className={`w-full px-4 py-2.5 border ${
-                        formErrors.deliveryPincode
-                          ? "border-red-300"
-                          : "border-gray-300"
-                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-                    />
-                    {formErrors.deliveryPincode && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {formErrors.deliveryPincode}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="mt-4">
-                  {/* Landmark */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Landmark
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress.landmark}
-                      onChange={(e) =>
-                        setDeliveryAddress((prev) => ({
-                          ...prev,
-                          landmark: e.target.value,
-                        }))
-                      }
-                      placeholder="Nearby landmark (Optional)"
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
+              <AddressLineSection
+                requestorName={requestorName}
+                setRequestorName={setRequestorName}
+                paymentErrors={paymentErrors}
+                mobileNumber={mobileNumber}
+                setMobileNumber={setMobileNumber}
+                formErrors={formErrors}
+                deliveryAddress={deliveryAddress}
+                setDeliveryAddress={setDeliveryAddress}
+              />
             )}
 
-            {/* Price Summary */}
             {selectedDocument && (
               <div className="bg-red-50 p-4 rounded-lg mb-6 border border-red-100">
                 <h3 className="font-medium text-red-800 mb-3 flex items-center">
@@ -1359,8 +1068,14 @@ const BuyEStampDocuments = () => {
                       Service Charge (Inc. GST):
                     </span>
                     <span className="font-medium text-gray-900">
-                      ₹{SERVICE_CHARGE_PER_DOCUMENT} × {quantity} = ₹
-                      {calculateServiceCharge()}
+                      {selectedDocument && getSelectedDocumentData() ? (
+                        <>
+                          ₹{getSelectedDocumentData().serviceCharge} ×{" "}
+                          {quantity} = ₹{calculateServiceCharge()}
+                        </>
+                      ) : (
+                        "₹0"
+                      )}
                     </span>
                   </div>
                   {deliveryType === "delivery" && selectedDeliveryService && (
@@ -1381,7 +1096,6 @@ const BuyEStampDocuments = () => {
               </div>
             )}
 
-            {/* Action Button */}
             <div className="flex justify-end">
               <button
                 onClick={handleProceedToPayment}
@@ -1399,128 +1113,17 @@ const BuyEStampDocuments = () => {
         </div>
       </div>
 
-      {/* Payment Modal */}
       {showPaymentModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-8 shadow-2xl w-full max-w-md transform transition-all border-t-4 border-red-600">
-            <div className="mb-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 mr-2 text-red-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                    />
-                  </svg>
-                  Payment Details
-                </h2>
-                <button
-                  onClick={() => setShowPaymentModal(false)}
-                  className="text-gray-400 hover:text-red-600 focus:outline-none transition duration-200"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-              <div className="h-0.5 w-full bg-gray-100 my-4"></div>
-            </div>
-
-            {/* Requestor Name Field */}
-            <div className="mb-6">
-              <label
-                htmlFor="requestorName"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Requestor Name *
-              </label>
-              <input
-                type="text"
-                id="requestorName"
-                value={requestorName}
-                onChange={(e) => setRequestorName(e.target.value)}
-                placeholder="Enter your name"
-                className={`w-full px-4 py-2.5 border ${
-                  paymentErrors.requestorName
-                    ? "border-red-300"
-                    : "border-gray-300"
-                } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-              />
-              {paymentErrors.requestorName && (
-                <p className="mt-1 text-sm text-red-600">
-                  {paymentErrors.requestorName}
-                </p>
-              )}
-            </div>
-
-            {/* Mobile Number Field */}
-            <div className="mb-6">
-              <label
-                htmlFor="paymentMobile"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Mobile Number *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <span className="text-gray-500 text-sm font-medium">+91</span>
-                </div>
-                <input
-                  type="tel"
-                  id="paymentMobile"
-                  value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value)}
-                  placeholder="Enter 10-digit mobile number"
-                  className={`w-full pl-12 pr-4 py-2.5 border ${
-                    paymentErrors.mobileNumber
-                      ? "border-red-300"
-                      : "border-gray-300"
-                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-                  maxLength="10"
-                />
-              </div>
-              {paymentErrors.mobileNumber && (
-                <p className="mt-1 text-sm text-red-600">
-                  {paymentErrors.mobileNumber}
-                </p>
-              )}
-            </div>
-
-            <div className="flex flex-col sm:flex-row sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3">
-              <button
-                onClick={() => setShowPaymentModal(false)}
-                className="w-full sm:w-auto px-4 py-2.5 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 font-medium shadow-sm transition duration-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handlePayment}
-                className="w-full sm:w-auto px-6 py-2.5 border border-transparent rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 font-medium transition duration-200"
-              >
-                Pay ₹{getTotalAmount()}
-              </button>
-            </div>
-          </div>
-        </div>
+        <PaymentModal
+          setShowPaymentModal={setShowPaymentModal}
+          requestorName={requestorName}
+          setRequestorName={setRequestorName}
+          paymentErrors={paymentErrors}
+          mobileNumber={mobileNumber}
+          setMobileNumber={setMobileNumber}
+          handlePayment={handlePayment}
+          getTotalAmount={getTotalAmount}
+        />
       )}
     </div>
   );

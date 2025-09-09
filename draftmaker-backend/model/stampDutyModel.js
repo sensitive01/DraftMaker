@@ -34,6 +34,7 @@ const stampDutySchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    serviceCharge:{type:Number}
   },
   { timestamps: true }
 );

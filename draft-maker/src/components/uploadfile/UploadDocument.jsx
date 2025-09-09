@@ -160,17 +160,17 @@ const DocumentUpload = () => {
     if (!selectedDocumentType) return [];
 
     return [
-      {
-        id: "draft",
-        name: "Draft Only",
-        description: "Get your document drafted by experts.",
-        price: selectedDocumentType.draftCharge || 0,
-        hasNotary: (selectedDocumentType.draftNotaryCharge || 0) > 0,
-        notaryCharge: selectedDocumentType.draftNotaryCharge || 0,
-        requiresStamp: false,
-        requiresDelivery: false,
-        requiresEmail: true,
-      },
+      // {
+      //   id: "draft",
+      //   name: "Draft Only",
+      //   description: "Get your document drafted by experts.",
+      //   price: selectedDocumentType.draftCharge || 0,
+      //   hasNotary: (selectedDocumentType.draftNotaryCharge || 0) > 0,
+      //   notaryCharge: selectedDocumentType.draftNotaryCharge || 0,
+      //   requiresStamp: false,
+      //   requiresDelivery: false,
+      //   requiresEmail: true,
+      // },
       {
         id: "draft_estamp",
         name: "Draft + e-Stamp",

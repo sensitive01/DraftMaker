@@ -105,11 +105,11 @@ function MainLayout({ children }) {
         <div className="content-wrapper">
           <div className="container">
             <div className="anim_line dark_bg">
-              {[...Array(9)].map((_, index) => (
+              {/* {[...Array(9)].map((_, index) => (
                 <span key={index}>
-                  <img src={animLogo} alt="anim_line" />
+                  <img src="" alt="anim_line" />
                 </span>
-              ))}
+              ))} */}
             </div>
           </div>
           <Header />
@@ -123,7 +123,7 @@ function MainLayout({ children }) {
               <div className="anim_line dark_bg">
                 {[...Array(9)].map((_, index) => (
                   <span key={index}>
-                    <img src={animLogo} alt="anim_line" />
+                    <img src="" alt="anim_line" />
                   </span>
                 ))}
               </div>
@@ -162,11 +162,11 @@ function PaymentLayout({ children }) {
         <div className="content-wrapper">
           <div className="container">
             <div className="anim_line dark_bg">
-              {[...Array(9)].map((_, index) => (
+              {/* {[...Array(9)].map((_, index) => (
                 <span key={index}>
-                  <img src={animLogo} alt="anim_line" />
+                  <img src="" alt="anim_line" />
                 </span>
-              ))}
+              ))} */}
             </div>
           </div>
           <Header />
@@ -188,11 +188,11 @@ function HomeLayout({ children }) {
         <div className="content-wrapper">
           <div className="container">
             <div className="anim_line dark_bg">
-              {[...Array(9)].map((_, index) => (
+              {/* {[...Array(9)].map((_, index) => (
                 <span key={index}>
-                  <img src={animLogo} alt="anim_line" />
+                  <img src="" alt="anim_line" />
                 </span>
-              ))}
+              ))} */}
             </div>
           </div>
           <Header />
@@ -206,7 +206,7 @@ function HomeLayout({ children }) {
               <div className="anim_line dark_bg">
                 {[...Array(9)].map((_, index) => (
                   <span key={index}>
-                    <img src={animLogo} alt="anim_line" />
+                    <img src="" alt="anim_line" />
                   </span>
                 ))}
               </div>
@@ -261,11 +261,11 @@ function AboutUsPage({ children }) {
         <div className="content-wrapper">
           <div className="container">
             <div className="anim_line dark_bg">
-              {[...Array(9)].map((_, index) => (
+              {/* {[...Array(9)].map((_, index) => (
                 <span key={index}>
-                  <img src={animLogo} alt="anim_line" />
+                  <img src="" alt="anim_line" />
                 </span>
-              ))}
+              ))} */}
             </div>
           </div>
           <Header />
@@ -279,7 +279,7 @@ function AboutUsPage({ children }) {
               <div className="anim_line dark_bg">
                 {[...Array(9)].map((_, index) => (
                   <span key={index}>
-                    <img src={animLogo} alt="anim_line" />
+                    <img src="" alt="anim_line" />
                   </span>
                 ))}
               </div>
@@ -304,11 +304,11 @@ function AboutUsFullPage({ children }) {
         <div className="content-wrapper">
           <div className="container">
             <div className="anim_line dark_bg">
-              {[...Array(9)].map((_, index) => (
+              {/* {[...Array(9)].map((_, index) => (
                 <span key={index}>
-                  <img src={animLogo} alt="anim_line" />
+                  <img src="" alt="anim_line" />
                 </span>
-              ))}
+              ))} */}
             </div>
           </div>
           <Header />
@@ -322,7 +322,7 @@ function AboutUsFullPage({ children }) {
               <div className="anim_line dark_bg">
                 {[...Array(9)].map((_, index) => (
                   <span key={index}>
-                    <img src={animLogo} alt="anim_line" />
+                    <img src="" alt="anim_line" />
                   </span>
                 ))}
               </div>
@@ -347,11 +347,11 @@ function ContactUsPage({ children }) {
         <div className="content-wrapper">
           <div className="container">
             <div className="anim_line dark_bg">
-              {[...Array(9)].map((_, index) => (
+              {/* {[...Array(9)].map((_, index) => (
                 <span key={index}>
-                  <img src={animLogo} alt="anim_line" />
+                  <img src="" alt="anim_line" />
                 </span>
-              ))}
+              ))} */}
             </div>
           </div>
           <Header />
@@ -365,7 +365,7 @@ function ContactUsPage({ children }) {
               <div className="anim_line dark_bg">
                 {[...Array(9)].map((_, index) => (
                   <span key={index}>
-                    <img src={animLogo} alt="anim_line" />
+                    <img src="" alt="anim_line" />
                   </span>
                 ))}
               </div>

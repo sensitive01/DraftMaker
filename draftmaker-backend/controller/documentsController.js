@@ -1088,7 +1088,7 @@ const saveDualNameCorrection = async (req, res) => {
       {
         formId: "DM-DNC-1",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {
@@ -1246,7 +1246,7 @@ const saveNameCorrection = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne(
       { formId: "DM-NC-2" },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {
@@ -1356,7 +1356,7 @@ const createDobCorrection = async (req, res) => {
       {
         formId: "DM-DOBC-3",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 ,serviceCharge:1}
     );
 
     if (!documentName) {
@@ -1466,7 +1466,7 @@ const createGasCorrection = async (req, res) => {
       {
         formId: "DM-GAS-5",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 ,serviceCharge:1}
     );
 
     if (!documentName) {
@@ -1576,7 +1576,7 @@ const createDocumentLost = async (req, res) => {
       {
         formId: "DM-DOC-LOST-5",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 ,serviceCharge:1}
     );
 
     if (!documentName) {
@@ -1684,7 +1684,7 @@ const createDobParentNameCorrection = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne(
       { formId: "DM-NC-2" },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {
@@ -1794,7 +1794,7 @@ const createBirthCertificateNameCorrection = async (req, res) => {
       {
         formId: "DM-BC-MNC-7",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {
@@ -1904,7 +1904,7 @@ const saveGstData = async (req, res) => {
       {
         formId: "DM-GST-8",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {
@@ -2014,7 +2014,7 @@ const createMetriculationLostData = async (req, res) => {
       {
         formId: "DM-MAL-9",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {
@@ -2124,7 +2124,7 @@ const createKhataCorrectionData = async (req, res) => {
       {
         formId: "DM-KH-10",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {
@@ -2234,7 +2234,7 @@ const createVehicleInsurenceData = async (req, res) => {
       {
         formId: "DM-VIC-11",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {
@@ -2344,7 +2344,7 @@ const createHufData = async (req, res) => {
       {
         formId: "DM-HUF-12",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {
@@ -2454,7 +2454,7 @@ const createGapPeriodData = async (req, res) => {
       {
         formId: "DM-GP-13",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {
@@ -2564,7 +2564,7 @@ const createPasswordAnnaxureData = async (req, res) => {
       {
         formId: "DM-PAF-14",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {
@@ -2674,7 +2674,7 @@ const createPassportNameChangeData = async (req, res) => {
       {
         formId: "DM-PNC-15",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {
@@ -2784,7 +2784,7 @@ const createAdressAffadavitData = async (req, res) => {
       {
         formId: "DM-AAF-16",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {
@@ -2894,7 +2894,7 @@ const createCommercialData = async (req, res) => {
       {
         formId: "DM-CFD-17",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 ,serviceCharge:1}
     );
 
     if (!documentName) {
@@ -3015,7 +3015,7 @@ const createRecidentialData = async (req, res) => {
       {
         formId: "DM-RFD-18",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 }
+      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
     );
 
     if (!documentName) {

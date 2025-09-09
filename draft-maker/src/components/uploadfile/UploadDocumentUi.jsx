@@ -354,7 +354,7 @@ const UploadDocumentUi = ({
                   <FileCheck className="w-3 h-3 mr-1.5 text-red-500" />
                   Step 4: Service Package
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {getServiceOptions().map((service) => (
                     <button
                       key={service.id}
@@ -682,9 +682,29 @@ const UploadDocumentUi = ({
                   Payment Summary
                 </h3>
                 <div className="space-y-0.5 text-xs">
+                  {selectedService.requiresStamp && selectedStampDuty && (
+                    <>
+                      <div className="flex justify-between">
+                        <span>Stamp Duty:</span>
+                        <span>
+                          ₹{calculateStampDutyAmount(selectedStampDuty)}
+                        </span>
+                      </div>
+                      {/* <div className="flex justify-between">
+                        <span>Service Charge:</span>
+                        <span>
+                          ₹{SERVICE_CHARGE_PER_DOCUMENT * (quantity || 1)}
+                        </span>
+                      </div> */}
+                    </>
+                  )}
+
                   <div className="flex justify-between">
-                    <span>Base Service:</span>
-                    <span>₹{selectedService.price}</span>
+                    <span> Service Charge:</span>
+                    <span>
+                      {" "}
+                      ₹{SERVICE_CHARGE_PER_DOCUMENT * (quantity || 1)}
+                    </span>
                   </div>
                   {selectedService.hasNotary && includeNotary && (
                     <div className="flex justify-between">
@@ -692,7 +712,7 @@ const UploadDocumentUi = ({
                       <span>₹{selectedService.notaryCharge}</span>
                     </div>
                   )}
-                  {selectedService.requiresStamp && selectedStampDuty && (
+                  {/* {selectedService.requiresStamp && selectedStampDuty && (
                     <>
                       <div className="flex justify-between">
                         <span>Stamp Duty:</span>
@@ -707,7 +727,7 @@ const UploadDocumentUi = ({
                         </span>
                       </div>
                     </>
-                  )}
+                  )} */}
                   {selectedService.requiresDelivery &&
                     selectedDeliveryCharge && (
                       <div className="flex justify-between">

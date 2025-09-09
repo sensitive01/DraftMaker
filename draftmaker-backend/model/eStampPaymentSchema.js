@@ -107,6 +107,8 @@ const estampPaymentSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    serviceCharge: { type: Number },
+
     quantity: {
       type: Number,
       default: 1,
