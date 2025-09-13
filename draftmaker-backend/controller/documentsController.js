@@ -3290,6 +3290,7 @@ const getDocumentPreviewData = async (req, res) => {
 
 const updateDocumentPreviewData = async (req, res) => {
   try {
+    console.log("updating")
     const { bookingId } = req.params;
     const { formData } = req.body;
 

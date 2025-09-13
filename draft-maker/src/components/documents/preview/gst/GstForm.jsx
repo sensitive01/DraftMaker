@@ -81,13 +81,14 @@ const GstForm = ({ formData, handleChange }) => {
           <label
             className={`block mb-1 text-sm sm:text-base ${requiredFieldStyle}`}
           >
-            Tenant Name *
+            Proprietor Name *
           </label>
           <input
             type="text"
             name="tenantName"
             value={formData?.tenantName}
             onChange={handleChange}
+            placeholder="Enter Proprietor Name"
             className="w-full p-2 sm:p-3 border rounded-md focus:ring focus:ring-blue-300 focus:border-blue-500 transition text-sm sm:text-base"
             required
           />

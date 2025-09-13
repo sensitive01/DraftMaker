@@ -108,34 +108,6 @@ export default function DocumentLostPage() {
       return false;
     }
 
-    // FIR details validation
-    if (!formData.firNumber.trim()) {
-      setValidationError("Please enter the FIR number");
-      return false;
-    }
-
-    if (!formData.firDay.trim()) {
-      setValidationError("Please enter the FIR day");
-      return false;
-    } else if (
-      isNaN(formData.firDay) ||
-      parseInt(formData.firDay) <= 0 ||
-      parseInt(formData.firDay) > 31
-    ) {
-      setValidationError("Please enter a valid day (1-31) for FIR date");
-      return false;
-    }
-
-    if (!formData.firMonth.trim()) {
-      setValidationError("Please select the FIR month");
-      return false;
-    }
-
-    if (!formData.firYear.trim()) {
-      setValidationError("Please enter the FIR year");
-      return false;
-    }
-
     // Date and place validation
     if (!formData.day.trim()) {
       setValidationError("Please enter the day");

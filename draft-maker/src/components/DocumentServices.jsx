@@ -87,7 +87,7 @@ export default function DocumentServices() {
     {
       id: 9,
       title: "Khata Transfer Document",
-      subtitle: "Property transfer document",
+      subtitle: "Joint Khata Transfer document",
       type: "affidavit",
       path: "/documents/khata-transfer/khata-transfer-document",
       apiTitle: "Joint Khata Transfer", // Match with API
@@ -105,7 +105,7 @@ export default function DocumentServices() {
     {
       id: 11,
       title: "GST",
-      subtitle: "GST document",
+       subtitle: "GST NOC by Owner document",
       type: "affidavit",
       path: "/documents/gst/gst-document",
       apiTitle: "Gst Noc By Owner", // Match with API

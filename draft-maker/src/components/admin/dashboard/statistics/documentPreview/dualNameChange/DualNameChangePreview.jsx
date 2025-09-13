@@ -18,7 +18,34 @@ const DualNameChangePreview = () => {
         setLoading(true);
         const response = await getAggrementFormData(bookingId);
         if (response.status === 200) {
-          setFormData(response?.data?.data || {});
+          const data = response?.data?.data || {};
+          
+          // Handle backward compatibility - convert old format to new format if needed
+          let processedData = { ...data };
+          
+          if (data.name2 && data.document2 && data.documentNo2) {
+            // If old format exists, convert to new format
+            processedData.additionalDocuments = [
+              {
+                id: 1,
+                name: data.name2,
+                document: data.document2,
+                documentNo: data.documentNo2
+              }
+            ];
+          } else if (!data.additionalDocuments || data.additionalDocuments.length === 0) {
+            // If no additional documents, create default empty one
+            processedData.additionalDocuments = [
+              {
+                id: 1,
+                name: "",
+                document: "",
+                documentNo: ""
+              }
+            ];
+          }
+          
+          setFormData(processedData);
         } else {
           setError("Failed to fetch data");
         }
@@ -36,6 +63,25 @@ const DualNameChangePreview = () => {
   const isFilled = (value) => {
     // Check if value exists and is a string with content
     return typeof value === "string" && value.trim() !== "";
+  };
+
+  // Handle backward compatibility - support both old and new data structures
+  const getAdditionalDocuments = () => {
+    if (formData?.additionalDocuments && formData.additionalDocuments.length > 0) {
+      return formData.additionalDocuments;
+    }
+    
+    // Fallback to old structure if new structure not available
+    if (formData?.name2 || formData?.document2 || formData?.documentNo2) {
+      return [{
+        id: 1,
+        name: formData.name2 || "",
+        document: formData.document2 || "",
+        documentNo: formData.documentNo2 || ""
+      }];
+    }
+    
+    return [];
   };
 
   // Format name with prefix if available
@@ -60,6 +106,81 @@ const DualNameChangePreview = () => {
     setLoading(true);
 
     try {
+      const additionalDocuments = getAdditionalDocuments();
+      
+      // Create numbered list paragraphs
+      const numberedParagraphs = [
+        new Paragraph({
+          spacing: { after: 200 },
+          numbering: { reference: "my-numbering", level: 0 },
+          text: `That I am the citizen of India.`,
+        }),
+
+        new Paragraph({
+          spacing: { after: 200 },
+          numbering: { reference: "my-numbering", level: 0 },
+          children: [
+            new TextRun(`That my name has been recorded as `),
+            new TextRun({
+              text: formData?.name1 || "NAME",
+              bold: true,
+            }),
+            new TextRun(`, Name of document-`),
+            new TextRun({
+              text: formData?.document1 || "NAME OF DOCUMENT",
+              bold: true,
+            }),
+            new TextRun(`, Document Serial No-`),
+            new TextRun({
+              text: formData?.documentNo1 || "DOCUMENT SERIAL NO",
+              bold: true,
+            }),
+          ],
+        }),
+      ];
+
+      // Add dynamic additional documents
+      additionalDocuments.forEach((document) => {
+        numberedParagraphs.push(
+          new Paragraph({
+            spacing: { after: 200 },
+            numbering: { reference: "my-numbering", level: 0 },
+            children: [
+              new TextRun(`That my name has been recorded as `),
+              new TextRun({
+                text: document.name || "NAME",
+                bold: true,
+              }),
+              new TextRun(`, Name of document-`),
+              new TextRun({
+                text: document.document || "NAME OF DOCUMENT",
+                bold: true,
+              }),
+              new TextRun(`, Document Serial No-`),
+              new TextRun({
+                text: document.documentNo || "DOCUMENT SERIAL NO",
+                bold: true,
+              }),
+            ],
+          })
+        );
+      });
+
+      // Add final paragraphs
+      numberedParagraphs.push(
+        new Paragraph({
+          spacing: { after: 200 },
+          numbering: { reference: "my-numbering", level: 0 },
+          text: `That I further declare that ${additionalDocuments.length > 1 ? "all the names" : "both the names"} mentioned hereinabove belongs to one and the same person i.e. "myself".`,
+        }),
+
+        new Paragraph({
+          spacing: { after: 300 },
+          numbering: { reference: "my-numbering", level: 0 },
+          text: `That my statement is true and correct.`,
+        })
+      );
+
       // Create a new document
       const doc = new Document({
         sections: [
@@ -122,68 +243,8 @@ const DualNameChangePreview = () => {
                 ],
               }),
 
-              // Numbered list items
-              new Paragraph({
-                spacing: { after: 200 },
-                numbering: { reference: "my-numbering", level: 0 },
-                text: `That I am the citizen of India.`,
-              }),
-
-              new Paragraph({
-                spacing: { after: 200 },
-                numbering: { reference: "my-numbering", level: 0 },
-                children: [
-                  new TextRun(`That my name has been recorded as `),
-                  new TextRun({
-                    text: formData?.name1 || "NAME",
-                    bold: true,
-                  }),
-                  new TextRun(`, `),
-                  new TextRun({
-                    text: formData?.document1 || "NAME OF DOCUMENT",
-                    bold: true,
-                  }),
-                  new TextRun(`, `),
-                  new TextRun({
-                    text: formData?.documentNo1 || "DOCUMENT SERIAL NO",
-                    bold: true,
-                  }),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { after: 200 },
-                numbering: { reference: "my-numbering", level: 0 },
-                children: [
-                  new TextRun(`That my name has been recorded as `),
-                  new TextRun({
-                    text: formData?.name2 || "NAME",
-                    bold: true,
-                  }),
-                  new TextRun(`, `),
-                  new TextRun({
-                    text: formData?.document2 || "NAME OF DOCUMENT",
-                    bold: true,
-                  }),
-                  new TextRun(`, `),
-                  new TextRun({
-                    text: formData?.documentNo2 || "DOCUMENT SERIAL NO",
-                    bold: true,
-                  }),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { after: 200 },
-                numbering: { reference: "my-numbering", level: 0 },
-                text: `That I further declare that both the names mentioned hereinabove belongs to one and the same person i.e. "myself".`,
-              }),
-
-              new Paragraph({
-                spacing: { after: 300 },
-                numbering: { reference: "my-numbering", level: 0 },
-                text: `That my statement is true and correct.`,
-              }),
+              // Add all numbered paragraphs
+              ...numberedParagraphs,
 
               new Paragraph({
                 spacing: { before: 300, after: 500 },
@@ -273,6 +334,8 @@ const DualNameChangePreview = () => {
       </div>
     );
   }
+
+  const additionalDocuments = getAdditionalDocuments();
 
   return (
     <div className="flex flex-col items-center">
@@ -412,7 +475,7 @@ const DualNameChangePreview = () => {
                 >
                   {formData?.name1 || "NAME"}
                 </span>
-                ,{" "}
+                , Name of document-{" "}
                 <span
                   className={
                     isFilled(formData?.document1) ? "" : "bg-yellow-200 px-1"
@@ -420,7 +483,7 @@ const DualNameChangePreview = () => {
                 >
                   {formData?.document1 || "NAME OF DOCUMENT"}
                 </span>
-                ,{" "}
+                , Document Serial No-{" "}
                 <span
                   className={
                     isFilled(formData?.documentNo1) ? "" : "bg-yellow-200 px-1"
@@ -430,46 +493,49 @@ const DualNameChangePreview = () => {
                 </span>
               </li>
 
+              {/* Dynamic additional documents */}
+              {additionalDocuments.map((document, index) => (
+                <li key={document.id || index} style={{ display: "block", counterIncrement: "item" }}>
+                  <span style={{ display: "inline-block", width: "1.5em" }}>
+                    {index + 3}.
+                  </span>{" "}
+                  That my name has been recorded as{" "}
+                  <span
+                    className={
+                      isFilled(document.name) ? "" : "bg-yellow-200 px-1"
+                    }
+                  >
+                    {document.name || "NAME"}
+                  </span>
+                  , Name of document-{" "}
+                  <span
+                    className={
+                      isFilled(document.document) ? "" : "bg-yellow-200 px-1"
+                    }
+                  >
+                    {document.document || "NAME OF DOCUMENT"}
+                  </span>
+                  , Document Serial No-{" "}
+                  <span
+                    className={
+                      isFilled(document.documentNo) ? "" : "bg-yellow-200 px-1"
+                    }
+                  >
+                    {document.documentNo || "DOCUMENT SERIAL NO"}
+                  </span>
+                </li>
+              ))}
+
               <li style={{ display: "block", counterIncrement: "item" }}>
                 <span style={{ display: "inline-block", width: "1.5em" }}>
-                  {3}.
+                  {additionalDocuments.length + 3}.
                 </span>{" "}
-                That my name has been recorded as{" "}
-                <span
-                  className={
-                    isFilled(formData?.name2) ? "" : "bg-yellow-200 px-1"
-                  }
-                >
-                  {formData?.name2 || "NAME"}
-                </span>
-                ,{" "}
-                <span
-                  className={
-                    isFilled(formData?.document2) ? "" : "bg-yellow-200 px-1"
-                  }
-                >
-                  {formData?.document2 || "NAME OF DOCUMENT"}
-                </span>
-                ,{" "}
-                <span
-                  className={
-                    isFilled(formData?.documentNo2) ? "" : "bg-yellow-200 px-1"
-                  }
-                >
-                  {formData?.documentNo2 || "DOCUMENT SERIAL NO"}
-                </span>
+                That I further declare that {additionalDocuments.length > 1 ? "all the names" : "both the names"} mentioned hereinabove belongs to one and the same person i.e. "myself".
               </li>
 
               <li style={{ display: "block", counterIncrement: "item" }}>
                 <span style={{ display: "inline-block", width: "1.5em" }}>
-                  {4}.
-                </span>{" "}
-                That I further declare that both the names mentioned hereinabove belongs to one and the same person i.e. "myself".
-              </li>
-
-              <li style={{ display: "block", counterIncrement: "item" }}>
-                <span style={{ display: "inline-block", width: "1.5em" }}>
-                  {5}.
+                  {additionalDocuments.length + 4}.
                 </span>{" "}
                 That my statement is true and correct.
               </li>
@@ -493,7 +559,7 @@ const DualNameChangePreview = () => {
                 >
                   {getDayWithSuffix(formData?.day) || "XX"}
                 </span>{" "}
-                {" "}
+                day of{" "}
                 <span
                   className={
                     isFilled(formData?.month) ? "" : "bg-yellow-200 px-1"

@@ -26,9 +26,15 @@ export default function PreviewDualNameChange() {
     name1: "",
     document1: "",
     documentNo1: "",
-    name2: "",
-    document2: "",
-    documentNo2: "",
+    // Changed to array structure for multiple documents
+    additionalDocuments: [
+      {
+        id: 1,
+        name: "",
+        document: "",
+        documentNo: ""
+      }
+    ],
     place: "",
     day: "",
     month: "",
@@ -42,13 +48,49 @@ export default function PreviewDualNameChange() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getDocumentPrviewPage(bookingId);
-      if (response.status === 200) {
-        setFormData(response.data.data);
+      try {
+        const response = await getDocumentPrviewPage(bookingId);
+        if (response.status === 200) {
+          const data = response.data.data;
+          
+          // Handle backward compatibility - convert old format to new format if needed
+          let processedData = { ...data };
+          
+          if (data.name2 && data.document2 && data.documentNo2) {
+            // If old format exists, convert to new format
+            processedData.additionalDocuments = [
+              {
+                id: 1,
+                name: data.name2,
+                document: data.document2,
+                documentNo: data.documentNo2
+              }
+            ];
+            // Remove old fields
+            delete processedData.name2;
+            delete processedData.document2;
+            delete processedData.documentNo2;
+          } else if (!data.additionalDocuments || data.additionalDocuments.length === 0) {
+            // If no additional documents, create default empty one
+            processedData.additionalDocuments = [
+              {
+                id: 1,
+                name: "",
+                document: "",
+                documentNo: ""
+              }
+            ];
+          }
+          
+          setFormData(processedData);
+        }
+      } catch (error) {
+        console.error("Error fetching document data:", error);
+        setSubmissionError("Failed to load document data");
       }
     };
     fetchData();
-  }, []);
+  }, [bookingId]);
 
   const previewRef = useRef(null);
 
@@ -64,7 +106,49 @@ export default function PreviewDualNameChange() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Add form validation function
+  // Handle changes for additional documents
+  const handleAdditionalDocumentChange = (index, field, value) => {
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      additionalDocuments: prev.additionalDocuments.map((doc, i) =>
+        i === index ? { ...doc, [field]: value } : doc
+      ),
+    }));
+  };
+
+  // Add a new document
+  const addDocument = () => {
+    const newId = Math.max(...formData.additionalDocuments.map(doc => doc.id)) + 1;
+    setFormData((prev) => ({
+      ...prev,
+      additionalDocuments: [
+        ...prev.additionalDocuments,
+        {
+          id: newId,
+          name: "",
+          document: "",
+          documentNo: ""
+        }
+      ],
+    }));
+  };
+
+  // Remove a document
+  const removeDocument = (index) => {
+    if (formData.additionalDocuments.length > 1) {
+      setFormData((prev) => ({
+        ...prev,
+        additionalDocuments: prev.additionalDocuments.filter((_, i) => i !== index),
+      }));
+    }
+  };
+
+  // Updated form validation function
   const validateForm = () => {
     // Personal details validation
     if (!formData.fullName.trim()) {
@@ -100,14 +184,14 @@ export default function PreviewDualNameChange() {
       return false;
     }
 
-    // Name correction details validation
+    // First document validation
     if (!formData.name1.trim()) {
-      setValidationError("Please enter the first name");
+      setValidationError("Please enter the first document name");
       return false;
     }
 
     if (!formData.document1.trim()) {
-      setValidationError("Please enter the first document");
+      setValidationError("Please enter the first document type");
       return false;
     }
 
@@ -116,19 +200,24 @@ export default function PreviewDualNameChange() {
       return false;
     }
 
-    if (!formData.name2.trim()) {
-      setValidationError("Please enter the second name");
-      return false;
-    }
+    // Additional documents validation
+    for (let i = 0; i < formData.additionalDocuments.length; i++) {
+      const doc = formData.additionalDocuments[i];
+      
+      if (!doc.name.trim()) {
+        setValidationError(`Please enter the name for document ${i + 2}`);
+        return false;
+      }
 
-    if (!formData.document2.trim()) {
-      setValidationError("Please enter the second document");
-      return false;
-    }
+      if (!doc.document.trim()) {
+        setValidationError(`Please enter the document type for document ${i + 2}`);
+        return false;
+      }
 
-    if (!formData.documentNo2.trim()) {
-      setValidationError("Please enter the second document number");
-      return false;
+      if (!doc.documentNo.trim()) {
+        setValidationError(`Please enter the document number for document ${i + 2}`);
+        return false;
+      }
     }
 
     // Date and place validation
@@ -158,6 +247,14 @@ export default function PreviewDualNameChange() {
   };
 
   const handleUpdateData = async () => {
+    if (!validateForm()) {
+      setShowErrorNotification(true);
+      setTimeout(() => {
+        setShowErrorNotification(false);
+      }, 5000);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const response = await updateAggrementData(formData, bookingId);
@@ -171,6 +268,8 @@ export default function PreviewDualNameChange() {
       }
     } catch (err) {
       console.log("error in updating the data", err);
+      setSubmissionError("Failed to update data. Please try again.");
+      setIsSubmitting(false);
     }
   };
 
@@ -190,7 +289,13 @@ export default function PreviewDualNameChange() {
           />
         )}
         <div className="print:hidden">
-          <DualNameChangeForm formData={formData} handleChange={handleChange} />
+          <DualNameChangeForm 
+            formData={formData} 
+            handleChange={handleChange}
+            handleAdditionalDocumentChange={handleAdditionalDocumentChange}
+            addDocument={addDocument}
+            removeDocument={removeDocument}
+          />
 
           {submissionError && (
             <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">

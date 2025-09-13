@@ -57,33 +57,32 @@ const BookingTable = () => {
   };
 
   // Utility function to format time in human-readable format
- const formatTime = (dateString) => {
-  if (!dateString) return "N/A";
-  try {
-    let date;
+  const formatTime = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      let date;
 
-    if (dateString.includes("-") && dateString.split("-").length === 3) {
-      const parts = dateString.split(" ");
-      const [day, month, year] = parts[0].split("-");
-      const time = parts.slice(1).join(" "); // Handle "09:50:01 PM"
-      const fullDateStr = `${month}/${day}/${year} ${time}`;
-      date = new Date(fullDateStr);
-    } else {
-      date = new Date(dateString);
+      if (dateString.includes("-") && dateString.split("-").length === 3) {
+        const parts = dateString.split(" ");
+        const [day, month, year] = parts[0].split("-");
+        const time = parts.slice(1).join(" "); // Handle "09:50:01 PM"
+        const fullDateStr = `${month}/${day}/${year} ${time}`;
+        date = new Date(fullDateStr);
+      } else {
+        date = new Date(dateString);
+      }
+
+      return date.toLocaleTimeString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+    } catch (error) {
+      console.log("Time parsing error:", error);
+      return dateString;
     }
-
-    return date.toLocaleTimeString("en-IN", {
-      timeZone: "Asia/Kolkata",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  } catch (error) {
-    console.log("Time parsing error:", error);
-    return dateString;
-  }
-};
-
+  };
 
   // Utility function to safely display values
   const safeDisplay = (value, fallback = "N/A") => {
@@ -236,25 +235,18 @@ const BookingTable = () => {
 
   const getStatusBadgeColor = (status) => {
     switch ((status || "").toLowerCase()) {
-      case "completed":
+      case "processing":
+        return "bg-blue-100 text-blue-800 border border-blue-200";
+      case "delivered":
         return "bg-green-100 text-green-800 border border-green-200";
-      case "pending":
+      case "hold":
         return "bg-yellow-100 text-yellow-800 border border-yellow-200";
       case "cancelled":
         return "bg-red-100 text-red-800 border border-red-200";
-      case "processing":
-        return "bg-blue-100 text-blue-800 border border-blue-200";
-      case "processed":
-        return "bg-indigo-100 text-indigo-800 border border-indigo-200";
-      case "approved":
-        return "bg-teal-100 text-teal-800 border border-teal-200";
-      case "delivered":
-        return "bg-emerald-100 text-emerald-800 border border-emerald-200";
       default:
         return "bg-gray-100 text-gray-800 border border-gray-200";
     }
   };
-
   const getPaymentStatusColor = (status) => {
     switch ((status || "").toLowerCase()) {
       case "success":
@@ -325,12 +317,9 @@ const BookingTable = () => {
               className="px-3 py-2 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm bg-white"
             >
               <option value="all">All Statuses</option>
-              <option value="completed">Completed</option>
-              <option value="pending">Pending</option>
               <option value="processing">Processing</option>
-              <option value="processed">Processed</option>
-              <option value="approved">Approved</option>
-              <option value="delivered">Delivered</option>
+              <option value="delivered">Deliver/Completed</option>
+              <option value="hold">Put on Hold</option>
               <option value="cancelled">Cancelled</option>
             </select>
 
@@ -634,24 +623,21 @@ const BookingTable = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Update Status <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={newStatus}
-                  onChange={(e) => setNewStatus(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                >
-                  <option value="">Select new status</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Processing">Processing</option>
-                  <option value="Processed">Processed</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Delivered">Delivered</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
-              </div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Update Status <span className="text-red-500">*</span>
+  </label>
+  <select
+    value={newStatus}
+    onChange={(e) => setNewStatus(e.target.value)}
+    className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+  >
+    <option value="">Select new status</option>
+    <option value="Processing">Processing</option>
+    <option value="Delivered">Deliver/Completed</option>
+    <option value="Hold">Put on Hold</option>
+    <option value="Cancelled">Cancelled</option>
+  </select>
+</div>
             </div>
 
             {/* Footer */}

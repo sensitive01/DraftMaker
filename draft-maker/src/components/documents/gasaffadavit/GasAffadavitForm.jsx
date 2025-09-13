@@ -163,7 +163,7 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
 
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
-                  Service Address <span className="text-red-500">*</span>
+                   Gas Consumer Address <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   name="serviceAddress"
@@ -171,7 +171,7 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
                   onChange={handleChange}
                   className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200 resize-none"
                   rows="3"
-                  placeholder="Enter complete service address"
+                  placeholder="Enter complete gas consumer  address"
                   required
                 />
               </div>

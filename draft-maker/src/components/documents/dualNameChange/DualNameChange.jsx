@@ -25,9 +25,15 @@ export default function DualNameChange() {
     name1: "",
     document1: "",
     documentNo1: "",
-    name2: "",
-    document2: "",
-    documentNo2: "",
+    // Changed to array structure for multiple documents
+    additionalDocuments: [
+      {
+        id: 1,
+        name: "",
+        document: "",
+        documentNo: "",
+      },
+    ],
     place: "",
     day: "",
     month: "",
@@ -63,7 +69,52 @@ export default function DualNameChange() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Add form validation function
+  // Handle changes for additional documents
+  const handleAdditionalDocumentChange = (index, field, value) => {
+    if (showErrorNotification) {
+      setShowErrorNotification(false);
+      setValidationError("");
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      additionalDocuments: prev.additionalDocuments.map((doc, i) =>
+        i === index ? { ...doc, [field]: value } : doc
+      ),
+    }));
+  };
+
+  // Add a new document
+  const addDocument = () => {
+    const newId =
+      Math.max(...formData.additionalDocuments.map((doc) => doc.id)) + 1;
+    setFormData((prev) => ({
+      ...prev,
+      additionalDocuments: [
+        ...prev.additionalDocuments,
+        {
+          id: newId,
+          name: "",
+          document: "",
+          documentNo: "",
+        },
+      ],
+    }));
+  };
+
+  // Remove a document
+  const removeDocument = (index) => {
+    if (formData.additionalDocuments.length > 1) {
+      setFormData((prev) => ({
+        ...prev,
+        additionalDocuments: prev.additionalDocuments.filter(
+          (_, i) => i !== index
+        ),
+      }));
+    }
+  };
+
+  // Updated form validation function
   const validateForm = () => {
     // Personal details validation
     if (!formData.fullName.trim()) {
@@ -99,14 +150,14 @@ export default function DualNameChange() {
       return false;
     }
 
-    // Name correction details validation
+    // First document validation
     if (!formData.name1.trim()) {
-      setValidationError("Please enter the first name");
+      setValidationError("Please enter the first document name");
       return false;
     }
 
     if (!formData.document1.trim()) {
-      setValidationError("Please enter the first document");
+      setValidationError("Please enter the first document type");
       return false;
     }
 
@@ -115,19 +166,28 @@ export default function DualNameChange() {
       return false;
     }
 
-    if (!formData.name2.trim()) {
-      setValidationError("Please enter the second name");
-      return false;
-    }
+    // Additional documents validation
+    for (let i = 0; i < formData.additionalDocuments.length; i++) {
+      const doc = formData.additionalDocuments[i];
 
-    if (!formData.document2.trim()) {
-      setValidationError("Please enter the second document");
-      return false;
-    }
+      if (!doc.name.trim()) {
+        setValidationError(`Please enter the name for document ${i + 2}`);
+        return false;
+      }
 
-    if (!formData.documentNo2.trim()) {
-      setValidationError("Please enter the second document number");
-      return false;
+      if (!doc.document.trim()) {
+        setValidationError(
+          `Please enter the document type for document ${i + 2}`
+        );
+        return false;
+      }
+
+      if (!doc.documentNo.trim()) {
+        setValidationError(
+          `Please enter the document number for document ${i + 2}`
+        );
+        return false;
+      }
     }
 
     // Date and place validation
@@ -220,194 +280,6 @@ export default function DualNameChange() {
     }
   };
 
-  const getServiceOptions = () => {
-    if (!documentDetails) return [];
-
-    const options = [];
-
-    options.push({
-      id: "draft",
-      name: "Draft Only",
-      price: documentDetails.draftCharge || 0,
-      hasNotary: documentDetails.hasDraftNotaryCharge,
-      notaryCharge: documentDetails.draftNotaryCharge || 0,
-      description: "Digital document sent to your email",
-    });
-
-    options.push({
-      id: "draft_estamp",
-      name: "Draft + E-stamp",
-      price: documentDetails.pdfCharge || 0,
-      hasNotary: documentDetails.hasPdfNotaryCharge,
-      notaryCharge: documentDetails.pdfNotaryCharge || 0,
-      description: "Digital document with legal e-stamp",
-    });
-
-    options.push({
-      id: "draft_estamp_delivery",
-      name: "Draft + E-stamp + Delivery",
-      price: documentDetails.homeDropCharge || 0,
-
-      hasNotary: documentDetails.hasHomeDropNotaryCharge,
-      notaryCharge: documentDetails.homeDropNotaryCharge || 0,
-      description: "Physical copy delivered to your address",
-    });
-
-    return options;
-  };
-
-  const handleServiceSelection = (service) => {
-    setSelectedService(service);
-    handlePayment(service);
-  };
-
-  const handlePayment = async (service) => {
-    try {
-      const totalPrice = service.hasNotary
-        ? service.price + service.notaryCharge
-        : service.price;
-
-      setShowServiceOptionsModal(false);
-
-      if (!window.Razorpay) {
-        const script = document.createElement("script");
-        script.src = "https://checkout.razorpay.com/v1/checkout.js";
-
-        script.onload = () => {
-          initializeRazorpay(service, totalPrice);
-        };
-
-        script.onerror = () => {
-          console.error("Razorpay SDK failed to load");
-          alert("Payment gateway failed to load. Please try again later.");
-        };
-
-        document.body.appendChild(script);
-      } else {
-        initializeRazorpay(service, totalPrice);
-      }
-    } catch (error) {
-      console.error("Error initializing payment:", error);
-      alert("Payment initialization failed. Please try again.");
-    }
-  };
-
-  const initializeRazorpay = async (service, totalPrice) => {
-    try {
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: totalPrice * 100,
-        currency: "INR",
-        name: "Draft Maker",
-        description: `${documentDetails.documentType} - ${service.name}`,
-        handler: function (response) {
-          console.log("razorpay response", response);
-          handlePaymentSuccess({
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-            bookingId: bookingId,
-            mobileNumber: mobileNumber,
-            documentType: documentDetails.documentType,
-            fullName: formData.fullName,
-            serviceType: service.id,
-            serviceName: service.name,
-            amount: totalPrice,
-            includesNotary: service.hasNotary,
-            userName: userName,
-          });
-        },
-        prefill: {
-          name: userName,
-          contact: mobileNumber,
-        },
-        notes: {
-          bookingId: bookingId,
-          serviceType: service.id,
-        },
-        theme: {
-          color: "#dc2626",
-        },
-        modal: {
-          ondismiss: function () {
-            console.log("Checkout form closed");
-          },
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-
-      razorpay.on("payment.failed", function (response) {
-        fetch("/api/payment-failed", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            error: response.error,
-            bookingId: bookingId,
-            mobileNumber: mobileNumber,
-            serviceType: service.id,
-            status: "failed",
-            userName: userName,
-          }),
-        }).catch((error) => {
-          console.error("Error logging payment failure:", error);
-        });
-
-        console.error("Payment failed:", response.error);
-        alert(`Payment failed: ${response.error.description}`);
-      });
-    } catch (error) {
-      console.error("Error in Razorpay initialization:", error);
-      alert("Payment initialization failed. Please try again.");
-    }
-  };
-
-  const handlePaymentSuccess = async (paymentData) => {
-    try {
-      setPaymentSuccess(true);
-      setPaymentDetails(paymentData);
-
-      const paymentConfirmationData = {
-        paymentId: paymentData.razorpay_payment_id,
-        orderId: paymentData.razorpay_order_id,
-        signature: paymentData.razorpay_signature,
-        bookingId: paymentData.bookingId,
-        mobileNumber: paymentData.mobileNumber,
-        documentType: documentDetails.documentType,
-        fullName: formData.fullName,
-        serviceType: paymentData.serviceType,
-        serviceName: paymentData.serviceName,
-        amount: paymentData.amount,
-        includesNotary: paymentData.includesNotary,
-        status: "success",
-        userName: userName,
-      };
-
-      const confirmationResponse = await createDualNameChangePaymentData(
-        paymentConfirmationData
-      );
-      if (confirmationResponse.status === 200) {
-        const confirmationData = confirmationResponse.data.data;
-        console.log("Payment confirmation successful:", confirmationData);
-
-        setTimeout(() => {
-          window.location.href = `/documents/name/name-correction`;
-        }, 3000);
-      } else {
-        const errorData = confirmationResponse.data.data;
-        throw new Error(errorData.message || "Failed to confirm payment");
-      }
-    } catch (error) {
-      console.error("Error confirming payment:", error);
-      alert(
-        "Payment was processed but we couldn't update your booking. Our team will contact you shortly."
-      );
-    }
-  };
-
   return (
     <div className="container-fluid mx-auto py-8">
       {showErrorNotification && validationError && (
@@ -419,7 +291,13 @@ export default function DualNameChange() {
 
       <div className="grid md:grid-cols-1 gap-8">
         <div className="print:hidden">
-          <DualNameChangeForm formData={formData} handleChange={handleChange} />
+          <DualNameChangeForm
+            formData={formData}
+            handleChange={handleChange}
+            handleAdditionalDocumentChange={handleAdditionalDocumentChange}
+            addDocument={addDocument}
+            removeDocument={removeDocument}
+          />
 
           {submissionError && (
             <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
@@ -481,23 +359,6 @@ export default function DualNameChange() {
         username={userName}
         setUsername={setUserName}
       />
-      {showServiceOptionsModal && (
-        <ServicePackageNotification
-          setShowServiceOptionsModal={setShowServiceOptionsModal}
-          bookingId={bookingId}
-          mobileNumber={mobileNumber}
-          documentName={documentDetails.documentType}
-          getServiceOptions={getServiceOptions}
-          handleServiceSelection={handleServiceSelection}
-        />
-      )}
-      {paymentSuccess && paymentDetails && (
-        <PaymentConfirmation
-          paymentSuccess={paymentSuccess}
-          paymentDetails={paymentDetails}
-          bookingId={bookingId}
-        />
-      )}
     </div>
   );
 }

@@ -138,7 +138,7 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
 
           <div className="mt-6">
             <label className="block text-sm font-medium text-red-600 mb-1">
-              Service Address
+              Gas Consumer Address 
             </label>
             <textarea
               name="serviceAddress"

@@ -183,6 +183,23 @@ const BuyEStampDocuments = () => {
     );
   };
 
+  const getConsiderationDescription = () => {
+    const stampDescriptions = { 
+      "684145ffb333b68bfef00580": "(0.5% on AAR, Fine, Premium, Advance)",
+      "6841457bb333b68bfef0057c":
+        "(0.5% on average annual rent fine premium subject to maximum of Rs.500)",
+      "6841452ab333b68bfef0057a":
+        "(Rs.2 for every Rs.100 or part thereof subject to minimum of Rs.100)",
+      "6841463db333b68bfef00582":
+        "(2% on the consideration price subject to maximum of Rs.500)",
+    };
+
+    return (
+      stampDescriptions[selectedDocument] 
+      
+    );
+  };
+
   const calculateStampAmount = () => {
     const selectedDocumentData = getSelectedDocumentData();
     if (!selectedDocumentData) return 0;
@@ -741,8 +758,7 @@ const BuyEStampDocuments = () => {
                     htmlFor="considerationAmount"
                     className="block text-sm font-medium text-gray-700 mb-2"
                   >
-                    Consideration Amount (₹) * (0.5% on ARR, fine, Premium,
-                    Advance)
+                    Consideration Amount (₹) * {getConsiderationDescription()}
                   </label>
                   <input
                     type="number"

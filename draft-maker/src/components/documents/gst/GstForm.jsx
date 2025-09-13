@@ -104,13 +104,13 @@ const GstForm = ({ formData, handleChange }) => {
               <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
                 3
               </span>
-              Tenant/Company Details
+              Proprietor/Company Details
             </h2>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
-                  Tenant Name <span className="text-red-500">*</span>
+                  Proprietor Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -118,7 +118,7 @@ const GstForm = ({ formData, handleChange }) => {
                   value={formData?.tenantName}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
-                  placeholder="Enter tenant name"
+                  placeholder="Enter proprietor name"
                   required
                 />
               </div>

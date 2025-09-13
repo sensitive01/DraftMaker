@@ -189,7 +189,7 @@ const DocumentLostForm = ({ formData, handleChange }) => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
-                  FIR Number <span className="text-red-500">*</span>
+                  FIR Number 
                 </label>
                 <input
                   type="text"
@@ -204,7 +204,7 @@ const DocumentLostForm = ({ formData, handleChange }) => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-red-600 mb-1">
-                    FIR Day <span className="text-red-500">*</span>
+                    FIR Day 
                   </label>
                   <input
                     type="number"
@@ -220,7 +220,7 @@ const DocumentLostForm = ({ formData, handleChange }) => {
 
                 <div>
                   <label className="block text-sm font-semibold text-red-600 mb-1">
-                    FIR Month <span className="text-red-500">*</span>
+                    FIR Month 
                   </label>
                   <input
                     type="number"
@@ -236,7 +236,7 @@ const DocumentLostForm = ({ formData, handleChange }) => {
 
                 <div>
                   <label className="block text-sm font-semibold text-red-600 mb-1">
-                    FIR Year <span className="text-red-500">*</span>
+                    FIR Year 
                   </label>
                   <input
                     type="number"

@@ -1,6 +1,12 @@
 import React from "react";
 
-const DualNameChangeForm = ({ formData = {}, handleChange = () => {} }) => {
+const DualNameChangeForm = ({ 
+  formData = {}, 
+  handleChange = () => {}, 
+  handleAdditionalDocumentChange = () => {},
+  addDocument = () => {},
+  removeDocument = () => {}
+}) => {
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 py-3 px-3 sm:px-4 lg:px-6">
       <div className="max-w-7xl mx-auto">
@@ -206,59 +212,92 @@ const DualNameChangeForm = ({ formData = {}, handleChange = () => {} }) => {
             </div>
           </div>
 
-          {/* Second Document Details Section */}
+          {/* Additional Document Details Section */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
-            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
-              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
-                3
-              </span>
-              Second Document Details
-            </h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-red-600 flex items-center">
+                <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                  3
+                </span>
+                Additional Document Details
+              </h2>
+              <button
+                type="button"
+                onClick={addDocument}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md font-medium text-sm transition-all duration-200 flex items-center gap-2 shadow-sm"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add Document
+              </button>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-red-600 mb-1">
-                  Name in Document <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="name2"
-                  value={formData?.name2 || ""}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
-                  required
-                />
-              </div>
+            <div className="space-y-6">
+              {formData?.additionalDocuments?.map((document, index) => (
+                <div key={document.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-md font-semibold text-gray-700">
+                      Document #{index + 2}
+                    </h3>
+                    {formData.additionalDocuments.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeDocument(index)}
+                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md font-medium text-sm transition-all duration-200 flex items-center gap-1 shadow-sm"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        Name in Document <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={document.name}
+                        onChange={(e) => handleAdditionalDocumentChange(index, 'name', e.target.value)}
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                        required
+                      />
+                    </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-red-600 mb-1">
-                  Document Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="document2"
-                  value={formData?.document2 || ""}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
-                  placeholder="e.g. Aadhar Card, PAN Card"
-                  required
-                />
-              </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        Document Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={document.document}
+                        onChange={(e) => handleAdditionalDocumentChange(index, 'document', e.target.value)}
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                        placeholder="e.g. Aadhar Card, PAN Card"
+                        required
+                      />
+                    </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-red-600 mb-1">
-                  Document Serial No. <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="documentNo2"
-                  value={formData?.documentNo2 || ""}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
-                  placeholder="Document serial number"
-                  required
-                />
-              </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-red-600 mb-1">
+                        Document Serial No. <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={document.documentNo}
+                        onChange={(e) => handleAdditionalDocumentChange(index, 'documentNo', e.target.value)}
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                        placeholder="Document serial number"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -350,4 +389,4 @@ const DualNameChangeForm = ({ formData = {}, handleChange = () => {} }) => {
   );
 };
 
-export default DualNameChangeForm;
+export default DualNameChangeForm

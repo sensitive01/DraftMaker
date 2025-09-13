@@ -16,108 +16,126 @@ const Header = () => {
       title: "Residential Rental/Lease Agreement",
       path: "/documents/rental/residential-lease",
       apiTitle: "Rental Agreement (residential)",
+      category: "agreement",
     },
     {
       id: 2,
       title: "Commercial Rental/Lease Agreement",
       path: "/documents/commercial/commercial-lease",
       apiTitle: "Rental Agreement  (commercial)",
+      category: "agreement",
     },
     {
       id: 3,
       title: "Address Proof Affidavit",
       path: "/documents/address/addressaffadavit",
       apiTitle: "Address Proof Affidavit",
+      category: "affidavit",
     },
     {
       id: 4,
       title: "Dual Name/ One and the Same",
       path: "/documents/dual-name/dual-name-correction",
       apiTitle: "Dual Name Change",
+      category: "affidavit",
     },
     {
       id: 5,
       title: "Name Change",
       path: "/documents/name/name-correction",
       apiTitle: "Name Correction Change",
+      category: "affidavit",
     },
     {
       id: 6,
       title: "DOB Mismatch",
       path: "/documents/dob/dob-correction",
       apiTitle: "Date Of Birth Correction",
+      category: "affidavit",
     },
     {
       id: 7,
       title: "Gas Voucher Lost",
       path: "/documents/gas/gas-document",
       apiTitle: "Gas",
+      category: "affidavit",
     },
     {
       id: 8,
       title: "Document Lost Declaration",
       path: "/documents/document-lost/document-lost-correction",
       apiTitle: "Document Lost",
+      category: "affidavit",
     },
     {
       id: 9,
       title: "Birth Certificate Parent's Name Correction",
       path: "/documents/birth-certificate-parent/birth-certificate-parent-name-correction",
       apiTitle: "Birth Cert Name Correction Minor Parents",
+      category: "affidavit",
     },
     {
       id: 10,
       title: "Birth Certificate Name Change",
       path: "/documents/birth-certificate/birth-certificate-correction",
       apiTitle: "Birth Cert Minor Name Correction",
+      category: "affidavit",
     },
     {
       id: 11,
       title: "GST NOC Premises by Owner",
       path: "/documents/gst/gst-document",
       apiTitle: "Gst Noc By Owner",
+      category: "affidavit",
     },
     {
       id: 12,
       title: "Matriculation Certificate Lost",
       path: "/documents/metriculation/metriculation-document",
       apiTitle: "Matriculation Certificate Lost",
+      category: "affidavit",
     },
     {
       id: 13,
       title: "Khata Transfer",
       path: "/documents/khata-transfer/khata-transfer-document",
       apiTitle: "Joint Khata Transfer",
+      category: "affidavit",
     },
     {
       id: 14,
       title: "Vehicle Insurance Claiming",
       path: "/documents/vehicle-insurance/vehicle-insurance-claiming",
       apiTitle: "Vehicle Insurance Claiming",
+      category: "affidavit",
     },
     {
       id: 15,
       title: "HUF PAN Deed",
       path: "/documents/huf/huf-aggrement",
       apiTitle: "Huf Correction",
+      category: "affidavit",
     },
     {
       id: 16,
       title: "Gap Period Tata",
       path: "/documents/gap-period/gap-period",
       apiTitle: "Gap Period",
+      category: "affidavit",
     },
     {
       id: 17,
       title: "Passport Annexure-F",
       path: "/documents/passport-annaxure/passport-annaxure",
       apiTitle: "Passport Annexure F",
+      category: "affidavit",
     },
     {
       id: 18,
       title: "Passport Name Change",
       path: "/documents/passport-name/passport-name-change",
       apiTitle: "Passport Name Change",
+      category: "affidavit",
     },
   ];
 
@@ -163,9 +181,26 @@ const Header = () => {
     setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
   };
 
-  // Function to render visible document links
-  const renderDocumentLinks = () => {
-    return visibleDocuments.map((doc) => (
+  // Function to render agreement documents (Residential and Commercial)
+  const renderAgreementLinks = () => {
+    const agreements = visibleDocuments.filter(
+      (doc) => doc.category === "agreement"
+    );
+    return agreements.map((doc) => (
+      <li key={doc.id}>
+        <Link to={doc.path} onClick={closeMenu}>
+          {doc.title}
+        </Link>
+      </li>
+    ));
+  };
+
+  // Function to render affidavit documents (all others)
+  const renderAffidavitLinks = () => {
+    const affidavits = visibleDocuments.filter(
+      (doc) => doc.category === "affidavit"
+    );
+    return affidavits.map((doc) => (
       <li key={doc.id}>
         <Link to={doc.path} onClick={closeMenu}>
           {doc.title}
@@ -225,37 +260,88 @@ const Header = () => {
                   </Link>
                 </li>
 
-                {/* Document Drafting Dropdown */}
+                {/* Agreements Dropdown */}
                 <li className="nav-item has_dropdown">
                   <a
                     className="nav-link dropdown-toggle-custom"
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
-                      toggleDropdown("documents");
+                      toggleDropdown("agreements");
                     }}
                   >
-                    Document Drafting
+                    Agreements
                   </a>
                   <span
                     className="drp_btn"
-                    onClick={() => toggleDropdown("documents")}
+                    onClick={() => toggleDropdown("agreements")}
                   >
                     <i
                       className={`icofont-rounded-down ${
-                        activeDropdown === "documents" ? "rotate-180" : ""
+                        activeDropdown === "agreements" ? "rotate-180" : ""
+                      }`}
+                    ></i>
+                  </span>
+                  <div
+                    className={`sub_menu ${
+                      activeDropdown === "agreements" ? "show-dropdown" : ""
+                    }`}
+                  >
+                    <ul>
+                      {visibleDocuments.filter(
+                        (doc) => doc.category === "agreement"
+                      ).length > 0 ? (
+                        renderAgreementLinks()
+                      ) : (
+                        <li>
+                          <span
+                            style={{
+                              padding: "12px 16px",
+                              display: "block",
+                              color: "#666",
+                            }}
+                          >
+                            Loading agreements...
+                          </span>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </li>
+
+                {/* Affidavits Dropdown */}
+                <li className="nav-item has_dropdown">
+                  <a
+                    className="nav-link dropdown-toggle-custom"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleDropdown("affidavits");
+                    }}
+                  >
+                    Affidavits
+                  </a>
+                  <span
+                    className="drp_btn"
+                    onClick={() => toggleDropdown("affidavits")}
+                  >
+                    <i
+                      className={`icofont-rounded-down ${
+                        activeDropdown === "affidavits" ? "rotate-180" : ""
                       }`}
                     ></i>
                   </span>
                   <div
                     className={`sub_menu scrollable-submenu ${
-                      activeDropdown === "documents" ? "show-dropdown" : ""
+                      activeDropdown === "affidavits" ? "show-dropdown" : ""
                     }`}
                   >
                     <div className="submenu-scroll-container">
                       <ul>
-                        {visibleDocuments.length > 0 ? (
-                          renderDocumentLinks()
+                        {visibleDocuments.filter(
+                          (doc) => doc.category === "affidavit"
+                        ).length > 0 ? (
+                          renderAffidavitLinks()
                         ) : (
                           <li>
                             <span
@@ -265,7 +351,7 @@ const Header = () => {
                                 color: "#666",
                               }}
                             >
-                              Loading documents...
+                              Loading affidavits...
                             </span>
                           </li>
                         )}
@@ -284,57 +370,7 @@ const Header = () => {
                   </Link>
                 </li>
 
-                {/* Newspaper Ad Dropdown */}
-                <li className="nav-item has_dropdown">
-                  <a
-                    className="nav-link dropdown-toggle-custom"
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      toggleDropdown("newspaper");
-                    }}
-                  >
-                    Newspaper Ad
-                  </a>
-                  <span
-                    className="drp_btn"
-                    onClick={() => toggleDropdown("newspaper")}
-                  >
-                    <i
-                      className={`icofont-rounded-down ${
-                        activeDropdown === "newspaper" ? "rotate-180" : ""
-                      }`}
-                    ></i>
-                  </span>
-                  <div
-                    className={`sub_menu ${
-                      activeDropdown === "newspaper" ? "show-dropdown" : ""
-                    }`}
-                  >
-                    <ul>
-                      {/* Only show Passport Name Change if it's visible */}
-                      {visibleDocuments.find(
-                        (doc) => doc.apiTitle === "Passport Name Change"
-                      ) && (
-                        <li>
-                          <Link
-                            to="/documents/passport-name/passport-name-change"
-                            onClick={closeMenu}
-                          >
-                            Passport Name Change
-                          </Link>
-                        </li>
-                      )}
-                      <li>
-                        <Link to="#" onClick={closeMenu}>
-                          Others
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                </li>
-
-                {/* In-Shop Services Dropdown */}
+                {/* Services Dropdown (formerly Newspaper Ad) */}
                 <li className="nav-item has_dropdown">
                   <a
                     className="nav-link dropdown-toggle-custom"
@@ -344,7 +380,7 @@ const Header = () => {
                       toggleDropdown("services");
                     }}
                   >
-                    In-Shop Services
+                    Services
                   </a>
                   <span
                     className="drp_btn"
@@ -359,6 +395,64 @@ const Header = () => {
                   <div
                     className={`sub_menu ${
                       activeDropdown === "services" ? "show-dropdown" : ""
+                    }`}
+                  >
+                    <ul>
+                      {/* Passport Name Change with pricing */}
+                      {visibleDocuments.find(
+                        (doc) => doc.apiTitle === "Passport Name Change"
+                      ) && (
+                        <li>
+                          <Link
+                            to="/documents/passport-name/passport-name-change"
+                            onClick={closeMenu}
+                          >
+                            News Paper Ad (Passport Name Change - Rs 3000)
+                          </Link>
+                        </li>
+                      )}
+                      {/* HUF Deed and Pan with pricing */}
+                      {visibleDocuments.find(
+                        (doc) => doc.apiTitle === "Huf Correction"
+                      ) && (
+                        <li>
+                          <Link
+                            to="/documents/huf/huf-aggrement"
+                            onClick={closeMenu}
+                          >
+                            HUF Deed and PAN - Rs 1500
+                          </Link>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </li>
+
+                {/* In-Shop Services Dropdown */}
+                <li className="nav-item has_dropdown">
+                  <a
+                    className="nav-link dropdown-toggle-custom"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleDropdown("inShopServices");
+                    }}
+                  >
+                    In-Shop Services
+                  </a>
+                  <span
+                    className="drp_btn"
+                    onClick={() => toggleDropdown("inShopServices")}
+                  >
+                    <i
+                      className={`icofont-rounded-down ${
+                        activeDropdown === "inShopServices" ? "rotate-180" : ""
+                      }`}
+                    ></i>
+                  </span>
+                  <div
+                    className={`sub_menu ${
+                      activeDropdown === "inShopServices" ? "show-dropdown" : ""
                     }`}
                   >
                     <ul>

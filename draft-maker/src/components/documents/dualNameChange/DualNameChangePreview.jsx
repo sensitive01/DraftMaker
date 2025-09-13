@@ -150,52 +150,55 @@ const DualNameChangePreview = ({ formData }) => {
                   </p>
                 </div>
 
-                <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
-                  <span className="font-bold text-base sm:text-lg md:text-xl w-6 sm:w-8 md:w-10 flex-shrink-0 mt-0.5">
-                    3.
-                  </span>
-                  <p className="text-justify">
-                    That my name has been recorded as{" "}
-                    <span
-                      className={
-                        isFilled(formData?.name2) ? "" : "bg-yellow-200 px-1"
-                      }
-                    >
-                      <strong>{formData?.name2 || "NAME"}</strong>
+                {/* Dynamic additional documents */}
+                {formData?.additionalDocuments?.map((document, index) => (
+                  <div key={document.id} className="flex items-start gap-2 sm:gap-3 md:gap-4">
+                    <span className="font-bold text-base sm:text-lg md:text-xl w-6 sm:w-8 md:w-10 flex-shrink-0 mt-0.5">
+                      {index + 3}.
                     </span>
-                    , Name of document-
-                    <span
-                      className={
-                        isFilled(formData?.document2)
-                          ? ""
-                          : "bg-yellow-200 px-1"
-                      }
-                    >
-                      <strong>
-                        {formData?.document2 || "NAME OF DOCUMENT"}
-                      </strong>
-                    </span>
-                    , Document Serial No-
-                    <span
-                      className={
-                        isFilled(formData?.documentNo2)
-                          ? ""
-                          : "bg-yellow-200 px-1"
-                      }
-                    >
-                      <strong>
-                        {formData?.documentNo2 || "DOCUMENT SERIAL NO"}
-                      </strong>
-                    </span>
-                  </p>
-                </div>
+                    <p className="text-justify">
+                      That my name has been recorded as{" "}
+                      <span
+                        className={
+                          isFilled(document.name) ? "" : "bg-yellow-200 px-1"
+                        }
+                      >
+                        <strong>{document.name || "NAME"}</strong>
+                      </span>
+                      , Name of document-
+                      <span
+                        className={
+                          isFilled(document.document)
+                            ? ""
+                            : "bg-yellow-200 px-1"
+                        }
+                      >
+                        <strong>
+                          {document.document || "NAME OF DOCUMENT"}
+                        </strong>
+                      </span>
+                      , Document Serial No-
+                      <span
+                        className={
+                          isFilled(document.documentNo)
+                            ? ""
+                            : "bg-yellow-200 px-1"
+                        }
+                      >
+                        <strong>
+                          {document.documentNo || "DOCUMENT SERIAL NO"}
+                        </strong>
+                      </span>
+                    </p>
+                  </div>
+                ))}
 
                 <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
                   <span className="font-bold text-base sm:text-lg md:text-xl w-6 sm:w-8 md:w-10 flex-shrink-0 mt-0.5">
-                    4.
+                    {(formData?.additionalDocuments?.length || 0) + 3}.
                   </span>
                   <p className="text-justify">
-                    That I further declare that both the names mentioned here in
+                    That I further declare that all the names mentioned here in
                     above belongs to one and the same person i.e.{" "}
                     <strong>"myself"</strong>.
                   </p>
@@ -203,7 +206,7 @@ const DualNameChangePreview = ({ formData }) => {
 
                 <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
                   <span className="font-bold text-base sm:text-lg md:text-xl w-6 sm:w-8 md:w-10 flex-shrink-0 mt-0.5">
-                    5.
+                    {(formData?.additionalDocuments?.length || 0) + 4}.
                   </span>
                   <p className="text-justify">
                     That my statement is true and correct.
@@ -504,116 +507,57 @@ const DualNameChangePreview = ({ formData }) => {
                     {formData?.documentNo1 || "DOCUMENT SERIAL NO"}
                   </span>
                 </li>
-              </ol>
-            </div>
 
-            {/* Page 2 */}
-            <div
-              style={{ height: "297mm", position: "relative", padding: "20mm" }}
-            >
-              {/* Corner marks */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  borderTop: "1px solid #999",
-                  borderLeft: "1px solid #999",
-                  width: "16px",
-                  height: "16px",
-                }}
-              ></div>
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  borderTop: "1px solid #999",
-                  borderRight: "1px solid #999",
-                  width: "16px",
-                  height: "16px",
-                }}
-              ></div>
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  borderBottom: "1px solid #999",
-                  borderLeft: "1px solid #999",
-                  width: "16px",
-                  height: "16px",
-                }}
-              ></div>
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  right: 0,
-                  borderBottom: "1px solid #999",
-                  borderRight: "1px solid #999",
-                  width: "16px",
-                  height: "16px",
-                }}
-              ></div>
-
-              {/* Continue the numbered list */}
-              <ol
-                style={{
-                  listStyleType: "decimal",
-                  marginLeft: "20px",
-                  lineHeight: "1.6",
-                  marginBottom: "24px",
-                }}
-                start="3"
-              >
-                <li style={{ marginBottom: "16px" }}>
-                  That my name has been recorded as{" "}
-                  <span
-                    style={
-                      isFilled(formData?.name2)
-                        ? { fontWeight: "bold" }
-                        : {
-                            backgroundColor: "#FEFCBF",
-                            padding: "0 0.25rem",
-                            fontWeight: "bold",
-                          }
-                    }
-                  >
-                    {formData?.name2 || "NAME"}
-                  </span>
-                  , Name of document-
-                  <span
-                    style={
-                      isFilled(formData?.document2)
-                        ? { fontWeight: "bold" }
-                        : {
-                            backgroundColor: "#FEFCBF",
-                            padding: "0 0.25rem",
-                            fontWeight: "bold",
-                          }
-                    }
-                  >
-                    {formData?.document2 || "NAME OF DOCUMENT"}
-                  </span>
-                  , Document Serial No-
-                  <span
-                    style={
-                      isFilled(formData?.documentNo2)
-                        ? { fontWeight: "bold" }
-                        : {
-                            backgroundColor: "#FEFCBF",
-                            padding: "0 0.25rem",
-                            fontWeight: "bold",
-                          }
-                    }
-                  >
-                    {formData?.documentNo2 || "DOCUMENT SERIAL NO"}
-                  </span>
-                </li>
+                {/* Dynamic additional documents for PDF */}
+                {formData?.additionalDocuments?.map((document, index) => (
+                  <li key={document.id} style={{ marginBottom: "16px" }}>
+                    That my name has been recorded as{" "}
+                    <span
+                      style={
+                        isFilled(document.name)
+                          ? { fontWeight: "bold" }
+                          : {
+                              backgroundColor: "#FEFCBF",
+                              padding: "0 0.25rem",
+                              fontWeight: "bold",
+                            }
+                      }
+                    >
+                      {document.name || "NAME"}
+                    </span>
+                    , Name of document-
+                    <span
+                      style={
+                        isFilled(document.document)
+                          ? { fontWeight: "bold" }
+                          : {
+                              backgroundColor: "#FEFCBF",
+                              padding: "0 0.25rem",
+                              fontWeight: "bold",
+                            }
+                      }
+                    >
+                      {document.document || "NAME OF DOCUMENT"}
+                    </span>
+                    , Document Serial No-
+                    <span
+                      style={
+                        isFilled(document.documentNo)
+                          ? { fontWeight: "bold" }
+                          : {
+                              backgroundColor: "#FEFCBF",
+                              padding: "0 0.25rem",
+                              fontWeight: "bold",
+                            }
+                      }
+                    >
+                      {document.documentNo || "DOCUMENT SERIAL NO"}
+                    </span>
+                  </li>
+                ))}
 
                 <li style={{ marginBottom: "16px" }}>
-                  That I further declare that both the names mentioned{" "}
+                  That I further declare that all the names mentioned{" "}
                   <span style={{ textDecoration: "underline" }}>
                     hereinabove
                   </span>{" "}

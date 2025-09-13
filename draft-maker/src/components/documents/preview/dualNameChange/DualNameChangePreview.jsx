@@ -4,6 +4,32 @@ import { getDayWithSuffix } from "../../../../utils/dateFormat";
 const DualNameChangePreview = ({ formData }) => {
   const pdfTemplateRef = useRef(null);
 
+  // Function to check if a field is filled
+  const isFilled = (value) => {
+    return value && value.toString().trim() !== "";
+  };
+
+  // Handle backward compatibility - support both old and new data structures
+  const getAdditionalDocuments = () => {
+    if (formData?.additionalDocuments && formData.additionalDocuments.length > 0) {
+      return formData.additionalDocuments;
+    }
+    
+    // Fallback to old structure if new structure not available
+    if (formData?.name2 || formData?.document2 || formData?.documentNo2) {
+      return [{
+        id: 1,
+        name: formData.name2 || "",
+        document: formData.document2 || "",
+        documentNo: formData.documentNo2 || ""
+      }];
+    }
+    
+    return [];
+  };
+
+  const additionalDocuments = getAdditionalDocuments();
+
   return (
     <>
       <div className="flex flex-col items-center">
@@ -27,7 +53,7 @@ const DualNameChangePreview = ({ formData }) => {
               <p className="text-justify">
                 I,{" "}
                 <span
-                  className={formData?.fullName ? "" : "bg-yellow-200 px-1"}
+                  className={isFilled(formData?.fullName) ? "" : "bg-yellow-200 px-1"}
                 >
                   <strong>
                     {formData?.namePrefix}{" "}
@@ -36,19 +62,19 @@ const DualNameChangePreview = ({ formData }) => {
                   </strong>
                 </span>{" "}
                 <span
-                  className={formData?.relation ? "" : "bg-yellow-200 px-1"}
+                  className={isFilled(formData?.relation) ? "" : "bg-yellow-200 px-1"}
                 >
                   <strong>{formData?.relation || "D/o, S/o, H/o, W/o"}</strong>
                 </span>{" "}
                 <span
-                  className={formData?.relationName ? "" : "bg-yellow-200 px-1"}
+                  className={isFilled(formData?.relationName) ? "" : "bg-yellow-200 px-1"}
                 >
                   <strong>
                     {formData?.relationName || "..................."}
                   </strong>
                 </span>
                 , Aged:{" "}
-                <span className={formData?.age ? "" : "bg-yellow-200 px-1"}>
+                <span className={isFilled(formData?.age) ? "" : "bg-yellow-200 px-1"}>
                   <strong>{formData?.age || "......"}</strong>
                 </span>{" "}
                 Years,
@@ -58,7 +84,7 @@ const DualNameChangePreview = ({ formData }) => {
                 Permanent Address{" "}
                 <span
                   className={
-                    formData?.permanentAddress ? "" : "bg-yellow-200 px-1"
+                    isFilled(formData?.permanentAddress) ? "" : "bg-yellow-200 px-1"
                   }
                 >
                   <strong>
@@ -71,7 +97,7 @@ const DualNameChangePreview = ({ formData }) => {
               <p className="text-justify">
                 My Aadhaar No:{" "}
                 <span
-                  className={formData?.aadhaarNo ? "" : "bg-yellow-200 px-1"}
+                  className={isFilled(formData?.aadhaarNo) ? "" : "bg-yellow-200 px-1"}
                 >
                   <strong>{formData?.aadhaarNo || "0000 0000 0000"}</strong>
                 </span>
@@ -98,14 +124,14 @@ const DualNameChangePreview = ({ formData }) => {
                   <p className="text-justify">
                     That my name has been recorded as{" "}
                     <span
-                      className={formData?.name1 ? "" : "bg-yellow-200 px-1"}
+                      className={isFilled(formData?.name1) ? "" : "bg-yellow-200 px-1"}
                     >
                       <strong>{formData?.name1 || "NAME"}</strong>
                     </span>
                     , Name of document-
                     <span
                       className={
-                        formData?.document1 ? "" : "bg-yellow-200 px-1"
+                        isFilled(formData?.document1) ? "" : "bg-yellow-200 px-1"
                       }
                     >
                       <strong>
@@ -115,7 +141,7 @@ const DualNameChangePreview = ({ formData }) => {
                     , Document Serial No-
                     <span
                       className={
-                        formData?.documentNo1 ? "" : "bg-yellow-200 px-1"
+                        isFilled(formData?.documentNo1) ? "" : "bg-yellow-200 px-1"
                       }
                     >
                       <strong>
@@ -125,46 +151,49 @@ const DualNameChangePreview = ({ formData }) => {
                   </p>
                 </div>
 
-                <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
-                  <span className="font-bold text-base sm:text-lg md:text-xl w-6 sm:w-8 md:w-10 flex-shrink-0 mt-0.5">
-                    3.
-                  </span>
-                  <p className="text-justify">
-                    That my name has been recorded as{" "}
-                    <span
-                      className={formData?.name2 ? "" : "bg-yellow-200 px-1"}
-                    >
-                      <strong>{formData?.name2 || "NAME"}</strong>
+                {/* Dynamic additional documents */}
+                {additionalDocuments.map((document, index) => (
+                  <div key={document.id || index} className="flex items-start gap-2 sm:gap-3 md:gap-4">
+                    <span className="font-bold text-base sm:text-lg md:text-xl w-6 sm:w-8 md:w-10 flex-shrink-0 mt-0.5">
+                      {index + 3}.
                     </span>
-                    , Name of document-
-                    <span
-                      className={
-                        formData?.document2 ? "" : "bg-yellow-200 px-1"
-                      }
-                    >
-                      <strong>
-                        {formData?.document2 || "NAME OF DOCUMENT"}
-                      </strong>
-                    </span>
-                    , Document Serial No-
-                    <span
-                      className={
-                        formData?.documentNo2 ? "" : "bg-yellow-200 px-1"
-                      }
-                    >
-                      <strong>
-                        {formData?.documentNo2 || "DOCUMENT SERIAL NO"}
-                      </strong>
-                    </span>
-                  </p>
-                </div>
+                    <p className="text-justify">
+                      That my name has been recorded as{" "}
+                      <span
+                        className={isFilled(document.name) ? "" : "bg-yellow-200 px-1"}
+                      >
+                        <strong>{document.name || "NAME"}</strong>
+                      </span>
+                      , Name of document-
+                      <span
+                        className={
+                          isFilled(document.document) ? "" : "bg-yellow-200 px-1"
+                        }
+                      >
+                        <strong>
+                          {document.document || "NAME OF DOCUMENT"}
+                        </strong>
+                      </span>
+                      , Document Serial No-
+                      <span
+                        className={
+                          isFilled(document.documentNo) ? "" : "bg-yellow-200 px-1"
+                        }
+                      >
+                        <strong>
+                          {document.documentNo || "DOCUMENT SERIAL NO"}
+                        </strong>
+                      </span>
+                    </p>
+                  </div>
+                ))}
 
                 <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
                   <span className="font-bold text-base sm:text-lg md:text-xl w-6 sm:w-8 md:w-10 flex-shrink-0 mt-0.5">
-                    4.
+                    {additionalDocuments.length + 3}.
                   </span>
                   <p className="text-justify">
-                    That I further declare that both the names mentioned here in
+                    That I further declare that {additionalDocuments.length > 1 ? "all the names" : "both the names"} mentioned here in
                     above belongs to one and the same person i.e.{" "}
                     <strong>"myself"</strong>.
                   </p>
@@ -172,7 +201,7 @@ const DualNameChangePreview = ({ formData }) => {
 
                 <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
                   <span className="font-bold text-base sm:text-lg md:text-xl w-6 sm:w-8 md:w-10 flex-shrink-0 mt-0.5">
-                    5.
+                    {additionalDocuments.length + 4}.
                   </span>
                   <p className="text-justify">
                     That my statement is true and correct.
@@ -183,19 +212,19 @@ const DualNameChangePreview = ({ formData }) => {
               <div className="mt-8 sm:mt-10 md:mt-12 text-justify">
                 <p>
                   Verified at{" "}
-                  <span className={formData?.place ? "" : "bg-yellow-200 px-1"}>
+                  <span className={isFilled(formData?.place) ? "" : "bg-yellow-200 px-1"}>
                     <strong>{formData?.place || "PLACE"}</strong>
                   </span>{" "}
                   on this{" "}
-                  <span className={formData?.day ? "" : "bg-yellow-200 px-1"}>
+                  <span className={isFilled(formData?.day) ? "" : "bg-yellow-200 px-1"}>
                     <strong>{getDayWithSuffix(formData?.day) || "XX"}</strong>
                   </span>{" "}
                   day of{" "}
-                  <span className={formData?.month ? "" : "bg-yellow-200 px-1"}>
+                  <span className={isFilled(formData?.month) ? "" : "bg-yellow-200 px-1"}>
                     <strong>{formData?.month || "XXXX"}</strong>
                   </span>
                   ,{" "}
-                  <span className={formData?.year ? "" : "bg-yellow-200 px-1"}>
+                  <span className={isFilled(formData?.year) ? "" : "bg-yellow-200 px-1"}>
                     <strong>{formData?.year || "XXXX"}</strong>
                   </span>{" "}
                   that the contents of the above said affidavit are true and
@@ -299,7 +328,7 @@ const DualNameChangePreview = ({ formData }) => {
                 I,{" "}
                 <span
                   style={
-                    formData?.fullName
+                    isFilled(formData?.fullName)
                       ? { fontWeight: "bold" }
                       : {
                           backgroundColor: "#FEFCBF",
@@ -314,7 +343,7 @@ const DualNameChangePreview = ({ formData }) => {
                 </span>{" "}
                 <span
                   style={
-                    formData?.relation
+                    isFilled(formData?.relation)
                       ? { fontWeight: "bold" }
                       : {
                           backgroundColor: "#FEFCBF",
@@ -327,7 +356,7 @@ const DualNameChangePreview = ({ formData }) => {
                 </span>{" "}
                 <span
                   style={
-                    formData?.relationName
+                    isFilled(formData?.relationName)
                       ? { fontWeight: "bold" }
                       : {
                           backgroundColor: "#FEFCBF",
@@ -341,7 +370,7 @@ const DualNameChangePreview = ({ formData }) => {
                 , Aged:{" "}
                 <span
                   style={
-                    formData?.age
+                    isFilled(formData?.age)
                       ? { fontWeight: "bold" }
                       : {
                           backgroundColor: "#FEFCBF",
@@ -359,7 +388,7 @@ const DualNameChangePreview = ({ formData }) => {
                 Permanent Address{" "}
                 <span
                   style={
-                    formData?.permanentAddress
+                    isFilled(formData?.permanentAddress)
                       ? { fontWeight: "bold" }
                       : {
                           backgroundColor: "#FEFCBF",
@@ -377,7 +406,7 @@ const DualNameChangePreview = ({ formData }) => {
                 My Aadhaar No:{" "}
                 <span
                   style={
-                    formData?.aadhaarNo
+                    isFilled(formData?.aadhaarNo)
                       ? { fontWeight: "bold" }
                       : {
                           backgroundColor: "#FEFCBF",
@@ -417,7 +446,7 @@ const DualNameChangePreview = ({ formData }) => {
                   That my name has been recorded as{" "}
                   <span
                     style={
-                      formData?.name1
+                      isFilled(formData?.name1)
                         ? { fontWeight: "bold" }
                         : {
                             backgroundColor: "#FEFCBF",
@@ -431,7 +460,7 @@ const DualNameChangePreview = ({ formData }) => {
                   , Name of document-
                   <span
                     style={
-                      formData?.document1
+                      isFilled(formData?.document1)
                         ? { fontWeight: "bold" }
                         : {
                             backgroundColor: "#FEFCBF",
@@ -445,7 +474,7 @@ const DualNameChangePreview = ({ formData }) => {
                   , Document Serial No-
                   <span
                     style={
-                      formData?.documentNo1
+                      isFilled(formData?.documentNo1)
                         ? { fontWeight: "bold" }
                         : {
                             backgroundColor: "#FEFCBF",
@@ -457,116 +486,57 @@ const DualNameChangePreview = ({ formData }) => {
                     {formData?.documentNo1 || "DOCUMENT SERIAL NO"}
                   </span>
                 </li>
-              </ol>
-            </div>
 
-            {/* Page 2 */}
-            <div
-              style={{ height: "297mm", position: "relative", padding: "20mm" }}
-            >
-              {/* Corner marks */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  borderTop: "1px solid #999",
-                  borderLeft: "1px solid #999",
-                  width: "16px",
-                  height: "16px",
-                }}
-              ></div>
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  borderTop: "1px solid #999",
-                  borderRight: "1px solid #999",
-                  width: "16px",
-                  height: "16px",
-                }}
-              ></div>
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  borderBottom: "1px solid #999",
-                  borderLeft: "1px solid #999",
-                  width: "16px",
-                  height: "16px",
-                }}
-              ></div>
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  right: 0,
-                  borderBottom: "1px solid #999",
-                  borderRight: "1px solid #999",
-                  width: "16px",
-                  height: "16px",
-                }}
-              ></div>
-
-              {/* Continue the numbered list */}
-              <ol
-                style={{
-                  listStyleType: "decimal",
-                  marginLeft: "20px",
-                  lineHeight: "1.6",
-                  marginBottom: "24px",
-                }}
-                start="3"
-              >
-                <li style={{ marginBottom: "16px" }}>
-                  That my name has been recorded as{" "}
-                  <span
-                    style={
-                      formData?.name2
-                        ? { fontWeight: "bold" }
-                        : {
-                            backgroundColor: "#FEFCBF",
-                            padding: "0 0.25rem",
-                            fontWeight: "bold",
-                          }
-                    }
-                  >
-                    {formData?.name2 || "NAME"}
-                  </span>
-                  , Name of document-
-                  <span
-                    style={
-                      formData?.document2
-                        ? { fontWeight: "bold" }
-                        : {
-                            backgroundColor: "#FEFCBF",
-                            padding: "0 0.25rem",
-                            fontWeight: "bold",
-                          }
-                    }
-                  >
-                    {formData?.document2 || "NAME OF DOCUMENT"}
-                  </span>
-                  , Document Serial No-
-                  <span
-                    style={
-                      formData?.documentNo2
-                        ? { fontWeight: "bold" }
-                        : {
-                            backgroundColor: "#FEFCBF",
-                            padding: "0 0.25rem",
-                            fontWeight: "bold",
-                          }
-                    }
-                  >
-                    {formData?.documentNo2 || "DOCUMENT SERIAL NO"}
-                  </span>
-                </li>
+                {/* Dynamic additional documents for PDF */}
+                {additionalDocuments.map((document, index) => (
+                  <li key={document.id || index} style={{ marginBottom: "16px" }}>
+                    That my name has been recorded as{" "}
+                    <span
+                      style={
+                        isFilled(document.name)
+                          ? { fontWeight: "bold" }
+                          : {
+                              backgroundColor: "#FEFCBF",
+                              padding: "0 0.25rem",
+                              fontWeight: "bold",
+                            }
+                      }
+                    >
+                      {document.name || "NAME"}
+                    </span>
+                    , Name of document-
+                    <span
+                      style={
+                        isFilled(document.document)
+                          ? { fontWeight: "bold" }
+                          : {
+                              backgroundColor: "#FEFCBF",
+                              padding: "0 0.25rem",
+                              fontWeight: "bold",
+                            }
+                      }
+                    >
+                      {document.document || "NAME OF DOCUMENT"}
+                    </span>
+                    , Document Serial No-
+                    <span
+                      style={
+                        isFilled(document.documentNo)
+                          ? { fontWeight: "bold" }
+                          : {
+                              backgroundColor: "#FEFCBF",
+                              padding: "0 0.25rem",
+                              fontWeight: "bold",
+                            }
+                      }
+                    >
+                      {document.documentNo || "DOCUMENT SERIAL NO"}
+                    </span>
+                  </li>
+                ))}
 
                 <li style={{ marginBottom: "16px" }}>
-                  That I further declare that both the names mentioned{" "}
+                  That I further declare that {additionalDocuments.length > 1 ? "all the names" : "both the names"} mentioned{" "}
                   <span style={{ textDecoration: "underline" }}>
                     hereinabove
                   </span>{" "}
@@ -584,7 +554,7 @@ const DualNameChangePreview = ({ formData }) => {
                   Verified at{" "}
                   <span
                     style={
-                      formData?.place
+                      isFilled(formData?.place)
                         ? { fontWeight: "bold" }
                         : {
                             backgroundColor: "#FEFCBF",
@@ -598,7 +568,7 @@ const DualNameChangePreview = ({ formData }) => {
                   on this{" "}
                   <span
                     style={
-                      formData?.day
+                      isFilled(formData?.day)
                         ? { fontWeight: "bold" }
                         : {
                             backgroundColor: "#FEFCBF",
@@ -612,7 +582,7 @@ const DualNameChangePreview = ({ formData }) => {
                   day of{" "}
                   <span
                     style={
-                      formData?.month
+                      isFilled(formData?.month)
                         ? { fontWeight: "bold" }
                         : {
                             backgroundColor: "#FEFCBF",
@@ -626,7 +596,7 @@ const DualNameChangePreview = ({ formData }) => {
                   ,{" "}
                   <span
                     style={
-                      formData?.year
+                      isFilled(formData?.year)
                         ? { fontWeight: "bold" }
                         : {
                             backgroundColor: "#FEFCBF",

@@ -156,7 +156,7 @@ const UploadDocumentUi = ({
                         className="px-2 py-1.5 text-xs text-gray-900 hover:bg-red-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                         onClick={() => handleDocumentSelect(docType)}
                       >
-                        {docType.documentType} - ₹{docType.draftCharge}
+                        {docType.documentType} 
                       </div>
                     ))}
                   </div>
