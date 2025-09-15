@@ -591,8 +591,8 @@ const DocumentPaymentPage = () => {
                     Important Notice
                   </h3>
                   <p className="text-yellow-700 text-sm">
-                    For Name Change Affidavit, paper advertisement is also
-                    required and included in this service.
+                    For Name Change Affidavit paper advertisement is also
+                    done here .
                   </p>
                 </div>
               </div>
