@@ -53,6 +53,7 @@ const DocumentPaymentPage = () => {
     state: "",
     pincode: "",
   });
+  const [showNameChangePopup, setShowNameChangePopup] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState();
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
@@ -75,6 +76,11 @@ const DocumentPaymentPage = () => {
     };
     fetchData();
   }, []);
+  useEffect(() => {
+    if (formId === "DM-PNC-15") {
+      setShowNameChangePopup(true);
+    }
+  }, [formId]);
 
   // Auto-select stamp duty based on formId - Updated to trigger when service is selected
   useEffect(() => {
@@ -99,6 +105,9 @@ const DocumentPaymentPage = () => {
       setSelectedStampDuty(selectedStamp || null);
     }
   }, [stampDutyOptions, formId, selectedService]); // Added selectedService dependency
+  const handleContactUs = () => {
+    navigate("/home/contact-us");
+  };
 
   const getServiceOptions = () => [
     {
@@ -196,29 +205,29 @@ const DocumentPaymentPage = () => {
     return 0;
   };
 
- const calculateTotalAmount = () => {
-  if (!selectedService) return 0;
+  const calculateTotalAmount = () => {
+    if (!selectedService) return 0;
 
-  let total = selectedService.price; // 1. Base Draft Charge
+    let total = selectedService.price; // 1. Base Draft Charge
 
-  // 2. Notary Charge (Optional)
-  if (selectedService.hasNotary && includeNotary) {
-    total += selectedService.notaryCharge;
-  }
+    // 2. Notary Charge (Optional)
+    if (selectedService.hasNotary && includeNotary) {
+      total += selectedService.notaryCharge;
+    }
 
-  // 3. Stamp Duty + Service Charge (if stamp required)
-  if (selectedService.requiresStamp && selectedStampDuty) {
-    total += calculateStampDutyAmount(selectedStampDuty); // 3a. Stamp Duty Amount
-    total += SERVICE_CHARGE_PER_DOCUMENT * quantity;      // 3b. Service Charge (₹210 per doc)
-  }
+    // 3. Stamp Duty + Service Charge (if stamp required)
+    if (selectedService.requiresStamp && selectedStampDuty) {
+      total += calculateStampDutyAmount(selectedStampDuty); // 3a. Stamp Duty Amount
+      total += SERVICE_CHARGE_PER_DOCUMENT * quantity; // 3b. Service Charge (₹210 per doc)
+    }
 
-  // 4. Delivery Charge (if delivery required)
-  if (selectedService.requiresDelivery && selectedDeliveryCharge) {
-    total += selectedDeliveryCharge.charge;
-  }
+    // 4. Delivery Charge (if delivery required)
+    if (selectedService.requiresDelivery && selectedDeliveryCharge) {
+      total += selectedDeliveryCharge.charge;
+    }
 
-  return total;
-};
+    return total;
+  };
 
   const canProceedToPayment = () => {
     if (!selectedService) return false;
@@ -551,8 +560,303 @@ const DocumentPaymentPage = () => {
     navigate(-1);
   };
 
+  const NameChangeAffidavitPopup = () => {
+    if (!showNameChangePopup) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-red-600 text-white p-4 rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                Name Change Affidavit Information
+              </h2>
+              <button
+                onClick={() => setShowNameChangePopup(false)}
+                className="text-white hover:text-gray-200 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6">
+            <div className="space-y-6">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-start">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-yellow-600 mr-3 flex-shrink-0 mt-0.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 18.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
+                  </svg>
+                  <div>
+                    <h3 className="font-semibold text-yellow-800 mb-2">
+                      Important Notice
+                    </h3>
+                    <p className="text-yellow-700 text-sm">
+                      For Name Change Affidavit, paper advertisement is also
+                      required and included in this service.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="font-semibold text-blue-800 mb-3 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                  </svg>
+                  What's Included in Your Service
+                </h3>
+                <ul className="space-y-2 text-blue-700 text-sm">
+                  <li className="flex items-start">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 mt-0.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Professional Name Change Affidavit drafting
+                  </li>
+                  <li className="flex items-start">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 mt-0.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Paper advertisement publication assistance
+                  </li>
+                  <li className="flex items-start">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 mt-0.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Legal compliance verification
+                  </li>
+                  <li className="flex items-start">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 mt-0.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Expert guidance throughout the process
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 011 1l4 4a2 2 0 011 1v11a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  Paper Advertisement Details
+                </h3>
+                <div className="text-gray-700 text-sm space-y-2">
+                  <p>
+                    • Publication in local/regional newspaper as per legal
+                    requirements
+                  </p>
+                  <p>
+                    • Advertisement content drafted according to standard format
+                  </p>
+                  <p>• Proof of publication provided for official records</p>
+                  <p>
+                    • Timeline: Advertisement publication typically takes 7-10
+                    business days
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <h3 className="font-semibold text-green-800 mb-3 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Need Help or Have Questions?
+                </h3>
+                <p className="text-green-700 text-sm mb-3">
+                  Our team is here to assist you with any questions about the
+                  name change process or advertisement requirements.
+                </p>
+                <button
+                  onClick={handleContactUs}
+                  className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center text-sm font-medium"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    />
+                  </svg>
+                  Contact Us for Support
+                </button>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+              <button
+                onClick={() => setShowNameChangePopup(false)}
+                className="px-4 py-2 text-gray-700 border-2 border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 transition-colors flex items-center font-medium text-sm"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+                Close
+              </button>
+              <button
+                onClick={() => setShowNameChangePopup(false)}
+                className="px-6 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors flex items-center font-medium text-sm shadow-md hover:shadow-lg"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+                Continue to Payment
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-4">
+      <NameChangeAffidavitPopup />
       {showErrorNotification && (
         <ErrorNoification
           validationError={errorMessage}
