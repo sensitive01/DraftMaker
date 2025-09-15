@@ -5,16 +5,16 @@ import MobileNumberInput from "../serviceNotification/MobileNumberInput";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ErrorNoification from "../serviceNotification/ErrorNoification";
-import {
-  createDobParentNameCorrectionPaymentData,
-  dobParentNameCorrectionData,
-} from "../../../api/service/axiosService";
+import { dobParentNameCorrectionData } from "../../../api/service/axiosService";
 import { useNavigate } from "react-router-dom";
 
-// Main Page Component containing both form and preview
 export default function BirthCertificateParentNameCorrectionPage() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+
+  // 🔹 Key for sessionStorage
+  const STORAGE_KEY = "birthCert_parentNameCorrection_temp";
+
+  const initialFormData = {
     formId: "DM-BCNCP-6",
     fatherTitle: "Mr.",
     fatherName: "",
@@ -34,26 +34,44 @@ export default function BirthCertificateParentNameCorrectionPage() {
     day: "1",
     month: "April",
     year: "2024",
-  });
+  };
+
+  // 🔹 Load saved data if exists
+  const getSavedData = () => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : initialFormData;
+    } catch {
+      return initialFormData;
+    }
+  };
+
+  const [formData, setFormData] = useState(getSavedData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
-  const [validationError, setValidationError] = useState(""); // Added for validation errors
-  const [showErrorNotification, setShowErrorNotification] = useState(false); // Added to control error notification visibility
+  const [validationError, setValidationError] = useState("");
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
-  const [showServiceOptionsModal, setShowServiceOptionsModal] = useState(false);
   const [bookingId, setBookingId] = useState("");
-  const [selectedService, setSelectedService] = useState("");
   const [documentDetails, setDocumentDetails] = useState(null);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [paymentDetails, setPaymentDetails] = useState(null);
   const [userName, setUserName] = useState();
+
+  // 🔹 Save form data to sessionStorage
+  const saveFormData = () => {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+  };
+
+  // 🔹 Clear form & sessionStorage
+  const handleClearForm = () => {
+    setFormData(initialFormData);
+    sessionStorage.removeItem(STORAGE_KEY);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Clear error notifications when user makes changes
     if (showErrorNotification) {
       setShowErrorNotification(false);
       setValidationError("");
@@ -62,27 +80,19 @@ export default function BirthCertificateParentNameCorrectionPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Validation function - checks all required fields
   const validateForm = () => {
-    // Father validation
     if (!formData.fatherName.trim()) {
       setValidationError("Please enter father's name");
       return false;
     }
-
-    // Mother validation
     if (!formData.motherName.trim()) {
       setValidationError("Please enter mother's name");
       return false;
     }
-
-    // Address validation
     if (!formData.address.trim()) {
       setValidationError("Please enter your address");
       return false;
     }
-
-    // Aadhaar validation - can add pattern validation if needed
     if (!formData.fatherAadhaar.trim()) {
       setValidationError("Please enter father's Aadhaar number");
       return false;
@@ -90,7 +100,6 @@ export default function BirthCertificateParentNameCorrectionPage() {
       setValidationError("Father's Aadhaar number must be 12 digits");
       return false;
     }
-
     if (!formData.motherAadhaar.trim()) {
       setValidationError("Please enter mother's Aadhaar number");
       return false;
@@ -98,68 +107,53 @@ export default function BirthCertificateParentNameCorrectionPage() {
       setValidationError("Mother's Aadhaar number must be 12 digits");
       return false;
     }
-
-    // Child details validation
     if (!formData.childName.trim()) {
       setValidationError("Please enter child's name");
       return false;
     }
-
-    // Certificate validation
     if (!formData.certificateNumber.trim()) {
       setValidationError("Please enter birth certificate number");
       return false;
     }
-
-    // Name correction validation
     if (!formData.incorrectFatherName.trim()) {
       setValidationError(
         "Please enter incorrect father's name as printed on certificate"
       );
       return false;
     }
-
     if (!formData.incorrectMotherName.trim()) {
       setValidationError(
         "Please enter incorrect mother's name as printed on certificate"
       );
       return false;
     }
-
     if (!formData.correctFatherName.trim()) {
       setValidationError("Please enter correct father's name");
       return false;
     }
-
     if (!formData.correctMotherName.trim()) {
       setValidationError("Please enter correct mother's name");
       return false;
     }
-
-    // Date and place validation
     if (!formData.place.trim()) {
       setValidationError("Please enter the place");
       return false;
     }
-
     if (!formData.day) {
       setValidationError("Please select a day");
       return false;
     }
-
     return true;
   };
 
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
 
-    // First validate the form
     if (validateForm()) {
+      saveFormData(); // 🔹 Save before opening mobile modal
       setShowMobileModal(true);
     } else {
-      // Show error notification
       setShowErrorNotification(true);
-      // Auto-hide notification after 5 seconds
       setTimeout(() => {
         setShowErrorNotification(false);
       }, 5000);
@@ -205,9 +199,6 @@ export default function BirthCertificateParentNameCorrectionPage() {
           formId: "DM-BCNCP-6",
         },
       });
-
-      // setShowServiceOptionsModal(true);
-      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -217,196 +208,8 @@ export default function BirthCertificateParentNameCorrectionPage() {
     }
   };
 
-  const getServiceOptions = () => {
-    if (!documentDetails) return [];
-
-    const options = [];
-
-    options.push({
-      id: "draft",
-      name: "Draft Only",
-      price: documentDetails.draftCharge || 0,
-      hasNotary: documentDetails.hasDraftNotaryCharge,
-      notaryCharge: documentDetails.draftNotaryCharge || 0,
-      description: "Digital document sent to your email",
-    });
-
-    options.push({
-      id: "draft_estamp",
-      name: "Draft + E-stamp",
-      price: documentDetails.pdfCharge || 0,
-      hasNotary: documentDetails.hasPdfNotaryCharge,
-      notaryCharge: documentDetails.pdfNotaryCharge || 0,
-      description: "Digital document with legal e-stamp",
-    });
-
-    options.push({
-      id: "draft_estamp_delivery",
-      name: "Draft + E-stamp + Delivery",
-      price: documentDetails.homeDropCharge || 0,
-
-      hasNotary: documentDetails.hasHomeDropNotaryCharge,
-      notaryCharge: documentDetails.homeDropNotaryCharge || 0,
-      description: "Physical copy delivered to your address",
-    });
-
-    return options;
-  };
-
-  const handleServiceSelection = (service) => {
-    setSelectedService(service);
-    handlePayment(service);
-  };
-
-  const handlePayment = async (service) => {
-    try {
-      const totalPrice = service.hasNotary
-        ? service.price + service.notaryCharge
-        : service.price;
-
-      setShowServiceOptionsModal(false);
-
-      if (!window.Razorpay) {
-        const script = document.createElement("script");
-        script.src = "https://checkout.razorpay.com/v1/checkout.js";
-
-        script.onload = () => {
-          initializeRazorpay(service, totalPrice);
-        };
-
-        script.onerror = () => {
-          console.error("Razorpay SDK failed to load");
-          alert("Payment gateway failed to load. Please try again later.");
-        };
-
-        document.body.appendChild(script);
-      } else {
-        initializeRazorpay(service, totalPrice);
-      }
-    } catch (error) {
-      console.error("Error initializing payment:", error);
-      alert("Payment initialization failed. Please try again.");
-    }
-  };
-
-  const initializeRazorpay = async (service, totalPrice) => {
-    try {
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: totalPrice * 100,
-        currency: "INR",
-        name: "Draft Maker",
-        description: `Dual Name Change - ${service.name}`,
-        handler: function (response) {
-          console.log("razorpay response", response);
-          handlePaymentSuccess({
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-            bookingId: bookingId,
-            mobileNumber: mobileNumber,
-            documentType: documentDetails.documentType,
-            fullName: formData.fullName,
-            serviceType: service.id,
-            serviceName: service.name,
-            amount: totalPrice,
-            includesNotary: service.hasNotary,
-            userName: userName,
-          });
-        },
-        prefill: {
-          name: userName,
-          contact: mobileNumber,
-        },
-        notes: {
-          bookingId: bookingId,
-          serviceType: service.id,
-        },
-        theme: {
-          color: "#dc2626",
-        },
-        modal: {
-          ondismiss: function () {
-            console.log("Checkout form closed");
-          },
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-
-      razorpay.on("payment.failed", function (response) {
-        fetch("/api/payment-failed", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            error: response.error,
-            bookingId: bookingId,
-            mobileNumber: mobileNumber,
-            serviceType: service.id,
-            status: "failed",
-            userName: userName,
-          }),
-        }).catch((error) => {
-          console.error("Error logging payment failure:", error);
-        });
-
-        console.error("Payment failed:", response.error);
-        alert(`Payment failed: ${response.error.description}`);
-      });
-    } catch (error) {
-      console.error("Error in Razorpay initialization:", error);
-      alert("Payment initialization failed. Please try again.");
-    }
-  };
-
-  const handlePaymentSuccess = async (paymentData) => {
-    try {
-      setPaymentSuccess(true);
-      setPaymentDetails(paymentData);
-
-      const paymentConfirmationData = {
-        paymentId: paymentData.razorpay_payment_id,
-        orderId: paymentData.razorpay_order_id,
-        signature: paymentData.razorpay_signature,
-        bookingId: paymentData.bookingId,
-        mobileNumber: paymentData.mobileNumber,
-        documentType: documentDetails.documentType,
-        fullName: formData.fullName,
-        serviceType: paymentData.serviceType,
-        serviceName: paymentData.serviceName,
-        amount: paymentData.amount,
-        includesNotary: paymentData.includesNotary,
-        userName: userName,
-        status: "success",
-      };
-
-      const confirmationResponse =
-        await createDobParentNameCorrectionPaymentData(paymentConfirmationData);
-      if (confirmationResponse.status === 200) {
-        const confirmationData = confirmationResponse.data.data;
-        console.log("Payment confirmation successful:", confirmationData);
-
-        setTimeout(() => {
-          window.location.href = `/documents/name/name-correction`;
-        }, 3000);
-      } else {
-        const errorData = confirmationResponse.data.data;
-        throw new Error(errorData.message || "Failed to confirm payment");
-      }
-    } catch (error) {
-      console.error("Error confirming payment:", error);
-      alert(
-        "Payment was processed but we couldn't update your booking. Our team will contact you shortly."
-      );
-    }
-  };
-
   return (
     <div className="container-fluid mx-auto p-2 sm:p-4 bg-gray-50 min-h-screen">
-      {/* Error notification component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
           validationError={validationError}
@@ -432,10 +235,6 @@ export default function BirthCertificateParentNameCorrectionPage() {
             </p>
           </div>
         </div>
-
-        {/* <div className="w-full overflow-x-auto">
-          <BirtCertificateParentNameCorrectionPreview formData={formData} />
-        </div> */}
       </div>
 
       <div className="mt-6 sm:mt-8 flex flex-col items-center">
@@ -472,6 +271,8 @@ export default function BirthCertificateParentNameCorrectionPage() {
             "Submit Application"
           )}
         </button>
+
+       
       </div>
 
       <MobileNumberInput
@@ -484,23 +285,6 @@ export default function BirthCertificateParentNameCorrectionPage() {
         username={userName}
         setUsername={setUserName}
       />
-      {/* {showServiceOptionsModal && (
-        <ServicePackageNotification
-          setShowServiceOptionsModal={setShowServiceOptionsModal}
-          bookingId={bookingId}
-          mobileNumber={mobileNumber}
-          documentName={documentDetails.documentType}
-          getServiceOptions={getServiceOptions}
-          handleServiceSelection={handleServiceSelection}
-        />
-      )} */}
-      {paymentSuccess && paymentDetails && (
-        <PaymentConfirmation
-          paymentSuccess={paymentSuccess}
-          paymentDetails={paymentDetails}
-          bookingId={bookingId}
-        />
-      )}
     </div>
   );
 }

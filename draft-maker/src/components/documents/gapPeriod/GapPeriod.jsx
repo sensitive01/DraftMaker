@@ -1,19 +1,22 @@
 import { useState } from "react";
 import GapPeriodForm from "./GapPeriodForm";
-import AffidavitDisplay from "./GapPeriodPreview"; // Make sure this import matches your actual file name
+import AffidavitDisplay from "./GapPeriodPreview";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
-import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
+import ErrorNoification from "../serviceNotification/ErrorNoification";
 import {
   createGapPeriodPaymentData,
   sendGapPeriodData,
 } from "../../../api/service/axiosService";
 import { useNavigate } from "react-router-dom";
 
+const STORAGE_KEY = "gapPeriod_temp";
+
 export default function GapPeriod() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+
+  const initialFormData = {
     formId: "DM-GP-13",
     name: "",
     relation: "S/o",
@@ -27,12 +30,23 @@ export default function GapPeriod() {
     month: "April",
     year: "2025",
     gapPeriods: [{ from: "", to: "", reason: "" }],
-  });
+  };
 
+  // Load saved data or use initial data
+  const getSavedData = () => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : initialFormData;
+    } catch {
+      return initialFormData;
+    }
+  };
+
+  const [formData, setFormData] = useState(getSavedData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
-  const [validationError, setValidationError] = useState(""); // Add validation error state
-  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
+  const [validationError, setValidationError] = useState("");
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -42,7 +56,17 @@ export default function GapPeriod() {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
-  const [userName, setUserName] = useState();
+  const [userName, setUserName] = useState("");
+
+  // Manual save function
+  const saveFormData = () => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+      console.log("Gap period form data saved!");
+    } catch (error) {
+      console.warn("Could not save form data");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -84,7 +108,7 @@ export default function GapPeriod() {
     }
   };
 
-  // Add form validation function
+  // Form validation function
   const validateForm = () => {
     // Personal details validation
     if (!formData.name.trim()) {
@@ -184,6 +208,9 @@ export default function GapPeriod() {
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
 
+    // Save form data before proceeding
+    saveFormData();
+
     // Validate form before showing mobile modal
     if (validateForm()) {
       setShowMobileModal(true);
@@ -235,15 +262,21 @@ export default function GapPeriod() {
           formId: "DM-GP-13",
         },
       });
-
-      // setShowServiceOptionsModal(true);
-      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
         error.message || "An error occurred while submitting your form"
       );
       setIsSubmitting(false);
+    }
+  };
+
+  const handleClearForm = () => {
+    setFormData(initialFormData);
+    try {
+      sessionStorage.removeItem(STORAGE_KEY);
+    } catch (error) {
+      console.warn("Could not clear form data");
     }
   };
 
@@ -274,7 +307,6 @@ export default function GapPeriod() {
       id: "draft_estamp_delivery",
       name: "Draft + E-stamp + Delivery",
       price: documentDetails.homeDropCharge || 0,
-
       hasNotary: documentDetails.hasHomeDropNotaryCharge,
       notaryCharge: documentDetails.homeDropNotaryCharge || 0,
       description: "Physical copy delivered to your address",
@@ -437,7 +469,7 @@ export default function GapPeriod() {
 
   return (
     <div className="container-fluid mx-auto py-2 sm:py-4 md:py-6 lg:py-8 px-1 sm:px-2 md:px-4 lg:px-6">
-      {/* Add Error Notification Component */}
+      {/* Error Notification Component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
           validationError={validationError}
@@ -469,21 +501,11 @@ export default function GapPeriod() {
             </div>
           </div>
         </div>
-
-        {/* Right column: Preview */}
-        {/* <div className="w-full">
-          <div className="bg-gray-50 rounded-lg p-1 sm:p-2 md:p-4 lg:p-6">
-            <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4 text-center text-gray-800 lg:hidden">
-              Preview
-            </h3>
-            <div className="transform scale-90 sm:scale-95 md:scale-100 origin-top -mx-2 sm:mx-0">
-              <AffidavitDisplay data={formData} />
-            </div>
-          </div>
-        </div> */}
       </div>
 
       <div className="mt-6 sm:mt-8 flex flex-col items-center px-2 sm:px-4">
+        
+
         <button
           onClick={handleSubmitButtonClick}
           disabled={isSubmitting}
@@ -517,6 +539,8 @@ export default function GapPeriod() {
             "Submit Application"
           )}
         </button>
+
+       
       </div>
 
       <MobileNumberInput

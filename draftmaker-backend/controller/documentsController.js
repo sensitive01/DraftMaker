@@ -168,7 +168,7 @@ const getDocumentNames = async (req, res) => {
   try {
     const documentsData = await documentPriceData.find(
       {status:true},
-      { documentType: 1, formId: 1, draftCharge: 1, draftNotaryCharge: 1 }
+      { documentType: 1, formId: 1, draftCharge: 1, draftNotaryCharge: 1,serviceCharge:1 }
     );
 
     if (!documentsData || documentsData.length === 0) {

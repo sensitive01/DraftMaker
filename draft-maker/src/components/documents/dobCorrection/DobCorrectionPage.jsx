@@ -1,77 +1,111 @@
 import { useState } from "react";
 import DobCorrectionForm from "./DobCorrectionForm";
-import DobCorrectionPreview from "./DobCorrectionPreview";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
-import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
-import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
-import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
-import {
-  createDobCorrectionPaymentData,
-  sendDobCorrectionData,
-} from "../../../api/service/axiosService";
+import ErrorNoification from "../serviceNotification/ErrorNoification";
+import { sendDobCorrectionData } from "../../../api/service/axiosService";
 import { useNavigate } from "react-router-dom";
 
 export default function DobCorrectionPage() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    formId: "DM-DOBC-3",
-    fullName: "",
-    relation: "S/o",
-    relationName: "",
-    age: "",
-    permanentAddress: "",
-    aadhaarNo: "",
-    dob1: "",
-    document1: "",
-    documentNo1: "",
-    dob2: "",
-    document2: "",
-    documentNo2: "",
-    place: "",
-    day: "1",
-    month: "",
-    year: "2025",
-  });
+
+  // Session storage key
+  const STORAGE_KEY = "dobCorrection_temp";
+
+  // Load saved data or fallback defaults
+  const getSavedData = () => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      return saved
+        ? JSON.parse(saved)
+        : {
+            formId: "DM-DOBC-3",
+            fullName: "",
+            relation: "S/o",
+            relationName: "",
+            age: "",
+            permanentAddress: "",
+            aadhaarNo: "",
+            dob1: "",
+            document1: "",
+            documentNo1: "",
+            dob2: "",
+            document2: "",
+            documentNo2: "",
+            place: "",
+            day: "1",
+            month: "",
+            year: "2025",
+          };
+    } catch {
+      return {
+        formId: "DM-DOBC-3",
+        fullName: "",
+        relation: "S/o",
+        relationName: "",
+        age: "",
+        permanentAddress: "",
+        aadhaarNo: "",
+        dob1: "",
+        document1: "",
+        documentNo1: "",
+        dob2: "",
+        document2: "",
+        documentNo2: "",
+        place: "",
+        day: "1",
+        month: "",
+        year: "2025",
+      };
+    }
+  };
+
+  const [formData, setFormData] = useState(getSavedData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
-  const [validationError, setValidationError] = useState(""); // Add validation error state
-  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
+  const [validationError, setValidationError] = useState("");
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
-  const [showServiceOptionsModal, setShowServiceOptionsModal] = useState(false);
   const [bookingId, setBookingId] = useState("");
-  const [selectedService, setSelectedService] = useState("");
   const [documentDetails, setDocumentDetails] = useState(null);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [paymentDetails, setPaymentDetails] = useState(null);
   const [userName, setUserName] = useState();
 
+  // Save to sessionStorage
+  const saveFormData = (data) => {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  };
+
+  // Clear form manually if needed
+  const handleClearForm = () => {
+    sessionStorage.removeItem(STORAGE_KEY);
+    setFormData(getSavedData());
+  };
+
+  // Handle input changes with auto-save
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Clear error notification when user starts typing
     if (showErrorNotification) {
       setShowErrorNotification(false);
       setValidationError("");
     }
 
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const updatedData = { ...formData, [name]: value };
+    setFormData(updatedData);
+    saveFormData(updatedData);
   };
 
-  // Add form validation function
+  // Validation
   const validateForm = () => {
-    // Personal details validation
     if (!formData.fullName.trim()) {
       setValidationError("Please enter your full name");
       return false;
     }
-
     if (!formData.relationName.trim()) {
       setValidationError("Please enter relation name");
       return false;
     }
-
     if (!formData.age.trim()) {
       setValidationError("Please enter your age");
       return false;
@@ -79,14 +113,10 @@ export default function DobCorrectionPage() {
       setValidationError("Please enter a valid age");
       return false;
     }
-
-    // Address validation
     if (!formData.permanentAddress.trim()) {
       setValidationError("Please enter your permanent address");
       return false;
     }
-
-    // Aadhaar validation
     if (!formData.aadhaarNo.trim()) {
       setValidationError("Please enter your Aadhaar number");
       return false;
@@ -94,39 +124,30 @@ export default function DobCorrectionPage() {
       setValidationError("Aadhaar number must be 12 digits");
       return false;
     }
-
-    // DOB correction details validation
     if (!formData.dob1.trim()) {
       setValidationError("Please enter the incorrect date of birth");
       return false;
     }
-
     if (!formData.document1.trim()) {
       setValidationError("Please enter the document with incorrect DOB");
       return false;
     }
-
     if (!formData.documentNo1.trim()) {
       setValidationError("Please enter the document number for incorrect DOB");
       return false;
     }
-
     if (!formData.dob2.trim()) {
       setValidationError("Please enter the correct date of birth");
       return false;
     }
-
     if (!formData.document2.trim()) {
       setValidationError("Please enter the document with correct DOB");
       return false;
     }
-
     if (!formData.documentNo2.trim()) {
       setValidationError("Please enter the document number for correct DOB");
       return false;
     }
-
-    // Date and place validation
     if (!formData.day.trim()) {
       setValidationError("Please enter the day");
       return false;
@@ -138,41 +159,35 @@ export default function DobCorrectionPage() {
       setValidationError("Please enter a valid day (1-31)");
       return false;
     }
-
     if (!formData.month.trim()) {
       setValidationError("Please select a month");
       return false;
     }
-
     if (!formData.place.trim()) {
       setValidationError("Please enter the place");
       return false;
     }
-
     return true;
   };
 
+  // Submit button click
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-
-    // Validate form before showing mobile modal
     if (validateForm()) {
+      saveFormData(formData); // Ensure latest state is saved
       setShowMobileModal(true);
     } else {
       setShowErrorNotification(true);
-      // Auto-hide the error notification after 5 seconds
-      setTimeout(() => {
-        setShowErrorNotification(false);
-      }, 5000);
+      setTimeout(() => setShowErrorNotification(false), 5000);
     }
   };
 
+  // Handle mobile submission
   const handleMobileSubmit = async () => {
     if (!mobileNumber.trim()) {
       setMobileError("Mobile number is required");
       return;
     }
-
     const mobileRegex = /^[0-9]{10}$/;
     if (!mobileRegex.test(mobileNumber)) {
       setMobileError("Please enter a valid 10-digit mobile number");
@@ -192,11 +207,12 @@ export default function DobCorrectionPage() {
       };
 
       const response = await sendDobCorrectionData(dataWithMobile);
-      console.log("responsein", response);
-
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
+
+      // ✅ Do NOT clear sessionStorage
+
       navigate("/documents/payment-page", {
         state: {
           bookingId: responseData.bookingId,
@@ -206,9 +222,6 @@ export default function DobCorrectionPage() {
           formId: "DM-DOBC-3",
         },
       });
-
-      // setShowServiceOptionsModal(true);
-      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -218,196 +231,8 @@ export default function DobCorrectionPage() {
     }
   };
 
-  const getServiceOptions = () => {
-    if (!documentDetails) return [];
-
-    const options = [];
-
-    options.push({
-      id: "draft",
-      name: "Draft Only",
-      price: documentDetails.draftCharge || 0,
-      hasNotary: documentDetails.hasDraftNotaryCharge,
-      notaryCharge: documentDetails.draftNotaryCharge || 0,
-      description: "Digital document sent to your email",
-    });
-
-    options.push({
-      id: "draft_estamp",
-      name: "Draft + E-stamp",
-      price: documentDetails.pdfCharge || 0,
-      hasNotary: documentDetails.hasPdfNotaryCharge,
-      notaryCharge: documentDetails.pdfNotaryCharge || 0,
-      description: "Digital document with legal e-stamp",
-    });
-
-    options.push({
-      id: "draft_estamp_delivery",
-      name: "Draft + E-stamp + Delivery",
-      price: documentDetails.homeDropCharge || 0,
-      hasNotary: documentDetails.hasHomeDropNotaryCharge,
-      notaryCharge: documentDetails.homeDropNotaryCharge || 0,
-      description: "Physical copy delivered to your address",
-    });
-
-    return options;
-  };
-
-  const handleServiceSelection = (service) => {
-    setSelectedService(service);
-    handlePayment(service);
-  };
-
-  const handlePayment = async (service) => {
-    try {
-      const totalPrice = service.hasNotary
-        ? service.price + service.notaryCharge
-        : service.price;
-
-      setShowServiceOptionsModal(false);
-
-      if (!window.Razorpay) {
-        const script = document.createElement("script");
-        script.src = "https://checkout.razorpay.com/v1/checkout.js";
-
-        script.onload = () => {
-          initializeRazorpay(service, totalPrice);
-        };
-
-        script.onerror = () => {
-          console.error("Razorpay SDK failed to load");
-          alert("Payment gateway failed to load. Please try again later.");
-        };
-
-        document.body.appendChild(script);
-      } else {
-        initializeRazorpay(service, totalPrice);
-      }
-    } catch (error) {
-      console.error("Error initializing payment:", error);
-      alert("Payment initialization failed. Please try again.");
-    }
-  };
-
-  const initializeRazorpay = async (service, totalPrice) => {
-    try {
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: totalPrice * 100,
-        currency: "INR",
-        name: "Draft Maker",
-        description: `${documentDetails.documentType} - ${service.name}`,
-        handler: function (response) {
-          console.log("razorpay response", response);
-          handlePaymentSuccess({
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-            bookingId: bookingId,
-            mobileNumber: mobileNumber,
-            documentType: documentDetails.documentType,
-            fullName: formData.fullName,
-            serviceType: service.id,
-            serviceName: service.name,
-            amount: totalPrice,
-            includesNotary: service.hasNotary,
-            userName: userName,
-          });
-        },
-        prefill: {
-          name: userName,
-          contact: mobileNumber,
-        },
-        notes: {
-          bookingId: bookingId,
-          serviceType: service.id,
-        },
-        theme: {
-          color: "#dc2626",
-        },
-        modal: {
-          ondismiss: function () {
-            console.log("Checkout form closed");
-          },
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-
-      razorpay.on("payment.failed", function (response) {
-        fetch("/api/payment-failed", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            error: response.error,
-            bookingId: bookingId,
-            mobileNumber: mobileNumber,
-            serviceType: service.id,
-            status: "failed",
-            userName: userName,
-          }),
-        }).catch((error) => {
-          console.error("Error logging payment failure:", error);
-        });
-
-        console.error("Payment failed:", response.error);
-        alert(`Payment failed: ${response.error.description}`);
-      });
-    } catch (error) {
-      console.error("Error in Razorpay initialization:", error);
-      alert("Payment initialization failed. Please try again.");
-    }
-  };
-
-  const handlePaymentSuccess = async (paymentData) => {
-    try {
-      setPaymentSuccess(true);
-      setPaymentDetails(paymentData);
-
-      const paymentConfirmationData = {
-        paymentId: paymentData.razorpay_payment_id,
-        orderId: paymentData.razorpay_order_id,
-        signature: paymentData.razorpay_signature,
-        bookingId: paymentData.bookingId,
-        mobileNumber: paymentData.mobileNumber,
-        documentType: documentDetails.documentType,
-        fullName: formData.fullName,
-        serviceType: paymentData.serviceType,
-        serviceName: paymentData.serviceName,
-        amount: paymentData.amount,
-        includesNotary: paymentData.includesNotary,
-        status: "success",
-        userName: userName,
-      };
-
-      const confirmationResponse = await createDobCorrectionPaymentData(
-        paymentConfirmationData
-      );
-      if (confirmationResponse.status === 200) {
-        const confirmationData = confirmationResponse.data.data;
-        console.log("Payment confirmation successful:", confirmationData);
-
-        setTimeout(() => {
-          window.location.href = `/documents/name/name-correction`;
-        }, 3000);
-      } else {
-        const errorData = confirmationResponse.data.data;
-        throw new Error(errorData.message || "Failed to confirm payment");
-      }
-    } catch (error) {
-      console.error("Error confirming payment:", error);
-      alert(
-        "Payment was processed but we couldn't update your booking. Our team will contact you shortly."
-      );
-    }
-  };
-
   return (
     <div className="container-fluid mx-auto py-8">
-      {/* Add Error Notification Component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
           validationError={validationError}
@@ -416,14 +241,15 @@ export default function DobCorrectionPage() {
       )}
 
       <div className="grid md:grid-cols-1 gap-8">
-        {/* Left column: Form */}
         <div className="print:hidden">
           <DobCorrectionForm formData={formData} handleChange={handleChange} />
+
           {submissionError && (
             <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
               {submissionError}
             </div>
           )}
+
           <div className="text-black font-bold text-center mt-4">
             <p>
               🔒 Preview and editing options will be available after successful
@@ -432,6 +258,7 @@ export default function DobCorrectionPage() {
           </div>
         </div>
       </div>
+
       <div className="mt-8 flex flex-col items-center">
         <button
           onClick={handleSubmitButtonClick}
@@ -466,6 +293,15 @@ export default function DobCorrectionPage() {
             "Submit Application"
           )}
         </button>
+
+        {/* Optional clear button */}
+        <button
+          type="button"
+          onClick={handleClearForm}
+          className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded mt-2"
+        >
+          Clear Form
+        </button>
       </div>
 
       <MobileNumberInput
@@ -478,23 +314,6 @@ export default function DobCorrectionPage() {
         username={userName}
         setUsername={setUserName}
       />
-      {showServiceOptionsModal && (
-        <ServicePackageNotification
-          setShowServiceOptionsModal={setShowServiceOptionsModal}
-          bookingId={bookingId}
-          mobileNumber={mobileNumber}
-          documentName={documentDetails.documentType}
-          getServiceOptions={getServiceOptions}
-          handleServiceSelection={handleServiceSelection}
-        />
-      )}
-      {paymentSuccess && paymentDetails && (
-        <PaymentConfirmation
-          paymentSuccess={paymentSuccess}
-          paymentDetails={paymentDetails}
-          bookingId={bookingId}
-        />
-      )}
     </div>
   );
 }

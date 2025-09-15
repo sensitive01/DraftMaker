@@ -14,101 +14,139 @@ import {
 export default function CommercialAggrement() {
   const navigate = useNavigate();
   const { type } = useParams();
-  console.log("Type", type);
-  const [formData, setFormData] = useState({
-    agreementDate: "",
-    lessors: [
-      {
-        name: "",
-        addressLine1: "",
-        addressLine2: "",
-        city: "",
-        state: "",
-        pinCode: "",
-      },
-    ],
-    lessees: [
-      {
-        name: "",
-        aadhaar: "",
-        permanentAddressLine1: "",
-        permanentAddressLine2: "",
-        permanentCity: "",
-        permanentState: "",
-        permanentPinCode: "",
-      },
-    ],
+  const STORAGE_KEY = "commercialAgreement_temp";
 
-    lessorAddressLine1: "",
-    lessorAddressLine2: "",
-    lessorCity: "",
-    lessorState: "",
-    lessorPinCode: "",
+  // Load saved data from sessionStorage or use defaults
+  const getSavedData = () => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      return saved
+        ? JSON.parse(saved)
+        : {
+            agreementDate: "",
+            lessors: [
+              {
+                name: "",
+                addressLine1: "",
+                addressLine2: "",
+                city: "",
+                state: "",
+                pinCode: "",
+              },
+            ],
+            lessees: [
+              {
+                name: "",
+                aadhaar: "",
+                permanentAddressLine1: "",
+                permanentAddressLine2: "",
+                permanentCity: "",
+                permanentState: "",
+                permanentPinCode: "",
+              },
+            ],
+            rentAmount: "",
+            rentAmountWords: "",
+            depositAmount: "",
+            depositAmountWords: "",
+            rentDueDate: "5",
+            agreementStartDate: "",
+            agreementEndDate: "",
+            noticePeriod: "",
+            fixtures: [{ item: "", quantity: "" }],
+            formId: "DM-CFD-17",
+            bhkConfig: "",
+            bedroomCount: "",
+            hallCount: "",
+            kitchenCount: "",
+            toiletCount: "",
+            commercialType: "",
+            squareFeet: "",
+            additionaldetails: "",
+          };
+    } catch {
+      return {
+        agreementDate: "",
+        lessors: [
+          {
+            name: "",
+            addressLine1: "",
+            addressLine2: "",
+            city: "",
+            state: "",
+            pinCode: "",
+          },
+        ],
+        lessees: [
+          {
+            name: "",
+            aadhaar: "",
+            permanentAddressLine1: "",
+            permanentAddressLine2: "",
+            permanentCity: "",
+            permanentState: "",
+            permanentPinCode: "",
+          },
+        ],
+        rentAmount: "",
+        rentAmountWords: "",
+        depositAmount: "",
+        depositAmountWords: "",
+        rentDueDate: "5",
+        agreementStartDate: "",
+        agreementEndDate: "",
+        noticePeriod: "",
+        fixtures: [{ item: "", quantity: "" }],
+        formId: "DM-CFD-17",
+        bhkConfig: "",
+        bedroomCount: "",
+        hallCount: "",
+        kitchenCount: "",
+        toiletCount: "",
+        commercialType: "",
+        squareFeet: "",
+        additionaldetails: "",
+      };
+    }
+  };
 
-    lesseeAadhaar: "",
-    lesseePermanentAddressLine1: "",
-    lesseePermanentAddressLine2: "",
-    lesseePermanentCity: "",
-    lesseePermanentState: "",
-    lesseePermanentPinCode: "",
-    rentAmount: "",
-    rentAmountWords: "",
-    rentDueDate: "5", // Default is 5th of every month
-    depositAmount: "",
-    depositAmountWords: "",
-    agreementStartDate: "",
-    agreementEndDate: "", // Optional: can calculate or allow user input
-    rentIncreasePercentage: "",
-    noticePeriod: "",
-    terminationPeriod: "", // Termination if rent not paid for X months
-    paintingCharges: "",
-    usePurpose: "Commecial Purpose",
-    formId: "DM-CFD-17",
-    bhkConfig: "",
-    bedroomCount: "",
-    hallCount: "",
-    kitchenCount: "",
-    toiletCount: "",
-    commercialType: "",
-    squareFeet: "",
-    additionaldetails: "",
-    fixtures: [{ item: "", quantity: "" }],
-  });
+  const [formData, setFormData] = useState(getSavedData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
-  const [validationError, setValidationError] = useState(""); // Add validation error state
-  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
+  const [validationError, setValidationError] = useState("");
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
-  const [showServiceOptionsModal, setShowServiceOptionsModal] = useState(false);
   const [bookingId, setBookingId] = useState("");
-  const [selectedService, setSelectedService] = useState("");
   const [documentDetails, setDocumentDetails] = useState(null);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [paymentDetails, setPaymentDetails] = useState(null);
   const [userName, setUserName] = useState();
 
+  // Save to sessionStorage
+  const saveFormData = (data) => {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  };
+
+  // Handle input changes with auto-save
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Clear error notification when user starts typing
     if (showErrorNotification) {
       setShowErrorNotification(false);
       setValidationError("");
     }
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    const updatedData = { ...formData, [name]: value };
+    setFormData(updatedData);
+    saveFormData(updatedData);
   };
 
+  // Lessor and Lessee handlers
   const addLessor = () => {
-    setFormData((prev) => ({
-      ...prev,
+    const updatedData = {
+      ...formData,
       lessors: [
-        ...prev.lessors,
+        ...formData.lessors,
         {
           name: "",
           addressLine1: "",
@@ -118,20 +156,35 @@ export default function CommercialAggrement() {
           pinCode: "",
         },
       ],
-    }));
+    };
+    setFormData(updatedData);
+    saveFormData(updatedData);
   };
   const removeLessor = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      lessors: prev.lessors.filter((_, i) => i !== index),
-    }));
+    const updatedData = {
+      ...formData,
+      lessors: formData.lessors.filter((_, i) => i !== index),
+    };
+    setFormData(updatedData);
+    saveFormData(updatedData);
+  };
+  const handleLessorChange = (index, e) => {
+    const { name, value } = e.target;
+    const updatedData = {
+      ...formData,
+      lessors: formData.lessors.map((lessor, i) =>
+        i === index ? { ...lessor, [name]: value } : lessor
+      ),
+    };
+    setFormData(updatedData);
+    saveFormData(updatedData);
   };
 
   const addLessee = () => {
-    setFormData((prev) => ({
-      ...prev,
+    const updatedData = {
+      ...formData,
       lessees: [
-        ...prev.lessees,
+        ...formData.lessees,
         {
           name: "",
           aadhaar: "",
@@ -142,210 +195,114 @@ export default function CommercialAggrement() {
           permanentPinCode: "",
         },
       ],
-    }));
+    };
+    setFormData(updatedData);
+    saveFormData(updatedData);
   };
-
   const removeLessee = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      lessees: prev.lessees.filter((_, i) => i !== index),
-    }));
+    const updatedData = {
+      ...formData,
+      lessees: formData.lessees.filter((_, i) => i !== index),
+    };
+    setFormData(updatedData);
+    saveFormData(updatedData);
   };
-
-  const handleLessorChange = (index, e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      lessors: prev.lessors.map((lessor, i) =>
-        i === index ? { ...lessor, [name]: value } : lessor
-      ),
-    }));
-  };
-
   const handleLesseeChange = (index, e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      lessees: prev.lessees.map((lessee, i) =>
+    const updatedData = {
+      ...formData,
+      lessees: formData.lessees.map((lessee, i) =>
         i === index ? { ...lessee, [name]: value } : lessee
       ),
-    }));
+    };
+    setFormData(updatedData);
+    saveFormData(updatedData);
   };
 
+  // Fixtures
   const handleFixtureChange = (index, field, value) => {
-    // Clear error notification when user modifies fixtures
-    if (showErrorNotification) {
-      setShowErrorNotification(false);
-      setValidationError("");
-    }
-
     const updatedFixtures = [...formData.fixtures];
     updatedFixtures[index] = { ...updatedFixtures[index], [field]: value };
-    setFormData((prev) => ({
-      ...prev,
-      fixtures: updatedFixtures,
-    }));
+    const updatedData = { ...formData, fixtures: updatedFixtures };
+    setFormData(updatedData);
+    saveFormData(updatedData);
+  };
+  const addFixture = () => {
+    const updatedData = {
+      ...formData,
+      fixtures: [...formData.fixtures, { item: "", quantity: "" }],
+    };
+    setFormData(updatedData);
+    saveFormData(updatedData);
+  };
+  const removeFixture = (index) => {
+    const updatedData = {
+      ...formData,
+      fixtures: formData.fixtures.filter((_, i) => i !== index),
+    };
+    setFormData(updatedData);
+    saveFormData(updatedData);
   };
 
-  // Add form validation function
+  // Form validation
   const validateForm = () => {
-    // Lessor details validation
-    // if (!formData.lessorName.trim()) {
-    //   setValidationError("Please enter lessor's name");
-    //   return false;
-    // }
-
-    // if (!formData.lessorAddressLine1.trim()) {
-    //   setValidationError("Please enter lessor's address");
-    //   return false;
-    // }
-
-    // if (!formData.lessorCity.trim()) {
-    //   setValidationError("Please enter lessor's city");
-    //   return false;
-    // }
-
-    // if (!formData.lessorState.trim()) {
-    //   setValidationError("Please enter lessor's state");
-    //   return false;
-    // }
-
-    // if (!formData.lessorPinCode.trim()) {
-    //   setValidationError("Please enter lessor's PIN code");
-    //   return false;
-    // } else if (!/^\d{6}$/.test(formData.lessorPinCode)) {
-    //   setValidationError("Lessor's PIN code must be 6 digits");
-    //   return false;
-    // }
-
-    // Lessee details validation
-    // if (!formData.lesseeName.trim()) {
-    //   setValidationError("Please enter lessee's name");
-    //   return false;
-    // }
-
-    // if (!formData.lesseeAadhaar.trim()) {
-    //   setValidationError("Please enter lessee's Aadhaar number");
-    //   return false;
-    // } else if (!/^\d{12}$/.test(formData.lesseeAadhaar)) {
-    //   setValidationError("Lessee's Aadhaar number must be 12 digits");
-    //   return false;
-    // }
-
-    // if (!formData.lesseePermanentAddressLine1.trim()) {
-    //   setValidationError("Please enter lessee's permanent address");
-    //   return false;
-    // }
-
-    // if (!formData.lesseePermanentCity.trim()) {
-    //   setValidationError("Please enter lessee's city");
-    //   return false;
-    // }
-
-    // if (!formData.lesseePermanentState.trim()) {
-    //   setValidationError("Please enter lessee's state");
-    //   return false;
-    // }
-
-    // if (!formData.lesseePermanentPinCode.trim()) {
-    //   setValidationError("Please enter lessee's PIN code");
-    //   return false;
-    // } else if (!/^\d{6}$/.test(formData.lesseePermanentPinCode)) {
-    //   setValidationError("Lessee's PIN code must be 6 digits");
-    //   return false;
-    // }
-
-    // Agreement details validation
-    if (!formData.rentAmount.trim()) {
-      setValidationError("Please enter rent amount");
-      return false;
-    } else if (
+    if (
+      !formData.rentAmount.trim() ||
       isNaN(formData.rentAmount) ||
       parseFloat(formData.rentAmount) <= 0
     ) {
       setValidationError("Please enter a valid rent amount");
       return false;
     }
-
     if (!formData.rentAmountWords.trim()) {
       setValidationError("Please enter rent amount in words");
       return false;
     }
-
-    if (!formData.depositAmount.trim()) {
-      setValidationError("Please enter deposit amount");
-      return false;
-    } else if (
+    if (
+      !formData.depositAmount.trim() ||
       isNaN(formData.depositAmount) ||
       parseFloat(formData.depositAmount) <= 0
     ) {
       setValidationError("Please enter a valid deposit amount");
       return false;
     }
-
     if (!formData.depositAmountWords.trim()) {
       setValidationError("Please enter deposit amount in words");
       return false;
     }
-
     if (!formData.agreementDate.trim()) {
       setValidationError("Please enter agreement date");
       return false;
     }
-
-    if (!formData.noticePeriod.trim()) {
-      setValidationError("Please enter notice period");
-      return false;
-    } else if (
+    if (
+      !formData.noticePeriod.trim() ||
       isNaN(formData.noticePeriod) ||
       parseInt(formData.noticePeriod) <= 0
     ) {
       setValidationError("Please enter a valid notice period in months");
       return false;
     }
-
-    // Check if at least one fixture is properly filled
     const hasValidFixture = formData.fixtures.some(
-      (fixture) => fixture.item.trim() && fixture.quantity.trim()
+      (f) => f.item.trim() && f.quantity.trim()
     );
-
     if (formData.fixtures.length > 0 && !hasValidFixture) {
       setValidationError(
         "Please enter at least one fixture item and quantity or remove empty entries"
       );
       return false;
     }
-
     return true;
   };
 
-  const addFixture = () => {
-    setFormData((prev) => ({
-      ...prev,
-      fixtures: [...prev.fixtures, { item: "", quantity: "" }],
-    }));
-  };
-
-  const removeFixture = (index) => {
-    const updatedFixtures = formData.fixtures.filter((_, i) => i !== index);
-    setFormData((prev) => ({
-      ...prev,
-      fixtures: updatedFixtures,
-    }));
-  };
-
+  // Submit handlers
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
-
-    // Validate form before showing mobile modal
     if (validateForm()) {
+      saveFormData(formData);
       setShowMobileModal(true);
     } else {
       setShowErrorNotification(true);
-      // Auto-hide the error notification after 5 seconds
-      setTimeout(() => {
-        setShowErrorNotification(false);
-      }, 5000);
+      setTimeout(() => setShowErrorNotification(false), 5000);
     }
   };
 
@@ -354,28 +311,17 @@ export default function CommercialAggrement() {
       setMobileError("Mobile number is required");
       return;
     }
-
-    const mobileRegex = /^[0-9]{10}$/;
-    if (!mobileRegex.test(mobileNumber)) {
+    if (!/^[0-9]{10}$/.test(mobileNumber)) {
       setMobileError("Please enter a valid 10-digit mobile number");
       return;
     }
-
     setMobileError("");
     setShowMobileModal(false);
     setIsSubmitting(true);
     setSubmissionError("");
-
     try {
-      const dataWithMobile = {
-        ...formData,
-        mobileNumber,
-        userName,
-      };
-
+      const dataWithMobile = { ...formData, mobileNumber, userName };
       const response = await sendCommercialData(dataWithMobile);
-      console.log("responsein", response);
-
       const responseData = response.data;
       setBookingId(responseData.bookingId || "");
       setDocumentDetails(responseData.documentDetails || null);
@@ -388,202 +334,12 @@ export default function CommercialAggrement() {
           formId: "DM-CFD-17",
         },
       });
-
-      // setShowServiceOptionsModal(true);
-      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
         error.message || "An error occurred while submitting your form"
       );
       setIsSubmitting(false);
-    }
-  };
-
-  const getServiceOptions = () => {
-    if (!documentDetails) return [];
-
-    const options = [];
-
-    options.push({
-      id: "draft",
-      name: "Draft Only",
-      price: documentDetails.draftCharge || 0,
-      hasNotary: documentDetails.hasDraftNotaryCharge,
-      notaryCharge: documentDetails.draftNotaryCharge || 0,
-      description: "Digital document sent to your email",
-    });
-
-    options.push({
-      id: "draft_estamp",
-      name: "Draft + E-stamp",
-      price: documentDetails.pdfCharge || 0,
-      hasNotary: documentDetails.hasPdfNotaryCharge,
-      notaryCharge: documentDetails.pdfNotaryCharge || 0,
-      description: "Digital document with legal e-stamp",
-    });
-
-    options.push({
-      id: "draft_estamp_delivery",
-      name: "Draft + E-stamp + Delivery",
-      price: documentDetails.homeDropCharge || 0,
-      hasNotary: documentDetails.hasHomeDropNotaryCharge,
-      notaryCharge: documentDetails.homeDropNotaryCharge || 0,
-      description: "Physical copy delivered to your address",
-    });
-
-    return options;
-  };
-
-  const handleServiceSelection = (service) => {
-    setSelectedService(service);
-    handlePayment(service);
-  };
-
-  const handlePayment = async (service) => {
-    try {
-      const totalPrice = service.hasNotary
-        ? service.price + service.notaryCharge
-        : service.price;
-
-      setShowServiceOptionsModal(false);
-
-      if (!window.Razorpay) {
-        const script = document.createElement("script");
-        script.src = "https://checkout.razorpay.com/v1/checkout.js";
-
-        script.onload = () => {
-          initializeRazorpay(service, totalPrice);
-        };
-
-        script.onerror = () => {
-          console.error("Razorpay SDK failed to load");
-          alert("Payment gateway failed to load. Please try again later.");
-        };
-
-        document.body.appendChild(script);
-      } else {
-        initializeRazorpay(service, totalPrice);
-      }
-    } catch (error) {
-      console.error("Error initializing payment:", error);
-      alert("Payment initialization failed. Please try again.");
-    }
-  };
-
-  const initializeRazorpay = async (service, totalPrice) => {
-    try {
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: totalPrice * 100,
-        currency: "INR",
-        name: "Draft Maker",
-        description: `${documentDetails.documentType} - ${service.name}`,
-        handler: function (response) {
-          console.log("razorpay response", response);
-          handlePaymentSuccess({
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-            bookingId: bookingId,
-            mobileNumber: mobileNumber,
-            documentType: documentDetails.documentType,
-            fullName: formData.fullName,
-            serviceType: service.id,
-            serviceName: service.name,
-            amount: totalPrice,
-            includesNotary: service.hasNotary,
-            userName: userName,
-          });
-        },
-        prefill: {
-          name: userName,
-          contact: mobileNumber,
-        },
-        notes: {
-          bookingId: bookingId,
-          serviceType: service.id,
-        },
-        theme: {
-          color: "#dc2626",
-        },
-        modal: {
-          ondismiss: function () {
-            console.log("Checkout form closed");
-          },
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-
-      razorpay.on("payment.failed", function (response) {
-        fetch("/api/payment-failed", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            error: response.error,
-            bookingId: bookingId,
-            mobileNumber: mobileNumber,
-            serviceType: service.id,
-            status: "failed",
-            userName: userName,
-          }),
-        }).catch((error) => {
-          console.error("Error logging payment failure:", error);
-        });
-
-        console.error("Payment failed:", response.error);
-        alert(`Payment failed: ${response.error.description}`);
-      });
-    } catch (error) {
-      console.error("Error in Razorpay initialization:", error);
-      alert("Payment initialization failed. Please try again.");
-    }
-  };
-
-  const handlePaymentSuccess = async (paymentData) => {
-    try {
-      setPaymentSuccess(true);
-      setPaymentDetails(paymentData);
-
-      const paymentConfirmationData = {
-        paymentId: paymentData.razorpay_payment_id,
-        orderId: paymentData.razorpay_order_id,
-        signature: paymentData.razorpay_signature,
-        bookingId: paymentData.bookingId,
-        mobileNumber: paymentData.mobileNumber,
-        documentType: documentDetails.documentType,
-        fullName: formData.fullName,
-        serviceType: paymentData.serviceType,
-        serviceName: paymentData.serviceName,
-        amount: paymentData.amount,
-        includesNotary: paymentData.includesNotary,
-        status: "success",
-        userName: userName,
-      };
-
-      const confirmationResponse = await createCommercialPaymentData(
-        paymentConfirmationData
-      );
-      if (confirmationResponse.status === 200) {
-        const confirmationData = confirmationResponse.data.data;
-        console.log("Payment confirmation successful:", confirmationData);
-
-        setTimeout(() => {
-          window.location.href = `/documents/name/name-correction`;
-        }, 3000);
-      } else {
-        const errorData = confirmationResponse.data.data;
-        throw new Error(errorData.message || "Failed to confirm payment");
-      }
-    } catch (error) {
-      console.error("Error confirming payment:", error);
-      alert(
-        "Payment was processed but we couldn't update your booking. Our team will contact you shortly."
-      );
     }
   };
 
@@ -677,23 +433,6 @@ export default function CommercialAggrement() {
         username={userName}
         setUsername={setUserName}
       />
-      {showServiceOptionsModal && (
-        <ServicePackageNotification
-          setShowServiceOptionsModal={setShowServiceOptionsModal}
-          bookingId={bookingId}
-          mobileNumber={mobileNumber}
-          documentName={documentDetails.documentType}
-          getServiceOptions={getServiceOptions}
-          handleServiceSelection={handleServiceSelection}
-        />
-      )}
-      {paymentSuccess && paymentDetails && (
-        <PaymentConfirmation
-          paymentSuccess={paymentSuccess}
-          paymentDetails={paymentDetails}
-          bookingId={bookingId}
-        />
-      )}
     </div>
   );
 }

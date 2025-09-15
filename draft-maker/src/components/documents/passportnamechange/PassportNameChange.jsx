@@ -2,13 +2,16 @@ import React, { useState } from "react";
 import PassportNameChangeForm from "./PassportNameChangeForm";
 import PassportNameChangePreview from "./PassportNameChangePreview";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
-import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
+import ErrorNoification from "../serviceNotification/ErrorNoification";
 import { sendPassportNameChangeData } from "../../../api/service/axiosService";
 import { useNavigate } from "react-router-dom";
 
+const STORAGE_KEY = "passportNameChange_temp";
+
 const PassportNameChange = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+
+  const initialFormData = {
     formId: "DM-PNC-15",
     name: "",
     gender: "",
@@ -36,15 +39,37 @@ const PassportNameChange = () => {
     newSurname: "",
     date: "",
     place: "",
-  });
+  };
+
+  // Load saved data or use initial data
+  const getSavedData = () => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : initialFormData;
+    } catch {
+      return initialFormData;
+    }
+  };
+
+  const [formData, setFormData] = useState(getSavedData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
-  const [userName, setUserName] = useState();
-  const [validationError, setValidationError] = useState(""); // Add validation error state
-  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
+  const [userName, setUserName] = useState("");
+  const [validationError, setValidationError] = useState("");
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
+
+  // Manual save function
+  const saveFormData = () => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+      console.log("Passport name change form data saved!");
+    } catch (error) {
+      console.warn("Could not save form data");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,7 +98,7 @@ const PassportNameChange = () => {
     }
   };
 
-  // Add form validation function
+  // Form validation function
   const validateForm = () => {
     if (!formData.name.trim()) {
       setValidationError("Please enter your full name");
@@ -196,6 +221,9 @@ const PassportNameChange = () => {
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
 
+    // Save form data before proceeding
+    saveFormData();
+
     // Validate form before showing mobile modal
     if (validateForm()) {
       setShowMobileModal(true);
@@ -254,9 +282,18 @@ const PassportNameChange = () => {
     }
   };
 
+  const handleClearForm = () => {
+    setFormData(initialFormData);
+    try {
+      sessionStorage.removeItem(STORAGE_KEY);
+    } catch (error) {
+      console.warn("Could not clear form data");
+    }
+  };
+
   return (
     <div className="container-fluid mx-auto py-8 px-4">
-      {/* Add Error Notification Component */}
+      {/* Error Notification Component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
           validationError={validationError}
@@ -282,10 +319,8 @@ const PassportNameChange = () => {
             </p>
           </div>
         </div>
-        {/* <div className="print-content">
-          <PassportNameChangePreview formData={formData} />
-        </div> */}
       </div>
+
       <div className="mt-8 flex flex-col items-center">
         <button
           onClick={handleSubmitButtonClick}

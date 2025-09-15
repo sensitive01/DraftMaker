@@ -5,16 +5,20 @@ import AffidavitPreview from "./AddressAffadavitPreview";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
 import { sendAddressAffadavitData } from "../../../api/service/axiosService";
 import ErrorNoification from "../serviceNotification/ErrorNoification";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+
+const STORAGE_KEY = "addressAffidavit_temp";
 
 const AddressAffidavit = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+  const location = useLocation();
+
+  const initialFormData = {
     formId: "DM-AAF-16",
     name: "",
     gender: "",
     age: "",
-    relatedPersonName: "", // Field for father's/husband's name
+    relatedPersonName: "",
     permanentAddress: {
       line1: "",
       line2: "",
@@ -35,8 +39,19 @@ const AddressAffidavit = () => {
     purposeOfAffidavit: "",
     date: "",
     place: "",
-  });
+  };
 
+  // Load saved data or use initial data
+  const getSavedData = () => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : initialFormData;
+    } catch {
+      return initialFormData;
+    }
+  };
+
+  const [formData, setFormData] = useState(getSavedData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
   const [validationError, setValidationError] = useState("");
@@ -44,8 +59,17 @@ const AddressAffidavit = () => {
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
+  const [userName, setUserName] = useState("");
 
-  const [userName, setUserName] = useState();
+  // Manual save function
+  const saveFormData = () => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+      console.log("Form data saved!");
+    } catch (error) {
+      console.warn("Could not save form data");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -173,6 +197,9 @@ const AddressAffidavit = () => {
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
 
+    // Save form data before proceeding
+    saveFormData();
+
     if (validateForm()) {
       setShowMobileModal(true);
     } else {
@@ -262,6 +289,7 @@ const AddressAffidavit = () => {
       </div>
 
       <div className="mt-8 flex flex-col items-center">
+       
         <button
           onClick={handleSubmitButtonClick}
           disabled={isSubmitting}

@@ -3,14 +3,16 @@ import PassportAnnaxureForm from "./PassportAnnaxureForm";
 import PassportAnnaxurePreview from "./PassportAnnaxurePreview";
 
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
-import ErrorNoification from "../serviceNotification/ErrorNoification"; // Import the error notification component
+import ErrorNoification from "../serviceNotification/ErrorNoification";
 import { sendPasswordAnnaxureData } from "../../../api/service/axiosService";
 import { useNavigate } from "react-router-dom";
 
+const STORAGE_KEY = "passportAnnaxure_temp";
+
 export default function PasswordAnnaxure() {
   const navigate = useNavigate();
-  // Initialize state with default values
-  const [formData, setFormData] = useState({
+
+  const initialFormData = {
     formId: "DM-PAF-14",
     name: "",
     relationType: "", // Changed from relationToName to relationType (dropdown)
@@ -34,16 +36,37 @@ export default function PasswordAnnaxure() {
     place: "",
     useNameAsSignature: false,
     residences: [{ country: "", periodFrom: "", periodTo: "", pageNos: "" }],
-  });
+  };
 
+  // Load saved data or use initial data
+  const getSavedData = () => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : initialFormData;
+    } catch {
+      return initialFormData;
+    }
+  };
+
+  const [formData, setFormData] = useState(getSavedData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
-  const [userName, setUserName] = useState();
-  const [validationError, setValidationError] = useState(""); // Add validation error state
-  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
+  const [userName, setUserName] = useState("");
+  const [validationError, setValidationError] = useState("");
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
+
+  // Manual save function
+  const saveFormData = () => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+      console.log("Passport annexure form data saved!");
+    } catch (error) {
+      console.warn("Could not save form data");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -100,7 +123,7 @@ export default function PasswordAnnaxure() {
     }));
   };
 
-  // Add form validation function
+  // Form validation function
   const validateForm = () => {
     if (!formData.name.trim()) {
       setValidationError("Please enter your full name");
@@ -165,6 +188,9 @@ export default function PasswordAnnaxure() {
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
 
+    // Save form data before proceeding
+    saveFormData();
+
     // Validate form before showing mobile modal
     if (validateForm()) {
       setShowMobileModal(true);
@@ -215,9 +241,6 @@ export default function PasswordAnnaxure() {
           formId: "DM-PAF-14",
         },
       });
-
-      // setShowServiceOptionsModal(true);
-      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -227,9 +250,18 @@ export default function PasswordAnnaxure() {
     }
   };
 
+  const handleClearForm = () => {
+    setFormData(initialFormData);
+    try {
+      sessionStorage.removeItem(STORAGE_KEY);
+    } catch (error) {
+      console.warn("Could not clear form data");
+    }
+  };
+
   return (
     <div className="container-fluid mx-auto p-4">
-      {/* Add Error Notification Component */}
+      {/* Error Notification Component */}
       {showErrorNotification && validationError && (
         <ErrorNoification
           validationError={validationError}
@@ -259,11 +291,10 @@ export default function PasswordAnnaxure() {
             </p>
           </div>
         </div>
-        {/* <div className="print-content">
-          <PassportAnnaxurePreview formData={formData} />
-        </div> */}
       </div>
+
       <div className="mt-8 flex flex-col items-center">
+       
         <button
           onClick={handleSubmitButtonClick}
           disabled={isSubmitting}
@@ -297,6 +328,8 @@ export default function PasswordAnnaxure() {
             "Submit Application"
           )}
         </button>
+
+      
       </div>
 
       <MobileNumberInput

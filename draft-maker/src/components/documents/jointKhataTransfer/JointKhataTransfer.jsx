@@ -4,16 +4,19 @@ import JoinKhataTransferPreview from "./JoinKhataTransferPreview";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
-import ErrorNotification from "../serviceNotification/ErrorNoification"; // Import the error notification component
+import ErrorNotification from "../serviceNotification/ErrorNoification";
 import {
   sendKhataCorrectionData,
   updateKhataCorrectionPaymentData,
 } from "../../../api/service/axiosService";
 import { useNavigate } from "react-router-dom";
 
+const STORAGE_KEY = "jointKhataTransfer_temp";
+
 const JointKhataTransfer = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+
+  const initialFormData = {
     formId: "DM-KH-10",
     // First applicant
     name1: "",
@@ -45,12 +48,23 @@ const JointKhataTransfer = () => {
     day: "1",
     month: "April",
     year: "2025",
-  });
+  };
 
+  // Load saved data or use initial data
+  const getSavedData = () => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : initialFormData;
+    } catch {
+      return initialFormData;
+    }
+  };
+
+  const [formData, setFormData] = useState(getSavedData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
-  const [validationError, setValidationError] = useState(""); // Add validation error state
-  const [showErrorNotification, setShowErrorNotification] = useState(false); // Add error notification state
+  const [validationError, setValidationError] = useState("");
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -60,7 +74,17 @@ const JointKhataTransfer = () => {
   const [documentDetails, setDocumentDetails] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
-  const [userName, setUserName] = useState();
+  const [userName, setUserName] = useState("");
+
+  // Manual save function
+  const saveFormData = () => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+      console.log("Form data saved!");
+    } catch (error) {
+      console.warn("Could not save form data");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -209,6 +233,9 @@ const JointKhataTransfer = () => {
   const handleSubmitButtonClick = (e) => {
     e.preventDefault();
 
+    // Save form data before proceeding
+    saveFormData();
+
     // Validate form before showing mobile modal
     if (validateForm()) {
       setShowMobileModal(true);
@@ -261,8 +288,6 @@ const JointKhataTransfer = () => {
         },
       });
 
-      // setShowServiceOptionsModal(true);
-      // setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -489,12 +514,8 @@ const JointKhataTransfer = () => {
             </p>
           </div>
         </div>
-
-        {/* Right column: Preview */}
-        {/* <div>
-          <JoinKhataTransferPreview formData={formData} />
-        </div> */}
       </div>
+      
       <div className="mt-8 flex flex-col items-center">
         <button
           onClick={handleSubmitButtonClick}
@@ -541,6 +562,7 @@ const JointKhataTransfer = () => {
         username={userName}
         setUsername={setUserName}
       />
+      
       {showServiceOptionsModal && (
         <ServicePackageNotification
           setShowServiceOptionsModal={setShowServiceOptionsModal}
@@ -551,6 +573,7 @@ const JointKhataTransfer = () => {
           handleServiceSelection={handleServiceSelection}
         />
       )}
+      
       {paymentSuccess && paymentDetails && (
         <PaymentConfirmation
           paymentSuccess={paymentSuccess}
@@ -561,4 +584,5 @@ const JointKhataTransfer = () => {
     </div>
   );
 };
+
 export default JointKhataTransfer;

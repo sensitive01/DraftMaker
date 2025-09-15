@@ -39,7 +39,7 @@ const DocumentUpload = () => {
   const [selectedDeliveryCharge, setSelectedDeliveryCharge] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
   const [emailAddress, setEmailAddress] = useState("");
-  const [includeNotary, setIncludeNotary] = useState(false); // Add this state
+  const [includeNotary, setIncludeNotary] = useState(false);
 
   // E-stamp logic states
   const [considerationAmount, setConsiderationAmount] = useState("");
@@ -59,7 +59,6 @@ const DocumentUpload = () => {
   const CLOUDINARY_UPLOAD_PRESET = import.meta.env
     .VITE_CLOUDINARY_UPLOAD_PRESET;
   const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-  const SERVICE_CHARGE_PER_DOCUMENT = 210;
 
   // File upload states
   const [files, setFiles] = useState([]);
@@ -72,6 +71,11 @@ const DocumentUpload = () => {
   });
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
+
+  // Get dynamic service charge based on selected document type
+  const getServiceChargePerDocument = () => {
+    return selectedDocumentType?.serviceCharge || 200; // fallback to 200 if not defined
+  };
 
   // Fetch document types and pricing data
   useEffect(() => {
@@ -139,7 +143,6 @@ const DocumentUpload = () => {
       console.log("Auto-selecting stamp duty:", selectedStamp);
       setSelectedStampDuty(selectedStamp || null);
     } else if (selectedService && !selectedService.requiresStamp) {
-      // Only clear stamp duty if service doesn't require it
       console.log("Clearing stamp duty - service doesn't require it");
       setSelectedStampDuty(null);
     }
@@ -160,17 +163,6 @@ const DocumentUpload = () => {
     if (!selectedDocumentType) return [];
 
     return [
-      // {
-      //   id: "draft",
-      //   name: "Draft Only",
-      //   description: "Get your document drafted by experts.",
-      //   price: selectedDocumentType.draftCharge || 0,
-      //   hasNotary: (selectedDocumentType.draftNotaryCharge || 0) > 0,
-      //   notaryCharge: selectedDocumentType.draftNotaryCharge || 0,
-      //   requiresStamp: false,
-      //   requiresDelivery: false,
-      //   requiresEmail: true,
-      // },
       {
         id: "draft_estamp",
         name: "Draft + e-Stamp",
@@ -220,7 +212,7 @@ const DocumentUpload = () => {
     return 0;
   };
 
-  // Calculate total amount - UPDATED to include notary checkbox logic
+  // Calculate total amount - UPDATED to use dynamic service charge
   const calculateTotalAmount = () => {
     if (!selectedService) return 0;
 
@@ -233,7 +225,7 @@ const DocumentUpload = () => {
 
     if (selectedService.requiresStamp && selectedStampDuty) {
       total += calculateStampDutyAmount(selectedStampDuty);
-      total += SERVICE_CHARGE_PER_DOCUMENT * (quantity || 1);
+      total += getServiceChargePerDocument() * (quantity || 1); // Use dynamic service charge
     }
 
     if (selectedService.requiresDelivery && selectedDeliveryCharge) {
@@ -350,7 +342,7 @@ const DocumentUpload = () => {
       setSelectedDocumentType(null);
       setSelectedStampDuty(null);
       setSelectedService(null);
-      setIncludeNotary(false); // Reset notary checkbox
+      setIncludeNotary(false);
       return;
     }
 
@@ -359,7 +351,7 @@ const DocumentUpload = () => {
     setSelectedDocumentType(docType || null);
     setSelectedService(null);
     setSelectedStampDuty(null);
-    setIncludeNotary(false); // Reset notary checkbox
+    setIncludeNotary(false);
 
     if (errors.documentType) {
       setErrors((prev) => ({
@@ -372,8 +364,7 @@ const DocumentUpload = () => {
   const handleServiceSelect = (service) => {
     console.log("Service selected:", service);
     setSelectedService(service);
-    
-    // Reset notary checkbox when service changes
+
     setIncludeNotary(false);
 
     if (!service.requiresDelivery) {
@@ -559,7 +550,7 @@ const DocumentUpload = () => {
     return updatedFiles;
   };
 
-  // Razorpay integration - UPDATED to include notary logic
+  // Razorpay integration - UPDATED to include dynamic service charge
   const initializeRazorpay = async (service, totalPrice, uploadedDocuments) => {
     try {
       const bookingId = `DOC-${Date.now()}`;
@@ -585,7 +576,7 @@ const DocumentUpload = () => {
             serviceType: service.id,
             serviceName: service.name,
             amount: totalPrice,
-            includesNotary: service.hasNotary && includeNotary, // Updated logic
+            includesNotary: service.hasNotary && includeNotary,
             userName: formData.userName,
             emailAddress: emailAddress,
             uploadedDocuments: uploadedDocuments,
@@ -593,7 +584,8 @@ const DocumentUpload = () => {
             selectedDeliveryCharge: selectedDeliveryCharge,
             serviceDetails: {
               basePrice: service.price,
-              notaryCharge: service.hasNotary && includeNotary ? service.notaryCharge : 0, // Updated logic
+              notaryCharge:
+                service.hasNotary && includeNotary ? service.notaryCharge : 0,
               stampDutyAmount: selectedStampDuty
                 ? calculateStampDutyAmount(selectedStampDuty)
                 : 0,
@@ -608,8 +600,8 @@ const DocumentUpload = () => {
               considerationAmount: considerationAmount,
               quantity: quantity,
               emailAddress,
-              serviceCharge: SERVICE_CHARGE_PER_DOCUMENT * (quantity || 1),
-              includeNotary: includeNotary, // Add this field
+              serviceCharge: getServiceChargePerDocument() * (quantity || 1), // Use dynamic service charge
+              includeNotary: includeNotary,
             },
           });
         },
@@ -626,7 +618,7 @@ const DocumentUpload = () => {
           deliveryChargeId: selectedDeliveryCharge?._id || null,
           documentType: selectedDocumentType?.documentType,
           emailAddress: emailAddress,
-          includeNotary: includeNotary, // Add this field
+          includeNotary: includeNotary,
         },
         theme: {
           color: "#dc2626",
@@ -655,7 +647,7 @@ const DocumentUpload = () => {
     }
   };
 
-  // Handle payment success - UPDATED to include notary logic
+  // Handle payment success - UPDATED to include dynamic service charge
   const handlePaymentSuccess = async (paymentData) => {
     try {
       const paymentConfirmationData = {
@@ -689,7 +681,7 @@ const DocumentUpload = () => {
         totalDocuments: files.length,
       };
 
-      // Fallback to original document submission - UPDATED
+      // Fallback to original document submission - UPDATED with dynamic service charge
       const documentUrls = paymentData?.uploadedDocuments?.map(
         (file) => file.cloudinaryUrl
       );
@@ -710,7 +702,7 @@ const DocumentUpload = () => {
           requiresStamp: selectedService.requiresStamp,
           requiresDelivery: selectedService.requiresDelivery,
           requiresEmail: selectedService.requiresEmail,
-          includeNotary: includeNotary, // Add this field
+          includeNotary: includeNotary,
         },
         stampDuty: selectedStampDuty
           ? {
@@ -723,7 +715,7 @@ const DocumentUpload = () => {
               quantity: quantity,
               considerationAmount: parseFloat(considerationAmount) || 0,
               calculatedAmount: calculateStampDutyAmount(selectedStampDuty),
-              serviceCharge: SERVICE_CHARGE_PER_DOCUMENT * quantity,
+              serviceCharge: getServiceChargePerDocument() * quantity, // Use dynamic service charge
             }
           : null,
         delivery: selectedDeliveryCharge
@@ -744,7 +736,7 @@ const DocumentUpload = () => {
         },
         bookingId: paymentData.bookingId,
         submittedAt: new Date().toISOString(),
-        includeNotary: includeNotary, // Add this field to root level too
+        includeNotary: includeNotary,
       };
 
       const response = await sendDocumentsToBackend(submitData);
@@ -759,7 +751,7 @@ const DocumentUpload = () => {
         setSelectedDocumentType(null);
         setSelectedService(null);
         setEmailAddress("");
-        setIncludeNotary(false); // Reset notary checkbox
+        setIncludeNotary(false);
 
         setTimeout(() => {
           setSuccess(false);
@@ -906,7 +898,7 @@ const DocumentUpload = () => {
       deliveryChargeOptions={deliveryChargeOptions}
       deliveryAddress={deliveryAddress}
       handleAddressChange={handleAddressChange}
-      SERVICE_CHARGE_PER_DOCUMENT={SERVICE_CHARGE_PER_DOCUMENT}
+      getServiceChargePerDocument={getServiceChargePerDocument}
       calculateTotalAmount={calculateTotalAmount}
       canProceedToPayment={canProceedToPayment}
       submitting={submitting}
