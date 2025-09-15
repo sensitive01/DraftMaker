@@ -194,10 +194,6 @@ const UploadDocumentUi = ({
                         <div className="font-medium">
                           {docType.documentType}
                         </div>
-                        <div className="text-sm text-gray-600">
-                          Draft: ₹{docType.draftCharge} | Service: ₹
-                          {docType.serviceCharge}
-                        </div>
                       </div>
                     ))}
                   </div>
