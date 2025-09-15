@@ -76,11 +76,6 @@ const DocumentPaymentPage = () => {
     };
     fetchData();
   }, []);
-  useEffect(() => {
-    if (formId === "DM-PNC-15") {
-      setShowNameChangePopup(true);
-    }
-  }, [formId]);
 
   // Auto-select stamp duty based on formId - Updated to trigger when service is selected
   useEffect(() => {
@@ -497,10 +492,14 @@ const DocumentPaymentPage = () => {
         setShowSuccessNotification(true);
         setSuccessNotification(confirmationResponse.data.message);
 
-        setTimeout(() => {
-          // window.location.href = `/documents/name/name-correction`;
-          window.location.href = `/documents/preview-page/${formId}/${bookingId}`;
-        }, 1500);
+        if (formId === "DM-PNC-15") {
+          setShowNameChangePopup(true);
+        } else {
+          setTimeout(() => {
+            // window.location.href = `/documents/name/name-correction`;
+            window.location.href = `/documents/preview-page/${formId}/${bookingId}`;
+          }, 1500);
+        }
       } else {
         const errorData = confirmationResponse.data.data;
         throw new Error(errorData.message || "Failed to confirm payment");
