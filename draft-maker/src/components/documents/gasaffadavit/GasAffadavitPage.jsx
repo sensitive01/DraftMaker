@@ -144,10 +144,10 @@ export default function GasAffidavitForm() {
       setValidationError("Please enter a valid deposit amount");
       return false;
     }
-    if (formData.reason === "shifting" && !formData.previousAddress.trim()) {
-      setValidationError("Please enter your previous address");
-      return false;
-    }
+    // if (formData.reason === "shifting" && !formData.previousAddress.trim()) {
+    //   setValidationError("Please enter your previous address");
+    //   return false;
+    // }
     if (!formData.day.trim()) {
       setValidationError("Please enter the day");
       return false;

@@ -231,7 +231,7 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
             Additional Information
           </h2>
 
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-red-600 mb-1">
               Previous Address (before shifting)
             </label>
@@ -243,7 +243,7 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
               rows="3"
               required
             />
-          </div>
+          </div> */}
 
           <div className="mt-6">
             <label className="block text-sm font-medium text-red-600 mb-1">

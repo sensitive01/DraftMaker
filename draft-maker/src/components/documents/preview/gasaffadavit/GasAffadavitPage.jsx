@@ -142,10 +142,10 @@ export default function PreviewGasAffidavitForm() {
       return false;
     }
 
-    if (formData.reason === "shifting" && !formData.previousAddress.trim()) {
-      setValidationError("Please enter your previous address");
-      return false;
-    }
+    // if (formData.reason === "shifting" && !formData.previousAddress.trim()) {
+    //   setValidationError("Please enter your previous address");
+    //   return false;
+    // }
 
     // Date and place validation
     if (!formData.day.trim()) {
