@@ -165,7 +165,7 @@ const UploadDocumentUi = ({
                     }
                   >
                     {selectedDocumentType
-                      ? `${selectedDocumentType.documentType} - Draft: ₹${selectedDocumentType.draftCharge} | Service: ₹${selectedDocumentType.serviceCharge}`
+                      ? `${selectedDocumentType.documentType}`
                       : "-- Select Document Type --"}
                   </span>
                   <ChevronDown
