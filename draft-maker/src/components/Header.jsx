@@ -270,7 +270,7 @@ const Header = () => {
                       toggleDropdown("agreements");
                     }}
                   >
-                    Agreements
+                    Rental/Lease Agreement
                   </a>
                   <span
                     className="drp_btn"
@@ -403,10 +403,7 @@ const Header = () => {
                         (doc) => doc.apiTitle === "Passport Name Change"
                       ) && (
                         <li>
-                          <Link
-                            to="/documents/passport-name/passport-name-change"
-                            onClick={closeMenu}
-                          >
+                          <Link to="/home/contact-us" onClick={closeMenu}>
                             News Paper Ad (Passport Name Change - Rs 3000)
                           </Link>
                         </li>
@@ -416,10 +413,7 @@ const Header = () => {
                         (doc) => doc.apiTitle === "Huf Correction"
                       ) && (
                         <li>
-                          <Link
-                            to="/documents/huf/huf-aggrement"
-                            onClick={closeMenu}
-                          >
+                          <Link to="/home/contact-us" onClick={closeMenu}>
                             HUF Deed and PAN - Rs 1500
                           </Link>
                         </li>
@@ -585,6 +579,88 @@ const Header = () => {
             }
           }
 
+          /* Navigation Layout - Keep consistent height */
+          .navbar {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            min-height: 60px;
+          }
+
+          .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+            padding: 0;
+          }
+
+          .nav-item {
+            display: flex;
+            align-items: center;
+          }
+
+          .nav-link {
+            padding: 0.5rem 0.75rem !important;
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 1.2;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            height: 40px;
+            white-space: nowrap;
+          }
+
+          .nav-link:hover {
+            background-color: #f8f9fa;
+            color: #007bff !important;
+            text-decoration: none;
+          }
+
+          /* Dark Button Styles - Same height as nav links */
+          .dark_btn {
+            background: #dc3545 !important; /* Red color for both buttons */
+            color: white !important;
+            border-radius: 25px !important; /* Pill-shaped rounded corners */
+            font-weight: 600 !important;
+            padding: 0.6rem 1.2rem !important;
+            height: 40px !important;
+            font-size: 13px !important;
+            line-height: 1.2 !important;
+            margin-left: 0.25rem !important;
+            transition: all 0.3s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.4rem !important;
+            border: none !important;
+            min-width: 140px !important;
+            justify-content: center !important;
+          }
+
+          .dark_btn:hover {
+            background: #c82333 !important; /* Darker red on hover */
+            color: white !important;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(220, 53, 69, 0.3);
+            text-decoration: none;
+          }
+
+          .nav-item:last-child .dark_btn {
+            background: #dc3545 !important; /* Same red color for Track Order */
+          }
+
+          .nav-item:last-child .dark_btn:hover {
+            background: #c82333 !important; /* Same hover effect */
+            box-shadow: 0 3px 8px rgba(220, 53, 69, 0.3);
+          }
+
+          .dark_btn i {
+            font-size: 12px;
+            margin-left: 0.25rem;
+          }
+
           /* Dropdown Toggle Custom Styles */
           .dropdown-toggle-custom {
             cursor: pointer;
@@ -593,10 +669,13 @@ const Header = () => {
           .drp_btn {
             cursor: pointer;
             transition: transform 0.3s ease;
+            margin-left: 0.25rem;
+            padding: 0.125rem;
           }
 
           .drp_btn i {
             transition: transform 0.3s ease;
+            font-size: 12px;
           }
 
           .rotate-180 {
@@ -685,6 +764,13 @@ const Header = () => {
 
             .nav-link {
               padding-right: 40px !important;
+            }
+
+            .dark_btn {
+              height: auto !important;
+              width: 100% !important;
+              justify-content: center !important;
+              margin: 0.5rem 0 !important;
             }
           }
 

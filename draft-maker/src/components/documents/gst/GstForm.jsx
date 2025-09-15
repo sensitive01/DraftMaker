@@ -23,7 +23,7 @@ const GstForm = ({ formData, handleChange }) => {
               <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
                 1
               </span>
-              Property Owner Details
+              Proprietor/Director.
             </h2>
 
             <div className="space-y-4">
@@ -104,7 +104,7 @@ const GstForm = ({ formData, handleChange }) => {
               <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
                 3
               </span>
-              Proprietor/Company Details
+              Proprietor/Director.
             </h2>
 
             <div className="space-y-4">

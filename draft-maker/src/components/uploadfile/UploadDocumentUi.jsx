@@ -44,10 +44,10 @@ const UploadDocumentUi = ({
   selectedService,
   selectedDeliveryCharge,
   setSelectedDeliveryCharge,
-  deliveryChargeOptions,
+  deliveryChargeOptions, // This now comes filtered from parent
   deliveryAddress,
   handleAddressChange,
-  getServiceChargePerDocument, // Updated from SERVICE_CHARGE_PER_DOCUMENT
+  getServiceChargePerDocument,
   calculateTotalAmount,
   canProceedToPayment,
   submitting,
@@ -76,6 +76,41 @@ const UploadDocumentUi = ({
     );
     setSelectedDeliveryCharge(deliveryCharge || null);
     setIsDeliveryDropdownOpen(false);
+  };
+
+  // NEW: Check if selected delivery service requires address
+  const requiresDeliveryAddress = () => {
+    if (!selectedDeliveryCharge) return false;
+    return (
+      selectedDeliveryCharge.serviceType === "scan_courier" ||
+      selectedDeliveryCharge.serviceType === "courier_only"
+    );
+  };
+
+  // NEW: Get delivery section title based on selected service
+  const getDeliverySectionTitle = () => {
+    if (!selectedService) return "Delivery Service";
+
+    if (selectedService.id === "draft_estamp") {
+      return "Scan & Delivery Service";
+    } else if (selectedService.id === "draft_estamp_delivery") {
+      return "Delivery Service";
+    }
+
+    return "Delivery Service";
+  };
+
+  // NEW: Get delivery section description
+  const getDeliverySectionDescription = () => {
+    if (!selectedService) return "";
+
+    if (selectedService.id === "draft_estamp") {
+      return "Select how you want to receive your scanned documents";
+    } else if (selectedService.id === "draft_estamp_delivery") {
+      return "Select your preferred delivery method";
+    }
+
+    return "";
   };
 
   return (
@@ -396,7 +431,7 @@ const UploadDocumentUi = ({
                       </p>
                       <div className="space-y-1">
                         <div className="flex justify-between text-sm">
-                          <span>Base:</span>
+                          <span>Draft Charge:</span>
                           <span className="font-bold text-red-600">
                             ₹{service.price}
                           </span>
@@ -549,12 +584,17 @@ const UploadDocumentUi = ({
               </div>
             )}
 
-            {/* Delivery Options */}
+            {/* Delivery Options - UPDATED with filtering logic */}
             {selectedService?.requiresDelivery && (
               <div className="p-3 bg-gray-50 rounded-md">
                 <h3 className="text-base font-semibold mb-2">
-                  Delivery Service
+                  {getDeliverySectionTitle()}
                 </h3>
+                {getDeliverySectionDescription() && (
+                  <p className="text-sm text-gray-600 mb-3">
+                    {getDeliverySectionDescription()}
+                  </p>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                   {/* Custom Delivery Dropdown */}
                   <div className="relative">
@@ -574,7 +614,7 @@ const UploadDocumentUi = ({
                       >
                         {selectedDeliveryCharge
                           ? `${selectedDeliveryCharge.serviceName} - ₹${selectedDeliveryCharge.charge}`
-                          : "Select Delivery"}
+                          : "Select Delivery Service"}
                       </span>
                       <ChevronDown
                         className={`w-4 h-4 transition-transform ${
@@ -592,7 +632,7 @@ const UploadDocumentUi = ({
                             setIsDeliveryDropdownOpen(false);
                           }}
                         >
-                          Select Delivery
+                          Select Delivery Service
                         </div>
                         {deliveryChargeOptions.map((dc) => (
                           <div
@@ -600,7 +640,10 @@ const UploadDocumentUi = ({
                             className="px-3 py-2 text-sm text-gray-900 hover:bg-red-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                             onClick={() => handleDeliverySelect(dc._id)}
                           >
-                            {dc.serviceName} - ₹{dc.charge}
+                            <div className="font-medium">{dc.serviceName}</div>
+                            <div className="text-sm text-gray-600">
+                              ₹{dc.charge} - {dc.description}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -618,11 +661,11 @@ const UploadDocumentUi = ({
                   )}
                 </div>
 
-                {/* Address */}
-                {selectedDeliveryCharge && (
+                {/* Address - Only show for courier services */}
+                {selectedDeliveryCharge && requiresDeliveryAddress() && (
                   <div>
                     <h4 className="text-sm font-medium mb-2">
-                      Delivery Address
+                      Delivery Address <span className="text-red-500">*</span>
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       <div className="md:col-span-2">
@@ -632,7 +675,7 @@ const UploadDocumentUi = ({
                           onChange={(e) =>
                             handleAddressChange("addressLine1", e.target.value)
                           }
-                          placeholder="Address Line 1"
+                          placeholder="Address Line 1 *"
                           className="w-full px-3 py-2 text-sm border rounded-md focus:border-red-500"
                         />
                       </div>
@@ -653,7 +696,7 @@ const UploadDocumentUi = ({
                         onChange={(e) =>
                           handleAddressChange("city", e.target.value)
                         }
-                        placeholder="City"
+                        placeholder="City *"
                         className="px-3 py-2 text-sm border rounded-md focus:border-red-500"
                       />
                       <input
@@ -662,7 +705,7 @@ const UploadDocumentUi = ({
                         onChange={(e) =>
                           handleAddressChange("state", e.target.value)
                         }
-                        placeholder="State"
+                        placeholder="State *"
                         className="px-3 py-2 text-sm border rounded-md focus:border-red-500"
                       />
                       <div className="md:col-span-2">
@@ -672,12 +715,22 @@ const UploadDocumentUi = ({
                           onChange={(e) =>
                             handleAddressChange("pincode", e.target.value)
                           }
-                          placeholder="Pincode"
+                          placeholder="Pincode *"
                           maxLength="6"
                           className="w-full px-3 py-2 text-sm border rounded-md focus:border-red-500"
                         />
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {/* Info message for scan-only services */}
+                {selectedDeliveryCharge && !requiresDeliveryAddress() && (
+                  <div className="mt-2 p-2 bg-blue-100 rounded-md border border-blue-200">
+                    <p className="text-sm text-blue-800">
+                      📧 Your scanned documents will be delivered to your email
+                      address.
+                    </p>
                   </div>
                 )}
               </div>
@@ -726,7 +779,7 @@ const UploadDocumentUi = ({
                   {selectedService.requiresDelivery &&
                     selectedDeliveryCharge && (
                       <div className="flex justify-between">
-                        <span>Delivery:</span>
+                        <span>{selectedDeliveryCharge.serviceName}:</span>
                         <span>₹{selectedDeliveryCharge.charge}</span>
                       </div>
                     )}

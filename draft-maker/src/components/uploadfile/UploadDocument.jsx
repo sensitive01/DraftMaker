@@ -77,6 +77,27 @@ const DocumentUpload = () => {
     return selectedDocumentType?.serviceCharge || 200; // fallback to 200 if not defined
   };
 
+  // NEW: Get filtered delivery options based on selected service
+  const getFilteredDeliveryOptions = () => {
+    if (!selectedService || !deliveryChargeOptions.length) return [];
+
+    if (selectedService.id === "draft_estamp") {
+      // For "Draft + e-Stamp", only show Scan Copy services
+      return deliveryChargeOptions.filter(
+        (option) => option.serviceType === "scan_delivery"
+      );
+    } else if (selectedService.id === "draft_estamp_delivery") {
+      // For "Draft + e-Stamp + Delivery", show Scan & Courier and Courier Only
+      return deliveryChargeOptions.filter(
+        (option) =>
+          option.serviceType === "scan_courier" ||
+          option.serviceType === "courier_only"
+      );
+    }
+
+    return deliveryChargeOptions;
+  };
+
   // Fetch document types and pricing data
   useEffect(() => {
     const fetchData = async () => {
@@ -148,6 +169,23 @@ const DocumentUpload = () => {
     }
   }, [stampDutyOptions, selectedDocumentType, selectedService]);
 
+  // NEW: Clear delivery selection when service changes to maintain consistency
+  useEffect(() => {
+    if (selectedService) {
+      const filteredOptions = getFilteredDeliveryOptions();
+
+      // If current selection is not in filtered options, clear it
+      if (
+        selectedDeliveryCharge &&
+        !filteredOptions.find(
+          (option) => option._id === selectedDeliveryCharge._id
+        )
+      ) {
+        setSelectedDeliveryCharge(null);
+      }
+    }
+  }, [selectedService, deliveryChargeOptions]);
+
   const ALLOWED_TYPES = {
     "image/jpeg": ".jpg, .jpeg",
     "image/png": ".png",
@@ -171,7 +209,7 @@ const DocumentUpload = () => {
         hasNotary: (selectedDocumentType.draftNotaryCharge || 0) > 0,
         notaryCharge: selectedDocumentType.draftNotaryCharge || 0,
         requiresStamp: true,
-        requiresDelivery: false,
+        requiresDelivery: true, // CHANGED: Now requires delivery (scan service)
         requiresEmail: true,
       },
       {
@@ -254,12 +292,18 @@ const DocumentUpload = () => {
     if (selectedService.requiresDelivery && !selectedDeliveryCharge)
       return false;
 
-    // Check delivery address
+    // Check delivery address - UPDATED: Only for courier services
     if (selectedService.requiresDelivery && selectedDeliveryCharge) {
-      const requiredFields = ["addressLine1", "city", "state", "pincode"];
-      for (let field of requiredFields) {
-        if (!deliveryAddress[field] || deliveryAddress[field].trim() === "") {
-          return false;
+      // Only require address for courier services, not scan-only services
+      if (
+        selectedDeliveryCharge.serviceType === "scan_courier" ||
+        selectedDeliveryCharge.serviceType === "courier_only"
+      ) {
+        const requiredFields = ["addressLine1", "city", "state", "pincode"];
+        for (let field of requiredFields) {
+          if (!deliveryAddress[field] || deliveryAddress[field].trim() === "") {
+            return false;
+          }
         }
       }
     }
@@ -343,6 +387,7 @@ const DocumentUpload = () => {
       setSelectedStampDuty(null);
       setSelectedService(null);
       setIncludeNotary(false);
+      setSelectedDeliveryCharge(null); // NEW: Clear delivery selection
       return;
     }
 
@@ -352,6 +397,7 @@ const DocumentUpload = () => {
     setSelectedService(null);
     setSelectedStampDuty(null);
     setIncludeNotary(false);
+    setSelectedDeliveryCharge(null); // NEW: Clear delivery selection
 
     if (errors.documentType) {
       setErrors((prev) => ({
@@ -367,9 +413,8 @@ const DocumentUpload = () => {
 
     setIncludeNotary(false);
 
-    if (!service.requiresDelivery) {
-      setSelectedDeliveryCharge(null);
-    }
+    // NEW: Clear delivery selection when service changes
+    setSelectedDeliveryCharge(null);
 
     if (errors.service) {
       setErrors((prev) => ({
@@ -895,7 +940,7 @@ const DocumentUpload = () => {
       selectedService={selectedService}
       selectedDeliveryCharge={selectedDeliveryCharge}
       setSelectedDeliveryCharge={setSelectedDeliveryCharge}
-      deliveryChargeOptions={deliveryChargeOptions}
+      deliveryChargeOptions={getFilteredDeliveryOptions()} // UPDATED: Pass filtered options
       deliveryAddress={deliveryAddress}
       handleAddressChange={handleAddressChange}
       getServiceChargePerDocument={getServiceChargePerDocument}

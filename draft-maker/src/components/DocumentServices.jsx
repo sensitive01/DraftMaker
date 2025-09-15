@@ -104,7 +104,7 @@ export default function DocumentServices() {
     },
     {
       id: 11,
-      title: "GST",
+      title: "GST NOC BY OWNER",
        subtitle: "GST NOC by Owner document",
       type: "affidavit",
       path: "/documents/gst/gst-document",

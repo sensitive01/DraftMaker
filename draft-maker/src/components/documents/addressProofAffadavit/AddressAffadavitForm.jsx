@@ -272,7 +272,7 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
-                  Residing Since <span className="text-red-500">*</span>
+                  Residing Since (On Present Address) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -285,7 +285,7 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
-                  Company Name <span className="text-red-500">*</span>
+                  Company Name (Document Given To) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"

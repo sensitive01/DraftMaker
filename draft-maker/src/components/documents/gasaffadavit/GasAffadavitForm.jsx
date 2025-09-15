@@ -267,7 +267,7 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
             </h2>
 
             <div className="space-y-4">
-              <div>
+              {/* <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
                   Previous Address (before shifting) <span className="text-red-500">*</span>
                 </label>
@@ -280,7 +280,7 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
                   placeholder="Enter previous address"
                   required
                 />
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-2">
