@@ -44,7 +44,7 @@ const UploadDocumentUi = ({
   selectedService,
   selectedDeliveryCharge,
   setSelectedDeliveryCharge,
-  deliveryChargeOptions, // This now comes filtered from parent
+  deliveryChargeOptions,
   deliveryAddress,
   handleAddressChange,
   getServiceChargePerDocument,
@@ -98,6 +98,22 @@ const UploadDocumentUi = ({
     }
 
     return "Delivery Service";
+  };
+
+  const getConsiderationLabelText = (selectedDocumentType) => {
+    if (!selectedDocumentType || !selectedDocumentType.formId) {
+      return "Consideration Amount (₹) *";
+    }
+
+    const formid = selectedDocumentType.formId;
+
+    if (formid === "DM-RFD-18") {
+      return "Consideration Amount (₹) * (0.5% on average annual rent fine premium subject to maximum of Rs.500)";
+    } else if (formid === "DM-CFD-17") {
+      return "Consideration Amount (₹) * (0.5% on AAR, Fine, Premium, Advance)";
+    }
+
+    return "Consideration Amount (₹) *";
   };
 
   // NEW: Get delivery section description
@@ -202,85 +218,7 @@ const UploadDocumentUi = ({
               {errors.documentType && (
                 <p className="text-red-500 text-sm">{errors.documentType}</p>
               )}
-
-              {/* Document Info */}
-              {selectedDocumentType && selectedStampDuty && (
-                <div className="p-3 bg-green-50 rounded-md border border-green-200">
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <p>
-                      <strong>Document:</strong>{" "}
-                      {selectedDocumentType.documentType}
-                    </p>
-                    <p>
-                      <strong>Form ID:</strong> {selectedDocumentType.formId}
-                    </p>
-                    <p>
-                      <strong>Draft Charge:</strong> ₹
-                      {selectedDocumentType.draftCharge}
-                    </p>
-                    <p>
-                      <strong>Service Charge:</strong> ₹
-                      {selectedDocumentType.serviceCharge}
-                    </p>
-                    <p className="col-span-2">
-                      <strong>Stamp Type:</strong>{" "}
-                      {selectedStampDuty.documentType}
-                    </p>
-                  </div>
-                </div>
-              )}
             </div>
-
-            {/* Stamp Duty Details */}
-            {selectedDocumentType && selectedStampDuty && (
-              <div className="p-3 bg-blue-50 rounded-md border">
-                <h3 className="text-base font-semibold text-gray-800 mb-3">
-                  Stamp Duty Details
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Quantity *
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={quantity}
-                      onChange={(e) => setQuantity(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:border-red-500 focus:ring-1 focus:ring-red-200"
-                    />
-                  </div>
-                  {selectedStampDuty.calculationType === "percentage" && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Consideration Amount (₹) *
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={considerationAmount || ""}
-                        onChange={(e) => setConsiderationAmount(e.target.value)}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:border-red-500 focus:ring-1 focus:ring-red-200"
-                        placeholder="Enter document value"
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="mt-3 p-2 bg-white rounded-md border">
-                  <p className="text-sm text-gray-600">
-                    Calculation:{" "}
-                    {selectedStampDuty.calculationType === "fixed"
-                      ? `₹${selectedStampDuty.fixedAmount} × ${quantity}`
-                      : `${selectedStampDuty.percentage}% of ₹${
-                          considerationAmount || "0"
-                        } × ${quantity}`}
-                  </p>
-                  <p className="font-bold text-blue-600 text-sm mt-1">
-                    Stamp Duty: ₹{calculateStampDutyAmount(selectedStampDuty)}
-                  </p>
-                </div>
-              </div>
-            )}
 
             {/* Step 2: User Info */}
             <div className="space-y-2">
@@ -427,7 +365,7 @@ const UploadDocumentUi = ({
                       </p>
                       <div className="space-y-1">
                         <div className="flex justify-between text-sm">
-                          <span>Draft Charge:</span>
+                          <span>Service Charge:</span>
                           <span className="font-bold text-red-600">
                             ₹{service.price}
                           </span>
@@ -445,6 +383,56 @@ const UploadDocumentUi = ({
                 {errors.service && (
                   <p className="text-red-500 text-sm">{errors.service}</p>
                 )}
+              </div>
+            )}
+            {/* Stamp Duty Details */}
+            {selectedDocumentType && selectedStampDuty && (
+              <div className="p-3 bg-blue-50 rounded-md border">
+                <h3 className="text-base font-semibold text-gray-800 mb-3">
+                  Stamp Duty Details
+                </h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Quantity *
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={quantity}
+                      onChange={(e) => setQuantity(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:border-red-500 focus:ring-1 focus:ring-red-200"
+                    />
+                  </div>
+                  {selectedStampDuty.calculationType === "percentage" && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {getConsiderationLabelText(selectedDocumentType)}
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={considerationAmount || ""}
+                        onChange={(e) => setConsiderationAmount(e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:border-red-500 focus:ring-1 focus:ring-red-200"
+                        placeholder="Enter document value"
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 p-2 bg-white rounded-md border">
+                  <p className="text-sm text-gray-600">
+                    Calculation:{" "}
+                    {selectedStampDuty.calculationType === "fixed"
+                      ? `₹${selectedStampDuty.fixedAmount} × ${quantity}`
+                      : `${selectedStampDuty.percentage}% of ₹${
+                          considerationAmount || "0"
+                        } × ${quantity}`}
+                  </p>
+                  <p className="font-bold text-blue-600 text-sm mt-1">
+                    Stamp Duty: ₹{calculateStampDutyAmount(selectedStampDuty)}
+                  </p>
+                </div>
               </div>
             )}
 
@@ -645,7 +633,7 @@ const UploadDocumentUi = ({
                       </div>
                     )}
                   </div>
-                  {selectedDeliveryCharge && (
+                  {/* {selectedDeliveryCharge && (
                     <div className="text-sm bg-white p-2 rounded-md border">
                       <p>
                         <strong>{selectedDeliveryCharge.serviceName}</strong>
@@ -654,7 +642,7 @@ const UploadDocumentUi = ({
                         ₹{selectedDeliveryCharge.charge}
                       </p>
                     </div>
-                  )}
+                  )} */}
                 </div>
 
                 {/* Address - Only show for courier services */}
@@ -739,39 +727,50 @@ const UploadDocumentUi = ({
                   Payment Summary
                 </h3>
                 <div className="space-y-1 text-sm">
-                  {/* Base Draft Charge */}
+                  {/* Base Draft/Service Charge with quantity */}
                   <div className="flex justify-between">
-                    <span>Draft Charge:</span>
-                    <span>₹{selectedService.price}</span>
-                  </div>
-
-                  {/* Dynamic Service Charge - Always show */}
-                  <div className="flex justify-between">
-                    <span>Service Charge:</span>
+                    <span>Service Charge ({quantity || 1}x):</span>
                     <span>
-                      ₹{getServiceChargePerDocument() * (quantity || 1)}
+                      ₹{selectedService.price} × {quantity || 1} = ₹
+                      {selectedService.price * (parseInt(quantity) || 1)}
                     </span>
                   </div>
 
-                  {/* Notary charge if selected */}
+                  {/* Service Processing Fee with quantity - ONLY show if stamp duty is required */}
+                  {/* {selectedService.requiresStamp && selectedStampDuty && (
+                    <div className="flex justify-between">
+                      <span>Service Fee ({quantity || 1}x):</span>
+                      <span>
+                        ₹{getServiceChargePerDocument()} × {quantity || 1} = ₹
+                        {getServiceChargePerDocument() *
+                          (parseInt(quantity) || 1)}
+                      </span>
+                    </div>
+                  )} */}
+
+                  {/* Notary charge with quantity if selected */}
                   {selectedService.hasNotary && includeNotary && (
                     <div className="flex justify-between">
-                      <span>Notary:</span>
-                      <span>₹{selectedService.notaryCharge}</span>
+                      <span>Notary ({quantity || 1}x):</span>
+                      <span>
+                        ₹{selectedService.notaryCharge} × {quantity || 1} = ₹
+                        {selectedService.notaryCharge *
+                          (parseInt(quantity) || 1)}
+                      </span>
                     </div>
                   )}
 
-                  {/* Stamp duty if applicable */}
+                  {/* Stamp duty with quantity if applicable */}
                   {selectedService.requiresStamp && selectedStampDuty && (
                     <div className="flex justify-between">
-                      <span>Stamp Duty:</span>
+                      <span>Stamp Duty ({quantity || 1}x):</span>
                       <span>
                         ₹{calculateStampDutyAmount(selectedStampDuty)}
                       </span>
                     </div>
                   )}
 
-                  {/* Delivery charge if selected */}
+                  {/* Delivery charge - NOT multiplied by quantity */}
                   {selectedService.requiresDelivery &&
                     selectedDeliveryCharge && (
                       <div className="flex justify-between">
@@ -792,6 +791,69 @@ const UploadDocumentUi = ({
                 </div>
               </div>
             )}
+
+            <div className="bg-white mt-4 rounded-lg overflow-hidden border border-gray-200">
+              <div className="bg-red-600 text-white text-center py-3 font-bold text-lg">
+                Important Note
+              </div>
+
+              <div className="p-4 space-y-3">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-800 text-sm">
+                    Note: Printed documents will be discarded after 30 days. We
+                    suggest adding "doorstep delivery" to retain a physical
+                    copy.
+                  </span>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                  <div>
+                    <span className="text-gray-800 font-medium text-sm">
+                      Cut-off time: 3:30 PM (everyday)
+                    </span>
+                    <div className="ml-6 mt-1">
+                      <div className="flex items-start">
+                        <div className="w-1.5 h-1.5 bg-gray-600 rounded-full mt-2 mr-2 flex-shrink-0"></div>
+                        <span className="text-gray-700 text-sm">
+                          Payment received for orders after the cut-off time
+                          will be processed on the next business day.
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-800 text-sm">
+                    Sunday and other state/central government
+                    holidays/strikes/bandhs/riots are non-business days.
+                  </span>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-800 text-sm">
+                    *Delivery of stamp paper is done by third party (courier
+                    company), on best effort basis ONLY and can be delayed
+                    (though very rarely) due to situations beyond our control.
+                  </span>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-800 text-sm">
+                    Shipment can be returned back to shipper if address is
+                    incorrect/incomplete, consignee not available at the
+                    shipping address/door locked/no one to receive the
+                    shipment/building security not ready to receive the
+                    shipment.
+                  </span>
+                </div>
+              </div>
+            </div>
 
             {/* Submit Button */}
             <div className="text-center pt-2">

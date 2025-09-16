@@ -184,7 +184,7 @@ const BuyEStampDocuments = () => {
   };
 
   const getConsiderationDescription = () => {
-    const stampDescriptions = { 
+    const stampDescriptions = {
       "684145ffb333b68bfef00580": "(0.5% on AAR, Fine, Premium, Advance)",
       "6841457bb333b68bfef0057c":
         "(0.5% on average annual rent fine premium subject to maximum of Rs.500)",
@@ -194,10 +194,7 @@ const BuyEStampDocuments = () => {
         "(2% on the consideration price subject to maximum of Rs.500)",
     };
 
-    return (
-      stampDescriptions[selectedDocument] 
-      
-    );
+    return stampDescriptions[selectedDocument];
   };
 
   const calculateStampAmount = () => {
@@ -937,7 +934,7 @@ const BuyEStampDocuments = () => {
                         />
                       </svg>
                       <span className="font-medium text-gray-900">
-                        Home Delivery
+                        Scan Copy / Home Delivery
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 ml-7">
@@ -1112,7 +1109,70 @@ const BuyEStampDocuments = () => {
               </div>
             )}
 
-            <div className="flex justify-end">
+            <div className="bg-white mt-4 rounded-lg overflow-hidden border border-gray-200">
+              <div className="bg-red-600 text-white text-center py-3 font-bold text-lg">
+                Important Note
+              </div>
+
+              <div className="p-4 space-y-3">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-800 text-sm">
+                    Printed documents will be discarded after 30 days. We
+                    suggest adding "doorstep delivery" to retain a physical
+                    copy.
+                  </span>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                  <div>
+                    <span className="text-gray-800 font-medium text-sm">
+                      Cut-off time: 3:30 PM (everyday)
+                    </span>
+                    <div className="ml-6 mt-1">
+                      <div className="flex items-start">
+                        <div className="w-1.5 h-1.5 bg-gray-600 rounded-full mt-2 mr-2 flex-shrink-0"></div>
+                        <span className="text-gray-700 text-sm">
+                          Payment received for orders after the cut-off time
+                          will be processed on the next business day.
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-800 text-sm">
+                    Sunday and other state/central government
+                    holidays/strikes/bandhs/riots are non-business days.
+                  </span>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-800 text-sm">
+                    Delivery of stamp paper is done by third party (courier
+                    company), on best effort basis ONLY and can be delayed
+                    (though very rarely) due to situations beyond our control.
+                  </span>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-800 text-sm">
+                    Shipment can be returned back to shipper if address is
+                    incorrect/incomplete, consignee not available at the
+                    shipping address/door locked/no one to receive the
+                    shipment/building security not ready to receive the
+                    shipment.
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-2" >
               <button
                 onClick={handleProceedToPayment}
                 disabled={!selectedDocument}

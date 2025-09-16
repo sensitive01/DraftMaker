@@ -202,8 +202,8 @@ const DocumentPriceTable = () => {
   const handleSubmit = async () => {
     if (
       newItem.documentType.trim() === "" ||
-      newItem.draftCharge === "" ||
-      newItem.serviceCharge === ""
+      newItem.draftCharge === "" 
+     
     ) {
       showNotification("Please fill in all required fields", "error");
       return;
@@ -404,13 +404,12 @@ const DocumentPriceTable = () => {
                   Document Type
                 </th>
                 <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
-                  Charges for Draft
-                  <br />
-                  (No E-Stamp Printed)
+                  Service Charge 
+                  
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
-                  Service Charge
-                </th>
+                {/* <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
+                  Service Charge 2
+                </th> */}
                 <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Status
                 </th>
@@ -447,9 +446,9 @@ const DocumentPriceTable = () => {
                         )}
                       </div>
                     </td>
-                    <td className="p-3 whitespace-nowrap text-sm text-red-900">
+                    {/* <td className="p-3 whitespace-nowrap text-sm text-red-900">
                       ₹{(price.serviceCharge || 0).toFixed(2)}
-                    </td>
+                    </td> */}
                     <td className="p-3 whitespace-nowrap text-sm">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -592,7 +591,7 @@ const DocumentPriceTable = () => {
                   </div>
                 </div>
 
-                <div className="border-t border-red-100 pt-4">
+                {/* <div className="border-t border-red-100 pt-4">
                   <label className="block text-sm font-medium text-red-600 mb-1">
                     Service Charge *
                   </label>
@@ -609,7 +608,7 @@ const DocumentPriceTable = () => {
                       placeholder="0.00"
                     />
                   </div>
-                </div>
+                </div> */}
               </div>
 
               <div className="flex justify-end space-x-3 mt-6">

@@ -74,7 +74,7 @@ const DocumentUpload = () => {
 
   // Get dynamic service charge based on selected document type
   const getServiceChargePerDocument = () => {
-    return selectedDocumentType?.serviceCharge || 200; // fallback to 200 if not defined
+    return selectedDocumentType?.serviceCharge || 0;
   };
 
   // NEW: Get filtered delivery options based on selected service
@@ -251,27 +251,35 @@ const DocumentUpload = () => {
   };
 
   // Calculate total amount - UPDATED to use dynamic service charge
-  const calculateTotalAmount = () => {
-    if (!selectedService) return 0;
+const calculateTotalAmount = () => {
+  if (!selectedService) return 0;
 
-    let total = selectedService.price || 0;
+  const qty = parseInt(quantity) || 1; // Ensure quantity is a number
+  let total = 0;
 
-    // Add notary charge only if checkbox is checked AND service has notary
-    if (selectedService.hasNotary && includeNotary) {
-      total += selectedService.notaryCharge || 0;
-    }
+  // Base service price multiplied by quantity
+  total += (selectedService.price || 0) * qty;
 
-    if (selectedService.requiresStamp && selectedStampDuty) {
-      total += calculateStampDutyAmount(selectedStampDuty);
-      total += getServiceChargePerDocument() * (quantity || 1); // Use dynamic service charge
-    }
+  // Add notary charge multiplied by quantity (only if checkbox is checked AND service has notary)
+  if (selectedService.hasNotary && includeNotary) {
+    total += (selectedService.notaryCharge || 0) * qty;
+  }
 
-    if (selectedService.requiresDelivery && selectedDeliveryCharge) {
-      total += selectedDeliveryCharge.charge || 0;
-    }
+  // Add stamp duty and service charge multiplied by quantity
+  if (selectedService.requiresStamp && selectedStampDuty) {
+    total += calculateStampDutyAmount(selectedStampDuty); // This already includes quantity
+    total += getServiceChargePerDocument() * qty; // Service charge multiplied by quantity
+  }
 
-    return total;
-  };
+  // Delivery charge is NOT multiplied by quantity (single delivery regardless of quantity)
+  if (selectedService.requiresDelivery && selectedDeliveryCharge) {
+    total += selectedDeliveryCharge.charge || 0;
+  }
+
+  return total;
+};
+
+
 
   // Check if can proceed to payment
   const canProceedToPayment = () => {
