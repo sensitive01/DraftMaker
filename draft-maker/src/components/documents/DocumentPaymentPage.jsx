@@ -227,33 +227,32 @@ const DocumentPaymentPage = () => {
     return 0;
   };
 
-  const calculateTotalAmount = () => {
-    if (!selectedService) return 0;
+const calculateTotalAmount = () => {
+  if (!selectedService) return 0;
 
-    const qty = parseInt(quantity) || 1;
-    let total = 0;
+  const qty = parseInt(quantity) || 1;
+  let total = 0;
 
-    // 1. Draft price × qty
-    total += (selectedService.price || 0) * qty;
+  // 1. Draft price × qty
+  total += (selectedService.price || 0) * qty;
 
-    // 2. Notary charge × qty (only if opted)
-    if (selectedService.hasNotary && includeNotary) {
-      total += (selectedService.notaryCharge || 0) * qty;
-    }
+  // 2. Notary charge × qty (only if opted)
+  if (selectedService.hasNotary && includeNotary) {
+    total += (selectedService.notaryCharge || 0) * qty;
+  }
 
-    // 3. Stamp duty × qty (if required)
-    if (selectedService.requiresStamp && selectedStampDuty) {
-      total += calculateStampDutyAmount(selectedStampDuty) * qty;
-      // ❗ if calculateStampDutyAmount already includes qty, remove "* qty"
-    }
+  // 3. Stamp duty (already includes quantity in calculation)
+  if (selectedService.requiresStamp && selectedStampDuty) {
+    total += calculateStampDutyAmount(selectedStampDuty); // ✅ Remove * qty
+  }
 
-    // 4. Delivery charge (added once, not multiplied)
-    if (selectedService.requiresDelivery && selectedDeliveryCharge) {
-      total += selectedDeliveryCharge.charge || 0;
-    }
+  // 4. Delivery charge (added once, not multiplied)
+  if (selectedService.requiresDelivery && selectedDeliveryCharge) {
+    total += selectedDeliveryCharge.charge || 0;
+  }
 
-    return total;
-  };
+  return total;
+};
 
   const canProceedToPayment = () => {
     if (!selectedService) return false;
