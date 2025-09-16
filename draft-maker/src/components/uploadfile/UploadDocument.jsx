@@ -268,7 +268,7 @@ const calculateTotalAmount = () => {
   // Add stamp duty and service charge multiplied by quantity
   if (selectedService.requiresStamp && selectedStampDuty) {
     total += calculateStampDutyAmount(selectedStampDuty); // This already includes quantity
-    total += getServiceChargePerDocument() * qty; // Service charge multiplied by quantity
+  
   }
 
   // Delivery charge is NOT multiplied by quantity (single delivery regardless of quantity)
