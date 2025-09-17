@@ -521,7 +521,7 @@ const CarouselItem = ({
           {doc.title}
         </h3>
 
-        <p className="text-gray-500 text-center text-sm">{doc.subtitle}</p>
+        {/* <p className="text-gray-500 text-center text-sm">{doc.subtitle}</p> */}
       </div>
     </div>
   );
