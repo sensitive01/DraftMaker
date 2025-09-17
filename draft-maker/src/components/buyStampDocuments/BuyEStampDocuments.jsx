@@ -42,6 +42,45 @@ const BuyEStampDocuments = () => {
   const [formErrors, setFormErrors] = useState({});
   const [paymentErrors, setPaymentErrors] = useState({});
 
+  // Real-time validation for character limits
+  const handleFirstPartyNameChange = (e) => {
+    const value = e.target.value;
+    setFirstPartyName(value);
+
+    // Update errors in real-time
+    setFormErrors((prev) => {
+      const newErrors = { ...prev };
+      if (value.length > 50) {
+        newErrors.firstPartyName =
+          "First party name cannot exceed 50 characters";
+      } else if (value.trim() === "") {
+        newErrors.firstPartyName = "First party name is required";
+      } else {
+        delete newErrors.firstPartyName;
+      }
+      return newErrors;
+    });
+  };
+
+  const handleSecondPartyNameChange = (e) => {
+    const value = e.target.value;
+    setSecondPartyName(value);
+
+    // Update errors in real-time
+    setFormErrors((prev) => {
+      const newErrors = { ...prev };
+      if (value.length > 50) {
+        newErrors.secondPartyName =
+          "Second party name cannot exceed 50 characters";
+      } else if (value.trim() === "") {
+        newErrors.secondPartyName = "Second party name is required";
+      } else {
+        delete newErrors.secondPartyName;
+      }
+      return newErrors;
+    });
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -102,10 +141,14 @@ const BuyEStampDocuments = () => {
 
     if (!firstPartyName.trim()) {
       errors.firstPartyName = "First party name is required";
+    } else if (firstPartyName.length > 50) {
+      errors.firstPartyName = "First party name cannot exceed 50 characters";
     }
 
     if (!secondPartyName.trim()) {
       errors.secondPartyName = "Second party name is required";
+    } else if (secondPartyName.length > 50) {
+      errors.secondPartyName = "Second party name cannot exceed 50 characters";
     }
 
     if (!stampDutyPayer) {
@@ -601,18 +644,30 @@ const BuyEStampDocuments = () => {
                 >
                   First Party Name *
                 </label>
-                <input
-                  type="text"
-                  id="firstPartyName"
-                  value={firstPartyName}
-                  onChange={(e) => setFirstPartyName(e.target.value)}
-                  placeholder="Enter first party name"
-                  className={`w-full px-4 py-2.5 border ${
-                    formErrors.firstPartyName
-                      ? "border-red-300"
-                      : "border-gray-300"
-                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="firstPartyName"
+                    value={firstPartyName}
+                    onChange={handleFirstPartyNameChange}
+                    placeholder="Enter first party name"
+                    maxLength="60"
+                    className={`w-full px-4 py-2.5 border ${
+                      formErrors.firstPartyName
+                        ? "border-red-300"
+                        : "border-gray-300"
+                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm pr-16`}
+                  />
+                  <div
+                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-xs ${
+                      firstPartyName.length > 50
+                        ? "text-red-500"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    {firstPartyName.length}/50
+                  </div>
+                </div>
                 {formErrors.firstPartyName && (
                   <p className="mt-1 text-sm text-red-600">
                     {formErrors.firstPartyName}
@@ -627,18 +682,30 @@ const BuyEStampDocuments = () => {
                 >
                   Second Party Name *
                 </label>
-                <input
-                  type="text"
-                  id="secondPartyName"
-                  value={secondPartyName}
-                  onChange={(e) => setSecondPartyName(e.target.value)}
-                  placeholder="Enter second party name"
-                  className={`w-full px-4 py-2.5 border ${
-                    formErrors.secondPartyName
-                      ? "border-red-300"
-                      : "border-gray-300"
-                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="secondPartyName"
+                    value={secondPartyName}
+                    onChange={handleSecondPartyNameChange}
+                    placeholder="Enter second party name"
+                    maxLength="60"
+                    className={`w-full px-4 py-2.5 border ${
+                      formErrors.secondPartyName
+                        ? "border-red-300"
+                        : "border-gray-300"
+                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm pr-16`}
+                  />
+                  <div
+                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-xs ${
+                      secondPartyName.length > 50
+                        ? "text-red-500"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    {secondPartyName.length}/50
+                  </div>
+                </div>
                 {formErrors.secondPartyName && (
                   <p className="mt-1 text-sm text-red-600">
                     {formErrors.secondPartyName}
@@ -646,7 +713,6 @@ const BuyEStampDocuments = () => {
                 )}
               </div>
             </div>
-
             <div className="mb-6">
               <label
                 htmlFor="stampDutyPayer"
@@ -1172,7 +1238,7 @@ const BuyEStampDocuments = () => {
               </div>
             </div>
 
-            <div className="flex justify-end mt-2" >
+            <div className="flex justify-end mt-2">
               <button
                 onClick={handleProceedToPayment}
                 disabled={!selectedDocument}

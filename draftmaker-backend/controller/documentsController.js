@@ -22,14 +22,14 @@ const eStampPaymentData = require("../model/eStampPaymentSchema");
 const uploadDocument = require("../model/upload/uploadDocument");
 const BookingIdRegistry = require("../model/documentsModel/bookingId");
 
+const sendEmail = require("../utils/sendEmail");
+
 const getDocumentNameData = async (req, res) => {
   try {
     const documentDataName = await documentPriceData.find(
       { status: true },
       { documentType: 1, status: 1 }
     );
-
-    console.log("documentDataName", documentDataName);
 
     return res.status(200).json({
       success: true,
@@ -167,8 +167,14 @@ const getDashboardStatistics = async (req, res) => {
 const getDocumentNames = async (req, res) => {
   try {
     const documentsData = await documentPriceData.find(
-      {status:true},
-      { documentType: 1, formId: 1, draftCharge: 1, draftNotaryCharge: 1,serviceCharge:1 }
+      { status: true },
+      {
+        documentType: 1,
+        formId: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentsData || documentsData.length === 0) {
@@ -1088,7 +1094,13 @@ const saveDualNameCorrection = async (req, res) => {
       {
         formId: "DM-DNC-1",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -1169,6 +1181,17 @@ const updateDualNamePaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
+
     res.status(200).json({
       message: "Payment details updated successfully.",
       data: updatedData,
@@ -1246,7 +1269,13 @@ const saveNameCorrection = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne(
       { formId: "DM-NC-2" },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -1333,7 +1362,16 @@ const saveNameCorrectionPaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -1356,7 +1394,13 @@ const createDobCorrection = async (req, res) => {
       {
         formId: "DM-DOBC-3",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 ,serviceCharge:1}
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -1443,7 +1487,16 @@ const saveDobCorrectionPaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -1466,7 +1519,13 @@ const createGasCorrection = async (req, res) => {
       {
         formId: "DM-GAS-5",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 ,serviceCharge:1}
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -1553,7 +1612,16 @@ const saveGasCorrectionPaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -1576,7 +1644,13 @@ const createDocumentLost = async (req, res) => {
       {
         formId: "DM-DOC-LOST-5",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 ,serviceCharge:1}
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -1663,7 +1737,16 @@ const saveDocumentLostPaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -1684,7 +1767,13 @@ const createDobParentNameCorrection = async (req, res) => {
     const { document } = req.body;
     const documentName = await documentPriceData.findOne(
       { formId: "DM-NC-2" },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -1771,7 +1860,16 @@ const saveDobParentNameCorrection = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -1794,7 +1892,13 @@ const createBirthCertificateNameCorrection = async (req, res) => {
       {
         formId: "DM-BC-MNC-7",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -1881,7 +1985,16 @@ const saveBirthCertificateNameCorrection = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -1904,7 +2017,13 @@ const saveGstData = async (req, res) => {
       {
         formId: "DM-GST-8",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -1991,7 +2110,16 @@ const saveGstPaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2014,7 +2142,13 @@ const createMetriculationLostData = async (req, res) => {
       {
         formId: "DM-MAL-9",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -2101,7 +2235,16 @@ const updateMetriculationLostPaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2124,7 +2267,13 @@ const createKhataCorrectionData = async (req, res) => {
       {
         formId: "DM-KH-10",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -2211,7 +2360,16 @@ const updateKhataCorrectionPaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2234,7 +2392,13 @@ const createVehicleInsurenceData = async (req, res) => {
       {
         formId: "DM-VIC-11",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -2321,7 +2485,16 @@ const updateVehicleInsurencePaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2344,7 +2517,13 @@ const createHufData = async (req, res) => {
       {
         formId: "DM-HUF-12",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -2431,7 +2610,16 @@ const updateHufPaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2454,7 +2642,13 @@ const createGapPeriodData = async (req, res) => {
       {
         formId: "DM-GP-13",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -2541,7 +2735,16 @@ const updateGapPeriodData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2564,7 +2767,13 @@ const createPasswordAnnaxureData = async (req, res) => {
       {
         formId: "DM-PAF-14",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -2651,7 +2860,16 @@ const updatePasswordAnnaxureData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2674,7 +2892,13 @@ const createPassportNameChangeData = async (req, res) => {
       {
         formId: "DM-PNC-15",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -2761,7 +2985,16 @@ const updatePassportNameChangePaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2784,7 +3017,13 @@ const createAdressAffadavitData = async (req, res) => {
       {
         formId: "DM-AAF-16",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -2871,7 +3110,16 @@ const updateAdressAffadavitPaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2894,7 +3142,13 @@ const createCommercialData = async (req, res) => {
       {
         formId: "DM-CFD-17",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1 ,serviceCharge:1}
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -2992,7 +3246,16 @@ const updateCommercialPaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -3015,7 +3278,13 @@ const createRecidentialData = async (req, res) => {
       {
         formId: "DM-RFD-18",
       },
-      { documentType: 1, draftCharge: 1, draftNotaryCharge: 1, formId: 1,serviceCharge:1 }
+      {
+        documentType: 1,
+        draftCharge: 1,
+        draftNotaryCharge: 1,
+        formId: 1,
+        serviceCharge: 1,
+      }
     );
 
     if (!documentName) {
@@ -3102,7 +3371,16 @@ const updateRecidentialPaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    console.log("✅ Payment data updated for booking:", bookingId);
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -3155,6 +3433,17 @@ const uploadDocumentData = async (req, res) => {
     });
 
     await newUpload.save();
+
+    await sendEmail("draftmakerinfo@gmail.com", "uploadDocuments", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: newUpload.createdAt,
+      userName: username,
+      mobile: userMobile,
+      paymentId: payment.paymentId,
+      paymentStatus: payment.paymentStatus,
+      amount: payment.totalAmount,
+    });
 
     res.status(201).json({
       success: true,
@@ -3290,7 +3579,7 @@ const getDocumentPreviewData = async (req, res) => {
 
 const updateDocumentPreviewData = async (req, res) => {
   try {
-    console.log("updating")
+    console.log("updating");
     const { bookingId } = req.params;
     const { formData } = req.body;
 

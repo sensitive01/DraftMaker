@@ -40,9 +40,6 @@ const BuyEStampDocuments = () => {
   const [formErrors, setFormErrors] = useState({});
   const [paymentErrors, setPaymentErrors] = useState({});
 
-  // Service charge including GST (fixed for all documents)
-  const SERVICE_CHARGE = 210;
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -60,6 +57,12 @@ const BuyEStampDocuments = () => {
     };
     fetchData();
   }, []);
+
+  // Get service charge based on selected document
+  const getServiceCharge = () => {
+    const selectedDocumentData = getSelectedDocumentData();
+    return selectedDocumentData?.serviceCharge || 210; // Default to 210 if no document selected or no service charge
+  };
 
   // Calculate progress percentage
   const calculateProgress = () => {
@@ -100,12 +103,19 @@ const BuyEStampDocuments = () => {
     const selectedDocumentData = getSelectedDocumentData();
     const isFixedType = selectedDocumentData?.calculationType === "fixed";
 
+    // First Party Name validation
     if (!firstPartyName.trim()) {
       errors.firstPartyName = "First party name is required";
+    } else if (firstPartyName.length > 50) {
+      errors.firstPartyName = "First party name must not exceed 50 characters";
     }
 
+    // Second Party Name validation
     if (!secondPartyName.trim()) {
       errors.secondPartyName = "Second party name is required";
+    } else if (secondPartyName.length > 50) {
+      errors.secondPartyName =
+        "Second party name must not exceed 50 characters";
     }
 
     if (!stampDutyPayer) {
@@ -184,6 +194,42 @@ const BuyEStampDocuments = () => {
     );
   };
 
+  const handleFirstPartyNameChange = (e) => {
+    const value = e.target.value;
+    setFirstPartyName(value);
+
+    // Clear existing error if user starts typing again and length is valid
+    if (formErrors.firstPartyName && value.length <= 50) {
+      setFormErrors((prev) => ({ ...prev, firstPartyName: null }));
+    }
+
+    // Show error immediately if exceeds 50 characters
+    if (value.length > 50) {
+      setFormErrors((prev) => ({
+        ...prev,
+        firstPartyName: "First party name must not exceed 50 characters",
+      }));
+    }
+  };
+
+  const handleSecondPartyNameChange = (e) => {
+    const value = e.target.value;
+    setSecondPartyName(value);
+
+    // Clear existing error if user starts typing again and length is valid
+    if (formErrors.secondPartyName && value.length <= 50) {
+      setFormErrors((prev) => ({ ...prev, secondPartyName: null }));
+    }
+
+    // Show error immediately if exceeds 50 characters
+    if (value.length > 50) {
+      setFormErrors((prev) => ({
+        ...prev,
+        secondPartyName: "Second party name must not exceed 50 characters",
+      }));
+    }
+  };
+
   const calculateStampAmount = () => {
     const selectedDocumentData = getSelectedDocumentData();
     if (!selectedDocumentData) return 0;
@@ -242,10 +288,11 @@ const BuyEStampDocuments = () => {
   const getTotalAmount = () => {
     const deliveryData = getSelectedDeliveryData();
     const stampAmount = calculateStampAmount();
+    const serviceCharge = getServiceCharge();
     const deliveryAmount =
       deliveryType === "delivery" && deliveryData ? deliveryData.charge : 0;
 
-    return stampAmount + SERVICE_CHARGE + deliveryAmount;
+    return stampAmount + serviceCharge + deliveryAmount;
   };
 
   const handleProceedToPayment = () => {
@@ -274,6 +321,7 @@ const BuyEStampDocuments = () => {
       state: "",
       pincode: "",
       landmark: "",
+      email: "",
     });
   };
 
@@ -311,7 +359,7 @@ const BuyEStampDocuments = () => {
 
         // Calculated Amounts
         stampDutyAmount: calculateStampAmount(),
-        serviceCharge: SERVICE_CHARGE,
+        serviceCharge: getServiceCharge(),
 
         // Delivery Information
         deliveryType: deliveryType,
@@ -344,6 +392,7 @@ const BuyEStampDocuments = () => {
                 state: deliveryAddress.state.trim(),
                 pincode: deliveryAddress.pincode.trim(),
                 landmark: deliveryAddress.landmark.trim(),
+                email: deliveryAddress.email.trim(),
               }
             : null,
       };
@@ -572,21 +621,37 @@ const BuyEStampDocuments = () => {
                   type="text"
                   id="firstPartyName"
                   value={firstPartyName}
-                  onChange={(e) => setFirstPartyName(e.target.value)}
+                  onChange={handleFirstPartyNameChange}
                   placeholder="Enter first party name"
                   className={`w-full px-4 py-2.5 border ${
-                    formErrors.firstPartyName
+                    formErrors.firstPartyName || firstPartyName.length > 50
                       ? "border-red-300"
                       : "border-gray-300"
                   } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                 />
-                {formErrors.firstPartyName && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {formErrors.firstPartyName}
+                <div className="flex justify-between items-center mt-1">
+                  {(formErrors.firstPartyName ||
+                    firstPartyName.length > 50) && (
+                    <p className="text-sm text-red-600">
+                      {formErrors.firstPartyName ||
+                        "First party name must not exceed 50 characters"}
+                    </p>
+                  )}
+                  <p
+                    className={`text-xs ml-auto ${
+                      firstPartyName.length > 50
+                        ? "text-red-500 font-medium"
+                        : firstPartyName.length > 45
+                        ? "text-orange-500"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    {firstPartyName.length}/50
                   </p>
-                )}
+                </div>
               </div>
 
+              {/* Second Party Name with character counter */}
               <div>
                 <label
                   htmlFor="secondPartyName"
@@ -598,19 +663,34 @@ const BuyEStampDocuments = () => {
                   type="text"
                   id="secondPartyName"
                   value={secondPartyName}
-                  onChange={(e) => setSecondPartyName(e.target.value)}
+                  onChange={handleSecondPartyNameChange}
                   placeholder="Enter second party name"
                   className={`w-full px-4 py-2.5 border ${
-                    formErrors.secondPartyName
+                    formErrors.secondPartyName || secondPartyName.length > 50
                       ? "border-red-300"
                       : "border-gray-300"
                   } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                 />
-                {formErrors.secondPartyName && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {formErrors.secondPartyName}
+                <div className="flex justify-between items-center mt-1">
+                  {(formErrors.secondPartyName ||
+                    secondPartyName.length > 50) && (
+                    <p className="text-sm text-red-600">
+                      {formErrors.secondPartyName ||
+                        "Second party name must not exceed 50 characters"}
+                    </p>
+                  )}
+                  <p
+                    className={`text-xs ml-auto ${
+                      secondPartyName.length > 50
+                        ? "text-red-500 font-medium"
+                        : secondPartyName.length > 45
+                        ? "text-orange-500"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    {secondPartyName.length}/50
                   </p>
-                )}
+                </div>
               </div>
             </div>
 
@@ -718,13 +798,14 @@ const BuyEStampDocuments = () => {
                 </p>
               )}
             </div>
+
             <input
               type="checkbox"
               onClick={() => setIsConsideration(true)}
             ></input>
 
             {isConsideration && (
-              <div>
+              <div className="mb-6">
                 <label
                   htmlFor="considerationAmount"
                   className="block text-sm font-medium text-gray-700 mb-2"
@@ -745,6 +826,11 @@ const BuyEStampDocuments = () => {
                       : "border-gray-300"
                   } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                 />
+                {formErrors.considerationAmount && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {formErrors.considerationAmount}
+                  </p>
+                )}
               </div>
             )}
 
@@ -1060,7 +1146,9 @@ const BuyEStampDocuments = () => {
                       onChange={(e) => setRequestorName(e.target.value)}
                       placeholder="Enter full name"
                       className={`w-full px-4 py-2.5 border ${
-                        requestorName ? "border-red-300" : "border-gray-300"
+                        paymentErrors.requestorName
+                          ? "border-red-300"
+                          : "border-gray-300"
                       } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                     />
                     {paymentErrors.requestorName && (
@@ -1089,47 +1177,49 @@ const BuyEStampDocuments = () => {
                         placeholder="Enter 10-digit phone number"
                         maxLength="10"
                         className={`w-full pl-12 pr-4 py-2.5 border ${
-                          formErrors.deliveryPhoneNumber
+                          paymentErrors.mobileNumber
                             ? "border-red-300"
                             : "border-gray-300"
                         } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                       />
                     </div>
+                    {paymentErrors.mobileNumber && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {paymentErrors.mobileNumber}
+                      </p>
+                    )}
                   </div>
-                  {paymentErrors.mobileNumber && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {paymentErrors.mobileNumber}
-                    </p>
-                  )}
+
+                  {/* Email Id */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Email Id *
                     </label>
                     <div className="relative">
                       <input
-                        type="text"
+                        type="email"
                         id="emailId"
                         value={deliveryAddress.email}
                         onChange={(e) =>
-                        setDeliveryAddress((prev) => ({
-                          ...prev,
-                          email: e.target.value,
-                        }))
-                      }
+                          setDeliveryAddress((prev) => ({
+                            ...prev,
+                            email: e.target.value,
+                          }))
+                        }
                         placeholder="Enter Your Email Id"
-                        className={`w-full pl-3  py-2.5 border ${
+                        className={`w-full pl-3 py-2.5 border ${
                           formErrors.emailId
                             ? "border-red-300"
                             : "border-gray-300"
                         } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                       />
                     </div>
+                    {paymentErrors.email && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {paymentErrors.email}
+                      </p>
+                    )}
                   </div>
-                  {paymentErrors.email && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {paymentErrors.email}
-                    </p>
-                  )}
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 mt-4">
@@ -1322,7 +1412,7 @@ const BuyEStampDocuments = () => {
                       Service Charge (Inc. GST):
                     </span>
                     <span className="font-medium text-gray-900">
-                      ₹{SERVICE_CHARGE}
+                      ₹{getServiceCharge()}
                     </span>
                   </div>
                   {deliveryType === "delivery" && selectedDeliveryService && (

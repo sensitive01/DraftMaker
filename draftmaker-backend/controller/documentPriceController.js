@@ -3,6 +3,8 @@ const stampDutySchema = require("../model/stampDutyModel");
 const deliveryChargeModel = require("../model/deliveryChargeModel");
 const EstampPayment = require("../model/eStampPaymentSchema");
 
+const sendEmail = require("../utils/sendEmail")
+
 const getAllDocumentPrices = async (req, res) => {
   try {
     const prices = await DocumentPrice.find();
@@ -406,9 +408,20 @@ const saveTheEstampData = async (req, res) => {
     console.log("OrderData", orderData);
     const bookingId = generateBookingId();
 
-    const newPayment = new EstampPayment(orderData); // Directly pass the whole object
+    const newPayment = new EstampPayment(orderData);
     newPayment.bookingId = bookingId;
     await newPayment.save();
+
+    await sendEmail("draftmakerinfo@gmail.com", "eStamp", {
+      bookingId: bookingId,
+      agreementName: orderData.documentType,
+      dateTime: newPayment.createdAt,
+      userName: orderData.requestorName,
+      mobile: orderData.mobileNumber,
+      paymentId: orderData.razorpayPaymentId,
+      paymentStatus: orderData.paymentStatus,
+      amount: orderData.totalAmount,
+    });
 
     res.status(201).json({
       success: true,
