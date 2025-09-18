@@ -1,26 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { getAggrementFormData } from "../../../../../../api/service/axiosService";
 import { useParams } from "react-router-dom";
-import {
-  Document,
-  Packer,
-  Paragraph,
-  TextRun,
-  Table,
-  TableRow,
-  TableCell,
-  BorderStyle,
-  HeadingLevel,
-  AlignmentType,
-  WidthType,
-} from "docx";
-import { saveAs } from "file-saver";
+import html2pdf from 'html2pdf.js';
 
 const RecidentialAggrementPreview = () => {
   const previewRef = useRef(null);
   const { bookingId } = useParams();
   const [formData, setFormData] = useState({});
-  // Add loading state
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -32,7 +18,7 @@ const RecidentialAggrementPreview = () => {
       }
     };
     fetchData();
-  }, [bookingId]); // Added bookingId dependency
+  }, [bookingId]);
 
   // Format date function
   const formatDate = (dateString) => {
@@ -41,6 +27,41 @@ const RecidentialAggrementPreview = () => {
       day: "numeric",
       month: "long",
       year: "numeric",
+    });
+  };
+
+  // PDF Download Function
+  const downloadPDF = () => {
+    setLoading(true);
+    
+    const element = previewRef.current;
+    const opt = {
+      margin: [20, 15, 20, 15], // top, left, bottom, right in mm
+      filename: `Rental_Agreement_${bookingId || 'document'}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2,
+        useCORS: true,
+        letterRendering: true,
+        allowTaint: false
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait',
+        compressPDF: true
+      },
+      pagebreak: { 
+        mode: ['avoid-all', 'css', 'legacy'],
+        before: '.page-break'
+      }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+      setLoading(false);
+    }).catch((error) => {
+      console.error('PDF generation failed:', error);
+      setLoading(false);
     });
   };
 
@@ -181,6 +202,29 @@ const RecidentialAggrementPreview = () => {
 
   return (
     <>
+      {/* Download Button */}
+      <div className="flex justify-center mb-6">
+        <button
+          onClick={downloadPDF}
+          disabled={loading}
+          className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-200 flex items-center gap-2"
+        >
+          {loading ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+              Generating PDF...
+            </>
+          ) : (
+            <>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              </svg>
+              Download PDF
+            </>
+          )}
+        </button>
+      </div>
+
       <div className="max-w-full overflow-x-auto py-4">
         <div ref={previewRef} className="print-container">
           {/* Page 1 */}
@@ -192,7 +236,7 @@ const RecidentialAggrementPreview = () => {
             <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-gray-500"></div>
 
             {/* Content with proper legal document padding */}
-            <div className="p-8 md:p-10 lg:p-12">
+            <div className="pdf-content">
               <div className="text-center font-bold text-xl mb-8 underline tracking-wide">
                 RENTAL AGREEMENT
               </div>
@@ -318,12 +362,11 @@ const RecidentialAggrementPreview = () => {
                   </div>
                 </div>
               </div>
-
-              <div className="absolute bottom-3 right-3 text-xs text-gray-500">
-                Page 1 of 3
-              </div>
             </div>
           </div>
+
+          {/* Page break marker */}
+          <div className="page-break"></div>
 
           {/* Page 2 */}
           <div className="page relative bg-white shadow-md mx-auto mb-8">
@@ -332,7 +375,7 @@ const RecidentialAggrementPreview = () => {
             <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-gray-500"></div>
             <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-gray-500"></div>
 
-            <div className="p-8 md:p-10 lg:p-12">
+            <div className="pdf-content">
               <p className="mb-5 text-justify leading-relaxed">
                 schedule premises to the LESSOR in the same condition in which
                 it was handed over at the time of joining.
@@ -461,12 +504,11 @@ const RecidentialAggrementPreview = () => {
               </p>
 
               {renderWitnessSections()}
-
-              <div className="absolute bottom-3 right-3 text-xs text-gray-500">
-                Page 2 of 3
-              </div>
             </div>
           </div>
+
+          {/* Page break marker */}
+          <div className="page-break"></div>
 
           {/* Page 3 */}
           <div className="page relative bg-white shadow-md mx-auto mb-8">
@@ -475,7 +517,7 @@ const RecidentialAggrementPreview = () => {
             <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-gray-500"></div>
             <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-gray-500"></div>
 
-            <div className="p-8 md:p-10 lg:p-12">
+            <div className="pdf-content">
               <div className="text-center mt-6 mb-8">
                 <div className="font-bold mb-2 text-lg underline">
                   ANNEXURE I
@@ -520,16 +562,12 @@ const RecidentialAggrementPreview = () => {
                   </tbody>
                 </table>
               </div>
-
-              <div className="absolute bottom-3 right-3 text-xs text-gray-500">
-                Page 3 of 3
-              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* CSS for printing and responsive display */}
+      {/* Enhanced CSS for PDF generation and responsive display */}
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap");
 
@@ -537,6 +575,20 @@ const RecidentialAggrementPreview = () => {
           font-family: "Libre Baskerville", "Times New Roman", Times, serif;
           line-height: 1.6;
           color: #111827;
+          position: relative;
+        }
+
+        .pdf-content {
+          padding: 40px 30px;
+          min-height: calc(297mm - 80px);
+          box-sizing: border-box;
+        }
+
+        /* Page break styling for PDF */
+        .page-break {
+          page-break-before: always;
+          height: 1px;
+          visibility: hidden;
         }
 
         @media print {
@@ -548,19 +600,25 @@ const RecidentialAggrementPreview = () => {
             visibility: visible;
           }
           .page {
-            margin: 0;
-            border: initial;
-            border-radius: initial;
-            width: 210mm;
-            height: 297mm;
-            min-height: initial;
-            box-shadow: initial;
-            background: initial;
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            width: 210mm !important;
+            height: 297mm !important;
+            min-height: 297mm !important;
+            box-shadow: none !important;
+            background: white !important;
             page-break-after: always;
-            padding: 0;
+            padding: 0 !important;
+            position: relative;
           }
-          .page > div {
-            padding: 25mm 20mm;
+          .pdf-content {
+            padding: 25mm 20mm !important;
+            height: 247mm !important;
+            overflow: hidden;
+          }
+          .page-break {
+            display: none;
           }
         }
 
@@ -572,13 +630,34 @@ const RecidentialAggrementPreview = () => {
             max-width: 210mm;
             min-height: 297mm;
             margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
           }
         }
 
-        /* Make sure content doesn't overflow on small screens */
-        @media screen and (max-width: 640px) {
+        /* Responsive adjustments */
+        @media screen and (max-width: 768px) {
+          .pdf-content {
+            padding: 20px 15px;
+          }
+          
           .page {
             min-height: auto;
+            box-shadow: none;
+            border: 1px solid #e5e7eb;
+          }
+        }
+
+        @media screen and (max-width: 640px) {
+          .pdf-content {
+            padding: 15px 10px;
+          }
+          
+          .page {
+            min-height: auto;
+          }
+          
+          .text-xl {
+            font-size: 1.125rem;
           }
         }
 
@@ -599,6 +678,60 @@ const RecidentialAggrementPreview = () => {
         th,
         td {
           vertical-align: middle;
+        }
+
+        /* Improved table styling for PDF */
+        .border-collapse {
+          border-collapse: collapse;
+        }
+
+        .border-black {
+          border-color: #000000;
+        }
+
+        /* Enhanced typography for professional appearance */
+        .font-semibold {
+          font-weight: 600;
+        }
+
+        .font-bold {
+          font-weight: 700;
+        }
+
+        /* Better spacing for lists */
+        .space-y-4 > * + * {
+          margin-top: 1rem;
+        }
+
+        /* Signature section styling */
+        .grid-cols-2 {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .gap-8 {
+          gap: 2rem;
+        }
+
+        /* Loading button animation */
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        /* Button hover effects */
+        .transition-colors {
+          transition-property: background-color, border-color, color, fill, stroke;
+          transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+          transition-duration: 200ms;
         }
       `}</style>
     </>
