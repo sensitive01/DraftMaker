@@ -25,6 +25,8 @@ export default function RentalAgreementForm() {
         : {
             formId: "DM-RFD-18",
             agreementDate: "",
+            agreementStartDate: "",
+            agreementEndDate: "",
             lessors: [
               {
                 name: "",
@@ -46,29 +48,17 @@ export default function RentalAgreementForm() {
                 permanentPinCode: "",
               },
             ],
-            lessorAddressLine1: "",
-            lessorAddressLine2: "",
-            lessorCity: "",
-            lessorState: "",
-            lessorPinCode: "",
-            lesseeAadhaar: "",
-            lesseePermanentAddressLine1: "",
-            lesseePermanentAddressLine2: "",
-            lesseePermanentCity: "",
-            lesseePermanentState: "",
-            lesseePermanentPinCode: "",
             rentAmount: "",
             rentAmountWords: "",
             rentDueDate: "5",
             depositAmount: "",
             depositAmountWords: "",
-            agreementStartDate: "",
-            agreementEndDate: "",
             rentIncreasePercentage: "",
             noticePeriod: "",
             terminationPeriod: "",
             paintingCharges: "",
             usePurpose: "RESIDENTIAL PURPOSE",
+            propertyAddress: "",
             bhkConfig: "",
             bedroomCount: "",
             hallCount: "",
@@ -76,11 +66,14 @@ export default function RentalAgreementForm() {
             toiletCount: "",
             additionaldetails: "",
             fixtures: [{ item: "", quantity: "" }],
+            agreeTerms: false,
           };
     } catch {
       return {
         formId: "DM-RFD-18",
         agreementDate: "",
+        agreementStartDate: "",
+        agreementEndDate: "",
         lessors: [
           {
             name: "",
@@ -102,29 +95,17 @@ export default function RentalAgreementForm() {
             permanentPinCode: "",
           },
         ],
-        lessorAddressLine1: "",
-        lessorAddressLine2: "",
-        lessorCity: "",
-        lessorState: "",
-        lessorPinCode: "",
-        lesseeAadhaar: "",
-        lesseePermanentAddressLine1: "",
-        lesseePermanentAddressLine2: "",
-        lesseePermanentCity: "",
-        lesseePermanentState: "",
-        lesseePermanentPinCode: "",
         rentAmount: "",
         rentAmountWords: "",
         rentDueDate: "5",
         depositAmount: "",
         depositAmountWords: "",
-        agreementStartDate: "",
-        agreementEndDate: "",
         rentIncreasePercentage: "",
         noticePeriod: "",
         terminationPeriod: "",
         paintingCharges: "",
         usePurpose: "RESIDENTIAL PURPOSE",
+        propertyAddress: "",
         bhkConfig: "",
         bedroomCount: "",
         hallCount: "",
@@ -132,6 +113,7 @@ export default function RentalAgreementForm() {
         toiletCount: "",
         additionaldetails: "",
         fixtures: [{ item: "", quantity: "" }],
+        agreeTerms: false,
       };
     }
   };
@@ -256,12 +238,71 @@ export default function RentalAgreementForm() {
       fixtures: prev.fixtures.filter((_, i) => i !== index),
     }));
 
-  // Existing validation function
+  // Comprehensive validation function
   const validateForm = () => {
+    // Agreement Details validation
     if (!formData.agreementDate.trim()) {
       setValidationError("Please enter the agreement date");
       return false;
     }
+    if (!formData.agreementStartDate.trim()) {
+      setValidationError("Please enter the agreement start date");
+      return false;
+    }
+
+    // Lessor validation
+    if (!formData.lessors[0].name.trim()) {
+      setValidationError("Please enter lessor name");
+      return false;
+    }
+    if (!formData.lessors[0].city.trim()) {
+      setValidationError("Please enter lessor city");
+      return false;
+    }
+    if (!formData.lessors[0].state.trim()) {
+      setValidationError("Please enter lessor state");
+      return false;
+    }
+    if (!formData.lessors[0].pinCode.trim()) {
+      setValidationError("Please enter lessor pin code");
+      return false;
+    }
+    if (!formData.lessors[0].addressLine1.trim()) {
+      setValidationError("Please enter lessor address");
+      return false;
+    }
+
+    // Lessee validation
+    if (!formData.lessees[0].name.trim()) {
+      setValidationError("Please enter lessee name");
+      return false;
+    }
+    if (!formData.lessees[0].aadhaar.trim()) {
+      setValidationError("Please enter lessee Aadhaar number");
+      return false;
+    }
+    if (!/^\d{12}$/.test(formData.lessees[0].aadhaar)) {
+      setValidationError("Please enter a valid 12-digit Aadhaar number");
+      return false;
+    }
+    if (!formData.lessees[0].permanentCity.trim()) {
+      setValidationError("Please enter lessee city");
+      return false;
+    }
+    if (!formData.lessees[0].permanentState.trim()) {
+      setValidationError("Please enter lessee state");
+      return false;
+    }
+    if (!formData.lessees[0].permanentPinCode.trim()) {
+      setValidationError("Please enter lessee pin code");
+      return false;
+    }
+    if (!formData.lessees[0].permanentAddressLine1.trim()) {
+      setValidationError("Please enter lessee permanent address");
+      return false;
+    }
+
+    // Rent & Financial validation
     if (
       !formData.rentAmount.trim() ||
       isNaN(formData.rentAmount) ||
@@ -288,6 +329,12 @@ export default function RentalAgreementForm() {
     }
     if (!formData.noticePeriod.trim()) {
       setValidationError("Please enter notice period");
+      return false;
+    }
+
+    // Property Details validation
+    if (!formData.propertyAddress.trim()) {
+      setValidationError("Please enter the property address");
       return false;
     }
     if (!formData.bhkConfig.trim()) {
@@ -318,6 +365,13 @@ export default function RentalAgreementForm() {
       setValidationError("Please enter a valid toilet count");
       return false;
     }
+
+    // Terms validation
+    if (!formData.agreeTerms) {
+      setValidationError("Please agree to the terms and conditions");
+      return false;
+    }
+
     return true;
   };
 

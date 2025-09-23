@@ -37,7 +37,7 @@ const RentalForm = ({
               </span>
               Agreement Details
             </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
                   Agreement Date <span className="text-red-500">*</span>
@@ -62,6 +62,18 @@ const RentalForm = ({
                   className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                 />
               </div>
+              {/* <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  name="agreementEndDate"
+                  value={formData.agreementEndDate || ""}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                />
+              </div> */}
             </div>
           </div>
 
@@ -385,7 +397,20 @@ const RentalForm = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Rent Due Date
+                </label>
+                <input
+                  type="text"
+                  name="rentDueDate"
+                  value={formData.rentDueDate || ""}
+                  onChange={handleChange}
+                  placeholder="e.g., 5th of every month"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
                   Rent Increase (%)
@@ -412,12 +437,39 @@ const RentalForm = ({
               </div>
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Termination Period (months)
+                </label>
+                <input
+                  type="text"
+                  name="terminationPeriod"
+                  value={formData.terminationPeriod || ""}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
                   Painting Charges (₹)
                 </label>
                 <input
                   type="text"
                   name="paintingCharges"
                   value={formData.paintingCharges || ""}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Use Purpose
+                </label>
+                <input
+                  type="text"
+                  name="usePurpose"
+                  value={formData.usePurpose || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                 />
@@ -467,7 +519,7 @@ const RentalForm = ({
                 <label className="block text-sm font-semibold text-red-600 mb-2">
                   Property Configuration
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-red-600 mb-1">
                       Configuration
@@ -501,6 +553,18 @@ const RentalForm = ({
                       type="text"
                       name="hallCount"
                       value={formData.hallCount || ""}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-red-600 mb-1">
+                      Kitchen
+                    </label>
+                    <input
+                      type="text"
+                      name="kitchenCount"
+                      value={formData.kitchenCount || ""}
                       onChange={handleChange}
                       className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                     />

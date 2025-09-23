@@ -11,12 +11,15 @@ import {
 } from "docx";
 import { saveAs } from "file-saver";
 import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
+import jsPDF from "jspdf";
 
 const MatriculationLostPreview = () => {
   const { bookingId } = useParams();
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [downloadType, setDownloadType] = useState(""); // Track which download is in progress
+  const printRef = useRef(); // Reference for PDF generation
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,6 +53,7 @@ const MatriculationLostPreview = () => {
 
   // Generate Word document
   const generateWordDocument = async () => {
+    setDownloadType("word");
     setLoading(true);
 
     try {
@@ -60,7 +64,7 @@ const MatriculationLostPreview = () => {
             properties: {},
             children: [
               new Paragraph({
-                text: `${formData.documentType}`,
+                text: `${formData.documentType || "AFFIDAVIT"}`,
                 heading: HeadingLevel.HEADING_1,
                 alignment: AlignmentType.CENTER,
                 spacing: { after: 300 },
@@ -268,10 +272,228 @@ const MatriculationLostPreview = () => {
       alert("Failed to generate Word document. Please try again.");
     } finally {
       setLoading(false);
+      setDownloadType("");
     }
   };
 
-  if (loading) {
+  // Generate PDF document
+  const generatePDFDocument = async () => {
+    setDownloadType("pdf");
+    setLoading(true);
+
+    try {
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const lineHeight = 7;
+      let currentY = margin;
+
+      // Helper function to add text with word wrapping
+      const addText = (text, x, y, options = {}) => {
+        const fontSize = options.fontSize || 12;
+        const isBold = options.bold || false;
+        const align = options.align || "left";
+
+        pdf.setFontSize(fontSize);
+        pdf.setFont("helvetica", isBold ? "bold" : "normal");
+
+        const textWidth = pageWidth - 2 * margin;
+        const lines = pdf.splitTextToSize(text, textWidth);
+
+        lines.forEach((line, index) => {
+          if (y + index * lineHeight > pageHeight - margin) {
+            pdf.addPage();
+            y = margin;
+          }
+
+          let xPos = x;
+          if (align === "center") {
+            xPos = pageWidth / 2;
+            pdf.text(line, xPos, y + index * lineHeight, { align: "center" });
+          } else if (align === "right") {
+            xPos = pageWidth - margin;
+            pdf.text(line, xPos, y + index * lineHeight, { align: "right" });
+          } else {
+            pdf.text(line, xPos, y + index * lineHeight);
+          }
+        });
+
+        return y + lines.length * lineHeight;
+      };
+
+      // Title
+      currentY = addText(
+        formData.documentType || "AFFIDAVIT",
+        margin,
+        currentY + 10,
+        { fontSize: 18, bold: true, align: "center" }
+      );
+
+      currentY += 15;
+
+      // Content
+      const content = [
+        `I, ${formData.name || "Mr/Mrs/Ms ................................"} ${
+          formData.relation || "D/o, S/o, H/o, W/o ........................"
+        }, Aged: ${formData?.age || "......"} Years,`,
+
+        `Permanent Address: ${
+          formData?.address ||
+          "[Address Line 1, Address Line 2, City, State, Pin Code]"
+        }`,
+
+        `My Aadhaar No: ${formData?.aadhaar || "0000 0000 0000"}`,
+
+        "Do hereby solemnly affirm and declare as under:",
+
+        `Hereby affirm and declare that I have irrecoverable Lost my ${
+          formData.year || "X"
+        } year, ${formData.semester || "X"} Semester, marks card of ${
+          formData.program || "..........................,"
+        }  issued to me by ${
+          formData.authority ||
+          "........................................................"
+        }`,
+
+        `Name of the college/Institution: ${formData.collegeName || "XXXX"}`,
+
+        `Batch: In the year ${formData.batch || "XXXX"}.`,
+
+        `Registration Number: ${
+          formData.regNumber || "..........................,"
+        }`,
+
+        `In the event of the above mentioned Statement of ${
+          formData.documentName || "DOCUMENT NAME"
+        } being found subsequently, I hereby undertake to return the duplicate issued. It is at my own risk the Statement of ${
+          formData.documentName || "DOCUMENT NAME"
+        } may be sent the address given by me.`,
+
+        `Verified at ${formData?.place || "PLACE"} on this ${
+          getDayWithSuffix(formData.day) || "XX"
+        } ${formData?.month || "XXXX"}, ${
+          formData?.year_verification || "XXXX"
+        } that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.`,
+      ];
+
+      // Helper function to make form data bold in PDF
+      const addFormattedText = (text, x, y, options = {}) => {
+        const fontSize = options.fontSize || 12;
+        const align = options.align || "left";
+
+        // Split text into parts and identify form data to make bold
+        const formFields = [
+          formData.name,
+          formData.relation,
+          formData.age?.toString(),
+          formData.address,
+          formData.aadhaar,
+          formData.year,
+          formData.semester,
+          formData.program,
+          formData.authority,
+          formData.collegeName,
+          formData.batch,
+          formData.regNumber,
+          formData.documentName,
+          formData.place,
+          getDayWithSuffix(formData.day),
+          formData.month,
+          formData.year_verification,
+        ].filter(Boolean);
+
+        let currentText = text;
+        let currentY = y;
+        const textWidth = pageWidth - 2 * margin;
+
+        // For simplicity, we'll make the entire content with form data bold
+        // You can enhance this further to selectively bold only form data
+        const hasFormData = formFields.some((field) => text.includes(field));
+
+        pdf.setFontSize(fontSize);
+        pdf.setFont(
+          "helvetica",
+          hasFormData && options.boldFormData
+            ? "bold"
+            : options.bold
+            ? "bold"
+            : "normal"
+        );
+
+        const lines = pdf.splitTextToSize(currentText, textWidth);
+
+        lines.forEach((line, index) => {
+          if (currentY + index * lineHeight > pageHeight - margin) {
+            pdf.addPage();
+            currentY = margin;
+          }
+
+          let xPos = x;
+          if (align === "center") {
+            xPos = pageWidth / 2;
+            pdf.text(line, xPos, currentY + index * lineHeight, {
+              align: "center",
+            });
+          } else if (align === "right") {
+            xPos = pageWidth - margin;
+            pdf.text(line, xPos, currentY + index * lineHeight, {
+              align: "right",
+            });
+          } else {
+            pdf.text(line, xPos, currentY + index * lineHeight);
+          }
+        });
+
+        return currentY + lines.length * lineHeight;
+      };
+
+      content.forEach((paragraph, index) => {
+        if (index === 3) {
+          // "Do hereby solemnly affirm..." - make it bold and centered
+          currentY = addFormattedText(paragraph, margin, currentY + 10, {
+            bold: true,
+            align: "center",
+          });
+        } else {
+          // Make paragraphs with form data bold
+          currentY = addFormattedText(paragraph, margin, currentY + 8, {
+            boldFormData: true,
+          });
+        }
+      });
+
+      // Signature section
+      currentY += 30;
+      currentY = addFormattedText(
+        "(Signature of the Deponent)",
+        margin,
+        currentY,
+        { align: "right" }
+      );
+      currentY = addFormattedText(
+        formData?.name || "................................",
+        margin,
+        currentY + 5,
+        { align: "right", bold: true }
+      );
+
+      // Save the PDF
+      const fileName = `Matriculation_Lost_Affidavit_${
+        formData.name ? formData.name.replace(/\s+/g, "_") : "User"
+      }.pdf`;
+
+      pdf.save(fileName);
+    } catch (error) {
+      console.error("Error generating PDF document:", error);
+      alert("Failed to generate PDF document. Please try again.");
+    } finally {
+      setLoading(false);
+      setDownloadType("");
+    }
+  };
+
+  if (loading && !downloadType) {
     return (
       <div className="flex justify-center items-center h-64">
         Loading preview...
@@ -289,15 +511,43 @@ const MatriculationLostPreview = () => {
 
   return (
     <div className="flex flex-col items-center">
-      {/* Download button */}
-      <div className="w-full max-w-2xl mb-4 flex justify-end">
+      {/* Download buttons */}
+      <div className="w-full max-w-2xl mb-4 flex justify-end gap-3">
         <button
-          onClick={generateWordDocument}
-          className="bg-red-600 hover:bg-blue-700 text-white px-2 py-2 rounded-md flex items-center"
+          onClick={generatePDFDocument}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center"
           disabled={loading}
         >
-          {loading ? (
-            <span>Generating...</span>
+          {loading && downloadType === "pdf" ? (
+            <span>Generating PDF...</span>
+          ) : (
+            <>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+              Download PDF
+            </>
+          )}
+        </button>
+
+        <button
+          onClick={generateWordDocument}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
+          disabled={loading}
+        >
+          {loading && downloadType === "word" ? (
+            <span>Generating Word...</span>
           ) : (
             <>
               <svg
@@ -314,14 +564,17 @@ const MatriculationLostPreview = () => {
                   d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                 />
               </svg>
-              Download
+              Download Word
             </>
           )}
         </button>
       </div>
 
       {/* Document preview */}
-      <div className="bg-white border border-gray-300 shadow font-serif w-full max-w-3xl">
+      <div
+        className="bg-white border border-gray-300 shadow font-serif w-full max-w-3xl"
+        ref={printRef}
+      >
         <div className="relative p-8">
           {/* Corner marks */}
           <div className="absolute top-0 left-0 border-t border-l w-4 h-4 border-gray-400"></div>
@@ -334,9 +587,8 @@ const MatriculationLostPreview = () => {
             {/* Official Header */}
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold uppercase tracking-wider mb-3 underline">
-                {formData.documentType}
+                {formData.documentType || "AFFIDAVIT"}
               </h1>
-      
             </div>
 
             <div className="space-y-4 text-gray-800 leading-relaxed">
@@ -344,22 +596,20 @@ const MatriculationLostPreview = () => {
               <p>
                 I,{" "}
                 <span
-                  className={`font-medium ${highlightIfEmpty(formData.name)}`}
+                  className={`font-bold ${highlightIfEmpty(formData.name)}`}
                 >
                   {formData.name ||
                     "Mr/Mrs/Ms ................................"}
                 </span>{" "}
                 {formData.relation ? (
-                  formData.relation
+                  <span className="font-bold">{formData.relation}</span>
                 ) : (
                   <span className={highlightIfEmpty(formData.relation)}>
                     D/o, S/o, H/o, W/o ........................
                   </span>
                 )}
                 , Aged:{" "}
-                <span
-                  className={`font-medium ${highlightIfEmpty(formData.age)}`}
-                >
+                <span className={`font-bold ${highlightIfEmpty(formData.age)}`}>
                   {formData.age || "......"}
                 </span>{" "}
                 Years,
@@ -367,7 +617,9 @@ const MatriculationLostPreview = () => {
 
               <p>
                 Permanent Address:{" "}
-                <span className={highlightIfEmpty(formData.address)}>
+                <span
+                  className={`font-bold ${highlightIfEmpty(formData.address)}`}
+                >
                   {formData.address ||
                     "[Address Line 1, Address Line 2, City, State, Pin Code]"}
                 </span>
@@ -376,44 +628,38 @@ const MatriculationLostPreview = () => {
               <p className="mb-6">
                 My Aadhaar No:{" "}
                 <span
-                  className={`font-medium ${highlightIfEmpty(
-                    formData.aadhaar
-                  )}`}
+                  className={`font-bold ${highlightIfEmpty(formData.aadhaar)}`}
                 >
                   {formData.aadhaar || "0000 0000 0000"}
                 </span>
               </p>
 
-              <p className="font-medium text-xl my-6">
+              <p className="font-bold text-xl my-6 text-center">
                 Do hereby solemnly affirm and declare as under:
               </p>
 
               <p>
                 Hereby affirm and declare that I have irrecoverable Lost my{" "}
                 <span
-                  className={`font-medium ${highlightIfEmpty(formData.year)}`}
+                  className={`font-bold ${highlightIfEmpty(formData.year)}`}
                 >
                   {formData.year || "X"}
                 </span>{" "}
                 year,{" "}
                 <span
-                  className={`font-medium ${highlightIfEmpty(
-                    formData.semester
-                  )}`}
+                  className={`font-bold ${highlightIfEmpty(formData.semester)}`}
                 >
                   {formData.semester || "X"}
                 </span>{" "}
                 Semester, marks card of{" "}
                 <span
-                  className={`font-medium ${highlightIfEmpty(
-                    formData.program
-                  )}`}
+                  className={`font-bold ${highlightIfEmpty(formData.program)}`}
                 >
                   {formData.program || "..........................,"}
                 </span>{" "}
                 issued to me by{" "}
                 <span
-                  className={`font-medium ${highlightIfEmpty(
+                  className={`font-bold ${highlightIfEmpty(
                     formData.authority
                   )}`}
                 >
@@ -425,7 +671,7 @@ const MatriculationLostPreview = () => {
               <p>
                 Name of the college/Institution:{" "}
                 <span
-                  className={`font-medium ${highlightIfEmpty(
+                  className={`font-bold ${highlightIfEmpty(
                     formData.collegeName
                   )}`}
                 >
@@ -436,7 +682,7 @@ const MatriculationLostPreview = () => {
               <p>
                 Batch: In the year{" "}
                 <span
-                  className={`font-medium ${highlightIfEmpty(formData.batch)}`}
+                  className={`font-bold ${highlightIfEmpty(formData.batch)}`}
                 >
                   {formData.batch || "XXXX"}
                 </span>
@@ -446,7 +692,7 @@ const MatriculationLostPreview = () => {
               <p>
                 Registration Number:{" "}
                 <span
-                  className={`font-medium ${highlightIfEmpty(
+                  className={`font-bold ${highlightIfEmpty(
                     formData.regNumber
                   )}`}
                 >
@@ -458,7 +704,7 @@ const MatriculationLostPreview = () => {
                 <p>
                   In the event of the above mentioned Statement of{" "}
                   <span
-                    className={`font-medium ${highlightIfEmpty(
+                    className={`font-bold ${highlightIfEmpty(
                       formData.documentName
                     )}`}
                   >
@@ -467,7 +713,7 @@ const MatriculationLostPreview = () => {
                   being found subsequently, I hereby undertake to return the
                   duplicate issued. It is at my own risk the Statement of{" "}
                   <span
-                    className={`font-medium ${highlightIfEmpty(
+                    className={`font-bold ${highlightIfEmpty(
                       formData.documentName
                     )}`}
                   >
@@ -481,29 +727,24 @@ const MatriculationLostPreview = () => {
                 <p>
                   Verified at{" "}
                   <span
-                    className={`font-medium ${highlightIfEmpty(
-                      formData.place
-                    )}`}
+                    className={`font-bold ${highlightIfEmpty(formData.place)}`}
                   >
                     {formData.place || "PLACE"}
                   </span>{" "}
                   on this{" "}
                   <span
-                    className={`font-medium ${highlightIfEmpty(formData.day)}`}
+                    className={`font-bold ${highlightIfEmpty(formData.day)}`}
                   >
                     {getDayWithSuffix(formData.day) || "XX"}
                   </span>{" "}
-                  {" "}
                   <span
-                    className={`font-medium ${highlightIfEmpty(
-                      formData.month
-                    )}`}
+                    className={`font-bold ${highlightIfEmpty(formData.month)}`}
                   >
                     {formData.month || "XXXX"}
                   </span>
                   ,{" "}
                   <span
-                    className={`font-medium ${highlightIfEmpty(
+                    className={`font-bold ${highlightIfEmpty(
                       formData.year_verification
                     )}`}
                   >
@@ -518,14 +759,14 @@ const MatriculationLostPreview = () => {
               <div className="grid grid-cols-1 mt-24 mb-8">
                 <div className="text-right">
                   <div className="h-24 border-black mb-3"></div>
-                  <p className="font-medium">Signature of the Deponent</p>
+                  <p className="font-medium">(Signature of the Deponent)</p>
                   <div className="text-sm text-gray-600 mt-1">
-                    <p>{formData.name ? formData.name : ""}</p>
+                    <p className="font-bold">
+                      {formData.name ? formData.name : ""}
+                    </p>
                   </div>
                 </div>
               </div>
-
-              
             </div>
           </div>
         </div>

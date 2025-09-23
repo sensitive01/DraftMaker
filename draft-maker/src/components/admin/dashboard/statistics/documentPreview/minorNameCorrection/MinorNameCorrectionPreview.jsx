@@ -11,12 +11,14 @@ import {
 } from "docx";
 import { saveAs } from "file-saver";
 import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
+import jsPDF from "jspdf";
 
 const MinorNameCorrectionPreview = () => {
   const { bookingId } = useParams();
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [downloadType, setDownloadType] = useState(""); // Track which download is in progress
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +42,6 @@ const MinorNameCorrectionPreview = () => {
 
   // Fixed isFilled function to safely check if a field has content
   const isFilled = (value) => {
-    // Check if value exists and is a string with content
     return typeof value === "string" && value.trim() !== "";
   };
 
@@ -52,6 +53,7 @@ const MinorNameCorrectionPreview = () => {
 
   // Generate Word document
   const generateWordDocument = async () => {
+    setDownloadType("word");
     setLoading(true);
 
     try {
@@ -62,7 +64,7 @@ const MinorNameCorrectionPreview = () => {
             properties: {},
             children: [
               new Paragraph({
-                text: `${formData.documentType}`,
+                text: `${formData.documentType || "AFFIDAVIT"}`,
                 heading: HeadingLevel.HEADING_1,
                 alignment: AlignmentType.CENTER,
                 spacing: { after: 300 },
@@ -187,10 +189,12 @@ const MinorNameCorrectionPreview = () => {
                   new TextRun(`'s name in `),
                   new TextRun({
                     text: formData.childRelation === "Daughter" ? "her" : "his",
+                    bold: true,
                   }),
                   new TextRun(` Birth Certificate as per `),
                   new TextRun({
                     text: formData.childRelation === "Daughter" ? "her" : "his",
+                    bold: true,
                   }),
                   new TextRun(` Aadhaar Card that is `),
                   new TextRun({
@@ -288,10 +292,137 @@ const MinorNameCorrectionPreview = () => {
       alert("Failed to generate Word document. Please try again.");
     } finally {
       setLoading(false);
+      setDownloadType("");
     }
   };
 
-  if (loading) {
+  // Generate PDF document
+  const generatePDFDocument = async () => {
+    setDownloadType("pdf");
+    setLoading(true);
+
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const lineHeight = 7;
+      let currentY = margin;
+
+      // Helper function to add formatted text with form data in bold
+      const addFormattedText = (text, x, y, options = {}) => {
+        const fontSize = options.fontSize || 12;
+        const align = options.align || 'left';
+        const textWidth = pageWidth - (2 * margin);
+        
+        // Identify form data fields to make bold
+        const formFields = [
+          formData.parentTitle, formData.parentName, formData.spouseTitle, 
+          formData.spouseName, formData.address, formData.parentAadhaar,
+          formData.spouseAadhaar, formData.certificateNumber, formData.childRelation,
+          formData.childName, formData.incorrectName, formData.correctName,
+          formData.place, getDayWithSuffix(formData.day), formData.month, 
+          formData.year
+        ].filter(Boolean);
+
+        let currentText = text;
+        let currentY = y;
+        
+        // For simplicity, make text with form data bold
+        const hasFormData = formFields.some(field => text.includes(field));
+        
+        pdf.setFontSize(fontSize);
+        pdf.setFont('helvetica', hasFormData && options.boldFormData ? 'bold' : (options.bold ? 'bold' : 'normal'));
+        
+        const lines = pdf.splitTextToSize(currentText, textWidth);
+        
+        lines.forEach((line, index) => {
+          if (currentY + (index * lineHeight) > pageHeight - margin) {
+            pdf.addPage();
+            currentY = margin;
+          }
+          
+          let xPos = x;
+          if (align === 'center') {
+            xPos = pageWidth / 2;
+            pdf.text(line, xPos, currentY + (index * lineHeight), { align: 'center' });
+          } else if (align === 'right') {
+            xPos = pageWidth - margin;
+            pdf.text(line, xPos, currentY + (index * lineHeight), { align: 'right' });
+          } else {
+            pdf.text(line, xPos, currentY + (index * lineHeight));
+          }
+        });
+        
+        return currentY + (lines.length * lineHeight);
+      };
+
+      // Title
+      currentY = addFormattedText(
+        formData.documentType || "AFFIDAVIT",
+        margin,
+        currentY + 10,
+        { fontSize: 18, bold: true, align: 'center' }
+      );
+
+      currentY += 15;
+
+      // Content paragraphs
+      const content = [
+        `We, ${formData.parentTitle || "Mr./Mrs."} ${formData.parentName || "___________________"} H/O ${formData.spouseTitle || "Mr./Mrs."} ${formData.spouseName || "___________________"}, Permanent Address ${formData?.address || "[Address Line 1, Address Line 2, City, State, Pin Code]"}`,
+        
+        `Our Aadhaar No: Aadhaar No: ${formData?.parentAadhaar || "0000 0000 0000"}, Aadhaar No: ${formData?.spouseAadhaar || "0000 0000 0000"}`,
+        
+        "Do hereby solemnly affirm and declare as under:",
+        
+        `1. That Birth Certificate No: ${formData.certificateNumber || "_______"} issued for our ${formData.childRelation || "child"} ${formData.childName || "_______"} from (Chief Register of Births and Deaths, Govt of Karnataka), the name of our ${formData.childRelation || "child"} mentioned as ${formData.incorrectName || "Incorrect Name"}.`,
+        
+        `2. That as per our ${formData.childRelation || "child"}'s Aadhaar card the given name is ${formData.correctName || "Correct Name"}.`,
+        
+        `3. We state that we wanted to change our ${formData.childRelation || "child"}'s name in ${getPronoun()} Birth Certificate as per ${getPronoun()} Aadhaar Card that is ${formData.correctName || "Correct Name"} which is correct name.`,
+        
+        "4. That we also required this affidavit for RE ISSUE the Birth Certificate with correct name.",
+        
+        `Verified at ${formData?.place || "PLACE"} on this ${getDayWithSuffix(formData.day) || "XX"} ${formData?.month || "XXXX"}, ${formData?.year || "XXXX"}, that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.`
+      ];
+
+      content.forEach((paragraph, index) => {
+        if (index === 2) { // "Do hereby solemnly affirm..." - make it bold and centered
+          currentY = addFormattedText(paragraph, margin, currentY + 10, { bold: true, align: 'center' });
+        } else {
+          // Make paragraphs with form data bold
+          currentY = addFormattedText(paragraph, margin, currentY + 8, { boldFormData: true });
+        }
+      });
+
+      // Signature section
+      currentY += 30;
+      currentY = addFormattedText("(Signature of the Deponents)", margin, currentY, { align: 'right' });
+      currentY = addFormattedText(
+        `${formData?.parentName || "___________________"}     ${formData?.spouseName || "___________________"}`, 
+        margin, 
+        currentY + 5, 
+        { align: 'right', bold: true }
+      );
+
+      // Save the PDF
+      const fileName = `Minor_Name_Correction_${
+        formData.childName
+          ? formData.childName.replace(/\s+/g, "_")
+          : "Document"
+      }.pdf`;
+      
+      pdf.save(fileName);
+    } catch (error) {
+      console.error("Error generating PDF document:", error);
+      alert("Failed to generate PDF document. Please try again.");
+    } finally {
+      setLoading(false);
+      setDownloadType("");
+    }
+  };
+
+  if (loading && !downloadType) {
     return (
       <div className="flex justify-center items-center h-64">
         Loading preview...
@@ -309,15 +440,43 @@ const MinorNameCorrectionPreview = () => {
 
   return (
     <div className="flex flex-col items-center">
-      {/* Download button */}
-      <div className="w-full max-w-2xl mb-4 flex justify-end">
+      {/* Download buttons */}
+      <div className="w-full max-w-2xl mb-4 flex justify-end gap-3">
         <button
-          onClick={generateWordDocument}
-          className="bg-red-600 hover:bg-red-700 text-white px-2 py-2 rounded-md flex items-center"
+          onClick={generatePDFDocument}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center"
           disabled={loading}
         >
-          {loading ? (
-            <span>Generating...</span>
+          {loading && downloadType === "pdf" ? (
+            <span>Generating PDF...</span>
+          ) : (
+            <>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+              Download PDF
+            </>
+          )}
+        </button>
+
+        <button
+          onClick={generateWordDocument}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
+          disabled={loading}
+        >
+          {loading && downloadType === "word" ? (
+            <span>Generating Word...</span>
           ) : (
             <>
               <svg
@@ -334,13 +493,13 @@ const MinorNameCorrectionPreview = () => {
                   d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                 />
               </svg>
-              Download 
+              Download Word
             </>
           )}
         </button>
       </div>
 
-      {/* Single page preview with continuous content */}
+      {/* Document preview */}
       <div className="bg-white border border-gray-300 shadow font-serif w-full max-w-3xl">
         <div className="relative p-8">
           {/* Corner marks */}
@@ -352,7 +511,7 @@ const MinorNameCorrectionPreview = () => {
           {/* Content */}
           <div>
             <h1 className="text-center font-bold text-xl mb-6 underline">
-              {formData.documentType}
+              {formData.documentType || "AFFIDAVIT"}
             </h1>
 
             <p className="mb-4 text-justify">
@@ -430,7 +589,7 @@ const MinorNameCorrectionPreview = () => {
               </span>
             </p>
 
-            <p className="mb-4 text-justify font-bold">
+            <p className="mb-4 text-justify font-bold text-center">
               Do hereby solemnly affirm and declare as under:
             </p>
 
@@ -524,8 +683,8 @@ const MinorNameCorrectionPreview = () => {
                 >
                   {formData?.childRelation || "child"}
                 </span>
-                's name in {getPronoun()} Birth Certificate as per{" "}
-                {getPronoun()} Aadhaar Card that is{" "}
+                's name in <span className="font-bold">{getPronoun()}</span> Birth Certificate as per{" "}
+                <span className="font-bold">{getPronoun()}</span> Aadhaar Card that is{" "}
                 <span
                   className={
                     isFilled(formData?.correctName)
@@ -592,8 +751,8 @@ const MinorNameCorrectionPreview = () => {
             </div>
 
             <div className="mt-24 text-right">
-              <p>(Signature of the Deponents)</p>
-              <p className="mt-1">
+              <p className="font-bold">(Signature of the Deponents)</p>
+              <p className="mt-1 font-bold">
                 {formData?.parentName || "___________________"}{" "}
                 {formData?.spouseName || "___________________"}
               </p>

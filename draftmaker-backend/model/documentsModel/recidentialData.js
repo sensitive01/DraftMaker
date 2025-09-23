@@ -87,6 +87,7 @@ const recidentailAgreementSchema = new mongoose.Schema(
     lesseePermanentCity: { type: String },
     lesseePermanentState: { type: String },
     lesseePermanentPinCode: { type: String },
+    propertyAddress:{type:String},
 
     // Rental Details
     rentAmount: { type: Number },

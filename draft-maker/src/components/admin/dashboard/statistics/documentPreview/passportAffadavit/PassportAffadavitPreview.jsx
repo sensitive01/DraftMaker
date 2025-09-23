@@ -14,6 +14,7 @@ import {
   BorderStyle,
 } from "docx";
 import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
 
 export default function PassportAffadavitPreview() {
   const { bookingId } = useParams();
@@ -22,6 +23,7 @@ export default function PassportAffadavitPreview() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [downloadType, setDownloadType] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,10 +61,10 @@ export default function PassportAffadavitPreview() {
 
   // Generate Word document
   const generateWordDocument = async () => {
+    setDownloadType("word");
     setLoading(true);
 
     try {
-      // Create borders for table cells
       const borders = {
         top: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
         bottom: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
@@ -70,11 +72,13 @@ export default function PassportAffadavitPreview() {
         right: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
       };
 
-      // Table for non-resident details if applicable
       let residenceTable = null;
-      
-      if (formData.nonResidentIndian === "YES" && formData.residences && formData.residences.length > 0) {
-        // Table header row
+
+      if (
+        formData.nonResidentIndian === "YES" &&
+        formData.residences &&
+        formData.residences.length > 0
+      ) {
         const headerRow = new TableRow({
           children: [
             new TableCell({
@@ -82,12 +86,7 @@ export default function PassportAffadavitPreview() {
               width: { size: 500, type: "dxa" },
               children: [
                 new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: "S. No.",
-                      bold: true,
-                    }),
-                  ],
+                  children: [new TextRun({ text: "S. No.", bold: true })],
                   alignment: AlignmentType.CENTER,
                 }),
               ],
@@ -98,10 +97,7 @@ export default function PassportAffadavitPreview() {
               children: [
                 new Paragraph({
                   children: [
-                    new TextRun({
-                      text: "Name of the Country",
-                      bold: true,
-                    }),
+                    new TextRun({ text: "Name of the Country", bold: true }),
                   ],
                   alignment: AlignmentType.CENTER,
                 }),
@@ -140,37 +136,64 @@ export default function PassportAffadavitPreview() {
           ],
         });
 
-        // Table data rows
         const rows = formData.residences
-          .filter(residence => residence.country)
-          .map((residence, index) => 
-            new TableRow({
-              children: [
-                new TableCell({
-                  borders,
-                  children: [
-                    new Paragraph({
-                      text: `${index + 1}.`,
-                      alignment: AlignmentType.CENTER,
-                    }),
-                  ],
-                }),
-                new TableCell({
-                  borders,
-                  children: [new Paragraph(residence.country || "")],
-                }),
-                new TableCell({
-                  borders,
-                  children: [
-                    new Paragraph(`${residence.periodFrom || ""} to ${residence.periodTo || ""}`),
-                  ],
-                }),
-                new TableCell({
-                  borders,
-                  children: [new Paragraph(residence.pageNos || "")],
-                }),
-              ],
-            })
+          .filter((residence) => residence.country)
+          .map(
+            (residence, index) =>
+              new TableRow({
+                children: [
+                  new TableCell({
+                    borders,
+                    children: [
+                      new Paragraph({
+                        text: `${index + 1}.`,
+                        alignment: AlignmentType.CENTER,
+                      }),
+                    ],
+                  }),
+                  new TableCell({
+                    borders,
+                    children: [
+                      new Paragraph({
+                        children: [
+                          new TextRun({
+                            text: residence.country || "",
+                            bold: true,
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+                  new TableCell({
+                    borders,
+                    children: [
+                      new Paragraph({
+                        children: [
+                          new TextRun({
+                            text: `${residence.periodFrom || ""} to ${
+                              residence.periodTo || ""
+                            }`,
+                            bold: true,
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+                  new TableCell({
+                    borders,
+                    children: [
+                      new Paragraph({
+                        children: [
+                          new TextRun({
+                            text: residence.pageNos || "",
+                            bold: true,
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+                ],
+              })
           );
 
         residenceTable = new Table({
@@ -179,7 +202,6 @@ export default function PassportAffadavitPreview() {
         });
       }
 
-      // Create a new document
       const doc = new Document({
         sections: [
           {
@@ -191,7 +213,7 @@ export default function PassportAffadavitPreview() {
                 alignment: AlignmentType.CENTER,
                 spacing: { after: 200 },
               }),
-              
+
               new Paragraph({
                 text: "SPECIMEN DECLARATION OF APPLICANT FOR OBTAINING A PASSPORT IN LIEU OF LOST/DAMAGED PASSPORT",
                 heading: HeadingLevel.HEADING_2,
@@ -203,20 +225,14 @@ export default function PassportAffadavitPreview() {
                 spacing: { after: 200 },
                 children: [
                   new TextRun("I, Mr/Mrs/Ms "),
-                  new TextRun({
-                    text: formData.name || "[NAME]",
-                    bold: true,
-                  }),
+                  new TextRun({ text: formData.name || "[NAME]", bold: true }),
                   new TextRun(" " + (formData.relationType || "") + " "),
                   new TextRun({
                     text: formData.guardianName || "[GUARDIAN NAME]",
                     bold: true,
                   }),
                   new TextRun(", Aged: "),
-                  new TextRun({
-                    text: formData.age || "[AGE]",
-                    bold: true,
-                  }),
+                  new TextRun({ text: formData.age || "[AGE]", bold: true }),
                   new TextRun(" Years,"),
                 ],
               }),
@@ -225,7 +241,7 @@ export default function PassportAffadavitPreview() {
                 spacing: { after: 100 },
                 text: "Permanent Address:",
               }),
-              
+
               new Paragraph({
                 spacing: { after: 200 },
                 children: [
@@ -240,7 +256,7 @@ export default function PassportAffadavitPreview() {
                 spacing: { after: 100 },
                 text: "Present Address:",
               }),
-              
+
               new Paragraph({
                 spacing: { after: 200 },
                 children: [
@@ -276,17 +292,18 @@ export default function PassportAffadavitPreview() {
                   }),
                 ],
               }),
-              
+
               new Paragraph({
                 spacing: { after: 50 },
                 text: "DETAILS OF INCIDENT:",
               }),
-              
+
               new Paragraph({
                 spacing: { after: 200 },
                 children: [
                   new TextRun({
                     text: formData.incidentDetails || "[INCIDENT DETAILS]",
+                    bold: true,
                   }),
                 ],
               }),
@@ -300,12 +317,17 @@ export default function PassportAffadavitPreview() {
                   }),
                 ],
               }),
-              
+
               new Paragraph({
                 spacing: { after: 200 },
                 children: [
-                  new TextRun(formData.travelled || "NO"),
-                  formData.travelled === "YES" ? new TextRun(`: ${formData.travelDetails || ""}`) : new TextRun(""),
+                  new TextRun({ text: formData.travelled || "NO", bold: true }),
+                  formData.travelled === "YES"
+                    ? new TextRun({
+                        text: `: ${formData.travelDetails || ""}`,
+                        bold: true,
+                      })
+                    : new TextRun(""),
                 ],
               }),
 
@@ -318,12 +340,20 @@ export default function PassportAffadavitPreview() {
                   }),
                 ],
               }),
-              
+
               new Paragraph({
                 spacing: { after: 200 },
                 children: [
-                  new TextRun(formData.trConcessions || "NO"),
-                  formData.trConcessions === "YES" ? new TextRun(`: ${formData.concessionDetails || ""}`) : new TextRun(""),
+                  new TextRun({
+                    text: formData.trConcessions || "NO",
+                    bold: true,
+                  }),
+                  formData.trConcessions === "YES"
+                    ? new TextRun({
+                        text: `: ${formData.concessionDetails || ""}`,
+                        bold: true,
+                      })
+                    : new TextRun(""),
                 ],
               }),
 
@@ -336,15 +366,19 @@ export default function PassportAffadavitPreview() {
                   }),
                 ],
               }),
-              
+
               new Paragraph({
                 spacing: { after: 50 },
-                text: formData.nonResidentIndian || "NO",
+                children: [
+                  new TextRun({
+                    text: formData.nonResidentIndian || "NO",
+                    bold: true,
+                  }),
+                ],
               }),
-              
-              // Insert residence table if applicable
+
               ...(residenceTable ? [residenceTable] : []),
-              
+
               new Paragraph({
                 spacing: { before: 200, after: 100 },
                 children: [
@@ -354,12 +388,20 @@ export default function PassportAffadavitPreview() {
                   }),
                 ],
               }),
-              
+
               new Paragraph({
                 spacing: { after: 200 },
                 children: [
-                  new TextRun(formData.passportObjection || "NO"),
-                  formData.passportObjection === "YES" ? new TextRun(`: ${formData.objectionDetails || ""}`) : new TextRun(""),
+                  new TextRun({
+                    text: formData.passportObjection || "NO",
+                    bold: true,
+                  }),
+                  formData.passportObjection === "YES"
+                    ? new TextRun({
+                        text: `: ${formData.objectionDetails || ""}`,
+                        bold: true,
+                      })
+                    : new TextRun(""),
                 ],
               }),
 
@@ -372,12 +414,17 @@ export default function PassportAffadavitPreview() {
                   }),
                 ],
               }),
-              
+
               new Paragraph({
                 spacing: { after: 300 },
                 children: [
-                  new TextRun(formData.deported || "NO"),
-                  formData.deported === "YES" ? new TextRun(`: ${formData.deportationDetails || ""}`) : new TextRun(""),
+                  new TextRun({ text: formData.deported || "NO", bold: true }),
+                  formData.deported === "YES"
+                    ? new TextRun({
+                        text: `: ${formData.deportationDetails || ""}`,
+                        bold: true,
+                      })
+                    : new TextRun(""),
                 ],
               }),
 
@@ -396,7 +443,7 @@ export default function PassportAffadavitPreview() {
                   }),
                 ],
               }),
-              
+
               new Paragraph({
                 spacing: { before: 100, after: 300 },
                 children: [
@@ -410,10 +457,17 @@ export default function PassportAffadavitPreview() {
 
               new Paragraph({
                 spacing: { before: 500 },
-                text: formData.useNameAsSignature ? formData.name || "[SIGNATURE]" : "[SIGNATURE]",
+                children: [
+                  new TextRun({
+                    text: formData.useNameAsSignature
+                      ? formData.name || "[SIGNATURE]"
+                      : "[SIGNATURE]",
+                    bold: true,
+                  }),
+                ],
                 alignment: AlignmentType.RIGHT,
               }),
-              
+
               new Paragraph({
                 spacing: { before: 100 },
                 text: "(Signature of applicant)",
@@ -424,10 +478,7 @@ export default function PassportAffadavitPreview() {
         ],
       });
 
-      // Generate the document as a blob
       const buffer = await Packer.toBlob(doc);
-
-      // Save the document with a meaningful filename
       const fileName = `Passport_Affidavit_${
         formData.name ? formData.name.replace(/\s+/g, "_") : "Document"
       }.docx`;
@@ -437,10 +488,250 @@ export default function PassportAffadavitPreview() {
       alert("Failed to generate Word document. Please try again.");
     } finally {
       setLoading(false);
+      setDownloadType("");
     }
   };
 
-  if (loading) {
+  // Generate PDF document
+  const generatePDFDocument = async () => {
+    setDownloadType("pdf");
+    setLoading(true);
+
+    try {
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 15;
+      const lineHeight = 6;
+      let currentY = margin;
+
+      const addText = (text, x, y, options = {}) => {
+        const fontSize = options.fontSize || 10;
+        const isBold = options.bold || false;
+        const align = options.align || "left";
+
+        pdf.setFontSize(fontSize);
+        pdf.setFont("helvetica", isBold ? "bold" : "normal");
+
+        const textWidth = pageWidth - 2 * margin;
+        const lines = pdf.splitTextToSize(text, textWidth);
+
+        lines.forEach((line, index) => {
+          if (y + index * lineHeight > pageHeight - margin) {
+            pdf.addPage();
+            y = margin;
+          }
+
+          let xPos = x;
+          if (align === "center") {
+            xPos = pageWidth / 2;
+            pdf.text(line, xPos, y + index * lineHeight, { align: "center" });
+          } else if (align === "right") {
+            xPos = pageWidth - margin;
+            pdf.text(line, xPos, y + index * lineHeight, { align: "right" });
+          } else {
+            pdf.text(line, xPos, y + index * lineHeight);
+          }
+        });
+
+        return y + lines.length * lineHeight;
+      };
+
+      // Title
+      currentY = addText(
+        formData.documentType || "AFFIDAVIT",
+        margin,
+        currentY + 10,
+        { fontSize: 16, bold: true, align: "center" }
+      );
+      currentY = addText(
+        "SPECIMEN DECLARATION OF APPLICANT FOR OBTAINING A PASSPORT IN LIEU OF LOST/DAMAGED PASSPORT",
+        margin,
+        currentY + 8,
+        { fontSize: 12, bold: true, align: "center" }
+      );
+
+      currentY += 15;
+
+      // Content
+      currentY = addText(
+        `I, Mr/Mrs/Ms ${formData.name || "[NAME]"} ${
+          formData.relationType || ""
+        } ${formData.guardianName || "[GUARDIAN NAME]"}, Aged: ${
+          formData.age || "[AGE]"
+        } Years,`,
+        margin,
+        currentY + 6,
+        { bold: true }
+      );
+
+      currentY = addText("Permanent Address:", margin, currentY + 8);
+      currentY = addText(
+        formData.permanentAddress || "[PERMANENT ADDRESS]",
+        margin,
+        currentY + 4,
+        { bold: true }
+      );
+
+      currentY = addText("Present Address:", margin, currentY + 8);
+      currentY = addText(
+        formData.presentAddress || "[PRESENT ADDRESS]",
+        margin,
+        currentY + 4,
+        { bold: true }
+      );
+
+      currentY = addText(
+        `My Aadhaar No: ${
+          formData.aadhaarNo || "[AADHAAR NUMBER]"
+        }   My Passport No: ${formData.passportNo || "[PASSPORT NUMBER]"}`,
+        margin,
+        currentY + 8,
+        { bold: true }
+      );
+
+      currentY = addText(
+        "1. State how and when the passport was lost/ damaged and when FIR was lodged at which Police Station and how many passports were lost/ damaged earlier?",
+        margin,
+        currentY + 10,
+        { bold: true }
+      );
+      currentY = addText("DETAILS OF INCIDENT:", margin, currentY + 6);
+      currentY = addText(
+        formData.incidentDetails || "[INCIDENT DETAILS]",
+        margin,
+        currentY + 4,
+        { bold: true }
+      );
+
+      currentY = addText(
+        "2. State whether you travelled on the lost/ damaged passport, if so state flight number and date and port of entry into India?",
+        margin,
+        currentY + 8,
+        { bold: true }
+      );
+      currentY = addText(
+        `${formData.travelled || "NO"}${
+          formData.travelled === "YES"
+            ? `: ${formData.travelDetails || ""}`
+            : ""
+        }`,
+        margin,
+        currentY + 4,
+        { bold: true }
+      );
+
+      currentY = addText(
+        "3. State whether you availed of any TR concessions/FTs allowance and if so details thereof?",
+        margin,
+        currentY + 8,
+        { bold: true }
+      );
+      currentY = addText(
+        `${formData.trConcessions || "NO"}${
+          formData.trConcessions === "YES"
+            ? `: ${formData.concessionDetails || ""}`
+            : ""
+        }`,
+        margin,
+        currentY + 4,
+        { bold: true }
+      );
+
+      currentY = addText(
+        "4. State whether non-resident Indian and if resident abroad, the details of the residence as follows:",
+        margin,
+        currentY + 8,
+        { bold: true }
+      );
+      currentY = addText(
+        formData.nonResidentIndian || "NO",
+        margin,
+        currentY + 4,
+        { bold: true }
+      );
+
+      currentY = addText(
+        "5. State whether the Passport had any objection by the PIA and if so the details thereof.",
+        margin,
+        currentY + 8,
+        { bold: true }
+      );
+      currentY = addText(
+        `${formData.passportObjection || "NO"}${
+          formData.passportObjection === "YES"
+            ? `: ${formData.objectionDetails || ""}`
+            : ""
+        }`,
+        margin,
+        currentY + 4,
+        { bold: true }
+      );
+
+      currentY = addText(
+        "6. State whether you were deported at any time at the expenses of the Government and if so was the expenditure incurred reimbursed to Government of India.",
+        margin,
+        currentY + 8,
+        { bold: true }
+      );
+      currentY = addText(
+        `${formData.deported || "NO"}${
+          formData.deported === "YES"
+            ? `: ${formData.deportationDetails || ""}`
+            : ""
+        }`,
+        margin,
+        currentY + 4,
+        { bold: true }
+      );
+
+      currentY = addText(
+        "I further affirm that I will take utmost care of my passport if issued and the Government will be at liberty to take any legal action under the Passports Act, 1967, if the lapse is repeated.",
+        margin,
+        currentY + 10
+      );
+
+      currentY += 20;
+      currentY = addText(
+        `Date: ${formatDate(formData.date) || "[DATE]"}`,
+        margin,
+        currentY,
+        { bold: true }
+      );
+      currentY = addText(
+        `PLACE: ${formData.place || "[PLACE]"}`,
+        margin,
+        currentY + 6,
+        { bold: true }
+      );
+
+      currentY += 15;
+      currentY = addText(
+        formData.useNameAsSignature
+          ? formData.name || "[SIGNATURE]"
+          : "[SIGNATURE]",
+        margin,
+        currentY,
+        { align: "right", bold: true }
+      );
+      currentY = addText("(Signature of applicant)", margin, currentY + 5, {
+        align: "right",
+      });
+
+      const fileName = `Passport_Affidavit_${
+        formData.name ? formData.name.replace(/\s+/g, "_") : "Document"
+      }.pdf`;
+      pdf.save(fileName);
+    } catch (error) {
+      console.error("Error generating PDF document:", error);
+      alert("Failed to generate PDF document. Please try again.");
+    } finally {
+      setLoading(false);
+      setDownloadType("");
+    }
+  };
+
+  if (loading && !downloadType) {
     return (
       <div className="flex justify-center items-center h-64">
         Loading preview...
@@ -458,15 +749,43 @@ export default function PassportAffadavitPreview() {
 
   return (
     <div className="flex flex-col items-center">
-      {/* Download button */}
-      <div className="w-full max-w-4xl mb-4 flex justify-end">
+      {/* Download buttons */}
+      <div className="w-full max-w-4xl mb-4 flex justify-end gap-3">
+        <button
+          onClick={generatePDFDocument}
+          className="bg-green-600 hover:bg-green-700 text-white px-2 py-2 rounded-md flex items-center"
+          disabled={loading}
+        >
+          {loading && downloadType === "pdf" ? (
+            <span>Generating PDF...</span>
+          ) : (
+            <>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+              Download PDF
+            </>
+          )}
+        </button>
+
         <button
           onClick={generateWordDocument}
           className="bg-red-600 hover:bg-red-700 text-white px-2 py-2 rounded-md flex items-center"
           disabled={loading}
         >
-          {loading ? (
-            <span>Generating...</span>
+          {loading && downloadType === "word" ? (
+            <span>Generating Word...</span>
           ) : (
             <>
               <svg
@@ -493,82 +812,79 @@ export default function PassportAffadavitPreview() {
       <div className="max-w-4xl mx-auto bg-white p-8 shadow-lg border border-gray-300 rounded-lg">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold mb-1">{formData.documentType}</h1>
-    
+          <h2 className="text-sm font-bold">
+            SPECIMEN DECLARATION OF APPLICANT FOR OBTAINING A PASSPORT IN LIEU
+            OF LOST/DAMAGED PASSPORT
+          </h2>
         </div>
 
         <div className="space-y-6 text-sm">
           <div className="mb-4">
             <p>
               I, Mr/Mrs/Ms{" "}
-              <span className="font-medium underline px-1">{formData.name}</span>{" "}
+              <span className="font-bold underline px-1">{formData.name}</span>{" "}
               {formData.relationType}{" "}
-              <span className="font-medium underline px-1">
+              <span className="font-bold underline px-1">
                 {formData.guardianName}
               </span>
               , Aged:{" "}
-              <span className="font-medium underline px-1">{formData.age}</span>{" "}
+              <span className="font-bold underline px-1">{formData.age}</span>{" "}
               Years,
             </p>
           </div>
 
           <div className="mb-4">
             <p className="mb-1">Permanent Address:</p>
-            <p className=" pb-1">
-              {formData.permanentAddress}
-            </p>
+            <p className="font-bold pb-1">{formData.permanentAddress}</p>
           </div>
 
           <div className="mb-4">
             <p className="mb-1">Present Address:</p>
-            <p className=" pb-1">
-              {formData.presentAddress}
-            </p>
+            <p className="font-bold pb-1">{formData.presentAddress}</p>
           </div>
 
           <div className="flex flex-wrap gap-6 mb-4">
             <p>
               My Aadhaar No:{" "}
-              <span className="font-medium  px-1">
-                {formData.aadhaarNo}
-              </span>
+              <span className="font-bold px-1">{formData.aadhaarNo}</span>
             </p>
             <p>
               My Passport No:{" "}
-              <span className="font-medium  px-1">
-                {formData.passportNo}
-              </span>
+              <span className="font-bold px-1">{formData.passportNo}</span>
             </p>
           </div>
 
           <div className="mb-4">
-            <p className="font-medium mb-1">
+            <p className="font-bold mb-1">
               1. State how and when the passport was lost/ damaged and when FIR
-              was lodged at which Police Station and how many passports were lost/
-              damaged earlier?
+              was lodged at which Police Station and how many passports were
+              lost/ damaged earlier?
             </p>
             <p className="mb-1">DETAILS OF INCIDENT:</p>
             <div className="pb-1 min-h-12">
-              <p>{formData.incidentDetails}</p>
+              <p className="font-bold">{formData.incidentDetails}</p>
             </div>
           </div>
 
           <div className="mb-4">
-            <p className="font-medium mb-1">
-              2. State whether you travelled on the lost/ damaged passport, if so
-              state flight number and date and port of entry into India?
+            <p className="font-bold mb-1">
+              2. State whether you travelled on the lost/ damaged passport, if
+              so state flight number and date and port of entry into India?
             </p>
-            <p>
+            <p className="font-bold">
               {formData.travelled}
-              {formData.travelled === "YES" ? `: ${formData.travelDetails}` : ""}
+              {formData.travelled === "YES"
+                ? `: ${formData.travelDetails}`
+                : ""}
             </p>
           </div>
 
           <div className="mb-4">
-            <p className="font-medium mb-1">
-              3. State whether you availed of any TR concessions/FTs allowance and
-              if so details thereof?
+            <p className="font-bold mb-1">
+              3. State whether you availed of any TR concessions/FTs allowance
+              and if so details thereof?
             </p>
-            <p>
+            <p className="font-bold">
               {formData.trConcessions}
               {formData.trConcessions === "YES"
                 ? `: ${formData.concessionDetails}`
@@ -577,61 +893,62 @@ export default function PassportAffadavitPreview() {
           </div>
 
           <div className="mb-4">
-            <p className="font-medium mb-1">
+            <p className="font-bold mb-1">
               4. State whether non-resident Indian and if resident abroad, the
               details of the residence as follows:
             </p>
-            <p>{formData.nonResidentIndian}</p>
+            <p className="font-bold">{formData.nonResidentIndian}</p>
 
             {formData.nonResidentIndian === "YES" && (
               <table className="w-full border border-black mt-2">
                 <thead>
                   <tr>
-                    <th className="border border-black p-2 text-left w-16">
+                    <th className="border border-black p-2 text-left w-16 font-bold">
                       S. No.
                     </th>
-                    <th className="border border-black p-2 text-left">
+                    <th className="border border-black p-2 text-left font-bold">
                       Name of the Country
                     </th>
-                    <th className="border border-black p-2 text-left">
+                    <th className="border border-black p-2 text-left font-bold">
                       Length of residence from... To...
                     </th>
-                    <th className="border border-black p-2 text-left">
+                    <th className="border border-black p-2 text-left font-bold">
                       Page Nos. of passport bearing departure and arrival stamps
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {formData.residences && formData.residences.map(
-                    (residence, index) =>
-                      residence.country && (
-                        <tr key={index}>
-                          <td className="border border-black p-2">
-                            {index + 1}.
-                          </td>
-                          <td className="border border-black p-2">
-                            {residence.country}
-                          </td>
-                          <td className="border border-black p-2">
-                            {residence.periodFrom} to {residence.periodTo}
-                          </td>
-                          <td className="border border-black p-2">
-                            {residence.pageNos}
-                          </td>
-                        </tr>
-                      )
-                  )}
+                  {formData.residences &&
+                    formData.residences.map(
+                      (residence, index) =>
+                        residence.country && (
+                          <tr key={index}>
+                            <td className="border border-black p-2">
+                              {index + 1}.
+                            </td>
+                            <td className="border border-black p-2 font-bold">
+                              {residence.country}
+                            </td>
+                            <td className="border border-black p-2 font-bold">
+                              {residence.periodFrom} to {residence.periodTo}
+                            </td>
+                            <td className="border border-black p-2 font-bold">
+                              {residence.pageNos}
+                            </td>
+                          </tr>
+                        )
+                    )}
                 </tbody>
               </table>
             )}
           </div>
 
           <div className="mb-4">
-            <p className="font-medium mb-1">
-              5. State whether the Passport had any objection by the PIA and if so
-              the details thereof.
+            <p className="font-bold mb-1">
+              5. State whether the Passport had any objection by the PIA and if
+              so the details thereof.
             </p>
-            <p>
+            <p className="font-bold">
               {formData.passportObjection}
               {formData.passportObjection === "YES"
                 ? `: ${formData.objectionDetails}`
@@ -640,12 +957,12 @@ export default function PassportAffadavitPreview() {
           </div>
 
           <div className="mb-6">
-            <p className="font-medium mb-1">
+            <p className="font-bold mb-1">
               6. State whether you were deported at any time at the expenses of
-              the Government and if so was the expenditure incurred reimbursed to
-              Government of India.
+              the Government and if so was the expenditure incurred reimbursed
+              to Government of India.
             </p>
-            <p>
+            <p className="font-bold">
               {formData.deported}
               {formData.deported === "YES"
                 ? `: ${formData.deportationDetails}`
@@ -665,20 +982,20 @@ export default function PassportAffadavitPreview() {
             <div>
               <p>
                 Date:{" "}
-                <span className="font-medium">{formatDate(formData.date)}</span>
+                <span className="font-bold">{formatDate(formData.date)}</span>
               </p>
               <p>
-                PLACE: <span className="font-medium">{formData.place}</span>
+                PLACE: <span className="font-bold">{formData.place}</span>
               </p>
             </div>
 
             <div className="text-center">
               <div className="h-8">
                 {formData.useNameAsSignature && (
-                  <p className="font-medium italic">{formData.name}</p>
+                  <p className="font-bold italic">{formData.name}</p>
                 )}
               </div>
-              <div className=" w-48"></div>
+              <div className="w-48"></div>
               <p>(Signature of applicant)</p>
             </div>
           </div>

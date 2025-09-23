@@ -14,12 +14,14 @@ import {
   BorderStyle,
 } from "docx";
 import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
 
 const PassportNameChangePreview = () => {
   const { bookingId } = useParams();
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [downloadType, setDownloadType] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -96,6 +98,7 @@ const PassportNameChangePreview = () => {
 
   // Generate Word document
   const generateWordDocument = async () => {
+    setDownloadType("word");
     setLoading(true);
 
     try {
@@ -106,7 +109,7 @@ const PassportNameChangePreview = () => {
             properties: {},
             children: [
               new Paragraph({
-                text: `${formData.documentType}`,
+                text: `${formData.documentType || "AFFIDAVIT"}`,
                 heading: HeadingLevel.HEADING_1,
                 alignment: AlignmentType.CENTER,
                 spacing: { after: 300 },
@@ -128,7 +131,10 @@ const PassportNameChangePreview = () => {
                     bold: true,
                   }),
                   new TextRun(", "),
-                  new TextRun(formatRelationship()),
+                  new TextRun({
+                    text: formatRelationship(),
+                    bold: true,
+                  }),
                   new TextRun(", Aged: "),
                   new TextRun({
                     text: formData.age || "……",
@@ -283,9 +289,13 @@ const PassportNameChangePreview = () => {
               }),
 
               new Paragraph({
-                text: "Deponent",
+                children: [
+                  new TextRun({
+                    text: "Deponent",
+                    bold: true,
+                  }),
+                ],
                 alignment: AlignmentType.RIGHT,
-                bold: true,
               }),
             ],
           },
@@ -305,10 +315,198 @@ const PassportNameChangePreview = () => {
       alert("Failed to generate Word document. Please try again.");
     } finally {
       setLoading(false);
+      setDownloadType("");
     }
   };
 
-  if (loading) {
+  // Generate PDF document
+  const generatePDFDocument = async () => {
+    setDownloadType("pdf");
+    setLoading(true);
+
+    try {
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const lineHeight = 7;
+      let currentY = margin;
+
+      const addText = (text, x, y, options = {}) => {
+        const fontSize = options.fontSize || 12;
+        const isBold = options.bold || false;
+        const align = options.align || "left";
+
+        pdf.setFontSize(fontSize);
+        pdf.setFont("helvetica", isBold ? "bold" : "normal");
+
+        const textWidth = pageWidth - 2 * margin;
+        const lines = pdf.splitTextToSize(text, textWidth);
+
+        lines.forEach((line, index) => {
+          if (y + index * lineHeight > pageHeight - margin) {
+            pdf.addPage();
+            y = margin;
+          }
+
+          let xPos = x;
+          if (align === "center") {
+            xPos = pageWidth / 2;
+            pdf.text(line, xPos, y + index * lineHeight, { align: "center" });
+          } else if (align === "right") {
+            xPos = pageWidth - margin;
+            pdf.text(line, xPos, y + index * lineHeight, { align: "right" });
+          } else {
+            pdf.text(line, xPos, y + index * lineHeight);
+          }
+        });
+
+        return y + lines.length * lineHeight;
+      };
+
+      // Title
+      currentY = addText(
+        formData.documentType || "AFFIDAVIT",
+        margin,
+        currentY + 10,
+        { fontSize: 18, bold: true, align: "center" }
+      );
+
+      currentY = addText(
+        "[To be printed on a stamp paper of appropriate value as per State stamp duty laws]",
+        margin,
+        currentY + 10,
+        { fontSize: 10, align: "center" }
+      );
+
+      currentY += 15;
+
+      // Content
+      currentY = addText(
+        `I, ${formData.name || "Mr/Mrs/Ms …………………………."}`,
+        margin,
+        currentY + 8,
+        { bold: true }
+      );
+
+      currentY = addText(
+        `, ${formatRelationship()}, Aged: ${formData.age || "……"} Years,`,
+        margin,
+        currentY + 2,
+        { bold: true }
+      );
+
+      currentY = addText(
+        `Permanent Address: ${formatPermanentAddress()}`,
+        margin,
+        currentY + 8,
+        { bold: true }
+      );
+
+      currentY = addText(
+        `Present Address: ${formatPresentAddress()}`,
+        margin,
+        currentY + 8,
+        { bold: true }
+      );
+
+      currentY = addText(
+        `My Aadhaar No: ${formData.aadhaarNo || "0000 0000 0000"}`,
+        margin,
+        currentY + 8,
+        { bold: true }
+      );
+
+      currentY = addText(
+        `My Passport No: ${formData.passportNo || "0000"}`,
+        margin,
+        currentY + 8,
+        { bold: true }
+      );
+
+      currentY += 10;
+
+      // Numbered list
+      currentY = addText(
+        `1. That as per My Aadhaar card my given name is ${
+          formData.currentGivenName || "NAME"
+        } and in my Expired Passport, my given name is ${
+          formData.currentGivenName || "NAME"
+        }, surname is ${formData.currentSurname || "NAME"}.`,
+        margin,
+        currentY + 8,
+        { bold: true }
+      );
+
+      currentY = addText(
+        `2. That I wanted to change my given name as ${
+          formData.newGivenName || "NAME"
+        } and surname as ${formData.newSurname || "NAME"} from given name ${
+          formData.currentGivenName || "NAME"
+        } and surname ${
+          formData.currentSurname || "NAME"
+        }, for getting reissue of PASSPORT.`,
+        margin,
+        currentY + 8,
+        { bold: true }
+      );
+
+      currentY = addText(
+        "3. That I also required this affidavit for Publishing News Paper Advertisement for The Name Change.",
+        margin,
+        currentY + 8
+      );
+
+      currentY = addText(
+        "I hereby state that whatever is stated herein above is true to the best of my knowledge.",
+        margin,
+        currentY + 10
+      );
+
+      // Signature section
+      currentY += 30;
+
+      currentY = addText(
+        `Solemnly affirmed at ${formData.place || "Bangalore"}`,
+        margin,
+        currentY,
+        { align: "right", bold: true }
+      );
+
+      currentY = addText(
+        `Date: ${formatDate(formData.date)}`,
+        margin,
+        currentY + 8,
+        { align: "right", bold: true }
+      );
+
+      currentY += 20;
+
+      currentY = addText("(Signature of the Applicant)", margin, currentY, {
+        align: "right",
+      });
+
+      currentY = addText("Deponent", margin, currentY + 5, {
+        align: "right",
+        bold: true,
+      });
+
+      // Save the PDF
+      const fileName = `Passport_Name_Change_Affidavit_${
+        formData.name ? formData.name.replace(/\s+/g, "_") : "Document"
+      }.pdf`;
+
+      pdf.save(fileName);
+    } catch (error) {
+      console.error("Error generating PDF document:", error);
+      alert("Failed to generate PDF document. Please try again.");
+    } finally {
+      setLoading(false);
+      setDownloadType("");
+    }
+  };
+
+  if (loading && !downloadType) {
     return (
       <div className="flex justify-center items-center h-64">
         Loading preview...
@@ -326,15 +524,43 @@ const PassportNameChangePreview = () => {
 
   return (
     <div className="flex flex-col items-center">
-      {/* Download button */}
-      <div className="w-full max-w-2xl mb-4 flex justify-end">
+      {/* Download buttons */}
+      <div className="w-full max-w-2xl mb-4 flex justify-end gap-3">
+        <button
+          onClick={generatePDFDocument}
+          className="bg-green-600 hover:bg-green-700 text-white px-2 py-2 rounded-md flex items-center"
+          disabled={loading}
+        >
+          {loading && downloadType === "pdf" ? (
+            <span>Generating PDF...</span>
+          ) : (
+            <>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+              Download PDF
+            </>
+          )}
+        </button>
+
         <button
           onClick={generateWordDocument}
           className="bg-red-600 hover:bg-red-700 text-white px-2 py-2 rounded-md flex items-center"
           disabled={loading}
         >
-          {loading ? (
-            <span>Generating...</span>
+          {loading && downloadType === "word" ? (
+            <span>Generating Word...</span>
           ) : (
             <>
               <svg
@@ -351,7 +577,7 @@ const PassportNameChangePreview = () => {
                   d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                 />
               </svg>
-              Download
+              Download Word
             </>
           )}
         </button>
@@ -362,7 +588,7 @@ const PassportNameChangePreview = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold mb-2 underline">
-            {formData.documentType}
+            {formData.documentType || "AFFIDAVIT"}
           </h1>
         </div>
 
@@ -373,7 +599,7 @@ const PassportNameChangePreview = () => {
             <span className="font-bold">
               {formData.name || "Mr/Mrs/Ms …………………………."}
             </span>
-            , {formatRelationship()}, Aged:{" "}
+            , <span className="font-bold">{formatRelationship()}</span>, Aged:{" "}
             <span className="font-bold">{formData.age || "……"}</span> Years,
           </p>
 
@@ -443,19 +669,18 @@ const PassportNameChangePreview = () => {
             best of my knowledge.
           </p>
 
-       
           <div className="flex justify-between mt-16 pt-16">
             {/* Left Side: Place and Date */}
             <div className="text-left">
               <p className="mb-6">
                 Solemnly affirmed at{" "}
                 <span className="font-bold">
-                  {" "}
                   {formData.place || "Bangalore"}
                 </span>
               </p>
               <p className="mb-8">
-                Date: <span className="font-bold">{formatDate(formData.date)}</span>
+                Date:{" "}
+                <span className="font-bold">{formatDate(formData.date)}</span>
               </p>
             </div>
 
