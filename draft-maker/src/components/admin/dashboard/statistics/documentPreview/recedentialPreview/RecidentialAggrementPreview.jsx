@@ -762,7 +762,7 @@ const RecidentialAggrementPreview = () => {
                 WHEREAS the Owner is the sole and absolute owner of the Premises
                 situated at{" "}
                 <span className="font-semibold form-data">
-                  {formData.propertyAddress || "Complete Property Address"}
+                  { getPropertyAddress() ||"Complete Property Address"}
                 </span>{" "}
                 more fully described in Schedule. The tenant for want of
                 accommodation requested the owner to let out premises and Owner

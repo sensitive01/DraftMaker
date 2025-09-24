@@ -106,6 +106,7 @@ export default function CommercialAggrement() {
         commercialType: "",
         squareFeet: "",
         additionaldetails: "",
+        propertyAddress:""
       };
     }
   };

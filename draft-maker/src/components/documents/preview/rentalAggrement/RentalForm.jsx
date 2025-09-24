@@ -415,7 +415,7 @@ const RentalForm = ({
             <div className="grid grid-cols-1 gap-6">
               <div>
                 <label className="block text-sm font-medium text-red-600 mb-2">
-                  Agreement
+                  Property Address
                 </label>
                 <textarea
                   name="propertyAddress"

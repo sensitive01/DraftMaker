@@ -3136,7 +3136,7 @@ const updateAdressAffadavitPaymentData = async (req, res) => {
 
 const createCommercialData = async (req, res) => {
   try {
-    console.log("Welcome to create name correction", req.body);
+    console.log("Welcome to create commecial data", req.body);
     const { document } = req.body;
     const documentName = await documentPriceData.findOne(
       {
@@ -3371,16 +3371,16 @@ const updateRecidentialPaymentData = async (req, res) => {
         .json({ message: "Booking not found for the given ID." });
     }
 
-    // await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
-    //   bookingId: bookingId,
-    //   agreementName: documentType,
-    //   dateTime: updatedData.createdAt,
-    //   userName: updatedData.userName,
-    //   mobile: updatedData.mobileNumber,
-    //   paymentId: paymentId,
-    //   paymentStatus: status,
-    //   amount: amount,
-    // });
+    await sendEmail("draftmakerinfo@gmail.com", "draftingService", {
+      bookingId: bookingId,
+      agreementName: documentType,
+      dateTime: updatedData.createdAt,
+      userName: updatedData.userName,
+      mobile: updatedData.mobileNumber,
+      paymentId: paymentId,
+      paymentStatus: status,
+      amount: amount,
+    });
 
     res.status(200).json({
       message: "Payment details updated successfully.",

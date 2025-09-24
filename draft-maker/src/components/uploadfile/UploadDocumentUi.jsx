@@ -61,6 +61,10 @@ const UploadDocumentUi = ({
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeliveryDropdownOpen, setIsDeliveryDropdownOpen] = useState(false);
+  const [isImportantNoticeAccepted, setIsImportantNoticeAccepted] =
+    useState(false);
+  const [showImportantNoticePopup, setShowImportantNoticePopup] =
+    useState(false);
 
   const handleDocumentSelect = (docType) => {
     const event = {
@@ -129,6 +133,114 @@ const UploadDocumentUi = ({
     return "";
   };
 
+  const ImportantNoticePopup = () => {
+    if (!showImportantNoticePopup) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+          <div className="bg-red-600 text-white p-4 rounded-t-lg">
+            <h2 className="text-lg font-bold flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 18.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+              Important Notice
+            </h2>
+          </div>
+
+          <div className="p-6 space-y-4">
+            <div className="space-y-3 text-sm text-gray-700">
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <span>
+                  Printed documents will be discarded after 30 days. We suggest
+                  adding "doorstep delivery" to retain a physical copy.
+                </span>
+              </div>
+
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <div>
+                  <span className="font-medium">
+                    Cut-off time: 3:30 PM (everyday)
+                  </span>
+                  <div className="ml-6 mt-1">
+                    <div className="flex items-start">
+                      <div className="w-1.5 h-1.5 bg-gray-600 rounded-full mt-2 mr-2 flex-shrink-0"></div>
+                      <span>
+                        Payment received for orders after the cut-off time will
+                        be processed on the next business day.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <span>
+                  Sunday and other state/central government
+                  holidays/strikes/bandhs/riots are non-business days.
+                </span>
+              </div>
+
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <span>
+                  Delivery of stamp paper is done by third party (courier
+                  company), on best effort basis ONLY and can be delayed (though
+                  very rarely) due to situations beyond our control.
+                </span>
+              </div>
+
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <span>
+                  Shipment can be returned back to shipper if address is
+                  incorrect/incomplete, consignee not available at the shipping
+                  address/door locked/no one to receive the shipment/building
+                  security not ready to receive the shipment.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-between gap-3 p-6 bg-gray-50 rounded-b-lg">
+            <button
+              onClick={() => {
+                setShowImportantNoticePopup(false);
+                setIsImportantNoticeAccepted(false);
+              }}
+              className="flex-1 px-4 py-2 text-gray-700 border-2 border-gray-300 rounded-md hover:bg-gray-100 transition-colors text-sm font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                setShowImportantNoticePopup(false);
+                setIsImportantNoticeAccepted(true);
+              }}
+              className="flex-1 px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
+            >
+              I Agree & Accept
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div
       className="min-h-screen bg-gray-50"
@@ -137,6 +249,7 @@ const UploadDocumentUi = ({
         setIsDeliveryDropdownOpen(false);
       }}
     >
+      <ImportantNoticePopup />
       <div className="max-w-4xl mx-auto px-4 py-3">
         {success && (
           <SuccessNotification
@@ -633,16 +746,6 @@ const UploadDocumentUi = ({
                       </div>
                     )}
                   </div>
-                  {/* {selectedDeliveryCharge && (
-                    <div className="text-sm bg-white p-2 rounded-md border">
-                      <p>
-                        <strong>{selectedDeliveryCharge.serviceName}</strong>
-                      </p>
-                      <p className="text-red-600 font-bold">
-                        ₹{selectedDeliveryCharge.charge}
-                      </p>
-                    </div>
-                  )} */}
                 </div>
 
                 {/* Address - Only show for courier services */}
@@ -712,7 +815,7 @@ const UploadDocumentUi = ({
                 {selectedDeliveryCharge && !requiresDeliveryAddress() && (
                   <div className="mt-2 p-2 bg-blue-100 rounded-md border border-blue-200">
                     <p className="text-sm text-blue-800">
-                      📧 Your scanned documents will be delivered to your email
+                      Your scanned documents will be delivered to your email
                       address.
                     </p>
                   </div>
@@ -735,18 +838,6 @@ const UploadDocumentUi = ({
                       {selectedService.price * (parseInt(quantity) || 1)}
                     </span>
                   </div>
-
-                  {/* Service Processing Fee with quantity - ONLY show if stamp duty is required */}
-                  {/* {selectedService.requiresStamp && selectedStampDuty && (
-                    <div className="flex justify-between">
-                      <span>Service Fee ({quantity || 1}x):</span>
-                      <span>
-                        ₹{getServiceChargePerDocument()} × {quantity || 1} = ₹
-                        {getServiceChargePerDocument() *
-                          (parseInt(quantity) || 1)}
-                      </span>
-                    </div>
-                  )} */}
 
                   {/* Notary charge with quantity if selected */}
                   {selectedService.hasNotary && includeNotary && (
@@ -792,65 +883,43 @@ const UploadDocumentUi = ({
               </div>
             )}
 
+            {/* Important Notice Checkbox */}
             <div className="bg-white mt-4 rounded-lg overflow-hidden border border-gray-200">
-              <div className="bg-red-600 text-white text-center py-3 font-bold text-lg">
-                Important Note
-              </div>
-
-              <div className="p-4 space-y-3">
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-800 text-sm">
-                    Note: Printed documents will be discarded after 30 days. We
-                    suggest adding "doorstep delivery" to retain a physical
-                    copy.
-                  </span>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <div>
-                    <span className="text-gray-800 font-medium text-sm">
-                      Cut-off time: 3:30 PM (everyday)
-                    </span>
-                    <div className="ml-6 mt-1">
-                      <div className="flex items-start">
-                        <div className="w-1.5 h-1.5 bg-gray-600 rounded-full mt-2 mr-2 flex-shrink-0"></div>
-                        <span className="text-gray-700 text-sm">
-                          Payment received for orders after the cut-off time
-                          will be processed on the next business day.
-                        </span>
-                      </div>
-                    </div>
+              <div className="p-4">
+                <div className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    id="importantNoticeCheckbox"
+                    checked={isImportantNoticeAccepted}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setShowImportantNoticePopup(true);
+                      } else {
+                        setIsImportantNoticeAccepted(false);
+                      }
+                    }}
+                    className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2 mt-1"
+                  />
+                  <div className="flex-1">
+                    <label
+                      htmlFor="importantNoticeCheckbox"
+                      className="text-sm font-medium text-gray-700 cursor-pointer"
+                    >
+                      I have read and agree to the{" "}
+                      <button
+                        type="button"
+                        onClick={() => setShowImportantNoticePopup(true)}
+                        className="text-red-600 hover:text-red-700 underline font-medium"
+                      >
+                        Important Notice
+                      </button>
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Please read the important notice before proceeding with
+                      payment
+                    </p>
                   </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-800 text-sm">
-                    Sunday and other state/central government
-                    holidays/strikes/bandhs/riots are non-business days.
-                  </span>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-800 text-sm">
-                    *Delivery of stamp paper is done by third party (courier
-                    company), on best effort basis ONLY and can be delayed
-                    (though very rarely) due to situations beyond our control.
-                  </span>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-800 text-sm">
-                    Shipment can be returned back to shipper if address is
-                    incorrect/incomplete, consignee not available at the
-                    shipping address/door locked/no one to receive the
-                    shipment/building security not ready to receive the
-                    shipment.
-                  </span>
                 </div>
               </div>
             </div>
@@ -859,9 +928,17 @@ const UploadDocumentUi = ({
             <div className="text-center pt-2">
               <button
                 onClick={handleSubmit}
-                disabled={!canProceedToPayment() || submitting || uploading}
+                disabled={
+                  !canProceedToPayment() ||
+                  !isImportantNoticeAccepted ||
+                  submitting ||
+                  uploading
+                }
                 className={`px-6 py-3 text-white font-bold rounded-md transition-all flex items-center gap-2 mx-auto ${
-                  canProceedToPayment() && !submitting && !uploading
+                  canProceedToPayment() &&
+                  isImportantNoticeAccepted &&
+                  !submitting &&
+                  !uploading
                     ? "bg-red-600 hover:bg-red-700 shadow-lg"
                     : "bg-gray-400 cursor-not-allowed"
                 }`}

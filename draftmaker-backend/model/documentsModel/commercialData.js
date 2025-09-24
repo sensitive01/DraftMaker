@@ -109,6 +109,7 @@ const commercialAgreementSchema = new mongoose.Schema(
     terminationPeriod: { type: String },
     paintingCharges: { type: String },
     usePurpose: { type: String },
+    propertyAddress:{type:String},
 
     // BHK
     bhkConfig: { type: String },

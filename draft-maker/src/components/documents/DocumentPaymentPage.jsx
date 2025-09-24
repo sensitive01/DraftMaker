@@ -58,6 +58,10 @@ const DocumentPaymentPage = () => {
   const [errorMessage, setErrorMessage] = useState();
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [successNotification, setSuccessNotification] = useState();
+  const [isImportantNoticeAccepted, setIsImportantNoticeAccepted] =
+    useState(false);
+  const [showImportantNoticePopup, setShowImportantNoticePopup] =
+    useState(false);
 
   // New state variables for e-stamp logic
   const [considerationAmount, setConsiderationAmount] = useState("");
@@ -227,35 +231,38 @@ const DocumentPaymentPage = () => {
     return 0;
   };
 
-const calculateTotalAmount = () => {
-  if (!selectedService) return 0;
+  const calculateTotalAmount = () => {
+    if (!selectedService) return 0;
 
-  const qty = parseInt(quantity) || 1;
-  let total = 0;
+    const qty = parseInt(quantity) || 1;
+    let total = 0;
 
-  // 1. Draft price × qty
-  total += (selectedService.price || 0) * qty;
+    // 1. Draft price × qty
+    total += (selectedService.price || 0) * qty;
 
-  // 2. Notary charge × qty (only if opted)
-  if (selectedService.hasNotary && includeNotary) {
-    total += (selectedService.notaryCharge || 0) * qty;
-  }
+    // 2. Notary charge × qty (only if opted)
+    if (selectedService.hasNotary && includeNotary) {
+      total += (selectedService.notaryCharge || 0) * qty;
+    }
 
-  // 3. Stamp duty (already includes quantity in calculation)
-  if (selectedService.requiresStamp && selectedStampDuty) {
-    total += calculateStampDutyAmount(selectedStampDuty); // ✅ Remove * qty
-  }
+    // 3. Stamp duty (already includes quantity in calculation)
+    if (selectedService.requiresStamp && selectedStampDuty) {
+      total += calculateStampDutyAmount(selectedStampDuty); // ✅ Remove * qty
+    }
 
-  // 4. Delivery charge (added once, not multiplied)
-  if (selectedService.requiresDelivery && selectedDeliveryCharge) {
-    total += selectedDeliveryCharge.charge || 0;
-  }
+    // 4. Delivery charge (added once, not multiplied)
+    if (selectedService.requiresDelivery && selectedDeliveryCharge) {
+      total += selectedDeliveryCharge.charge || 0;
+    }
 
-  return total;
-};
+    return total;
+  };
 
   const canProceedToPayment = () => {
     if (!selectedService) return false;
+
+    // Check if important notice is accepted
+    if (!isImportantNoticeAccepted) return false;
 
     // Check email requirement
     if (
@@ -548,7 +555,10 @@ const calculateTotalAmount = () => {
       let errorMessage =
         "Please complete all required selections before proceeding to payment.";
 
-      if (
+      if (!isImportantNoticeAccepted) {
+        errorMessage =
+          "Please read and accept the important terms & conditions";
+      } else if (
         selectedService?.requiresEmail &&
         (!emailAddress || !isValidEmail(emailAddress))
       ) {
@@ -652,9 +662,118 @@ const calculateTotalAmount = () => {
     );
   };
 
+  const ImportantNoticePopup = () => {
+    if (!showImportantNoticePopup) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+          <div className="bg-red-600 text-white p-4 rounded-t-lg">
+            <h2 className="text-lg font-bold flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 18.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+              Important Notice
+            </h2>
+          </div>
+
+          <div className="p-6 space-y-4">
+            <div className="space-y-3 text-sm text-gray-700">
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <span>
+                  Printed documents will be discarded after 30 days. We suggest
+                  adding "doorstep delivery" to retain a physical copy.
+                </span>
+              </div>
+
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <div>
+                  <span className="font-medium">
+                    Cut-off time: 3:30 PM (everyday)
+                  </span>
+                  <div className="ml-6 mt-1">
+                    <div className="flex items-start">
+                      <div className="w-1.5 h-1.5 bg-gray-600 rounded-full mt-2 mr-2 flex-shrink-0"></div>
+                      <span>
+                        Payment received for orders after the cut-off time will
+                        be processed on the next business day.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <span>
+                  Sunday and other state/central government
+                  holidays/strikes/bandhs/riots are non-business days.
+                </span>
+              </div>
+
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <span>
+                  Delivery of stamp paper is done by third party (courier
+                  company), on best effort basis ONLY and can be delayed (though
+                  very rarely) due to situations beyond our control.
+                </span>
+              </div>
+
+              <div className="flex items-start">
+                <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                <span>
+                  Shipment can be returned back to shipper if address is
+                  incorrect/incomplete, consignee not available at the shipping
+                  address/door locked/no one to receive the shipment/building
+                  security not ready to receive the shipment.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-between gap-3 p-6 bg-gray-50 rounded-b-lg">
+            <button
+              onClick={() => {
+                setShowImportantNoticePopup(false);
+                setIsImportantNoticeAccepted(false);
+              }}
+              className="flex-1 px-4 py-2 text-gray-700 border-2 border-gray-300 rounded-md hover:bg-gray-100 transition-colors text-sm font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                setShowImportantNoticePopup(false);
+                setIsImportantNoticeAccepted(true);
+              }}
+              className="flex-1 px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
+            >
+              I Agree & Accept
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-4">
       <NameChangeAffidavitPopup />
+      <ImportantNoticePopup />
       {showErrorNotification && (
         <ErrorNoification
           validationError={errorMessage}
@@ -1124,6 +1243,7 @@ const calculateTotalAmount = () => {
                 handleAddressChange={handleAddressChange}
               />
             )}
+
             {selectedStampDuty && (
               <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-lg border border-red-200 mt-4 mb-4">
                 <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
@@ -1220,65 +1340,43 @@ const calculateTotalAmount = () => {
               </div>
             )}
 
+            {/* Important Notice Checkbox */}
             <div className="bg-white mt-4 mb-4 rounded-lg overflow-hidden border border-gray-200">
-              <div className="bg-red-600 text-white text-center py-3 font-bold text-lg">
-                Important Note
-              </div>
-
-              <div className="p-4 space-y-3">
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-800 text-sm">
-                    Note: Printed documents will be discarded after 30 days. We
-                    suggest adding "doorstep delivery" to retain a physical
-                    copy.
-                  </span>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <div>
-                    <span className="text-gray-800 font-medium text-sm">
-                      Cut-off time: 3:30 PM (everyday)
-                    </span>
-                    <div className="ml-6 mt-1">
-                      <div className="flex items-start">
-                        <div className="w-1.5 h-1.5 bg-gray-600 rounded-full mt-2 mr-2 flex-shrink-0"></div>
-                        <span className="text-gray-700 text-sm">
-                          Payment received for orders after the cut-off time
-                          will be processed on the next business day.
-                        </span>
-                      </div>
-                    </div>
+              <div className="p-4">
+                <div className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    id="importantNoticeCheckbox"
+                    checked={isImportantNoticeAccepted}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setShowImportantNoticePopup(true);
+                      } else {
+                        setIsImportantNoticeAccepted(false);
+                      }
+                    }}
+                    className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2 mt-1"
+                  />
+                  <div className="flex-1">
+                    <label
+                      htmlFor="importantNoticeCheckbox"
+                      className="text-sm font-medium text-gray-700 cursor-pointer"
+                    >
+                      I have read and agree to the{" "}
+                      <button
+                        type="button"
+                        onClick={() => setShowImportantNoticePopup(true)}
+                        className="text-red-600 hover:text-red-700 underline font-medium"
+                      >
+                        Important Notice
+                      </button>
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Please read the important notice before proceeding with
+                      payment
+                    </p>
                   </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-800 text-sm">
-                    Sunday and other state/central government
-                    holidays/strikes/bandhs/riots are non-business days.
-                  </span>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-800 text-sm">
-                    *Delivery of stamp paper is done by third party (courier
-                    company), on best effort basis ONLY and can be delayed
-                    (though very rarely) due to situations beyond our control.
-                  </span>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-gray-800 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-800 text-sm">
-                    Shipment can be returned back to shipper if address is
-                    incorrect/incomplete, consignee not available at the
-                    shipping address/door locked/no one to receive the
-                    shipment/building security not ready to receive the
-                    shipment.
-                  </span>
                 </div>
               </div>
             </div>
@@ -1331,6 +1429,8 @@ const calculateTotalAmount = () => {
                 <div className="text-gray-500 text-xs bg-gray-100 px-4 py-2 rounded-md">
                   {!selectedService
                     ? "Please select a service package to continue"
+                    : !isImportantNoticeAccepted
+                    ? "Please read and accept the important notice"
                     : selectedService.requiresEmail &&
                       (!emailAddress || !isValidEmail(emailAddress))
                     ? "Please enter a valid email address"

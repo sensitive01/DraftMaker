@@ -402,7 +402,7 @@ const CommercialPreview = ({ formData }) => {
                 </div>
                 <p className="text-justify leading-relaxed">
                   All the piece and parcel of the premises at{" "}
-                  <span>{getPropertyAddress()}</span>
+                  <span className="font-bold" >{formData.propertyAddress}</span>
                   and consisting of{" "}
                   <span className="font-semibold">
                     {formData.commercialType
