@@ -14,8 +14,8 @@ import {
   BorderStyle,
 } from "docx";
 import { saveAs } from "file-saver";
+import html2pdf from "html2pdf.js";
 import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
-import html2pdf from 'html2pdf.js';
 
 const HufPreview = () => {
   const { bookingId } = useParams();
@@ -24,7 +24,7 @@ const HufPreview = () => {
   });
   const [loading, setLoading] = useState(true);
   const [downloadLoading, setDownloadLoading] = useState(false);
-  const [downloadType, setDownloadType] = useState('');
+  const [downloadType, setDownloadType] = useState("");
   const [error, setError] = useState(null);
   const documentRef = useRef(null);
 
@@ -84,246 +84,309 @@ const HufPreview = () => {
   // PDF Download Function
   const downloadPDF = () => {
     setDownloadLoading(true);
-    setDownloadType('pdf');
-    
+    setDownloadType("pdf");
+
     const element = documentRef.current;
     const opt = {
       margin: [20, 15, 20, 15], // top, left, bottom, right in mm
-      filename: `HUF_Affidavit_${formData.name ? formData.name.replace(/\s+/g, "_") : "Document"}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
+      filename: `HUF_Affidavit_${
+        formData.name ? formData.name.replace(/\s+/g, "_") : "Document"
+      }.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
         scale: 2,
         useCORS: true,
         letterRendering: true,
-        allowTaint: false
+        allowTaint: false,
       },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait',
-        compressPDF: true
-      }
+      jsPDF: {
+        unit: "mm",
+        format: "a4",
+        orientation: "portrait",
+        compressPDF: true,
+      },
     };
 
-    html2pdf().set(opt).from(element).save().then(() => {
-      setDownloadLoading(false);
-      setDownloadType('');
-    }).catch((error) => {
-      console.error('PDF generation failed:', error);
-      setDownloadLoading(false);
-      setDownloadType('');
-    });
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .save()
+      .then(() => {
+        setDownloadLoading(false);
+        setDownloadType("");
+      })
+      .catch((error) => {
+        console.error("PDF generation failed:", error);
+        setDownloadLoading(false);
+        setDownloadType("");
+      });
+  };
+  const getDayWithSuffixStrings = (day) => {
+    if (!day) return "[DAY]";
+    const num = parseInt(day);
+    const j = num % 10,
+      k = num % 100;
+    let suffix = "th";
+    if (j === 1 && k !== 11) suffix = "st";
+    else if (j === 2 && k !== 12) suffix = "nd";
+    else if (j === 3 && k !== 13) suffix = "rd";
+    return num + suffix;
   };
 
   // Generate Word document
+  // Generate Word document
   const generateWordDocument = async () => {
     setDownloadLoading(true);
-    setDownloadType('word');
+    setDownloadType("word");
 
     try {
       // Create structured content for Word document
       const generateWordContent = () => {
-        return `
-          <div style="text-align: center; font-weight: bold; font-size: 18pt; margin-bottom: 30px;">
-            ${formData.documentType || "HUF AFFIDAVIT"}
-          </div>
+        // Ensure all date values are strings to avoid [object Object]
+        const dayValue = getDayWithSuffixStrings(formData.day);
+        const monthValue = formData.month ? String(formData.month) : "[MONTH]";
+        const yearValue = formData.year ? String(formData.year) : "[YEAR]";
+        const existenceDate = formattedExistenceDate
+          ? String(formattedExistenceDate)
+          : "[DATE OF EXISTENCE]";
 
+        return `
+        <div style="text-align: center; font-weight: bold; font-size: 18pt; margin-bottom: 30px;">
+          ${formData.documentType || "HUF AFFIDAVIT"}
+        </div>
+
+        ${
+          formData.firstParty
+            ? `
+          <div style="margin-bottom: 20px; line-height: 1.6;">
+            <p style="margin-bottom: 8px;">
+              <span style="font-size: 12pt;">First Party (Stamp Duty): </span>
+              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+                ${formData.firstParty}
+              </strong>
+            </p>
+            <p style="font-size: 10pt; font-style: italic; margin-bottom: 16px;">
+              (Responsible for payment of stamp duty charges as per applicable state regulations)
+            </p>
+            <p style="margin-bottom: 16px;">
+              <span style="font-size: 12pt;">Second Party: </span>
+              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+                ${formData.secondParty || ""}
+              </strong>
+            </p>
+          </div>
+        `
+            : ""
+        }
+
+        <p style="margin-bottom: 16px; line-height: 1.6;">
+          I, 
+          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+            ${(formData.title || "") + " " + (formData.name || "[FULL NAME]")}
+          </strong> 
+          ${
+            formData.relationTo
+              ? `<strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+              ${
+                formData.relationTo +
+                " " +
+                (formData.relationName || "[RELATION NAME]")
+              }
+            </strong>`
+              : ""
+          }, 
+          Aged: 
+          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+            ${formData.age || "[AGE]"}
+          </strong> 
+          Years,
+        </p>
+
+        <p style="margin-bottom: 16px; line-height: 1.6;">
+          Permanent Address 
+          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+            ${address || "[COMPLETE ADDRESS WITH PIN CODE]"}
+          </strong>
+        </p>
+
+        <p style="margin-bottom: 30px; line-height: 1.6;">
+          My Aadhaar No: 
+          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+            ${formData.aadhaarNo || "[AADHAAR NUMBER]"}
+          </strong> 
+          and as 
+          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+            Karta of my Hindu Undivided Family (HUF)
+          </strong> 
+          affirm on oath and declare as under --
+        </p>
+
+        <p style="font-weight: bold; text-align: center; margin: 20px 0 30px 0;">
+          Do hereby solemnly affirm and declare as under:
+        </p>
+
+        <div style="margin-bottom: 32px;">
           <p style="margin-bottom: 16px; line-height: 1.6;">
-            I, 
+            1. That I am 
             <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
               ${(formData.title || "") + " " + (formData.name || "[FULL NAME]")}
             </strong> 
-            ${formData.relationTo ? 
-              `<strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${formData.relationTo + " " + (formData.relationName || "[RELATION NAME]")}
-              </strong>` : ''
-            }, 
-            Aged: 
+            of our 
             <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-              ${formData.age || "[AGE]"}
+              HUF
             </strong> 
-            Years,
-          </p>
-
-          <p style="margin-bottom: 16px; line-height: 1.6;">
-            Permanent Address 
+            which is known as 
             <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-              ${address || "[COMPLETE ADDRESS WITH PIN CODE]"}
+              ${(formData.hufName || "[HUF NAME]") + " HUF"}
             </strong>
           </p>
 
-          <p style="margin-bottom: 30px; line-height: 1.6;">
-            My Aadhaar No: 
-            <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-              ${formData.aadhaarNo || "[AADHAAR NUMBER]"}
-            </strong> 
-            and as 
-            <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-              Karta of my Hindu Undivided Family (HUF)
-            </strong> 
-            affirm on oath and declare as under --
+          <p style="margin: 20px 0; line-height: 1.6;">
+            2. That as on today, name of coparceners of our above said HUF, their name, Relationship and addresses are as below --
           </p>
+        </div>
 
-          <p style="font-weight: bold; text-align: center; margin: 20px 0 30px 0;">
-            Do hereby solemnly affirm and declare as under:
-          </p>
-
-          <div style="margin-bottom: 32px;">
-            <p style="margin-bottom: 16px; line-height: 1.6;">
-              1. That I am 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${(formData.title || "") + " " + (formData.name || "[FULL NAME]")}
-              </strong> 
-              of our 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                HUF
-              </strong> 
-              which is known as 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${(formData.hufName || "[HUF NAME]") + " HUF"}
-              </strong>
-            </p>
-
-            <p style="margin: 20px 0; line-height: 1.6;">
-              2. That as on today, name of coparceners of our above said HUF, their name, Relationship and addresses are as below --
-            </p>
-          </div>
-
-          <table style="width: 100%; border-collapse: collapse; margin: 20px 0; border: 1px solid #666;">
-            <thead>
-              <tr style="background-color: #f3f4f6;">
-                <th style="border: 1px solid #666; padding: 8px; width: 8.33%; text-align: center; font-weight: bold;">
-                  S. No
-                </th>
-                <th style="border: 1px solid #666; padding: 8px; width: 33.33%; text-align: center; font-weight: bold;">
-                  Name of the coparceners
-                </th>
-                <th style="border: 1px solid #666; padding: 8px; width: 25%; text-align: center; font-weight: bold;">
-                  Relationship
-                </th>
-                <th style="border: 1px solid #666; padding: 8px; width: 33.33%; text-align: center; font-weight: bold;">
-                  Address
-                </th>
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0; border: 1px solid #666;">
+          <thead>
+            <tr style="background-color: #f3f4f6;">
+              <th style="border: 1px solid #666; padding: 8px; width: 8.33%; text-align: center; font-weight: bold;">
+                S. No
+              </th>
+              <th style="border: 1px solid #666; padding: 8px; width: 33.33%; text-align: center; font-weight: bold;">
+                Name of the coparceners
+              </th>
+              <th style="border: 1px solid #666; padding: 8px; width: 25%; text-align: center; font-weight: bold;">
+                Relationship
+              </th>
+              <th style="border: 1px solid #666; padding: 8px; width: 33.33%; text-align: center; font-weight: bold;">
+                Address
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(formData.coparceners || [])
+              .map(
+                (coparcener, index) => `
+              <tr>
+                <td style="border: 1px solid #666; padding: 8px; text-align: center;">
+                  ${index + 1}
+                </td>
+                <td style="border: 1px solid #666; padding: 8px;">
+                  <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+                    ${coparcener?.name || "[NAME]"}
+                  </strong>
+                </td>
+                <td style="border: 1px solid #666; padding: 8px;">
+                  <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+                    ${coparcener?.relationship || "[RELATIONSHIP]"}
+                  </strong>
+                </td>
+                <td style="border: 1px solid #666; padding: 8px;">
+                  <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+                    ${coparcener?.address || "[ADDRESS]"}
+                  </strong>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              ${(formData.coparceners || []).map((coparcener, index) => `
-                <tr>
-                  <td style="border: 1px solid #666; padding: 8px; text-align: center;">
-                    ${index + 1}
-                  </td>
-                  <td style="border: 1px solid #666; padding: 8px;">
-                    <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                      ${coparcener?.name || "[NAME]"}
-                    </strong>
-                  </td>
-                  <td style="border: 1px solid #666; padding: 8px;">
-                    <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                      ${coparcener?.relationship || "[RELATIONSHIP]"}
-                    </strong>
-                  </td>
-                  <td style="border: 1px solid #666; padding: 8px;">
-                    <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                      ${coparcener?.address || "[ADDRESS]"}
-                    </strong>
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+            `
+              )
+              .join("")}
+          </tbody>
+        </table>
 
-          <p style="margin: 30px 0; line-height: 1.6;">
-            That the above said HUF is in existence since 
+        <p style="margin: 30px 0; line-height: 1.6;">
+          That the above said HUF is in existence since 
+          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+            ${existenceDate}
+          </strong>.
+        </p>
+
+        <div style="margin-top: 50px; margin-bottom: 40px;">
+          <p style="line-height: 1.6;">
+            Verified at 
             <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-              ${formattedExistenceDate || "[DATE OF EXISTENCE]"}
-            </strong>.
+              ${formData.place || "[PLACE]"}
+            </strong> 
+            on this 
+            <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+              ${dayValue}
+            </strong> 
+            <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+              ${monthValue}
+            </strong>, 
+            <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+              ${yearValue}
+            </strong> 
+            that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.
           </p>
+        </div>
 
-          <div style="margin-top: 50px; margin-bottom: 40px;">
-            <p style="line-height: 1.6;">
-              Verified at 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${formData.place || "[PLACE]"}
-              </strong> 
-              on this 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${getDayWithSuffix(formData.day) || "[DAY]"}
-              </strong> 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${formData.month || "[MONTH]"}
-              </strong>, 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${formData.year || "[YEAR]"}
-              </strong> 
-              that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.
-            </p>
-          </div>
-
-          <div style="margin-top: 80px; text-align: right;">
-            <p>(Signature of the Deponent)</p>
-          </div>
-        `;
+        <div style="margin-top: 80px; text-align: right;">
+          <p>(Signature of the Deponent)</p>
+        </div>
+      `;
       };
 
       // Enhanced Word document template with proper A4 styling
       const wordDocument = `
-        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head>
-          <meta charset='utf-8'>
-          <title>HUF Affidavit</title>
-          <!--[if gte mso 9]>
-          <xml>
-            <w:WordDocument>
-              <w:View>Print</w:View>
-              <w:Zoom>90</w:Zoom>
-              <w:DoNotPromptForConvert/>
-              <w:DoNotShowInsertionsAndDeletions/>
-            </w:WordDocument>
-          </xml>
-          <![endif]-->
-          <style>
-            @page {
-              size: A4;
-              margin: 2cm 1.5cm 2cm 1.5cm;
-            }
-            body {
-              font-family: "Times New Roman", Times, serif;
-              font-size: 12pt;
-              line-height: 1.6;
-              color: #000;
-              margin: 0;
-              padding: 20px;
-              max-width: 100%;
-            }
-          </style>
-        </head>
-        <body>
-          ${generateWordContent()}
-        </body>
-        </html>
-      `;
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <meta charset='utf-8'>
+        <title>HUF Affidavit</title>
+        <!--[if gte mso 9]>
+        <xml>
+          <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>90</w:Zoom>
+            <w:DoNotPromptForConvert/>
+            <w:DoNotShowInsertionsAndDeletions/>
+          </w:WordDocument>
+        </xml>
+        <![endif]-->
+        <style>
+          @page {
+            size: A4;
+            margin: 2cm 1.5cm 2cm 1.5cm;
+          }
+          body {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            color: #000;
+            margin: 0;
+            padding: 20px;
+            max-width: 100%;
+          }
+        </style>
+      </head>
+      <body>
+        ${generateWordContent()}
+      </body>
+      </html>
+    `;
 
       // Create blob and download
       const blob = new Blob([wordDocument], {
-        type: 'application/msword'
+        type: "application/msword",
       });
-      
+
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `HUF_Affidavit_${formData.name ? formData.name.replace(/\s+/g, "_") : "Document"}.doc`;
+      link.download = `HUF_Affidavit_${
+        formData.name ? formData.name.replace(/\s+/g, "_") : "Document"
+      }.doc`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      
+
       setDownloadLoading(false);
-      setDownloadType('');
+      setDownloadType("");
     } catch (error) {
       console.error("Error generating Word document:", error);
       alert("Failed to generate Word document. Please try again.");
       setDownloadLoading(false);
-      setDownloadType('');
+      setDownloadType("");
     }
   };
 
@@ -352,7 +415,7 @@ const HufPreview = () => {
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center transition-colors duration-300"
           disabled={downloadLoading}
         >
-          {downloadLoading && downloadType === 'pdf' ? (
+          {downloadLoading && downloadType === "pdf" ? (
             <div className="flex items-center">
               <svg
                 className="animate-spin h-5 w-5 mr-2 text-white"
@@ -402,7 +465,7 @@ const HufPreview = () => {
           className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md flex items-center transition-colors duration-300"
           disabled={downloadLoading}
         >
-          {downloadLoading && downloadType === 'word' ? (
+          {downloadLoading && downloadType === "word" ? (
             <div className="flex items-center">
               <svg
                 className="animate-spin h-5 w-5 mr-2 text-white"
@@ -449,7 +512,7 @@ const HufPreview = () => {
       </div>
 
       {/* Simple legal document preview */}
-      <div 
+      <div
         ref={documentRef}
         className="bg-white border border-gray-300 w-full max-w-3xl p-8 font-serif"
       >
@@ -462,7 +525,9 @@ const HufPreview = () => {
         <div className="space-y-4 text-base leading-relaxed">
           <p>
             I, {formData.title || ""}{" "}
-            <span className="font-bold form-data">{formData.name || "[FULL NAME]"}</span>{" "}
+            <span className="font-bold form-data">
+              {formData.name || "[FULL NAME]"}
+            </span>{" "}
             {formData.relationTo && (
               <>
                 <span className="form-data">{formData.relationTo}</span>{" "}
@@ -471,7 +536,10 @@ const HufPreview = () => {
                 </span>
               </>
             )}
-            , Aged: <span className="font-bold form-data">{formData.age || "[AGE]"}</span>{" "}
+            , Aged:{" "}
+            <span className="font-bold form-data">
+              {formData.age || "[AGE]"}
+            </span>{" "}
             Years,
           </p>
 
@@ -487,7 +555,10 @@ const HufPreview = () => {
             <span className="font-bold form-data">
               {formData.aadhaarNo || "[AADHAAR NUMBER]"}
             </span>{" "}
-            and as <strong className="form-data">Karta of my Hindu Undivided Family (HUF)</strong>{" "}
+            and as{" "}
+            <strong className="form-data">
+              Karta of my Hindu Undivided Family (HUF)
+            </strong>{" "}
             affirm on oath and declare as under --
           </p>
 
@@ -501,7 +572,8 @@ const HufPreview = () => {
               <span className="font-bold form-data">
                 {formData.name || "[FULL NAME]"}
               </span>{" "}
-              of our <strong className="form-data">HUF</strong> which is known as{" "}
+              of our <strong className="form-data">HUF</strong> which is known
+              as{" "}
               <strong>
                 <span className="font-bold form-data">
                   {formData.hufName || "[HUF NAME]"}
@@ -568,13 +640,22 @@ const HufPreview = () => {
 
           <p className="mt-8">
             Verified at{" "}
-            <span className="font-bold form-data">{formData.place || "[PLACE]"}</span> on
-            this <span className="font-bold form-data">{getDayWithSuffix(formData.day) || "[DAY]"}</span>{" "}
-           {" "}
-            <span className="font-bold form-data">{formData.month || "[MONTH]"}</span>,{" "}
-            <span className="font-bold form-data">{formData.year || "[YEAR]"}</span> that
-            the contents of the above said affidavit are true and correct to the
-            best of my knowledge and belief.
+            <span className="font-bold form-data">
+              {formData.place || "[PLACE]"}
+            </span>{" "}
+            on this{" "}
+            <span className="font-bold form-data">
+              {getDayWithSuffix(formData.day) || "[DAY]"}
+            </span>{" "}
+            <span className="font-bold form-data">
+              {formData.month || "[MONTH]"}
+            </span>
+            ,{" "}
+            <span className="font-bold form-data">
+              {formData.year || "[YEAR]"}
+            </span>{" "}
+            that the contents of the above said affidavit are true and correct
+            to the best of my knowledge and belief.
           </p>
 
           {/* Signature Block */}
@@ -618,7 +699,8 @@ const HufPreview = () => {
 
         /* Transition effects */
         .transition-colors {
-          transition-property: background-color, border-color, color, fill, stroke;
+          transition-property: background-color, border-color, color, fill,
+            stroke;
           transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
           transition-duration: 300ms;
         }
