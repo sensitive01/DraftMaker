@@ -1,6 +1,17 @@
 import React from "react";
 
 const NameCorrectionForm = ({ formData, handleChange }) => {
+  const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 py-3 px-3 sm:px-4 lg:px-6">
       <div className="max-w-7xl mx-auto">

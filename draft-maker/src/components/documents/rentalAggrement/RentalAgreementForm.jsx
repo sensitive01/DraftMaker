@@ -67,6 +67,8 @@ export default function RentalAgreementForm() {
             additionaldetails: "",
             fixtures: [{ item: "", quantity: "" }],
             agreeTerms: false,
+            firstParty: "",
+            secondParty: "",
           };
     } catch {
       return {
@@ -114,6 +116,8 @@ export default function RentalAgreementForm() {
         additionaldetails: "",
         fixtures: [{ item: "", quantity: "" }],
         agreeTerms: false,
+        firstParty: "",
+        secondParty: "",
       };
     }
   };
@@ -124,12 +128,8 @@ export default function RentalAgreementForm() {
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
-  const [showServiceOptionsModal, setShowServiceOptionsModal] = useState(false);
   const [bookingId, setBookingId] = useState("");
-  const [selectedService, setSelectedService] = useState("");
   const [documentDetails, setDocumentDetails] = useState(null);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [paymentDetails, setPaymentDetails] = useState(null);
   const [userName, setUserName] = useState();
   const [validationError, setValidationError] = useState("");
   const [showErrorNotification, setShowErrorNotification] = useState(false);
@@ -299,6 +299,14 @@ export default function RentalAgreementForm() {
     }
     if (!formData.lessees[0].permanentAddressLine1.trim()) {
       setValidationError("Please enter lessee permanent address");
+      return false;
+    }
+    if (!formData.firstParty) {
+      setValidationError("Please enter who will pay the stamp duty");
+      return false;
+    }
+    if (!formData.secondParty) {
+      setValidationError("Please enter the second party details");
       return false;
     }
 

@@ -33,7 +33,9 @@ export default function PreviewDocumentLostPage() {
     place: "",
     day: "",
     month: "April",
-    year: "2024",
+    year: "2025",
+    firstParty: "",
+    secondParty: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
@@ -110,8 +112,6 @@ export default function PreviewDocumentLostPage() {
       return false;
     }
 
-   
-
     // Date and place validation
     if (!formData.day.trim()) {
       setValidationError("Please enter the day");
@@ -124,6 +124,14 @@ export default function PreviewDocumentLostPage() {
       setValidationError("Please enter a valid day (1-31)");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
 
     if (!formData.month.trim()) {
       setValidationError("Please select a month");

@@ -1,8 +1,19 @@
 const JoinKhataTransferForm = ({ formData, handleChange }) => {
+  const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
   return (
     <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-lg shadow-md max-w-4xl mx-auto">
-      <h2 className="text-lg sm:text-xl font-semibold mb-4 pb-2 border-b border-gray-200">
-        Enter Details
+      <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4 md:mb-6 text-gray-800 border-b pb-2 text-center">
+        Joint Khata Transfer Form
       </h2>
 
       {/* First Applicant */}
@@ -260,6 +271,54 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
             className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             placeholder="Enter authorized person's name"
           />
+        </div>
+      </div>
+      {/* Party Names & Stamp Duty Section */}
+      <div className="mb-6">
+        <h3 className="text-base sm:text-lg font-medium mb-3 text-indigo-700">
+          Party Names & Stamp Duty
+        </h3>
+        <div className="space-y-3 sm:space-y-4">
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-red-600 mb-1">
+              Who will pay the Stamp Duty?
+            </label>
+            <input
+              type="text"
+              name="firstParty"
+              value={formData.firstParty}
+              onChange={handlePartyNameChange}
+              maxLength={50}
+              className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter first party name (letters, spaces, commas only)"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              {formData.firstParty?.length || 0}/50 characters
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-red-600 mb-1">
+              Second Party Name
+            </label>
+            <input
+              type="text"
+              name="secondParty"
+              value={formData.secondParty}
+              onChange={handlePartyNameChange}
+              maxLength={50}
+              className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter second party name (letters, spaces, commas only)"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              {formData.secondParty?.length || 0}/50 characters
+            </p>
+          </div>
+
+          <p className="text-xs text-red-600 italic">
+            ℹ️ Please enter the names of both parties to the agreement. Only
+            letters, spaces, and commas are allowed (max 50 characters each).
+          </p>
         </div>
       </div>
 

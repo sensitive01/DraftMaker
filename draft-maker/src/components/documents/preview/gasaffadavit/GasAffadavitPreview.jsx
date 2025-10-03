@@ -21,9 +21,31 @@ const GasAffadavitPreview = ({ formData }) => {
 
       {/* Content */}
       <div className="relative z-20 font-serif">
-        <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-center underline mb-4 sm:mb-6 md:mb-8 tracking-wider">
-          AFFIDAVIT
+        <h1 className="text-lg sm:text-xl md:text-xl lg:text-2xl font-bold text-center underline mb-4 sm:mb-6 md:mb-8 tracking-wider">
+        GAS  AFFIDAVIT
         </h1>
+        {formData.firstParty && (
+          <>
+            <div className="mb-5 text-justify leading-relaxed">
+              <span className="font-lg">
+                First Party (Stamp Duty):{" "}
+                <span className="font-bold">{formData.firstParty}</span>
+              </span>
+
+              <br />
+              <span className="text-sm italic">
+                (Responsible for payment of stamp duty charges as per applicable
+                state regulations)
+              </span>
+            </div>
+            <div className="mb-5 text-justify leading-relaxed">
+              <span className="font-lg">
+                Second Party :{" "}
+                <span className="font-bold">{formData.secondParty}</span>
+              </span>
+            </div>
+          </>
+        )}
 
         <div className="space-y-3 sm:space-y-4 md:space-y-5 text-sm sm:text-base md:text-lg leading-relaxed">
           <p className="text-justify">

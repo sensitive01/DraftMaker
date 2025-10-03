@@ -43,10 +43,9 @@ const serviceDetailsSchema = new mongoose.Schema(
     deliveryCharge: Number,
     requiresStamp: Boolean,
     requiresDelivery: Boolean,
-    considerationAmount:Number,
-    quantity:Number,
-    serviceCharge:Number
-
+    considerationAmount: Number,
+    quantity: Number,
+    serviceCharge: Number,
   },
   { _id: false }
 );
@@ -109,7 +108,7 @@ const commercialAgreementSchema = new mongoose.Schema(
     terminationPeriod: { type: String },
     paintingCharges: { type: String },
     usePurpose: { type: String },
-    propertyAddress:{type:String},
+    propertyAddress: { type: String },
 
     // BHK
     bhkConfig: { type: String },
@@ -166,6 +165,8 @@ const commercialAgreementSchema = new mongoose.Schema(
       email: { type: String },
     },
     email: { type: String },
+    firstParty: { type: String },
+    secondParty: { type: String },
   },
   {
     timestamps: true,

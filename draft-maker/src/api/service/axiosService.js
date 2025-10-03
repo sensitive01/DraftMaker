@@ -914,3 +914,39 @@ export const updateAggrementData = async (formData, bookingId) => {
     return err;
   }
 };
+
+
+export const deleteBooking = async ( bookingId) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/documents/delete-booking-data/${bookingId}`,
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const deleteEstampBooking = async ( bookingId) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/documents/delete-stamp-booking-data/${bookingId}`,
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const deleteUploadBooking = async ( bookingId) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/documents/delete-uploading-booking-data/${bookingId}`,
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};

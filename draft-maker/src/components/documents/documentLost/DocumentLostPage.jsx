@@ -37,6 +37,8 @@ export default function DocumentLostPage() {
     day: "",
     month: "April",
     year: "2024",
+    firstParty: "",
+    secondParty: "",
   };
 
   // 🔹 Load saved data from sessionStorage
@@ -125,6 +127,14 @@ export default function DocumentLostPage() {
       setValidationError("Please enter the document number");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
     if (!formData.day.trim()) {
       setValidationError("Please enter the day");
       return false;
@@ -277,8 +287,6 @@ export default function DocumentLostPage() {
             "Submit Application"
           )}
         </button>
-
-      
       </div>
 
       {/* 🔹 Mobile Input Modal */}

@@ -34,6 +34,8 @@ export default function BirthCertificateParentNameCorrectionPage() {
     day: "1",
     month: "April",
     year: "2024",
+    firstParty: "",
+    secondParty: "",
   };
 
   // 🔹 Load saved data if exists
@@ -111,6 +113,14 @@ export default function BirthCertificateParentNameCorrectionPage() {
       setValidationError("Please enter child's name");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
     if (!formData.certificateNumber.trim()) {
       setValidationError("Please enter birth certificate number");
       return false;
@@ -271,8 +281,6 @@ export default function BirthCertificateParentNameCorrectionPage() {
             "Submit Application"
           )}
         </button>
-
-       
       </div>
 
       <MobileNumberInput

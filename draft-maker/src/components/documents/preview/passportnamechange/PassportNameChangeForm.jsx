@@ -1,6 +1,17 @@
 import React from "react";
 
 const PassportNameChangeForm = ({ formData, handleChange }) => {
+  const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
   return (
     <div className="bg-gray-50 p-8 rounded-lg shadow-lg max-w-5xl mx-auto">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2 text-center">
@@ -296,7 +307,7 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-red-600 mb-1">
-                New Correct Given Name  (for passport)
+                New Correct Given Name (for passport)
               </label>
               <input
                 type="text"
@@ -309,7 +320,7 @@ const PassportNameChangeForm = ({ formData, handleChange }) => {
             </div>
             <div>
               <label className="block text-xs font-medium text-red-600 mb-1">
-                New Correct Surname  (for passport)
+                New Correct Surname (for passport)
               </label>
               <input
                 type="text"

@@ -7,6 +7,17 @@ const HufForm = ({
   addCoparcener,
   removeCoparcener,
 }) => {
+  const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 py-3 px-3 sm:px-4 lg:px-6">
       <div className="max-w-7xl mx-auto">
@@ -14,7 +25,7 @@ const HufForm = ({
         <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 mb-5 border-t-3 border-red-500">
           <div className="text-center">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
-              HUF Declaration Form
+              HUF AFFIDAVIT
             </h1>
             <p className="text-sm sm:text-base text-gray-600">
               Fill the details below to generate your document in realtime

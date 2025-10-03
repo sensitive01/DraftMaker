@@ -1,6 +1,17 @@
 import React from "react";
 
 const DobCorrectionForm = ({ formData, handleChange }) => {
+    const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
   return (
     <div className="p-6 max-w-4xl mx-auto bg-gray-50 rounded-lg shadow">
       <h1 className="text-3xl font-bold mb-8 text-center text-blue-600">

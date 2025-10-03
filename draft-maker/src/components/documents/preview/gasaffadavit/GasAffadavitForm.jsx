@@ -1,9 +1,20 @@
 import React from "react";
 
 const GasAffidavitForm = ({ formData, handleChange }) => {
+  const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
   return (
     <div className="p-6 max-w-4xl mx-auto bg-gray-50 rounded-lg shadow">
-      <h1 className="text-3xl font-bold mb-8 text-center text-blue-600">
+      <h1 className="text-3xl font-bold mb-8 text-center text-black">
         Gas Affidavit Form
       </h1>
 
@@ -138,7 +149,7 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
 
           <div className="mt-6">
             <label className="block text-sm font-medium text-red-600 mb-1">
-              Gas Consumer Address 
+              Gas Consumer Address
             </label>
             <textarea
               name="serviceAddress"
@@ -327,6 +338,57 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
                 </label>
               </div>
             </div>
+          </div>
+        </div>
+        {/* Party Names & Stamp Duty Section */}
+        <div className="bg-white p-5 rounded-md shadow-sm">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">
+            Party Names & Stamp Duty
+          </h2>
+
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-red-600 mb-1">
+                Who will pay the Stamp Duty?
+              </label>
+              <input
+                type="text"
+                name="firstParty"
+                value={formData.firstParty || ""}
+                onChange={handlePartyNameChange}
+                maxLength={50}
+                className="block w-full border border-gray-300 rounded-md shadow-sm p-2.5 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter first party name (letters, spaces, commas only)"
+                required
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                {formData.firstParty?.length || 0}/50 characters
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-red-600 mb-1">
+                Second Party Name
+              </label>
+              <input
+                type="text"
+                name="secondParty"
+                value={formData.secondParty || ""}
+                onChange={handlePartyNameChange}
+                maxLength={50}
+                className="block w-full border border-gray-300 rounded-md shadow-sm p-2.5 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter second party name (letters, spaces, commas only)"
+                required
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                {formData.secondParty?.length || 0}/50 characters
+              </p>
+            </div>
+
+            <p className="text-xs text-red-600 italic">
+              ℹ️ Please enter the names of both parties to the agreement. Only
+              letters, spaces, and commas are allowed (max 50 characters each).
+            </p>
           </div>
         </div>
 

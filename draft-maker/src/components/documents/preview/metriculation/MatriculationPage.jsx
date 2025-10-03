@@ -38,6 +38,8 @@ const PreviewMatriculationPage = () => {
     day: "1",
     month: "April",
     year_verification: "2025",
+    firstParty: "",
+    secondParty: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
@@ -127,6 +129,14 @@ const PreviewMatriculationPage = () => {
 
     if (!formData.collegeName.trim()) {
       setValidationError("Please enter the college name");
+      return false;
+    }
+    if (!formData.firstParty) {
+      setValidationError("Please enter who will pay the stamp duty");
+      return false;
+    }
+    if (!formData.secondParty) {
+      setValidationError("Please enter the second party details");
       return false;
     }
 

@@ -1,10 +1,21 @@
 import React from "react";
 
 const MetriculationForm = ({ formData, handleChange }) => {
+  const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-6 pb-2 border-b border-gray-200">
-        Enter Details
+    <div className="bg-white  p-6 rounded-lg shadow-md">
+      <h2 className="text-2xl text-center font-bold mb-6 pb-2 border-b border-gray-200">
+        Metriculation Lost Form
       </h2>
 
       {/* Personal Details */}
@@ -221,6 +232,54 @@ const MetriculationForm = ({ formData, handleChange }) => {
               placeholder="e.g. Matriculation Certificate"
             />
           </div>
+        </div>
+      </div>
+      {/* Party Names & Stamp Duty Section */}
+      <div className="mb-8">
+        <h3 className="text-lg font-medium mb-4 text-indigo-700">
+          Party Names & Stamp Duty
+        </h3>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-red-600 mb-1">
+              Who will pay the Stamp Duty?
+            </label>
+            <input
+              type="text"
+              name="firstParty"
+              value={formData.firstParty || ""}
+              onChange={handlePartyNameChange}
+              maxLength={50}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter first party name (letters, spaces, commas only)"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              {formData.firstParty?.length || 0}/50 characters
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-red-600 mb-1">
+              Second Party Name
+            </label>
+            <input
+              type="text"
+              name="secondParty"
+              value={formData.secondParty || ""}
+              onChange={handlePartyNameChange}
+              maxLength={50}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter second party name (letters, spaces, commas only)"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              {formData.secondParty?.length || 0}/50 characters
+            </p>
+          </div>
+
+          <p className="text-xs text-red-600 italic">
+            ℹ️ Please enter the names of both parties to the agreement. Only
+            letters, spaces, and commas are allowed (max 50 characters each).
+          </p>
         </div>
       </div>
 

@@ -57,204 +57,242 @@ const MatriculationLostPreview = () => {
     setLoading(true);
 
     try {
+      const docChildren = [
+        new Paragraph({
+          text: `${formData.documentType || "AFFIDAVIT"}`,
+          heading: HeadingLevel.HEADING_1,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 300 },
+        }),
+      ];
+
+      // Add First and Second Party if they exist
+      if (formData.firstParty) {
+        docChildren.push(
+          new Paragraph({
+            spacing: { after: 100 },
+            children: [
+              new TextRun("First Party (Stamp Duty): "),
+              new TextRun({
+                text: formData.firstParty,
+                bold: true,
+              }),
+            ],
+          }),
+          new Paragraph({
+            spacing: { after: 200 },
+            children: [
+              new TextRun({
+                text: "(Responsible for payment of stamp duty charges as per applicable state regulations)",
+                italics: true,
+                size: 20,
+              }),
+            ],
+          }),
+          new Paragraph({
+            spacing: { after: 200 },
+            children: [
+              new TextRun("Second Party: "),
+              new TextRun({
+                text: formData.secondParty || "",
+                bold: true,
+              }),
+            ],
+          })
+        );
+      }
+
+      // Add remaining content
+      docChildren.push(
+        new Paragraph({
+          spacing: { after: 200 },
+          children: [
+            new TextRun(`I, `),
+            new TextRun({
+              text:
+                formData.name || "Mr/Mrs/Ms ................................",
+              bold: true,
+            }),
+            new TextRun(
+              ` ${
+                formData.relation ||
+                "D/o, S/o, H/o, W/o ........................"
+              }`
+            ),
+            new TextRun(`, Aged: `),
+            new TextRun({
+              text: formData?.age?.toString() || "......",
+              bold: true,
+            }),
+            new TextRun(` Years,`),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { after: 200 },
+          children: [
+            new TextRun(`Permanent Address: `),
+            new TextRun({
+              text:
+                formData?.address ||
+                "[Address Line 1, Address Line 2, City, State, Pin Code]",
+              bold: true,
+            }),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { after: 300 },
+          children: [
+            new TextRun(`My Aadhaar No: `),
+            new TextRun({
+              text: formData?.aadhaar || "0000 0000 0000",
+              bold: true,
+            }),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { after: 300 },
+          alignment: AlignmentType.CENTER,
+          children: [
+            new TextRun({
+              text: `Do hereby solemnly affirm and declare as under:`,
+              bold: true,
+            }),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { after: 200 },
+          children: [
+            new TextRun(
+              `Hereby affirm and declare that I have irrecoverable Lost my `
+            ),
+            new TextRun({
+              text: formData.year || "X",
+              bold: true,
+            }),
+            new TextRun(` year, `),
+            new TextRun({
+              text: formData.semester || "X",
+              bold: true,
+            }),
+            new TextRun(` Semester, marks card of `),
+            new TextRun({
+              text: formData.program || "..........................,",
+              bold: true,
+            }),
+            new TextRun(` issued to me by `),
+            new TextRun({
+              text:
+                formData.authority ||
+                "........................................................",
+              bold: true,
+            }),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { after: 200 },
+          children: [
+            new TextRun(`Name of the college/Institution: `),
+            new TextRun({
+              text: formData.collegeName || "XXXX",
+              bold: true,
+            }),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { after: 200 },
+          children: [
+            new TextRun(`Batch: In the year `),
+            new TextRun({
+              text: formData.batch || "XXXX",
+              bold: true,
+            }),
+            new TextRun(`.`),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { after: 300 },
+          children: [
+            new TextRun(`Registration Number: `),
+            new TextRun({
+              text: formData.regNumber || "..........................,",
+              bold: true,
+            }),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { after: 300 },
+          children: [
+            new TextRun(`In the event of the above mentioned Statement of `),
+            new TextRun({
+              text: formData.documentName || "DOCUMENT NAME",
+              bold: true,
+            }),
+            new TextRun(
+              ` being found subsequently, I hereby undertake to return the duplicate issued. It is at my own risk the Statement of `
+            ),
+            new TextRun({
+              text: formData.documentName || "DOCUMENT NAME",
+              bold: true,
+            }),
+            new TextRun(` may be sent the address given by me.`),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { before: 300, after: 500 },
+          children: [
+            new TextRun(`Verified at `),
+            new TextRun({
+              text: formData?.place || "PLACE",
+              bold: true,
+            }),
+            new TextRun(` on this `),
+            new TextRun({
+              text: formData?.day || "XX",
+              bold: true,
+            }),
+            new TextRun(` day of `),
+            new TextRun({
+              text: formData?.month || "XXXX",
+              bold: true,
+            }),
+            new TextRun(`, `),
+            new TextRun({
+              text: formData?.year_verification || "XXXX",
+              bold: true,
+            }),
+            new TextRun(
+              ` that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.`
+            ),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { before: 500 },
+          text: "(Signature of the Deponent)",
+          alignment: AlignmentType.RIGHT,
+        }),
+
+        new Paragraph({
+          text: formData?.name || "................................",
+          alignment: AlignmentType.RIGHT,
+        })
+      );
+
       // Create a new document
       const doc = new Document({
         sections: [
           {
             properties: {},
-            children: [
-              new Paragraph({
-                text: `${formData.documentType || "AFFIDAVIT"}`,
-                heading: HeadingLevel.HEADING_1,
-                alignment: AlignmentType.CENTER,
-                spacing: { after: 300 },
-              }),
-
-              new Paragraph({
-                spacing: { after: 200 },
-                children: [
-                  new TextRun(`I, `),
-                  new TextRun({
-                    text:
-                      formData.name ||
-                      "Mr/Mrs/Ms ................................",
-                    bold: true,
-                  }),
-                  new TextRun(
-                    ` ${
-                      formData.relation ||
-                      "D/o, S/o, H/o, W/o ........................"
-                    }`
-                  ),
-                  new TextRun(`, Aged: `),
-                  new TextRun({
-                    text: formData?.age?.toString() || "......",
-                    bold: true,
-                  }),
-                  new TextRun(` Years,`),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { after: 200 },
-                children: [
-                  new TextRun(`Permanent Address: `),
-                  new TextRun({
-                    text:
-                      formData?.address ||
-                      "[Address Line 1, Address Line 2, City, State, Pin Code]",
-                    bold: true,
-                  }),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { after: 300 },
-                children: [
-                  new TextRun(`My Aadhaar No: `),
-                  new TextRun({
-                    text: formData?.aadhaar || "0000 0000 0000",
-                    bold: true,
-                  }),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { after: 300 },
-                alignment: AlignmentType.CENTER,
-                children: [
-                  new TextRun({
-                    text: `Do hereby solemnly affirm and declare as under:`,
-                    bold: true,
-                  }),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { after: 200 },
-                children: [
-                  new TextRun(
-                    `Hereby affirm and declare that I have irrecoverable Lost my `
-                  ),
-                  new TextRun({
-                    text: formData.year || "X",
-                    bold: true,
-                  }),
-                  new TextRun(` year, `),
-                  new TextRun({
-                    text: formData.semester || "X",
-                    bold: true,
-                  }),
-                  new TextRun(` Semester, marks card of `),
-                  new TextRun({
-                    text: formData.program || "..........................,",
-                    bold: true,
-                  }),
-                  new TextRun(` issued to me by `),
-                  new TextRun({
-                    text:
-                      formData.authority ||
-                      "........................................................",
-                    bold: true,
-                  }),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { after: 200 },
-                children: [
-                  new TextRun(`Name of the college/Institution: `),
-                  new TextRun({
-                    text: formData.collegeName || "XXXX",
-                    bold: true,
-                  }),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { after: 200 },
-                children: [
-                  new TextRun(`Batch: In the year `),
-                  new TextRun({
-                    text: formData.batch || "XXXX",
-                    bold: true,
-                  }),
-                  new TextRun(`.`),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { after: 300 },
-                children: [
-                  new TextRun(`Registration Number: `),
-                  new TextRun({
-                    text: formData.regNumber || "..........................,",
-                    bold: true,
-                  }),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { after: 300 },
-                children: [
-                  new TextRun(
-                    `In the event of the above mentioned Statement of `
-                  ),
-                  new TextRun({
-                    text: formData.documentName || "DOCUMENT NAME",
-                    bold: true,
-                  }),
-                  new TextRun(
-                    ` being found subsequently, I hereby undertake to return the duplicate issued. It is at my own risk the Statement of `
-                  ),
-                  new TextRun({
-                    text: formData.documentName || "DOCUMENT NAME",
-                    bold: true,
-                  }),
-                  new TextRun(` may be sent the address given by me.`),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { before: 300, after: 500 },
-                children: [
-                  new TextRun(`Verified at `),
-                  new TextRun({
-                    text: formData?.place || "PLACE",
-                    bold: true,
-                  }),
-                  new TextRun(` on this `),
-                  new TextRun({
-                    text: formData?.day || "XX",
-                    bold: true,
-                  }),
-                  new TextRun(` day of `),
-                  new TextRun({
-                    text: formData?.month || "XXXX",
-                    bold: true,
-                  }),
-                  new TextRun(`, `),
-                  new TextRun({
-                    text: formData?.year_verification || "XXXX",
-                    bold: true,
-                  }),
-                  new TextRun(
-                    ` that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.`
-                  ),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { before: 500 },
-                text: "(Signature of the Deponent)",
-                alignment: AlignmentType.RIGHT,
-              }),
-
-              new Paragraph({
-                text: formData?.name || "................................",
-                alignment: AlignmentType.RIGHT,
-              }),
-            ],
+            children: docChildren,
           },
         ],
       });
@@ -331,6 +369,32 @@ const MatriculationLostPreview = () => {
       );
 
       currentY += 15;
+
+      // Add First and Second Party if they exist
+      if (formData.firstParty) {
+        currentY = addText(
+          `First Party (Stamp Duty): ${formData.firstParty}`,
+          margin,
+          currentY + 5,
+          { bold: false }
+        );
+
+        currentY = addText(
+          "(Responsible for payment of stamp duty charges as per applicable state regulations)",
+          margin,
+          currentY + 3,
+          { fontSize: 10 }
+        );
+
+        currentY = addText(
+          `Second Party: ${formData.secondParty || ""}`,
+          margin,
+          currentY + 5,
+          { bold: false }
+        );
+
+        currentY += 10;
+      }
 
       // Content
       const content = [
@@ -590,6 +654,28 @@ const MatriculationLostPreview = () => {
                 {formData.documentType || "AFFIDAVIT"}
               </h1>
             </div>
+            {formData.firstParty && (
+              <>
+                <div className="mb-5 text-justify leading-relaxed">
+                  <span className="font-lg">
+                    First Party (Stamp Duty):{" "}
+                    <span className="font-bold">{formData.firstParty}</span>
+                  </span>
+
+                  <br />
+                  <span className="text-sm italic">
+                    (Responsible for payment of stamp duty charges as per
+                    applicable state regulations)
+                  </span>
+                </div>
+                <div className="mb-5 text-justify leading-relaxed">
+                  <span className="font-lg">
+                    Second Party :{" "}
+                    <span className="font-bold">{formData.secondParty}</span>
+                  </span>
+                </div>
+              </>
+            )}
 
             <div className="space-y-4 text-gray-800 leading-relaxed">
               {/* Personal Details */}

@@ -47,11 +47,32 @@ const MetriculationPreview = ({ formData }) => {
         <div className="p-3 sm:p-4 md:p-6 print-container font-serif">
           {/* Official Header */}
           <div className="text-center mb-4 sm:mb-6 md:mb-8">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-wider mb-2 sm:mb-3">
-              AFFIDAVIT
-            </h1>
-            <div className="border-b-2 border-black w-32 sm:w-40 md:w-48 mx-auto mb-2"></div>
+            <h2 className="text-2xl text-center font-bold mb-6 pb-2 border-b border-gray-200">
+              Metriculation Lost Preview
+            </h2>
           </div>
+          {formData.firstParty && (
+            <>
+              <div className="mb-5 text-justify leading-relaxed">
+                <span className="font-lg">
+                  First Party (Stamp Duty):{" "}
+                  <span className="font-bold">{formData.firstParty}</span>
+                </span>
+
+                <br />
+                <span className="text-sm italic">
+                  (Responsible for payment of stamp duty charges as per
+                  applicable state regulations)
+                </span>
+              </div>
+              <div className="mb-5 text-justify leading-relaxed">
+                <span className="font-lg">
+                  Second Party :{" "}
+                  <span className="font-bold">{formData.secondParty}</span>
+                </span>
+              </div>
+            </>
+          )}
 
           <div className="space-y-2 sm:space-y-3 md:space-y-4 text-gray-800 leading-relaxed text-sm sm:text-base">
             {/* Personal Details */}

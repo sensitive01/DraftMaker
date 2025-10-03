@@ -13,6 +13,17 @@ const CommercialForm = ({
   handleLessorChange,
   handleLesseeChange,
 }) => {
+  const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
   return (
     <div className="w-full max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 bg-white rounded-lg shadow-sm">
       <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-center mb-3 sm:mb-4 px-2">
@@ -312,6 +323,56 @@ const CommercialForm = ({
             ))}
           </div>
 
+          {/* Party Names & Stamp Duty */}
+          <div id="party-stamp" className="mb-6 sm:mb-8">
+            <h2 className="text-base sm:text-lg font-medium text-gray-800 mb-3 sm:mb-4 pb-2 border-b">
+              Party Names & Stamp Duty
+            </h2>
+            <div className="space-y-4 sm:space-y-6">
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
+                  Who will pay the Stamp Duty?
+                </label>
+                <input
+                  type="text"
+                  name="firstParty"
+                  value={formData.firstParty || ""}
+                  onChange={handlePartyNameChange}
+                  maxLength={50}
+                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  placeholder="Enter first party name (letters, spaces, commas only)"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {formData.firstParty?.length || 0}/50 characters
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
+                  Second Party Name
+                </label>
+                <input
+                  type="text"
+                  name="secondParty"
+                  value={formData.secondParty || ""}
+                  onChange={handlePartyNameChange}
+                  maxLength={50}
+                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  placeholder="Enter second party name (letters, spaces, commas only)"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {formData.secondParty?.length || 0}/50 characters
+                </p>
+              </div>
+
+              <p className="text-xs text-red-600 italic">
+                ℹ️ Please enter the names of both parties to the agreement. Only
+                letters, spaces, and commas are allowed (max 50 characters
+                each).
+              </p>
+            </div>
+          </div>
+
           {/* Rent & Deposit Details */}
           <div id="rent" className="mb-6 sm:mb-8">
             <h2 className="text-base sm:text-lg font-medium text-gray-800 mb-3 sm:mb-4 pb-2 border-b">
@@ -414,10 +475,9 @@ const CommercialForm = ({
               Property Details
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:gap-6">
-              {/* First Row - Agreement Field */}
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-              Property Address
+                  Property Address
                 </label>
                 <textarea
                   name="propertyAddress"
@@ -440,7 +500,6 @@ const CommercialForm = ({
                 ></textarea>
               </div>
 
-              {/* Second Row - Configuration */}
               <div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div>

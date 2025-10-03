@@ -12,6 +12,11 @@ documentRouter.get("/get-uploaded-document-data",documentController.getUploadedD
 documentRouter.get("/get-uploaded-document-details/:bookingId",documentController.getUploadedBookingDetailsPreview)
 
 
+documentRouter.delete("/delete-booking-data/:bookingId",documentController.deleteBookingData)
+documentRouter.delete("/delete-stamp-booking-data/:bookingId",documentController.deleteStampBookingData)
+documentRouter.delete("/delete-uploading-booking-data/:bookingId",documentController.deleteUploadingBookingData)
+
+
 
 
 

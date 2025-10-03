@@ -69,6 +69,8 @@ export default function DualNameChange() {
         day: "",
         month: "",
         year: "2025",
+        firstParty: "",
+        secondParty: "",
       };
     }
   };
@@ -179,6 +181,14 @@ export default function DualNameChange() {
       setValidationError("Aadhaar number must be 12 digits");
       return false;
     }
+    //  if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
     if (!formData.name1.trim()) {
       setValidationError("Please enter the first document name");
       return false;
@@ -356,8 +366,6 @@ export default function DualNameChange() {
             "Submit Application"
           )}
         </button>
-
-       
       </div>
 
       <MobileNumberInput

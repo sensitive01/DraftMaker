@@ -40,6 +40,8 @@ const MatriculationPage = () => {
     day: "1",
     month: "April",
     year_verification: "2025",
+    firstParty: "",
+    secondParty: "",
   };
 
   // Load saved data or use initial data
@@ -124,6 +126,14 @@ const MatriculationPage = () => {
       return false;
     } else if (!/^\d{12}$/.test(formData.aadhaar)) {
       setValidationError("Aadhaar number must be 12 digits");
+      return false;
+    }
+    if (!formData.firstParty) {
+      setValidationError("Please enter who will pay the stamp duty");
+      return false;
+    }
+    if (!formData.secondParty) {
+      setValidationError("Please enter the second party details");
       return false;
     }
 
@@ -251,7 +261,6 @@ const MatriculationPage = () => {
           formId: "DM-MAL-9",
         },
       });
-
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(

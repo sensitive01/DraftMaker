@@ -48,6 +48,8 @@ const JointKhataTransfer = () => {
     day: "1",
     month: "April",
     year: "2025",
+    firstParty: "",
+    secondParty: "",
   };
 
   // Load saved data or use initial data
@@ -198,6 +200,14 @@ const JointKhataTransfer = () => {
       setValidationError("Please select an authorized person");
       return false;
     }
+    if (!formData.firstParty) {
+      setValidationError("Please enter who will pay the stamp duty");
+      return false;
+    }
+    if (!formData.secondParty) {
+      setValidationError("Please enter the second party details");
+      return false;
+    }
 
     // Validate verification details
     if (!formData.place.trim()) {
@@ -287,7 +297,6 @@ const JointKhataTransfer = () => {
           formId: "DM-KH-10",
         },
       });
-
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -515,7 +524,7 @@ const JointKhataTransfer = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="mt-8 flex flex-col items-center">
         <button
           onClick={handleSubmitButtonClick}
@@ -562,7 +571,7 @@ const JointKhataTransfer = () => {
         username={userName}
         setUsername={setUserName}
       />
-      
+
       {showServiceOptionsModal && (
         <ServicePackageNotification
           setShowServiceOptionsModal={setShowServiceOptionsModal}
@@ -573,7 +582,7 @@ const JointKhataTransfer = () => {
           handleServiceSelection={handleServiceSelection}
         />
       )}
-      
+
       {paymentSuccess && paymentDetails && (
         <PaymentConfirmation
           paymentSuccess={paymentSuccess}

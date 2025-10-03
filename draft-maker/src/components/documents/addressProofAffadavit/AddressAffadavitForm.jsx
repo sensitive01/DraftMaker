@@ -1,6 +1,17 @@
 import React from "react";
 
 const AddressAffidavitForm = ({ formData, handleChange }) => {
+  const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 py-3 px-3 sm:px-4 lg:px-6">
       <div className="max-w-7xl mx-auto">
@@ -20,10 +31,12 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
           {/* Personal Details Section - Compact */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
             <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
-              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">1</span>
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                1
+              </span>
               Personal Details
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
@@ -38,7 +51,7 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
                   placeholder="Mr/Mrs/Ms Full Name"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
                   Relationship <span className="text-red-500">*</span>
@@ -55,7 +68,7 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
                   <option value="W/O">Wife of (W/O)</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
                   Age <span className="text-red-500">*</span>
@@ -69,7 +82,7 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
                   placeholder="Age in years"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
                   Aadhaar Number <span className="text-red-500">*</span>
@@ -83,7 +96,7 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
                   placeholder="12-digit Aadhaar Number"
                 />
               </div>
-              
+
               {formData.gender && (
                 <div className="md:col-span-2">
                   <label className="block text-sm font-semibold text-red-600 mb-1">
@@ -91,7 +104,8 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
                       ? "Father's Name"
                       : formData.gender === "D/O"
                       ? "Father's Name"
-                      : "Husband's Name"} <span className="text-red-500">*</span>
+                      : "Husband's Name"}{" "}
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -113,10 +127,12 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
           {/* Permanent Address Section - Compact */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
             <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
-              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">2</span>
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                2
+              </span>
               Permanent Address
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
@@ -145,7 +161,7 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
                 />
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
@@ -189,10 +205,12 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
           {/* Present Address Section - Compact */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
             <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
-              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">3</span>
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                3
+              </span>
               Present Address
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
@@ -221,7 +239,7 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
                 />
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
@@ -261,18 +279,69 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
               </div>
             </div>
           </div>
+          {/* Party Names & Stamp Duty Section */}
+          <div className="mb-2 bg-white p-4 rounded-lg shadow-sm">
+            <h3 className="text-lg font-semibold mb-3 text-gray-800 border-l-4 border-red-500 pl-3">
+              Party Names & Stamp Duty
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-red-600 mb-1">
+                  Who will pay the Stamp Duty? *
+                </label>
+                <input
+                  type="text"
+                  name="firstParty"
+                  value={formData.firstParty || ""}
+                  onChange={handlePartyNameChange}
+                  maxLength={50}
+                  className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
+                  placeholder="Enter first party name (letters, spaces, commas only)"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {formData.firstParty?.length || 0}/50 characters
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-red-600 mb-1">
+                  Second Party Name *
+                </label>
+                <input
+                  type="text"
+                  name="secondParty"
+                  value={formData.secondParty || ""}
+                  onChange={handlePartyNameChange}
+                  maxLength={50}
+                  className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
+                  placeholder="Enter second party name (letters, spaces, commas only)"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {formData.secondParty?.length || 0}/50 characters
+                </p>
+              </div>
+            </div>
+
+            <p className="mt-3 text-xs text-red-600 italic">
+              ℹ️ Please enter the names of both parties to the agreement. Only
+              letters, spaces, and commas are allowed (max 50 characters each).
+            </p>
+          </div>
 
           {/* Other Details Section - Compact */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
             <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
-              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">4</span>
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                4
+              </span>
               Other Details
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
-                  Residing Since (On Present Address) <span className="text-red-500">*</span>
+                  Residing Since (On Present Address){" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -285,7 +354,8 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
-                  Company Name (Document Given To) <span className="text-red-500">*</span>
+                  Company Name (Document Given To){" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"

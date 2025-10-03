@@ -36,6 +36,8 @@ export default function PreviewHufAgreement() {
     month: "April",
     year: "2025",
     coparceners: [{ name: "", relationship: "", address: "" }],
+    firstParty: "",
+    secondParty: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
@@ -162,6 +164,14 @@ export default function PreviewHufAgreement() {
       setValidationError("Please enter the state");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
 
     if (!formData.address.pinCode.trim()) {
       setValidationError("Please enter the PIN code");

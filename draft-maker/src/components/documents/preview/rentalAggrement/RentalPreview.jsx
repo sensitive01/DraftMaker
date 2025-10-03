@@ -161,6 +161,29 @@ const RentalPreview = ({ formData }) => {
                 RENTAL AGREEMENT
               </div>
 
+              {formData.firstParty && (
+                <>
+                  <div className="mb-5 text-justify leading-relaxed">
+                    <span className="font-lg">
+                      First Party (Stamp Duty):{" "}
+                      <span className="font-bold">{formData.firstParty}</span>
+                    </span>
+
+                    <br />
+                    <span className="text-sm italic">
+                      (Responsible for payment of stamp duty charges as per
+                      applicable state regulations)
+                    </span>
+                  </div>
+                  <div className="mb-5 text-justify leading-relaxed">
+                    <span className="font-lg">
+                      Second Party :{" "}
+                      <span className="font-bold">{formData.secondParty}</span>
+                    </span>
+                  </div>
+                </>
+              )}
+
               <p className="mb-5 text-justify leading-relaxed">
                 This Tenancy Agreement is made and executed at Bangalore, on
                 this{" "}
@@ -403,7 +426,8 @@ const RentalPreview = ({ formData }) => {
                 </div>
                 <p className="text-justify leading-relaxed">
                   All the piece and parcel of the premises at{" "}
-                  <span className ="font-bold" >{formData.propertyAddress}</span> and consisting of{" "}
+                  <span className="font-bold">{formData.propertyAddress}</span>{" "}
+                  and consisting of{" "}
                   <span className="font-semibold">
                     {formData.bhkConfig || "XBHK"},{" "}
                     {formData.bedroomCount || "X"} bedroom,{" "}

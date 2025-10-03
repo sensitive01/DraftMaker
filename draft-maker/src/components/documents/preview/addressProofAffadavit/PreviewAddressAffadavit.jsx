@@ -39,6 +39,8 @@ const PreviewAddressAffadavit = () => {
     purposeOfAffidavit: "",
     date: "",
     place: "",
+    firstParty: "",
+    secondParty: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -149,6 +151,14 @@ const PreviewAddressAffadavit = () => {
       return false;
     } else if (!/^\d{6}$/.test(formData.presentAddress.pinCode)) {
       setValidationError("Present address pin code must be 6 digits");
+      return false;
+    }
+    if (!formData.firstParty) {
+      setValidationError("Please enter who will pay the stamp duty");
+      return false;
+    }
+    if (!formData.secondParty) {
+      setValidationError("Please enter the second party details");
       return false;
     }
 

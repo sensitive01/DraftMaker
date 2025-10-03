@@ -38,6 +38,8 @@ export default function HufAgreement() {
     month: "April",
     year: "2025",
     coparceners: [{ name: "", relationship: "", address: "" }],
+    firstParty: "",
+    secondParty: "",
   };
 
   // Load saved data or use initial data
@@ -180,6 +182,15 @@ export default function HufAgreement() {
       setValidationError("Please enter the city");
       return false;
     }
+
+    //  if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
 
     if (!formData.address.state.trim()) {
       setValidationError("Please enter the state");
@@ -378,8 +389,6 @@ export default function HufAgreement() {
       </div>
 
       <div className="mt-6 sm:mt-8 flex flex-col items-center px-2 sm:px-4">
-       
-
         <button
           onClick={handleSubmitButtonClick}
           disabled={isSubmitting}
@@ -413,8 +422,6 @@ export default function HufAgreement() {
             "Submit Application"
           )}
         </button>
-
-        
       </div>
 
       <MobileNumberInput

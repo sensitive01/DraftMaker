@@ -46,6 +46,8 @@ const PreviewJointKhataTransfer = () => {
     day: "1",
     month: "April",
     year: "2025",
+    firstParty: "",
+    secondParty: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,6 +118,14 @@ const PreviewJointKhataTransfer = () => {
     // Validate second applicant details
     if (!formData.name2.trim()) {
       setValidationError("Please enter the second applicant's name");
+      return false;
+    }
+    if (!formData.firstParty) {
+      setValidationError("Please enter who will pay the stamp duty");
+      return false;
+    }
+    if (!formData.secondParty) {
+      setValidationError("Please enter the second party details");
       return false;
     }
 

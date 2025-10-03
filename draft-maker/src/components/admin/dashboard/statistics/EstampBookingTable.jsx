@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Eye, X, Search, Filter, Calendar, Clock, Edit } from "lucide-react";
+import {
+  Eye,
+  X,
+  Search,
+  Filter,
+  Calendar,
+  Clock,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import {
   getBookedEstampData,
   updateEstampBookingStatus,
+  deleteEstampBooking,
 } from "../../../../api/service/axiosService";
 import Pagination from "./Pagination";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 const EstampBookingTable = () => {
   const navigate = useNavigate();
@@ -20,20 +31,22 @@ const EstampBookingTable = () => {
   const [filterDeliveryType, setFilterDeliveryType] = useState("all");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(15);
 
-  // State for status update modal
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [statusUpdateBooking, setStatusUpdateBooking] = useState(null);
   const [newStatus, setNewStatus] = useState("");
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
 
-  // Utility function to safely display values
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteBookingData, setDeleteBookingData] = useState(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   const safeDisplay = (value, fallback = "N/A") => {
     return value && value.toString().trim() !== "" ? value : fallback;
   };
 
-  // Updated utility function to format date only
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -48,7 +61,6 @@ const EstampBookingTable = () => {
     }
   };
 
-  // New utility function to format time only
   const formatTime = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -63,7 +75,6 @@ const EstampBookingTable = () => {
     }
   };
 
-  // New utility function to format date and time together
   const formatDateTime = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -99,13 +110,12 @@ const EstampBookingTable = () => {
             mobileNumber: safeDisplay(booking.mobileNumber),
             totalAmount: booking.totalAmount || 0,
             orderDate: formatDate(booking.orderDate),
-            orderTime: formatTime(booking.createdAt), // Added time from createdAt
-            createdDateTime: formatDateTime(booking.createdAt), // Added full datetime
+            orderTime: formatTime(booking.createdAt),
+            createdDateTime: formatDateTime(booking.createdAt),
             status: safeDisplay(booking.documentStatus, "Pending"),
             paymentStatus: safeDisplay(booking.paymentStatus, "Pending"),
             paymentId: safeDisplay(booking.razorpayPaymentId),
             deliveryType: safeDisplay(booking.deliveryType),
-            // Additional fields preserved for functionality
             selectedDocumentId: booking.selectedDocumentId || "",
             documentCalculationType: booking.documentCalculationType || "",
             documentFixedAmount: booking.documentFixedAmount || 0,
@@ -141,6 +151,7 @@ const EstampBookingTable = () => {
       } catch (err) {
         console.error("Error fetching e-stamp booking data:", err);
         setError("Failed to load e-stamp booking data");
+        toast.error("Failed to load e-stamp booking data. Please try again.");
         setLoading(false);
       }
     };
@@ -238,8 +249,10 @@ const EstampBookingTable = () => {
 
     try {
       setStatusUpdateLoading(true);
-
-      await updateEstampBookingStatus(statusUpdateBooking._id, newStatus);
+      const response = await updateEstampBookingStatus(
+        statusUpdateBooking._id,
+        newStatus
+      );
 
       const updatedBookings = bookings.map((booking) => {
         if (booking._id === statusUpdateBooking._id) {
@@ -252,11 +265,74 @@ const EstampBookingTable = () => {
       setStatusUpdateLoading(false);
       handleCloseStatusModal();
 
-      alert("Status updated successfully!");
+      toast.success(
+        response?.data?.message ||
+          `Status updated to ${newStatus} successfully!`,
+        {
+          duration: 4000,
+          position: "top-right",
+        }
+      );
     } catch (error) {
       console.error("Error updating status:", error);
       setStatusUpdateLoading(false);
-      alert("Failed to update status. Please try again.");
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to update status. Please try again.",
+        {
+          duration: 4000,
+          position: "top-right",
+        }
+      );
+    }
+  };
+
+  const handleOpenDeleteModal = (booking) => {
+    setDeleteBookingData(booking);
+    setDeleteConfirmText("");
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeleteBookingData(null);
+    setDeleteConfirmText("");
+  };
+
+  const handleDeleteBooking = async () => {
+    if (!deleteBookingData || deleteConfirmText.toLowerCase() !== "delete")
+      return;
+
+    try {
+      setDeleteLoading(true);
+      const response = await deleteEstampBooking(deleteBookingData._id);
+
+      const updatedBookings = bookings.filter(
+        (booking) => booking._id !== deleteBookingData._id
+      );
+
+      setBookings(updatedBookings);
+      setDeleteLoading(false);
+      handleCloseDeleteModal();
+
+      toast.success(
+        response?.data?.message || "E-Stamp booking deleted successfully!",
+        {
+          duration: 4000,
+          position: "top-right",
+        }
+      );
+    } catch (error) {
+      console.error("Error deleting e-stamp booking:", error);
+      setDeleteLoading(false);
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to delete e-stamp booking. Please try again.",
+        {
+          duration: 4000,
+          position: "top-right",
+        }
+      );
     }
   };
 
@@ -330,15 +406,14 @@ const EstampBookingTable = () => {
 
   return (
     <div className="space-y-6 p-6 bg-white rounded-lg shadow">
-      {/* Header Section */}
+      <Toaster />
+
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <h2 className="text-2xl font-bold text-red-900">
           E-Stamp Booking Details
         </h2>
 
-        {/* Search and Filter Controls */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
-          {/* Search Input */}
           <div className="relative w-full sm:w-64">
             <input
               type="text"
@@ -361,7 +436,6 @@ const EstampBookingTable = () => {
             </span>
           </div>
 
-          {/* Filter Controls */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <select
               value={filterStatus}
@@ -374,6 +448,7 @@ const EstampBookingTable = () => {
               <option value="Hold">Put on Hold</option>
               <option value="Cancelled">Cancelled</option>
             </select>
+
             <select
               value={filterPaymentStatus}
               onChange={(e) => setFilterPaymentStatus(e.target.value)}
@@ -405,7 +480,6 @@ const EstampBookingTable = () => {
         </div>
       </div>
 
-      {/* Results Counter */}
       <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
         <Filter size={16} />
         <span>
@@ -418,7 +492,6 @@ const EstampBookingTable = () => {
         </span>
       </div>
 
-      {/* Table Container */}
       <div className="bg-white rounded-lg border border-red-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-[1400px] w-full">
@@ -474,7 +547,7 @@ const EstampBookingTable = () => {
                 </th>
                 <th
                   className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
-                  style={{ minWidth: "180px" }}
+                  style={{ minWidth: "300px" }}
                 >
                   Actions
                 </th>
@@ -487,12 +560,10 @@ const EstampBookingTable = () => {
                     key={booking.id}
                     className="hover:bg-red-50 transition-colors duration-200"
                   >
-                    {/* Serial Number */}
                     <td className="p-3 whitespace-nowrap text-sm text-gray-600 font-medium">
                       {indexOfFirstItem + index + 1}
                     </td>
 
-                    {/* Booking ID & Date/Time - Updated */}
                     <td className="p-3">
                       <div className="space-y-1">
                         <div className="text-sm font-semibold text-red-900 break-all">
@@ -509,7 +580,6 @@ const EstampBookingTable = () => {
                       </div>
                     </td>
 
-                    {/* Party Details - Much Wider Column */}
                     <td className="p-3">
                       <div className="space-y-2">
                         <div className="flex items-start">
@@ -545,7 +615,6 @@ const EstampBookingTable = () => {
                       </div>
                     </td>
 
-                    {/* Document & Service Type */}
                     <td className="p-3">
                       <div className="space-y-1">
                         <div
@@ -569,7 +638,6 @@ const EstampBookingTable = () => {
                       </div>
                     </td>
 
-                    {/* Document Status */}
                     <td className="p-3 whitespace-nowrap">
                       <span
                         className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(
@@ -580,7 +648,6 @@ const EstampBookingTable = () => {
                       </span>
                     </td>
 
-                    {/* Payment Status */}
                     <td className="p-3 whitespace-nowrap">
                       <span
                         className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusBadgeColor(
@@ -591,7 +658,6 @@ const EstampBookingTable = () => {
                       </span>
                     </td>
 
-                    {/* Payment ID */}
                     <td className="p-2">
                       <div
                         className="text-xs font-mono text-gray-700 break-all"
@@ -601,12 +667,10 @@ const EstampBookingTable = () => {
                       </div>
                     </td>
 
-                    {/* Total Amount */}
                     <td className="p-3 whitespace-nowrap text-sm font-semibold text-green-600">
                       {formatAmount(booking.totalAmount)}
                     </td>
 
-                    {/* Actions */}
                     <td className="p-2">
                       <div className="flex gap-2">
                         <button
@@ -619,12 +683,21 @@ const EstampBookingTable = () => {
                         </button>
 
                         <button
-                          className="px-3 py-1.5 bg-purple-50 text-purple-600 rounded-md hover:bg-purple-100 transition-colors flex items-center space-x-1 text-xs border border-purple-200"
+                          className="px-2 py-1.5 bg-purple-50 text-purple-600 rounded-md hover:bg-purple-100 transition-colors flex items-center space-x-1 text-xs border border-purple-200"
                           onClick={() => handleOpenStatusModal(booking)}
                           title="Update Status"
                         >
                           <Edit size={12} />
                           <span className="font-medium">Update</span>
+                        </button>
+
+                        <button
+                          className="px-2 py-1.5 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors flex items-center space-x-1 text-xs border border-red-200"
+                          onClick={() => handleOpenDeleteModal(booking)}
+                          title="Delete Booking"
+                        >
+                          <Trash2 size={12} />
+                          <span className="font-medium">Delete</span>
                         </button>
                       </div>
                     </td>
@@ -651,7 +724,6 @@ const EstampBookingTable = () => {
           </table>
         </div>
 
-        {/* Pagination */}
         {filteredBookings.length > 0 && (
           <div className="border-t border-red-100 bg-red-50/30">
             <Pagination
@@ -668,11 +740,9 @@ const EstampBookingTable = () => {
         )}
       </div>
 
-      {/* Status Update Modal - Optimized */}
       {isStatusModalOpen && statusUpdateBooking && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-            {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h3 className="text-lg font-bold text-red-900">
                 Update E-Stamp Status
@@ -685,7 +755,6 @@ const EstampBookingTable = () => {
               </button>
             </div>
 
-            {/* Content */}
             <div className="p-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -749,7 +818,6 @@ const EstampBookingTable = () => {
               </div>
             </div>
 
-            {/* Footer */}
             <div className="flex justify-end space-x-3 p-4 border-t border-gray-200">
               <button
                 onClick={handleCloseStatusModal}
@@ -773,6 +841,131 @@ const EstampBookingTable = () => {
                   </>
                 ) : (
                   "Update"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDeleteModalOpen && deleteBookingData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-red-50">
+              <div className="flex items-center space-x-2">
+                <div className="bg-red-100 p-2 rounded-full">
+                  <Trash2 size={20} className="text-red-600" />
+                </div>
+                <h3 className="text-lg font-bold text-red-900">
+                  Delete E-Stamp Booking
+                </h3>
+              </div>
+              <button
+                onClick={handleCloseDeleteModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-4 space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-sm text-red-800 font-medium">
+                  ⚠️ Warning: This action cannot be undone!
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-sm text-gray-700">
+                  You are about to delete the following e-stamp booking:
+                </p>
+
+                <div className="bg-gray-50 p-3 rounded-lg space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-xs font-medium text-gray-600">
+                      Booking ID:
+                    </span>
+                    <span className="text-sm font-semibold text-gray-900">
+                      {deleteBookingData.id}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-xs font-medium text-gray-600">
+                      First Party:
+                    </span>
+                    <span className="text-sm text-gray-900">
+                      {deleteBookingData.firstPartyName}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-xs font-medium text-gray-600">
+                      Document:
+                    </span>
+                    <span className="text-sm text-gray-900">
+                      {deleteBookingData.documentType}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-xs font-medium text-gray-600">
+                      Amount:
+                    </span>
+                    <span className="text-sm font-semibold text-green-600">
+                      {formatAmount(deleteBookingData.totalAmount)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Type{" "}
+                  <span className="font-mono bg-gray-100 px-2 py-1 rounded text-red-600">
+                    DELETE
+                  </span>{" "}
+                  to confirm <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="Type DELETE here"
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Please type DELETE (case-insensitive) to enable the delete
+                  button
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 p-4 border-t border-gray-200">
+              <button
+                onClick={handleCloseDeleteModal}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteBooking}
+                disabled={
+                  deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
+                }
+                className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center ${
+                  deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                {deleteLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={16} className="mr-2" />
+                    Delete Booking
+                  </>
                 )}
               </button>
             </div>

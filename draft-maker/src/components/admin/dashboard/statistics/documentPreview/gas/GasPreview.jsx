@@ -1,10 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { getAggrementFormData } from "../../../../../../api/service/axiosService";
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from "docx";
+import {
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  HeadingLevel,
+  AlignmentType,
+} from "docx";
 import { saveAs } from "file-saver";
 import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
-import html2pdf from 'html2pdf.js';
+import html2pdf from "html2pdf.js";
 
 const GasPreview = () => {
   const pdfTemplateRef = useRef(null);
@@ -13,7 +20,7 @@ const GasPreview = () => {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
   const [downloadLoading, setDownloadLoading] = useState(false);
-  const [downloadType, setDownloadType] = useState('');
+  const [downloadType, setDownloadType] = useState("");
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -54,41 +61,48 @@ const GasPreview = () => {
   // PDF Download Function
   const downloadPDF = () => {
     setDownloadLoading(true);
-    setDownloadType('pdf');
-    
+    setDownloadType("pdf");
+
     const element = documentRef.current;
     const opt = {
       margin: [20, 15, 20, 15], // top, left, bottom, right in mm
-      filename: `Gas_Affidavit_${formData.fullName ? formData.fullName.replace(/\s+/g, "_") : "User"}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
+      filename: `Gas_Affidavit_${
+        formData.fullName ? formData.fullName.replace(/\s+/g, "_") : "User"
+      }.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
         scale: 2,
         useCORS: true,
         letterRendering: true,
-        allowTaint: false
+        allowTaint: false,
       },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait',
-        compressPDF: true
-      }
+      jsPDF: {
+        unit: "mm",
+        format: "a4",
+        orientation: "portrait",
+        compressPDF: true,
+      },
     };
 
-    html2pdf().set(opt).from(element).save().then(() => {
-      setDownloadLoading(false);
-      setDownloadType('');
-    }).catch((error) => {
-      console.error('PDF generation failed:', error);
-      setDownloadLoading(false);
-      setDownloadType('');
-    });
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .save()
+      .then(() => {
+        setDownloadLoading(false);
+        setDownloadType("");
+      })
+      .catch((error) => {
+        console.error("PDF generation failed:", error);
+        setDownloadLoading(false);
+        setDownloadType("");
+      });
   };
 
   // Generate Word document
   const generateWordDocument = async () => {
     setDownloadLoading(true);
-    setDownloadType('word');
+    setDownloadType("word");
 
     try {
       // Create structured content for Word document
@@ -97,6 +111,29 @@ const GasPreview = () => {
           <div style="text-align: center; font-weight: bold; font-size: 18pt; margin-bottom: 30px; text-decoration: underline;">
             ${formData.documentType || "GAS AFFIDAVIT"}
           </div>
+           ${
+             formData.firstParty
+               ? `
+      <div style="margin-bottom: 20px; line-height: 1.6;">
+        <p style="margin-bottom: 8px;">
+          <span style="font-size: 12pt;">First Party (Stamp Duty): </span>
+          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+            ${formData.firstParty}
+          </strong>
+        </p>
+        <p style="font-size: 10pt; font-style: italic; margin-bottom: 16px;">
+          (Responsible for payment of stamp duty charges as per applicable state regulations)
+        </p>
+        <p style="margin-bottom: 16px;">
+          <span style="font-size: 12pt;">Second Party: </span>
+          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+            ${formData.secondParty}
+          </strong>
+        </p>
+      </div>
+    `
+               : ""
+           }
 
           <p style="margin-bottom: 16px; line-height: 1.6;">
             I, 
@@ -156,7 +193,10 @@ const GasPreview = () => {
                 </strong> 
                 I was issued with Subscription Voucher No 
                 <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData?.subscriptionVoucher || "..........................."}
+                  ${
+                    formData?.subscriptionVoucher ||
+                    "..........................."
+                  }
                 </strong> 
                 by M/s 
                 <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
@@ -185,16 +225,18 @@ const GasPreview = () => {
               </li>
 
               <li style="margin-bottom: 16px; counter-increment: item; display: block; padding-left: 1.5em; line-height: 1.6;">
-                ${formData?.reason === "shifting" ? 
-                  "That I want to return the Subscription Voucher along with the cylinder(s) and regulator as I am shifting my residence from this town and want to terminate the agreement with the above mentioned Corporation." :
-                  "That I want to terminate the agreement with the above mentioned distributor."
+                ${
+                  formData?.reason === "shifting"
+                    ? "That I want to return the Subscription Voucher along with the cylinder(s) and regulator as I am shifting my residence from this town and want to terminate the agreement with the above mentioned Corporation."
+                    : "That I want to terminate the agreement with the above mentioned distributor."
                 }
               </li>
 
               <li style="margin-bottom: 16px; counter-increment: item; display: block; padding-left: 1.5em; line-height: 1.6;">
-                ${formData?.lostItem === "subscription" ?
-                  "That I am not able to produce the Subscription Voucher along with the cylinder and regulator to obtain the refundable deposit as it is misplaced / lost." :
-                  "That I am not able to produce the Termination Voucher as it misplaced / lost."
+                ${
+                  formData?.lostItem === "subscription"
+                    ? "That I am not able to produce the Subscription Voucher along with the cylinder and regulator to obtain the refundable deposit as it is misplaced / lost."
+                    : "That I am not able to produce the Termination Voucher as it misplaced / lost."
                 }
               </li>
 
@@ -301,25 +343,27 @@ const GasPreview = () => {
 
       // Create blob and download
       const blob = new Blob([wordDocument], {
-        type: 'application/msword'
+        type: "application/msword",
       });
-      
+
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `Gas_Affidavit_${formData.fullName ? formData.fullName.replace(/\s+/g, "_") : "User"}.doc`;
+      link.download = `Gas_Affidavit_${
+        formData.fullName ? formData.fullName.replace(/\s+/g, "_") : "User"
+      }.doc`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      
+
       setDownloadLoading(false);
-      setDownloadType('');
+      setDownloadType("");
     } catch (error) {
       console.error("Error generating Word document:", error);
       alert("Failed to generate Word document. Please try again.");
       setDownloadLoading(false);
-      setDownloadType('');
+      setDownloadType("");
     }
   };
 
@@ -348,7 +392,7 @@ const GasPreview = () => {
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center transition-colors duration-300"
           disabled={downloadLoading}
         >
-          {downloadLoading && downloadType === 'pdf' ? (
+          {downloadLoading && downloadType === "pdf" ? (
             <div className="flex items-center">
               <svg
                 className="animate-spin h-5 w-5 mr-2 text-white"
@@ -398,7 +442,7 @@ const GasPreview = () => {
           className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md flex items-center transition-colors duration-300"
           disabled={downloadLoading}
         >
-          {downloadLoading && downloadType === 'word' ? (
+          {downloadLoading && downloadType === "word" ? (
             <div className="flex items-center">
               <svg
                 className="animate-spin h-5 w-5 mr-2 text-white"
@@ -446,10 +490,7 @@ const GasPreview = () => {
 
       {/* Single page preview with continuous content */}
       <div className="bg-white border border-gray-300 shadow font-serif w-full max-w-3xl">
-        <div 
-          ref={documentRef}
-          className="relative p-8"
-        >
+        <div ref={documentRef} className="relative p-8">
           {/* Corner marks */}
           <div className="absolute top-0 left-0 border-t border-l w-4 h-4 border-gray-400"></div>
           <div className="absolute top-0 right-0 border-t border-r w-4 h-4 border-gray-400"></div>
@@ -458,21 +499,70 @@ const GasPreview = () => {
 
           {/* Content */}
           <div>
-            <h1 className="text-center font-bold text-xl mb-6 underline">{formData.documentType}</h1>
+            <h1 className="text-center font-bold text-xl mb-6 underline">
+              {formData.documentType}
+            </h1>
+            {formData.firstParty && (
+              <>
+                <div className="mb-5 text-justify leading-relaxed">
+                  <span className="font-lg">
+                    First Party (Stamp Duty):{" "}
+                    <span className="font-bold">{formData.firstParty}</span>
+                  </span>
+
+                  <br />
+                  <span className="text-sm italic">
+                    (Responsible for payment of stamp duty charges as per
+                    applicable state regulations)
+                  </span>
+                </div>
+                <div className="mb-5 text-justify leading-relaxed">
+                  <span className="font-lg">
+                    Second Party :{" "}
+                    <span className="font-bold">{formData.secondParty}</span>
+                  </span>
+                </div>
+              </>
+            )}
 
             <p className="mb-4">
               I,{" "}
-              <span className={isFilled(formData?.fullName) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+              <span
+                className={
+                  isFilled(formData?.fullName)
+                    ? "font-bold form-data"
+                    : "bg-yellow-200 px-1 font-bold form-data"
+                }
+              >
                 {formData?.fullName || "..........................."}
               </span>{" "}
-              <span className={isFilled(formData?.relation) ? "form-data" : "bg-yellow-200 px-1 form-data"}>
+              <span
+                className={
+                  isFilled(formData?.relation)
+                    ? "form-data"
+                    : "bg-yellow-200 px-1 form-data"
+                }
+              >
                 {formData?.relation || "..."}
-              </span>,
-              <span className={isFilled(formData?.fatherName) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+              </span>
+              ,
+              <span
+                className={
+                  isFilled(formData?.fatherName)
+                    ? "font-bold form-data"
+                    : "bg-yellow-200 px-1 font-bold form-data"
+                }
+              >
                 {formData?.fatherName || "..........................."}
               </span>{" "}
               Aged:{" "}
-              <span className={isFilled(formData?.age?.toString()) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+              <span
+                className={
+                  isFilled(formData?.age?.toString())
+                    ? "font-bold form-data"
+                    : "bg-yellow-200 px-1 font-bold form-data"
+                }
+              >
                 {formData?.age || "..."}
               </span>{" "}
               Years,
@@ -480,65 +570,142 @@ const GasPreview = () => {
 
             <p className="mb-4">
               Permanent Address{" "}
-              <span className={isFilled(formData?.permanentAddress) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+              <span
+                className={
+                  isFilled(formData?.permanentAddress)
+                    ? "font-bold form-data"
+                    : "bg-yellow-200 px-1 font-bold form-data"
+                }
+              >
                 {formData?.permanentAddress || "..........................."}
               </span>
             </p>
 
             <p className="mb-4">
               My Aadhaar No:{" "}
-              <span className={isFilled(formData?.aadhaarNo) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+              <span
+                className={
+                  isFilled(formData?.aadhaarNo)
+                    ? "font-bold form-data"
+                    : "bg-yellow-200 px-1 font-bold form-data"
+                }
+              >
                 {formData?.aadhaarNo || "..........................."}
               </span>
             </p>
 
-            <p className="mb-4 font-bold">Do hereby solemnly affirm and declare as under:</p>
+            <p className="mb-4 font-bold">
+              Do hereby solemnly affirm and declare as under:
+            </p>
 
             <ol className="list-decimal pl-6 space-y-4">
               <li>
                 That I am / was a consumer of{" "}
-                <span className={isFilled(formData?.gasCompanyName) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+                <span
+                  className={
+                    isFilled(formData?.gasCompanyName)
+                      ? "font-bold form-data"
+                      : "bg-yellow-200 px-1 font-bold form-data"
+                  }
+                >
                   {formData?.gasCompanyName || "..........................."}
                 </span>{" "}
                 for domestic use at the following address{" "}
-                <span className={isFilled(formData?.serviceAddress) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+                <span
+                  className={
+                    isFilled(formData?.serviceAddress)
+                      ? "font-bold form-data"
+                      : "bg-yellow-200 px-1 font-bold form-data"
+                  }
+                >
                   {formData?.serviceAddress || "..........................."}
                 </span>{" "}
                 since{" "}
-                <span className={isFilled(formData?.connectionDate) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+                <span
+                  className={
+                    isFilled(formData?.connectionDate)
+                      ? "font-bold form-data"
+                      : "bg-yellow-200 px-1 font-bold form-data"
+                  }
+                >
                   {formatDate(formData?.connectionDate)}
                 </span>
                 <p className="mt-2">
                   My consumer number is / was{" "}
-                  <span className={isFilled(formData?.consumerNumber) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+                  <span
+                    className={
+                      isFilled(formData?.consumerNumber)
+                        ? "font-bold form-data"
+                        : "bg-yellow-200 px-1 font-bold form-data"
+                    }
+                  >
                     {formData?.consumerNumber || "..........................."}
                   </span>{" "}
                   I was issued with Subscription Voucher No{" "}
-                  <span className={isFilled(formData?.subscriptionVoucher) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
-                    {formData?.subscriptionVoucher || "..........................."}
+                  <span
+                    className={
+                      isFilled(formData?.subscriptionVoucher)
+                        ? "font-bold form-data"
+                        : "bg-yellow-200 px-1 font-bold form-data"
+                    }
+                  >
+                    {formData?.subscriptionVoucher ||
+                      "..........................."}
                   </span>{" "}
                   by M/s{" "}
-                  <span className={isFilled(formData?.gasCompanyName) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+                  <span
+                    className={
+                      isFilled(formData?.gasCompanyName)
+                        ? "font-bold form-data"
+                        : "bg-yellow-200 px-1 font-bold form-data"
+                    }
+                  >
                     {formData?.gasCompanyName || "..........................."}
                   </span>{" "}
                   towards{" "}
-                  <span className={isFilled(formData?.cylinderCount?.toString()) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+                  <span
+                    className={
+                      isFilled(formData?.cylinderCount?.toString())
+                        ? "font-bold form-data"
+                        : "bg-yellow-200 px-1 font-bold form-data"
+                    }
+                  >
                     {formData?.cylinderCount || "..."}
                   </span>{" "}
                   Gas cylinder and{" "}
-                  <span className={isFilled(formData?.regulatorCount?.toString()) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+                  <span
+                    className={
+                      isFilled(formData?.regulatorCount?.toString())
+                        ? "font-bold form-data"
+                        : "bg-yellow-200 px-1 font-bold form-data"
+                    }
+                  >
                     {formData?.regulatorCount || "..."}
                   </span>{" "}
-                  regulator on loan for my use against the refundable deposit of Rs{" "}
-                  <span className={isFilled(formData?.depositAmount?.toString()) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+                  regulator on loan for my use against the refundable deposit of
+                  Rs{" "}
+                  <span
+                    className={
+                      isFilled(formData?.depositAmount?.toString())
+                        ? "font-bold form-data"
+                        : "bg-yellow-200 px-1 font-bold form-data"
+                    }
+                  >
                     {formData?.depositAmount || "..."}
                   </span>
                 </p>
               </li>
 
               <li>
-                That I was given the gas cylinder and a regulator when I was residing in{" "}
-                <span className={isFilled(formData?.previousAddress) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+                That I was given the gas cylinder and a regulator when I was
+                residing in{" "}
+                <span
+                  className={
+                    isFilled(formData?.previousAddress)
+                      ? "font-bold form-data"
+                      : "bg-yellow-200 px-1 font-bold form-data"
+                  }
+                >
                   {formData?.previousAddress || "..........................."}
                 </span>{" "}
                 Thereafter, I shifted to my above mentioned residence.
@@ -547,11 +714,15 @@ const GasPreview = () => {
               <li>
                 {formData?.reason === "shifting" ? (
                   <p>
-                    That I want to return the Subscription Voucher along with the cylinder(s) and regulator as I am shifting my residence from this town and want to terminate the agreement with the above mentioned Corporation.
+                    That I want to return the Subscription Voucher along with
+                    the cylinder(s) and regulator as I am shifting my residence
+                    from this town and want to terminate the agreement with the
+                    above mentioned Corporation.
                   </p>
                 ) : (
                   <p>
-                    That I want to terminate the agreement with the above mentioned distributor.
+                    That I want to terminate the agreement with the above
+                    mentioned distributor.
                   </p>
                 )}
               </li>
@@ -559,46 +730,81 @@ const GasPreview = () => {
               <li>
                 {formData?.lostItem === "subscription" ? (
                   <p>
-                    That I am not able to produce the Subscription Voucher along with the cylinder and regulator to obtain the refundable deposit as it is misplaced / lost.
+                    That I am not able to produce the Subscription Voucher along
+                    with the cylinder and regulator to obtain the refundable
+                    deposit as it is misplaced / lost.
                   </p>
                 ) : (
                   <p>
-                    That I am not able to produce the Termination Voucher as it misplaced / lost.
+                    That I am not able to produce the Termination Voucher as it
+                    misplaced / lost.
                   </p>
                 )}
               </li>
 
               <li>
-                That I have not assigned or transferred the Subscription Voucher / Termination Voucher to any person whomsoever.
+                That I have not assigned or transferred the Subscription Voucher
+                / Termination Voucher to any person whomsoever.
               </li>
 
               <li>
-                That I undertake to return forthwith the above referred Subscription Voucher / Termination Voucher to M/s. Hindustan Petroleum Corporation Ltd. if found at any time in the future.
+                That I undertake to return forthwith the above referred
+                Subscription Voucher / Termination Voucher to M/s. Hindustan
+                Petroleum Corporation Ltd. if found at any time in the future.
               </li>
 
               <li>
-                That I shall be liable to M/s. Hindustan Petroleum Corporation Ltd. for any loss or expense incurred by them if any one produces the above referred Subscription Voucher / Termination Voucher to claim any amount from the Corporation.
+                That I shall be liable to M/s. Hindustan Petroleum Corporation
+                Ltd. for any loss or expense incurred by them if any one
+                produces the above referred Subscription Voucher / Termination
+                Voucher to claim any amount from the Corporation.
               </li>
             </ol>
 
             <div className="mt-12">
               <p>
                 Verified at{" "}
-                <span className={isFilled(formData?.place) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+                <span
+                  className={
+                    isFilled(formData?.place)
+                      ? "font-bold form-data"
+                      : "bg-yellow-200 px-1 font-bold form-data"
+                  }
+                >
                   {formData?.place || "..........................."}
                 </span>{" "}
                 on this{" "}
-                <span className={isFilled(formData?.day) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+                <span
+                  className={
+                    isFilled(formData?.day)
+                      ? "font-bold form-data"
+                      : "bg-yellow-200 px-1 font-bold form-data"
+                  }
+                >
                   {getDayWithSuffix(formData?.day) || "..."}
                 </span>{" "}
                 day of{" "}
-                <span className={isFilled(formData?.month) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+                <span
+                  className={
+                    isFilled(formData?.month)
+                      ? "font-bold form-data"
+                      : "bg-yellow-200 px-1 font-bold form-data"
+                  }
+                >
                   {formData?.month || "..."}
-                </span>,{" "}
-                <span className={isFilled(formData?.year) ? "font-bold form-data" : "bg-yellow-200 px-1 font-bold form-data"}>
+                </span>
+                ,{" "}
+                <span
+                  className={
+                    isFilled(formData?.year)
+                      ? "font-bold form-data"
+                      : "bg-yellow-200 px-1 font-bold form-data"
+                  }
+                >
                   {formData?.year || "..."}
                 </span>{" "}
-                that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.
+                that the contents of the above said affidavit are true and
+                correct to the best of my knowledge and belief.
               </p>
             </div>
 
@@ -646,7 +852,8 @@ const GasPreview = () => {
 
         /* Transition effects */
         .transition-colors {
-          transition-property: background-color, border-color, color, fill, stroke;
+          transition-property: background-color, border-color, color, fill,
+            stroke;
           transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
           transition-duration: 300ms;
         }

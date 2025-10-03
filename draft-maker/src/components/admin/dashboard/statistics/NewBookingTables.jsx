@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Eye, X, Search, Filter, Calendar, Edit, File } from "lucide-react";
+import {
+  Eye,
+  X,
+  Search,
+  Filter,
+  Calendar,
+  Edit,
+  File,
+  Trash2,
+} from "lucide-react";
 import {
   getAllBookingData,
   updateBookingStatus,
+  deleteBooking,
 } from "../../../../api/service/axiosService";
 import Pagination from "./Pagination";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 const BookingTable = () => {
   const navigate = useNavigate();
@@ -19,15 +30,21 @@ const BookingTable = () => {
   const [filterPaymentStatus, setFilterPaymentStatus] = useState("all");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(15);
 
   const [selectedBooking, setSelectedBooking] = useState(null);
 
-  // State for modal
+  // State for status update modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [statusUpdateBooking, setStatusUpdateBooking] = useState(null);
   const [newStatus, setNewStatus] = useState("");
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
+
+  // State for delete modal
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteBookingData, setDeleteBookingData] = useState(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Utility function to format date in human-readable format
   const formatDate = (dateString) => {
@@ -65,7 +82,7 @@ const BookingTable = () => {
       if (dateString.includes("-") && dateString.split("-").length === 3) {
         const parts = dateString.split(" ");
         const [day, month, year] = parts[0].split("-");
-        const time = parts.slice(1).join(" "); // Handle "09:50:01 PM"
+        const time = parts.slice(1).join(" ");
         const fullDateStr = `${month}/${day}/${year} ${time}`;
         date = new Date(fullDateStr);
       } else {
@@ -119,6 +136,7 @@ const BookingTable = () => {
       } catch (err) {
         console.error("Error fetching booking data:", err);
         setError("Failed to load booking data");
+        toast.error("Failed to load booking data. Please try again.");
         setLoading(false);
       }
     };
@@ -195,10 +213,11 @@ const BookingTable = () => {
     try {
       setStatusUpdateLoading(true);
 
-      // Call your API to update the status
-      await updateBookingStatus(statusUpdateBooking._id, newStatus);
+      const response = await updateBookingStatus(
+        statusUpdateBooking._id,
+        newStatus
+      );
 
-      // Update the local state
       const updatedBookings = bookings.map((booking) => {
         if (booking._id === statusUpdateBooking._id) {
           return { ...booking, status: newStatus };
@@ -210,12 +229,82 @@ const BookingTable = () => {
       setStatusUpdateLoading(false);
       handleCloseModal();
 
-      // Optional: Show success message
-      alert("Status updated successfully!");
+      // Success toast
+      toast.success(
+        response?.data?.message ||
+          `Status updated to ${newStatus} successfully!`,
+        {
+          duration: 4000,
+          position: "top-right",
+        }
+      );
     } catch (error) {
       console.error("Error updating status:", error);
       setStatusUpdateLoading(false);
-      alert("Failed to update status. Please try again.");
+
+      // Error toast
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to update status. Please try again.",
+        {
+          duration: 4000,
+          position: "top-right",
+        }
+      );
+    }
+  };
+
+  // Delete Modal Handlers
+  const handleOpenDeleteModal = (booking) => {
+    setDeleteBookingData(booking);
+    setDeleteConfirmText("");
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeleteBookingData(null);
+    setDeleteConfirmText("");
+  };
+
+  const handleDeleteBooking = async () => {
+    if (!deleteBookingData || deleteConfirmText.toLowerCase() !== "delete")
+      return;
+
+    try {
+      setDeleteLoading(true);
+
+      const response = await deleteBooking(deleteBookingData._id);
+
+      const updatedBookings = bookings.filter(
+        (booking) => booking._id !== deleteBookingData._id
+      );
+
+      setBookings(updatedBookings);
+      setDeleteLoading(false);
+      handleCloseDeleteModal();
+
+      // Success toast
+      toast.success(
+        response?.data?.message || "Booking deleted successfully!",
+        {
+          duration: 4000,
+          position: "top-right",
+        }
+      );
+    } catch (error) {
+      console.error("Error deleting booking:", error);
+      setDeleteLoading(false);
+
+      // Error toast
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to delete booking. Please try again.",
+        {
+          duration: 4000,
+          position: "top-right",
+        }
+      );
     }
   };
 
@@ -247,6 +336,7 @@ const BookingTable = () => {
         return "bg-gray-100 text-gray-800 border border-gray-200";
     }
   };
+
   const getPaymentStatusColor = (status) => {
     switch ((status || "").toLowerCase()) {
       case "success":
@@ -280,6 +370,9 @@ const BookingTable = () => {
 
   return (
     <div className="space-y-6 p-6 bg-white rounded-lg shadow">
+      {/* Toast Container */}
+      <Toaster />
+
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <h2 className="text-2xl font-bold text-red-900">Booking Details</h2>
@@ -406,7 +499,7 @@ const BookingTable = () => {
                 </th>
                 <th
                   className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
-                  style={{ minWidth: "200px" }}
+                  style={{ minWidth: "420px" }}
                 >
                   Actions
                 </th>
@@ -499,7 +592,7 @@ const BookingTable = () => {
                     </td>
 
                     {/* Actions */}
-                    <td className="p-3 whitespace-nowrap">
+                    <td className="p-3">
                       <div className="flex space-x-2">
                         <button
                           className="px-2 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors flex items-center space-x-1"
@@ -530,6 +623,15 @@ const BookingTable = () => {
                         >
                           <Edit size={14} />
                           <span className="text-xs font-medium">Update</span>
+                        </button>
+
+                        <button
+                          className="px-2 py-1 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors flex items-center space-x-1"
+                          onClick={() => handleOpenDeleteModal(booking)}
+                          title="Delete Booking"
+                        >
+                          <Trash2 size={14} />
+                          <span className="text-xs font-medium">Delete</span>
                         </button>
                       </div>
                     </td>
@@ -623,21 +725,21 @@ const BookingTable = () => {
               </div>
 
               <div>
-  <label className="block text-sm font-medium text-gray-700 mb-2">
-    Update Status <span className="text-red-500">*</span>
-  </label>
-  <select
-    value={newStatus}
-    onChange={(e) => setNewStatus(e.target.value)}
-    className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-  >
-    <option value="">Select new status</option>
-    <option value="Processing">Processing</option>
-    <option value="Delivered">Deliver/Completed</option>
-    <option value="Hold">Put on Hold</option>
-    <option value="Cancelled">Cancelled</option>
-  </select>
-</div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Update Status <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                >
+                  <option value="">Select new status</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Delivered">Deliver/Completed</option>
+                  <option value="Hold">Put on Hold</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
             </div>
 
             {/* Footer */}
@@ -664,6 +766,127 @@ const BookingTable = () => {
                   </>
                 ) : (
                   "Update"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && deleteBookingData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-red-50">
+              <div className="flex items-center space-x-2">
+                <div className="bg-red-100 p-2 rounded-full">
+                  <Trash2 size={20} className="text-red-600" />
+                </div>
+                <h3 className="text-lg font-bold text-red-900">
+                  Delete Booking
+                </h3>
+              </div>
+              <button
+                onClick={handleCloseDeleteModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-4 space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-sm text-red-800 font-medium">
+                  ⚠️ Warning: This action cannot be undone!
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-sm text-gray-700">
+                  You are about to delete the following booking:
+                </p>
+
+                <div className="bg-gray-50 p-3 rounded-lg space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-xs font-medium text-gray-600">
+                      Booking ID:
+                    </span>
+                    <span className="text-sm font-semibold text-gray-900">
+                      {deleteBookingData.id}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-xs font-medium text-gray-600">
+                      Customer:
+                    </span>
+                    <span className="text-sm text-gray-900">
+                      {deleteBookingData.name}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-xs font-medium text-gray-600">
+                      Document:
+                    </span>
+                    <span className="text-sm text-gray-900">
+                      {deleteBookingData.documentType}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Type{" "}
+                  <span className="font-mono bg-gray-100 px-2 py-1 rounded text-red-600">
+                    DELETE
+                  </span>{" "}
+                  to confirm <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="Type DELETE here"
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Please type DELETE (case-insensitive) to enable the delete
+                  button
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end space-x-3 p-4 border-t border-gray-200">
+              <button
+                onClick={handleCloseDeleteModal}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteBooking}
+                disabled={
+                  deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
+                }
+                className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center ${
+                  deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                {deleteLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={16} className="mr-2" />
+                    Delete Booking
+                  </>
                 )}
               </button>
             </div>

@@ -1,4 +1,15 @@
 const JoinKhataTransferForm = ({ formData, handleChange }) => {
+  const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 py-3 px-3 sm:px-4 lg:px-6">
       <div className="max-w-7xl mx-auto">
@@ -18,10 +29,12 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
           {/* First Applicant Section - Compact */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
             <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
-              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">1</span>
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                1
+              </span>
               First Applicant
             </h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
@@ -39,7 +52,8 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
 
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
-                  Relation (D/o, S/o, W/o, H/o) <span className="text-red-500">*</span>
+                  Relation (D/o, S/o, W/o, H/o){" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -98,10 +112,12 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
           {/* Second Applicant Section - Compact */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
             <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
-              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">2</span>
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                2
+              </span>
               Second Applicant
             </h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
@@ -119,7 +135,8 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
 
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
-                  Relation (D/o, S/o, W/o, H/o) <span className="text-red-500">*</span>
+                  Relation (D/o, S/o, W/o, H/o){" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -178,10 +195,12 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
           {/* Property Details Section - Compact */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
             <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
-              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">3</span>
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                3
+              </span>
               Property Details
             </h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
@@ -244,7 +263,8 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
 
                 <div>
                   <label className="block text-sm font-semibold text-red-600 mb-1">
-                    SAS Application Number <span className="text-red-500">*</span>
+                    SAS Application Number{" "}
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -262,13 +282,16 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
           {/* Authorization Section - Compact */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
             <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
-              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">4</span>
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                4
+              </span>
               Authorization
             </h2>
-            
+
             <div>
               <label className="block text-sm font-semibold text-red-600 mb-1">
-                Name of Authorized Person for e-signing <span className="text-red-500">*</span>
+                Name of Authorized Person for e-signing{" "}
+                <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -280,14 +303,70 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
               />
             </div>
           </div>
+          {/* Party Names & Stamp Duty Section */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                📄
+              </span>
+              Party Names & Stamp Duty
+            </h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Who will pay the Stamp Duty?{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="firstParty"
+                  value={formData.firstParty}
+                  onChange={handlePartyNameChange}
+                  maxLength={50}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  placeholder="Enter first party name (letters, spaces, commas only)"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {formData.firstParty?.length || 0}/50 characters
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Second Party Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="secondParty"
+                  value={formData.secondParty}
+                  onChange={handlePartyNameChange}
+                  maxLength={50}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  placeholder="Enter second party name (letters, spaces, commas only)"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {formData.secondParty?.length || 0}/50 characters
+                </p>
+              </div>
+
+              <p className="text-xs text-red-600 italic">
+                ℹ️ Please enter the names of both parties to the agreement. Only
+                letters, spaces, and commas are allowed (max 50 characters
+                each).
+              </p>
+            </div>
+          </div>
 
           {/* Verification Details Section - Compact */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
             <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
-              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">5</span>
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                5
+              </span>
               Verification Details
             </h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">

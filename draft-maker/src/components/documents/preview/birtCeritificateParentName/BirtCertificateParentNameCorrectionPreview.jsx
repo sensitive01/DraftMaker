@@ -49,6 +49,28 @@ const BirthCertificateParentNameCorrectionPreview = ({ formData }) => {
             <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-center underline mb-4 sm:mb-6 md:mb-8">
               AFFIDAVIT
             </h2>
+            {formData.firstParty && (
+              <>
+                <div className="mb-5 text-justify leading-relaxed">
+                  <span className="font-lg">
+                    First Party (Stamp Duty):{" "}
+                    <span className="font-bold">{formData.firstParty}</span>
+                  </span>
+
+                  <br />
+                  <span className="text-sm italic">
+                    (Responsible for payment of stamp duty charges as per
+                    applicable state regulations)
+                  </span>
+                </div>
+                <div className="mb-5 text-justify leading-relaxed">
+                  <span className="font-lg">
+                    Second Party :{" "}
+                    <span className="font-bold">{formData.secondParty}</span>
+                  </span>
+                </div>
+              </>
+            )}
 
             <p className="leading-relaxed text-justify break-words">
               We, {formData.fatherTitle}{" "}

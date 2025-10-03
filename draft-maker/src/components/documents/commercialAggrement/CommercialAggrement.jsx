@@ -106,7 +106,9 @@ export default function CommercialAggrement() {
         commercialType: "",
         squareFeet: "",
         additionaldetails: "",
-        propertyAddress:""
+        propertyAddress: "",
+        firstParty: "",
+        secondParty: "",
       };
     }
   };
@@ -265,6 +267,14 @@ export default function CommercialAggrement() {
       parseFloat(formData.depositAmount) <= 0
     ) {
       setValidationError("Please enter a valid deposit amount");
+      return false;
+    }
+    if (!formData.firstParty) {
+      setValidationError("Please enter who will pay the stamp duty");
+      return false;
+    }
+    if (!formData.secondParty) {
+      setValidationError("Please enter the second party details");
       return false;
     }
     if (!formData.depositAmountWords.trim()) {

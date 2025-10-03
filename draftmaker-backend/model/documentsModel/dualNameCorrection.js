@@ -44,10 +44,10 @@ const serviceDetailsSchema = new mongoose.Schema(
 // ✅ Additional documents subschema
 const additionalDocumentSchema = new mongoose.Schema(
   {
-    id: { type: Number, },
-    name: { type: String, },
-    document: { type: String, },
-    documentNo: { type: String, },
+    id: { type: Number },
+    name: { type: String },
+    document: { type: String },
+    documentNo: { type: String },
   },
   { _id: false }
 );
@@ -62,23 +62,23 @@ const dualNameCorrection = new mongoose.Schema(
     docId: String,
     documentType: String,
 
-    namePrefix: { type: String, },
-    fullName: { type: String, },
+    namePrefix: { type: String },
+    fullName: { type: String },
     relation: { type: String, default: "S/o" },
     relationNamePrefix: String,
-    relationName: { type: String, },
-    age: { type: Number, },
-    permanentAddress: { type: String, },
-    aadhaarNo: { type: String, },
-    mobileNumber: { type: String, },
+    relationName: { type: String },
+    age: { type: Number },
+    permanentAddress: { type: String },
+    aadhaarNo: { type: String },
+    mobileNumber: { type: String },
 
     // Old single documents (optional – you can remove if only array is used)
-    name1: { type: String, },
-    document1: { type: String, },
-    documentNo1: { type: String, },
-    name2: { type: String, },
-    document2: { type: String, },
-    documentNo2: { type: String, },
+    name1: { type: String },
+    document1: { type: String },
+    documentNo1: { type: String },
+    name2: { type: String },
+    document2: { type: String },
+    documentNo2: { type: String },
 
     // ✅ New field for multiple documents
     additionalDocuments: {
@@ -86,9 +86,9 @@ const dualNameCorrection = new mongoose.Schema(
       default: [],
     },
 
-    place: { type: String, },
-    day: { type: String, },
-    month: { type: String, },
+    place: { type: String },
+    day: { type: String },
+    month: { type: String },
     year: { type: String, default: "2025" },
 
     doumentStatus: { type: String, default: "Pending" },
@@ -116,6 +116,8 @@ const dualNameCorrection = new mongoose.Schema(
       email: String,
     },
     email: String,
+    firstParty: { type: String },
+    secondParty: { type: String },
   },
   { timestamps: true }
 );

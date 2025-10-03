@@ -3643,7 +3643,128 @@ const updateDocumentPreviewData = async (req, res) => {
   }
 };
 
+const deleteBookingData = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+
+    if (!bookingId) {
+      return res.status(400).json({ message: "Booking ID is required" });
+    }
+
+    const collections = [
+      dualNameCorrection,
+      nameCorrection,
+      dobCorrection,
+      GasFormData,
+      documentLost,
+      dobParentNameCorrection,
+      birthCertificateNameCorrection,
+      gstSchema,
+      metriculationLost,
+      khataCorrection,
+      vehicleInsurence,
+      hufSchema,
+      gapPeriodSchema,
+      passportAnnaxure,
+      passportNameChange,
+      adressAffadavit,
+      commercialSchema,
+      recidentialSchema,
+      uploadDocument,
+      eStampPaymentData,
+    ];
+
+    let deleted = null;
+
+    for (const collection of collections) {
+      deleted = await collection.findByIdAndDelete(bookingId);
+      if (deleted) break;
+    }
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    res.status(200).json({
+      message: "Booking deleted successfully",
+      data: deleted,
+    });
+  } catch (err) {
+    console.error("Error deleting booking:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const deleteStampBookingData = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    console.log("bookingId", bookingId);
+
+    if (!bookingId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Booking ID is required" });
+    }
+
+    const stampData = await eStampPaymentData.findOneAndDelete({
+      _id: bookingId,
+    });
+
+    if (!stampData) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Booking not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Booking deleted successfully",
+      data: stampData,
+    });
+  } catch (err) {
+    console.error("Error deleting booking:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+const deleteUploadingBookingData = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    console.log("bookingId", bookingId);
+
+    if (!bookingId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Booking ID is required" });
+    }
+
+    const stampData = await uploadDocument.findOneAndDelete({ _id: bookingId });
+
+    if (!stampData) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Booking not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Booking deleted successfully",
+      data: stampData,
+    });
+  } catch (err) {
+    console.error("Error deleting booking:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 module.exports = {
+  deleteUploadingBookingData,
+  deleteStampBookingData,
+  deleteBookingData,
   updateDocumentPreviewData,
   getDocumentPreviewData,
   getBookingDataPreview,

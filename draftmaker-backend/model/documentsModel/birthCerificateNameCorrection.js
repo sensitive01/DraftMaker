@@ -122,6 +122,8 @@ const nameCorrectionFormSchema = new mongoose.Schema(
       email: { type: String },
     },
     email: { type: String },
+    firstParty: { type: String },
+    secondParty: { type: String },
   },
   {
     timestamps: true,

@@ -32,15 +32,37 @@ export default function AffidavitDisplay({ data, onEdit }) {
   };
 
   return (
-<div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
       {/* Affidavit content */}
       <div className="print-container p-2 sm:p-4 md:p-6 lg:p-8 border border-gray-300 rounded-lg relative">
         {/* Watermark */}
         <div className="watermark">INTERNAL PURPOSE ONLY</div>
 
         <h2 className="text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6 underline font-serif tracking-wide">
-          AFFIDAVIT
+          GAP PERIOD PREVIEW
         </h2>
+        {data.firstParty && (
+          <>
+            <div className="mb-5 text-justify leading-relaxed">
+              <span className="font-lg">
+                First Party (Stamp Duty):{" "}
+                <span className="font-bold">{data.firstParty}</span>
+              </span>
+
+              <br />
+              <span className="text-sm italic">
+                (Responsible for payment of stamp duty charges as per applicable
+                state regulations)
+              </span>
+            </div>
+            <div className="mb-5 text-justify leading-relaxed">
+              <span className="font-lg">
+                Second Party :{" "}
+                <span className="font-bold">{data.secondParty}</span>
+              </span>
+            </div>
+          </>
+        )}
 
         <p className="mb-3 sm:mb-4 font-serif text-sm sm:text-base leading-relaxed">
           I,{" "}
@@ -126,7 +148,9 @@ export default function AffidavitDisplay({ data, onEdit }) {
                       </td>
                       <td className="border border-gray-400 px-1 sm:px-3 py-2">
                         {period.reason ? (
-                          <span className="block break-words">{period.reason}</span>
+                          <span className="block break-words">
+                            {period.reason}
+                          </span>
                         ) : (
                           <span className="bg-yellow-100 px-1 block text-center">
                             ________
@@ -207,27 +231,28 @@ export default function AffidavitDisplay({ data, onEdit }) {
             margin: 0;
             max-width: 100%;
           }
-          
+
           .rounded-lg {
             border-radius: 0.25rem;
           }
-          
+
           .shadow-md {
             box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
           }
-          
+
           table {
             font-size: 0.65rem;
           }
-          
-          th, td {
+
+          th,
+          td {
             padding: 0.25rem 0.25rem;
           }
-          
+
           .watermark {
             font-size: 1.25rem;
           }
-          
+
           .print-container {
             padding: 0.5rem;
           }

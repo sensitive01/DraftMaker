@@ -39,6 +39,8 @@ const AddressAffidavit = () => {
     purposeOfAffidavit: "",
     date: "",
     place: "",
+    firstParty: "",
+    secondParty: "",
   };
 
   // Load saved data or use initial data
@@ -145,6 +147,14 @@ const AddressAffidavit = () => {
 
     if (!formData.presentAddress.line1.trim()) {
       setValidationError("Please enter your present address line 1");
+      return false;
+    }
+    if (!formData.firstParty) {
+      setValidationError("Please enter who will pay the stamp duty");
+      return false;
+    }
+    if (!formData.secondParty) {
+      setValidationError("Please enter the second party details");
       return false;
     }
 
@@ -289,7 +299,6 @@ const AddressAffidavit = () => {
       </div>
 
       <div className="mt-8 flex flex-col items-center">
-       
         <button
           onClick={handleSubmitButtonClick}
           disabled={isSubmitting}

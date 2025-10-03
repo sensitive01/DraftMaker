@@ -35,6 +35,8 @@ export default function PreviewBirthCertificateParentNameCorrectionPage() {
     day: "1",
     month: "April",
     year: "2024",
+    firstParty: "",
+    secondParty: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
@@ -120,6 +122,14 @@ export default function PreviewBirthCertificateParentNameCorrectionPage() {
       );
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
 
     if (!formData.incorrectMotherName.trim()) {
       setValidationError(

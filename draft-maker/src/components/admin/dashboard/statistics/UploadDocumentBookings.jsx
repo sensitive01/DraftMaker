@@ -21,13 +21,16 @@ import {
   FileImage,
   File,
   Smartphone,
+  Trash2,
 } from "lucide-react";
 import {
   getUploadedDocumentBookings,
   updateUploadDocumentStatus,
+  deleteUploadBooking,
 } from "../../../../api/service/axiosService";
 import Pagination from "./Pagination";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 const UploadDocumentBookings = () => {
   const navigate = useNavigate();
@@ -42,15 +45,18 @@ const UploadDocumentBookings = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  // State for preview modal
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
 
-  // State for status update modal
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [statusUpdateBooking, setStatusUpdateBooking] = useState(null);
   const [newStatus, setNewStatus] = useState("");
   const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteBookingData, setDeleteBookingData] = useState(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const statusOptions = [
     {
@@ -71,7 +77,6 @@ const UploadDocumentBookings = () => {
     { value: "Rejected", label: "Rejected", color: "bg-red-100 text-red-800" },
   ];
 
-  // Utility function to format date in human-readable format
   const formatHumanDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -86,7 +91,6 @@ const UploadDocumentBookings = () => {
     }
   };
 
-  // Utility function to format time in 12-hour format
   const formatHumanTime = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -101,7 +105,6 @@ const UploadDocumentBookings = () => {
     }
   };
 
-  // Utility function to safely display values
   const safeDisplay = (value, fallback = "N/A") => {
     return value && value.toString().trim() !== "" ? value : fallback;
   };
@@ -114,7 +117,7 @@ const UploadDocumentBookings = () => {
 
         if (response.status === 200) {
           const formattedBookings = response.data.data.map((booking) => ({
-            ...booking, // Keep all original data
+            ...booking,
             username: safeDisplay(booking.userName, "Unknown"),
             userMobile: safeDisplay(booking.userMobile),
             documents: booking.documents || [],
@@ -134,6 +137,7 @@ const UploadDocumentBookings = () => {
       } catch (err) {
         console.error("Error fetching booking data:", err);
         setError("Failed to load booking data");
+        toast.error("Failed to load booking data. Please try again.");
         setLoading(false);
       }
     };
@@ -144,7 +148,6 @@ const UploadDocumentBookings = () => {
   useEffect(() => {
     let result = bookings;
 
-    // Filter by status
     if (filterStatus !== "all") {
       result = result.filter(
         (booking) =>
@@ -152,7 +155,6 @@ const UploadDocumentBookings = () => {
       );
     }
 
-    // Search filter
     if (searchTerm) {
       const lowercasedSearch = searchTerm.toLowerCase();
       result = result.filter(
@@ -226,13 +228,75 @@ const UploadDocumentBookings = () => {
 
         setBookings(updatedBookings);
         handleCloseStatusModal();
-        alert(`Status updated successfully to ${newStatus}`);
+        
+        toast.success(
+          response?.data?.message || `Status updated to ${newStatus} successfully!`,
+          {
+            duration: 4000,
+            position: "top-right",
+          }
+        );
       }
     } catch (error) {
       console.error("Error updating status:", error);
-      alert("Failed to update status. Please try again.");
+      toast.error(
+        error?.response?.data?.message || "Failed to update status. Please try again.",
+        {
+          duration: 4000,
+          position: "top-right",
+        }
+      );
     } finally {
       setUpdatingStatus(false);
+    }
+  };
+
+  const handleOpenDeleteModal = (booking) => {
+    setDeleteBookingData(booking);
+    setDeleteConfirmText("");
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeleteBookingData(null);
+    setDeleteConfirmText("");
+  };
+
+  const handleDeleteBooking = async () => {
+    if (!deleteBookingData || deleteConfirmText.toLowerCase() !== "delete")
+      return;
+
+    try {
+      setDeleteLoading(true);
+      const response = await deleteUploadBooking(deleteBookingData._id);
+
+      const updatedBookings = bookings.filter(
+        (booking) => booking._id !== deleteBookingData._id
+      );
+
+      setBookings(updatedBookings);
+      setDeleteLoading(false);
+      handleCloseDeleteModal();
+
+      toast.success(
+        response?.data?.message || "Booking deleted successfully!",
+        {
+          duration: 4000,
+          position: "top-right",
+        }
+      );
+    } catch (error) {
+      console.error("Error deleting booking:", error);
+      setDeleteLoading(false);
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to delete booking. Please try again.",
+        {
+          duration: 4000,
+          position: "top-right",
+        }
+      );
     }
   };
 
@@ -305,7 +369,6 @@ const UploadDocumentBookings = () => {
       window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       console.error("Download failed:", error);
-      // Fallback: open in new tab
       window.open(url, "_blank");
     }
   };
@@ -337,15 +400,14 @@ const UploadDocumentBookings = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 bg-white rounded-lg shadow">
-      {/* Header Section */}
+      <Toaster />
+
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <h2 className="text-xl sm:text-2xl font-bold text-red-900">
           Upload Document Bookings
         </h2>
 
-        {/* Search and Filter Section */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
-          {/* Search Input */}
           <div className="relative w-full sm:w-64">
             <input
               type="text"
@@ -368,7 +430,6 @@ const UploadDocumentBookings = () => {
             </span>
           </div>
 
-          {/* Filter Controls */}
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <select
               value={filterStatus}
@@ -393,7 +454,6 @@ const UploadDocumentBookings = () => {
         </div>
       </div>
 
-      {/* Results Count */}
       <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
         <Filter size={16} />
         <span>
@@ -405,7 +465,6 @@ const UploadDocumentBookings = () => {
         </span>
       </div>
 
-      {/* Mobile Card View */}
       <div className="block lg:hidden space-y-4">
         {currentItems.length > 0 ? (
           currentItems.map((booking, index) => (
@@ -480,6 +539,13 @@ const UploadDocumentBookings = () => {
                   <Edit size={14} />
                   <span>Status</span>
                 </button>
+                <button
+                  className="flex-1 px-3 py-2 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors flex items-center justify-center space-x-1 text-sm border border-red-200"
+                  onClick={() => handleOpenDeleteModal(booking)}
+                >
+                  <Trash2 size={14} />
+                  <span>Delete</span>
+                </button>
               </div>
             </div>
           ))
@@ -500,7 +566,6 @@ const UploadDocumentBookings = () => {
         )}
       </div>
 
-      {/* Desktop Table View */}
       <div className="hidden lg:block bg-white rounded-lg border border-red-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-[1200px] w-full">
@@ -544,7 +609,7 @@ const UploadDocumentBookings = () => {
                 </th>
                 <th
                   className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
-                  style={{ minWidth: "160px" }}
+                  style={{ minWidth: "220px" }}
                 >
                   Actions
                 </th>
@@ -611,9 +676,9 @@ const UploadDocumentBookings = () => {
                       </span>
                     </td>
                     <td className="p-3">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-nowrap">
                         <button
-                          className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors flex items-center space-x-1 text-xs border border-blue-200"
+                          className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors flex items-center space-x-1 text-xs border border-blue-200 whitespace-nowrap"
                           onClick={() => handlePreviewBooking(booking)}
                           title="Preview Details"
                         >
@@ -621,12 +686,20 @@ const UploadDocumentBookings = () => {
                           <span className="font-medium">View</span>
                         </button>
                         <button
-                          className="px-3 py-1.5 bg-orange-50 text-orange-600 rounded-md hover:bg-orange-100 transition-colors flex items-center space-x-1 text-xs border border-orange-200"
+                          className="px-3 py-1.5 bg-orange-50 text-orange-600 rounded-md hover:bg-orange-100 transition-colors flex items-center space-x-1 text-xs border border-orange-200 whitespace-nowrap"
                           onClick={() => handleUpdateStatus(booking)}
                           title="Update Status"
                         >
                           <Edit size={12} />
                           <span className="font-medium">Status</span>
+                        </button>
+                        <button
+                          className="px-3 py-1.5 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors flex items-center space-x-1 text-xs border border-red-200 whitespace-nowrap"
+                          onClick={() => handleOpenDeleteModal(booking)}
+                          title="Delete Booking"
+                        >
+                          <Trash2 size={12} />
+                          <span className="font-medium">Delete</span>
                         </button>
                       </div>
                     </td>
@@ -669,7 +742,6 @@ const UploadDocumentBookings = () => {
         )}
       </div>
 
-      {/* Mobile Pagination */}
       {filteredBookings.length > 0 && (
         <div className="block lg:hidden">
           <Pagination
@@ -685,11 +757,9 @@ const UploadDocumentBookings = () => {
         </div>
       )}
 
-      {/* Status Update Modal - Compact Design */}
       {isStatusModalOpen && statusUpdateBooking && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-            {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h3 className="text-lg font-bold text-red-900 flex items-center">
                 <Edit size={18} className="mr-2" />
@@ -703,7 +773,6 @@ const UploadDocumentBookings = () => {
               </button>
             </div>
 
-            {/* Content */}
             <div className="p-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -769,7 +838,6 @@ const UploadDocumentBookings = () => {
               </div>
             </div>
 
-            {/* Footer */}
             <div className="flex justify-end space-x-3 p-4 border-t border-gray-200">
               <button
                 onClick={handleCloseStatusModal}
@@ -793,6 +861,131 @@ const UploadDocumentBookings = () => {
                   </>
                 ) : (
                   "Update"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDeleteModalOpen && deleteBookingData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-red-50">
+              <div className="flex items-center space-x-2">
+                <div className="bg-red-100 p-2 rounded-full">
+                  <Trash2 size={20} className="text-red-600" />
+                </div>
+                <h3 className="text-lg font-bold text-red-900">
+                  Delete Booking
+                </h3>
+              </div>
+              <button
+                onClick={handleCloseDeleteModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-4 space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-sm text-red-800 font-medium">
+                  ⚠️ Warning: This action cannot be undone!
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-sm text-gray-700">
+                  You are about to delete the following booking:
+                </p>
+
+                <div className="bg-gray-50 p-3 rounded-lg space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-xs font-medium text-gray-600">
+                      Booking ID:
+                    </span>
+                    <span className="text-sm font-semibold text-gray-900">
+                      {deleteBookingData.bookingId}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-xs font-medium text-gray-600">
+                      Customer:
+                    </span>
+                    <span className="text-sm text-gray-900">
+                      {deleteBookingData.username}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-xs font-medium text-gray-600">
+                      Documents:
+                    </span>
+                    <span className="text-sm text-gray-900">
+                      {deleteBookingData.totalDocuments} file{deleteBookingData.totalDocuments !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-xs font-medium text-gray-600">
+                      Status:
+                    </span>
+                    <span className="text-sm text-gray-900">
+                      {deleteBookingData.documentStatus}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Type{" "}
+                  <span className="font-mono bg-gray-100 px-2 py-1 rounded text-red-600">
+                    DELETE
+                  </span>{" "}
+                  to confirm <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="Type DELETE here"
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Please type DELETE (case-insensitive) to enable the delete
+                  button
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 p-4 border-t border-gray-200">
+              <button
+                onClick={handleCloseDeleteModal}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteBooking}
+                disabled={
+                  deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
+                }
+                className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center ${
+                  deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                {deleteLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={16} className="mr-2" />
+                    Delete Booking
+                  </>
                 )}
               </button>
             </div>

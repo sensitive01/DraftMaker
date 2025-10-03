@@ -1,6 +1,17 @@
 import { useState } from "react";
 
 const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
+  const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
   return (
     <div className="bg-gray-50 p-8 rounded-lg shadow-lg max-w-5xl mx-auto">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2 text-center">
@@ -82,21 +93,21 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
                 <option value="H/o">Husband of</option>
               </select>
             </div>
-            {/* <div>
+
+            <div>
               <label className="block text-xs font-medium text-red-600 mb-1">
-                Aadhaar Number <span className="text-red-500">*</span>
+                Guardian Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                name="aadhaarNo"
-                value={formData.aadhaarNo}
+                name="guardianName"
+                value={formData.guardianName}
                 onChange={handleChange}
                 className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
-                placeholder="0000 0000 0000"
-                maxLength="14"
+                placeholder="Enter guardian name"
                 required
               />
-            </div> */}
+            </div>
 
             <div>
               <label className="block text-xs font-medium text-red-600 mb-1">
@@ -265,32 +276,87 @@ const VehicleInsuranceClaimForm = ({ formData, handleChange }) => {
             Accident Details
           </h3>
 
-          <div>
-            <label className="block text-xs font-medium text-red-600 mb-1">
-              Driver Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="driverName"
-              value={formData.driverName}
-              onChange={handleChange}
-              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
-              required
-            />
-          </div>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-red-600 mb-1">
+                Driver Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="driverName"
+                value={formData.driverName}
+                onChange={handleChange}
+                className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
+                required
+              />
+            </div>
 
-          <div className="mt-4">
-            <label className="block text-xs font-medium text-red-600 mb-1">
-              Accident Details <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              name="accidentDetails"
-              value={formData.accidentDetails}
-              onChange={handleChange}
-              className="w-full p-2 text-sm border border-gray-300 rounded h-36 focus:ring-1 focus:ring-red-400 focus:border-red-400"
-              placeholder="Please provide detailed information about the accident including date, time, location, and circumstances"
-              required
-            ></textarea>
+            <div>
+              <label className="block text-xs font-medium text-red-600 mb-1">
+                Accident Details <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                name="accidentDetails"
+                value={formData.accidentDetails}
+                onChange={handleChange}
+                className="w-full p-2 text-sm border border-gray-300 rounded h-36 focus:ring-1 focus:ring-red-400 focus:border-red-400"
+                placeholder="Please provide detailed information about the accident including date, time, location, and circumstances"
+                required
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        {/* Party Names & Stamp Duty Section */}
+        <div className="mb-6 bg-white p-4 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-3 text-gray-800 border-l-4 border-red-500 pl-3">
+            Party Names & Stamp Duty
+          </h3>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-red-600 mb-1">
+                Who will pay the Stamp Duty?{" "}
+                <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="firstParty"
+                value={formData.firstParty}
+                onChange={handlePartyNameChange}
+                maxLength={50}
+                className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
+                placeholder="Enter first party name (letters, spaces, commas only)"
+                required
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                {formData.firstParty?.length || 0}/50 characters
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-red-600 mb-1">
+                Second Party Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="secondParty"
+                value={formData.secondParty}
+                onChange={handlePartyNameChange}
+                maxLength={50}
+                className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
+                placeholder="Enter second party name (letters, spaces, commas only)"
+                required
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                {formData.secondParty?.length || 0}/50 characters
+              </p>
+            </div>
+
+            <p className="text-xs text-red-600 italic">
+              ℹ️ Please enter the names of both parties to the agreement. Only
+              letters, spaces, and commas are allowed (max 50 characters each).
+            </p>
           </div>
         </div>
 

@@ -68,6 +68,28 @@ const AffidavitPreview = ({ formData }) => {
             INTERNAL PURPOSE ONLY
           </div>
         </div>
+        {formData.firstParty && (
+          <>
+            <div className="mb-5 text-justify leading-relaxed">
+              <span className="font-lg">
+                First Party (Stamp Duty):{" "}
+                <span className="font-bold">{formData.firstParty}</span>
+              </span>
+
+              <br />
+              <span className="text-sm italic">
+                (Responsible for payment of stamp duty charges as per applicable
+                state regulations)
+              </span>
+            </div>
+            <div className="mb-5 text-justify leading-relaxed">
+              <span className="font-lg">
+                Second Party :{" "}
+                <span className="font-bold">{formData.secondParty}</span>
+              </span>
+            </div>
+          </>
+        )}
 
         {/* Document Content */}
         <div className="relative z-10">

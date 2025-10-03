@@ -1,6 +1,17 @@
 import React from "react";
 
 const AddressAffidavitForm = ({ formData, handleChange }) => {
+  const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
   return (
     <div className="bg-gray-50 p-6 rounded-lg shadow-lg max-w-5xl mx-auto">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2 text-center">
@@ -238,6 +249,55 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
             />
           </div>
         </div>
+      </div>
+
+      {/* Party Names & Stamp Duty Section */}
+      <div className="mb-2 bg-white p-4 rounded-lg shadow-sm">
+        <h3 className="text-lg font-semibold mb-3 text-gray-800 border-l-4 border-red-500 pl-3">
+          Party Names & Stamp Duty
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-red-600 mb-1">
+              Who will pay the Stamp Duty? *
+            </label>
+            <input
+              type="text"
+              name="firstParty"
+              value={formData.firstParty || ""}
+              onChange={handlePartyNameChange}
+              maxLength={50}
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
+              placeholder="Enter first party name (letters, spaces, commas only)"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              {formData.firstParty?.length || 0}/50 characters
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-red-600 mb-1">
+              Second Party Name *
+            </label>
+            <input
+              type="text"
+              name="secondParty"
+              value={formData.secondParty || ""}
+              onChange={handlePartyNameChange}
+              maxLength={50}
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
+              placeholder="Enter second party name (letters, spaces, commas only)"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              {formData.secondParty?.length || 0}/50 characters
+            </p>
+          </div>
+        </div>
+
+        <p className="mt-3 text-xs text-red-600 italic">
+          ℹ️ Please enter the names of both parties to the agreement. Only
+          letters, spaces, and commas are allowed (max 50 characters each).
+        </p>
       </div>
 
       {/* Other Details Section */}

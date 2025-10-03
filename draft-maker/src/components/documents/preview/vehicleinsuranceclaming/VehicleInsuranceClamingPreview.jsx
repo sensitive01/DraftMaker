@@ -60,6 +60,28 @@ const VehicleInsuranceClaimingPreview = ({ formData }) => {
           <h2 className="text-lg sm:text-xl lg:text-2xl font-bold mb-4 sm:mb-6 text-gray-800 border-b pb-2 text-center">
             Vehicle Insurance Claim Affidavit
           </h2>
+          {formData.firstParty && (
+            <>
+              <div className="mb-5 text-justify leading-relaxed">
+                <span className="font-lg">
+                  First Party (Stamp Duty):{" "}
+                  <span className="font-bold">{formData.firstParty}</span>
+                </span>
+
+                <br />
+                <span className="text-sm italic">
+                  (Responsible for payment of stamp duty charges as per
+                  applicable state regulations)
+                </span>
+              </div>
+              <div className="mb-5 text-justify leading-relaxed">
+                <span className="font-lg">
+                  Second Party :{" "}
+                  <span className="font-bold">{formData.secondParty}</span>
+                </span>
+              </div>
+            </>
+          )}
 
           <div className="mb-8 sm:mb-12 leading-relaxed sm:leading-loose text-sm sm:text-base">
             <p className="mb-4 sm:mb-6">
@@ -86,7 +108,7 @@ const VehicleInsuranceClaimingPreview = ({ formData }) => {
             <p className="mb-4 sm:mb-6">
               My Aadhaar No:{" "}
               <span className="font-bold">
-                {formData.aadhaar || "____ ____ ____"}
+                {formData.aadhaarNo || "____ ____ ____"}
               </span>
             </p>
 

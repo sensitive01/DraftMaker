@@ -151,6 +151,8 @@ const hufDeclarationSchema = new mongoose.Schema(
         default: false,
       },
     },
+    firstParty: { type: String },
+    secondParty: { type: String },
 
     // Added stamp duty, delivery charge, and service details fields
     selectedStampDuty: {

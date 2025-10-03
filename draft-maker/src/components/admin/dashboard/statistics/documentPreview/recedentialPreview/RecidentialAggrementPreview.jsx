@@ -109,6 +109,33 @@ const RecidentialAggrementPreview = () => {
             RENTAL AGREEMENT
           </div>
 
+          ${
+            formData.firstParty
+              ? `
+    <div style="margin-bottom: 20px; text-align: justify; line-height: 1.6;">
+      <span style="font-size: 12pt;">
+        First Party (Stamp Duty): 
+        <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+          ${formData.firstParty}
+        </strong>
+      </span>
+      <br />
+      <span style="font-size: 11pt; font-style: italic;">
+        (Responsible for payment of stamp duty charges as per applicable state regulations)
+      </span>
+    </div>
+    <div style="margin-bottom: 20px; text-align: justify; line-height: 1.6;">
+      <span style="font-size: 12pt;">
+        Second Party: 
+        <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+          ${formData.secondParty}
+        </strong>
+      </span>
+    </div>
+  `
+              : ""
+          }
+
           <p style="margin-bottom: 20px; text-align: justify; line-height: 1.6;">
             This Tenancy Agreement is made and executed at Bangalore, on this 
             <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
@@ -734,6 +761,28 @@ const RecidentialAggrementPreview = () => {
               <div className="text-center font-bold text-xl mb-8 underline tracking-wide">
                 RENTAL AGREEMENT
               </div>
+              {formData.firstParty && (
+                <>
+                  <div className="mb-5 text-justify leading-relaxed">
+                    <span className="font-lg">
+                      First Party (Stamp Duty):{" "}
+                      <span className="font-bold">{formData.firstParty}</span>
+                    </span>
+
+                    <br />
+                    <span className="text-sm italic">
+                      (Responsible for payment of stamp duty charges as per
+                      applicable state regulations)
+                    </span>
+                  </div>
+                  <div className="mb-5 text-justify leading-relaxed">
+                    <span className="font-lg">
+                      Second Party :{" "}
+                      <span className="font-bold">{formData.secondParty}</span>
+                    </span>
+                  </div>
+                </>
+              )}
 
               <p className="mb-5 text-justify leading-relaxed">
                 This Tenancy Agreement is made and executed at Bangalore, on
@@ -762,7 +811,7 @@ const RecidentialAggrementPreview = () => {
                 WHEREAS the Owner is the sole and absolute owner of the Premises
                 situated at{" "}
                 <span className="font-semibold form-data">
-                  { getPropertyAddress() ||"Complete Property Address"}
+                  {getPropertyAddress() || "Complete Property Address"}
                 </span>{" "}
                 more fully described in Schedule. The tenant for want of
                 accommodation requested the owner to let out premises and Owner

@@ -39,6 +39,8 @@ export default function PreviewPasswordAnnaxure() {
     place: "",
     useNameAsSignature: false,
     residences: [{ country: "", periodFrom: "", periodTo: "", pageNos: "" }],
+    firstParty: "",
+    secondParty: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -146,6 +148,14 @@ export default function PreviewPasswordAnnaxure() {
       setValidationError("Please enter your present address");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
 
     if (!formData.aadhaarNo.trim()) {
       setValidationError("Please enter Aadhaar number");

@@ -33,6 +33,8 @@ export default function PreviewBirthCertificatePage() {
     day: "1",
     month: "April",
     year: "2025",
+    firstParty: "",
+    secondParty: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
@@ -98,6 +100,14 @@ export default function PreviewBirthCertificatePage() {
       setValidationError("Spouse's Aadhaar number must be 12 digits");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
 
     // Child details validation
     if (!formData.childName.trim()) {

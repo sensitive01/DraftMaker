@@ -87,7 +87,7 @@ const recidentailAgreementSchema = new mongoose.Schema(
     lesseePermanentCity: { type: String },
     lesseePermanentState: { type: String },
     lesseePermanentPinCode: { type: String },
-    propertyAddress:{type:String},
+    propertyAddress: { type: String },
 
     // Rental Details
     rentAmount: { type: Number },
@@ -155,6 +155,8 @@ const recidentailAgreementSchema = new mongoose.Schema(
       email: { type: String },
     },
     email: { type: String },
+    firstParty: { type: String },
+    secondParty: { type: String },
   },
   {
     timestamps: true,

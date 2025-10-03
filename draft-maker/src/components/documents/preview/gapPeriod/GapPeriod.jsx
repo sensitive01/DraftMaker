@@ -28,6 +28,8 @@ export default function PreviewGapPeriod() {
     month: "April",
     year: "2025",
     gapPeriods: [{ from: "", to: "", reason: "" }],
+    firstParty: "",
+    secondParty: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -110,6 +112,14 @@ export default function PreviewGapPeriod() {
     // Address validation
     if (!formData.address.trim()) {
       setValidationError("Please enter your address");
+      return false;
+    }
+    if (!formData.firstParty) {
+      setValidationError("Please enter who will pay the stamp duty");
+      return false;
+    }
+    if (!formData.secondParty) {
+      setValidationError("Please enter the second party details");
       return false;
     }
 

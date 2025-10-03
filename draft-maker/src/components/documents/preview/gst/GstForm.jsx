@@ -2,6 +2,17 @@ import React from "react";
 
 const GstForm = ({ formData, handleChange }) => {
   const requiredFieldStyle = "text-red-600 font-medium";
+  const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white p-4 sm:p-6 rounded-lg shadow-md">

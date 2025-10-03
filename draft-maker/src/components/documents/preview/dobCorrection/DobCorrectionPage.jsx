@@ -32,6 +32,8 @@ export default function PreviewDobCorrectionPage() {
     day: "1",
     month: "",
     year: "2025",
+    firstParty: "",
+    secondParty: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
@@ -96,6 +98,14 @@ export default function PreviewDobCorrectionPage() {
       setValidationError("Aadhaar number must be 12 digits");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
 
     // DOB correction details validation
     if (!formData.dob1.trim()) {

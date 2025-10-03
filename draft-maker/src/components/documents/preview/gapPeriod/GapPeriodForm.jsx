@@ -5,6 +5,17 @@ export default function GapPeriodForm({
   addGapPeriod,
   removeGapPeriod,
 }) {
+  const handlePartyNameChange = (e) => {
+    const { name, value } = e.target;
+    // Allow only letters, spaces, and commas, max 50 characters
+    const filteredValue = value.replace(/[^a-zA-Z\s,]/g, "").slice(0, 50);
+    handleChange({
+      target: {
+        name: name,
+        value: filteredValue,
+      },
+    });
+  };
   return (
     <div className="max-w-4xl mx-auto p-2 sm:p-4 bg-white rounded shadow-md">
       <h1 className="text-lg sm:text-xl font-bold mb-4 text-center text-red-600">
@@ -305,6 +316,54 @@ export default function GapPeriodForm({
               </tbody>
             </table>
           </div>
+        </div>
+        {/* Party Names & Stamp Duty Section */}
+        <div className="mb-6">
+          <h2 className="text-base sm:text-lg font-medium mb-3 text-red-600">
+            Party Names & Stamp Duty
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-red-600 mb-1">
+                Who will pay the Stamp Duty?
+              </label>
+              <input
+                type="text"
+                name="firstParty"
+                value={formData.firstParty}
+                onChange={handlePartyNameChange}
+                maxLength={50}
+                className="w-full p-2 border border-gray-300 rounded text-sm"
+                placeholder="Enter first party name (letters, spaces, commas only)"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                {formData.firstParty?.length || 0}/50 characters
+              </p>
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-red-600 mb-1">
+                Second Party Name
+              </label>
+              <input
+                type="text"
+                name="secondParty"
+                value={formData.secondParty}
+                onChange={handlePartyNameChange}
+                maxLength={50}
+                className="w-full p-2 border border-gray-300 rounded text-sm"
+                placeholder="Enter second party name (letters, spaces, commas only)"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                {formData.secondParty?.length || 0}/50 characters
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-3 text-xs text-red-600 italic">
+            ℹ️ Please enter the names of both parties to the agreement. Only
+            letters, spaces, and commas are allowed (max 50 characters each).
+          </p>
         </div>
 
         {/* Verification Details */}

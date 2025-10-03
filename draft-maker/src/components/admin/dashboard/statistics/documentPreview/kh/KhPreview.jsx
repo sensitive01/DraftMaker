@@ -97,6 +97,29 @@ const KhPreview = () => {
           <div style="text-align: center; font-weight: bold; font-size: 18pt; margin-bottom: 10px;">
             ${formData.documentType || "AFFIDAVIT"}
           </div>
+           ${
+             formData.firstParty
+               ? `
+      <div style="margin-bottom: 20px; line-height: 1.6;">
+        <p style="margin-bottom: 8px;">
+          <span style="font-size: 12pt;">First Party (Stamp Duty): </span>
+          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+            ${formData.firstParty}
+          </strong>
+        </p>
+        <p style="font-size: 10pt; font-style: italic; margin-bottom: 16px;">
+          (Responsible for payment of stamp duty charges as per applicable state regulations)
+        </p>
+        <p style="margin-bottom: 16px;">
+          <span style="font-size: 12pt;">Second Party: </span>
+          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+            ${formData.secondParty}
+          </strong>
+        </p>
+      </div>
+    `
+               : ""
+           }
 
           <div style="text-align: center; font-style: italic; font-size: 10pt; margin-bottom: 40px;">
             [To be printed on a stamp paper of appropriate value as per State stamp duty laws]
@@ -456,6 +479,28 @@ const KhPreview = () => {
             stamp duty laws]
           </p>
         </div>
+        {formData.firstParty && (
+          <>
+            <div className="mb-5 text-justify leading-relaxed">
+              <span className="font-lg">
+                First Party (Stamp Duty):{" "}
+                <span className="font-bold">{formData.firstParty}</span>
+              </span>
+
+              <br />
+              <span className="text-sm italic">
+                (Responsible for payment of stamp duty charges as per applicable
+                state regulations)
+              </span>
+            </div>
+            <div className="mb-5 text-justify leading-relaxed">
+              <span className="font-lg">
+                Second Party :{" "}
+                <span className="font-bold">{formData.secondParty}</span>
+              </span>
+            </div>
+          </>
+        )}
 
         {/* Content */}
         <div className="space-y-4 text-base leading-relaxed">

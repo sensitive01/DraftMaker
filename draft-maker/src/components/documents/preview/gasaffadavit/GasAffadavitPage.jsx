@@ -37,6 +37,8 @@ export default function PreviewGasAffidavitForm() {
     day: "1",
     month: "",
     year: "2025",
+    firstParty: "",
+    secondParty: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -157,6 +159,14 @@ export default function PreviewGasAffidavitForm() {
       parseInt(formData.day) > 31
     ) {
       setValidationError("Please enter a valid day (1-31)");
+      return false;
+    }
+    if (!formData.firstParty) {
+      setValidationError("Please enter who will pay the stamp duty");
+      return false;
+    }
+    if (!formData.secondParty) {
+      setValidationError("Please enter the second party details");
       return false;
     }
 

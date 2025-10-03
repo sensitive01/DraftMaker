@@ -32,13 +32,15 @@ export default function PreviewDualNameChange() {
         id: 1,
         name: "",
         document: "",
-        documentNo: ""
-      }
+        documentNo: "",
+      },
     ],
     place: "",
     day: "",
     month: "",
     year: "2025",
+    firstParty: "",
+    secondParty: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
@@ -52,10 +54,10 @@ export default function PreviewDualNameChange() {
         const response = await getDocumentPrviewPage(bookingId);
         if (response.status === 200) {
           const data = response.data.data;
-          
+
           // Handle backward compatibility - convert old format to new format if needed
           let processedData = { ...data };
-          
+
           if (data.name2 && data.document2 && data.documentNo2) {
             // If old format exists, convert to new format
             processedData.additionalDocuments = [
@@ -63,25 +65,28 @@ export default function PreviewDualNameChange() {
                 id: 1,
                 name: data.name2,
                 document: data.document2,
-                documentNo: data.documentNo2
-              }
+                documentNo: data.documentNo2,
+              },
             ];
             // Remove old fields
             delete processedData.name2;
             delete processedData.document2;
             delete processedData.documentNo2;
-          } else if (!data.additionalDocuments || data.additionalDocuments.length === 0) {
+          } else if (
+            !data.additionalDocuments ||
+            data.additionalDocuments.length === 0
+          ) {
             // If no additional documents, create default empty one
             processedData.additionalDocuments = [
               {
                 id: 1,
                 name: "",
                 document: "",
-                documentNo: ""
-              }
+                documentNo: "",
+              },
             ];
           }
-          
+
           setFormData(processedData);
         }
       } catch (error) {
@@ -123,7 +128,8 @@ export default function PreviewDualNameChange() {
 
   // Add a new document
   const addDocument = () => {
-    const newId = Math.max(...formData.additionalDocuments.map(doc => doc.id)) + 1;
+    const newId =
+      Math.max(...formData.additionalDocuments.map((doc) => doc.id)) + 1;
     setFormData((prev) => ({
       ...prev,
       additionalDocuments: [
@@ -132,8 +138,8 @@ export default function PreviewDualNameChange() {
           id: newId,
           name: "",
           document: "",
-          documentNo: ""
-        }
+          documentNo: "",
+        },
       ],
     }));
   };
@@ -143,7 +149,9 @@ export default function PreviewDualNameChange() {
     if (formData.additionalDocuments.length > 1) {
       setFormData((prev) => ({
         ...prev,
-        additionalDocuments: prev.additionalDocuments.filter((_, i) => i !== index),
+        additionalDocuments: prev.additionalDocuments.filter(
+          (_, i) => i !== index
+        ),
       }));
     }
   };
@@ -189,6 +197,14 @@ export default function PreviewDualNameChange() {
       setValidationError("Please enter the first document name");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
 
     if (!formData.document1.trim()) {
       setValidationError("Please enter the first document type");
@@ -203,19 +219,23 @@ export default function PreviewDualNameChange() {
     // Additional documents validation
     for (let i = 0; i < formData.additionalDocuments.length; i++) {
       const doc = formData.additionalDocuments[i];
-      
+
       if (!doc.name.trim()) {
         setValidationError(`Please enter the name for document ${i + 2}`);
         return false;
       }
 
       if (!doc.document.trim()) {
-        setValidationError(`Please enter the document type for document ${i + 2}`);
+        setValidationError(
+          `Please enter the document type for document ${i + 2}`
+        );
         return false;
       }
 
       if (!doc.documentNo.trim()) {
-        setValidationError(`Please enter the document number for document ${i + 2}`);
+        setValidationError(
+          `Please enter the document number for document ${i + 2}`
+        );
         return false;
       }
     }
@@ -289,8 +309,8 @@ export default function PreviewDualNameChange() {
           />
         )}
         <div className="print:hidden">
-          <DualNameChangeForm 
-            formData={formData} 
+          <DualNameChangeForm
+            formData={formData}
             handleChange={handleChange}
             handleAdditionalDocumentChange={handleAdditionalDocumentChange}
             addDocument={addDocument}

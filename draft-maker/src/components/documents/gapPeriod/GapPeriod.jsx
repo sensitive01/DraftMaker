@@ -30,6 +30,8 @@ export default function GapPeriod() {
     month: "April",
     year: "2025",
     gapPeriods: [{ from: "", to: "", reason: "" }],
+    firstParty: "",
+    secondParty: "",
   };
 
   // Load saved data or use initial data
@@ -171,6 +173,14 @@ export default function GapPeriod() {
     // Authority validation
     if (!formData.authority.trim()) {
       setValidationError("Please enter the authority");
+      return false;
+    }
+     if (!formData.firstParty) {
+      setValidationError("Please enter who will pay the stamp duty");
+      return false;
+    }
+    if (!formData.secondParty) {
+      setValidationError("Please enter the second party details");
       return false;
     }
 
@@ -504,8 +514,6 @@ export default function GapPeriod() {
       </div>
 
       <div className="mt-6 sm:mt-8 flex flex-col items-center px-2 sm:px-4">
-        
-
         <button
           onClick={handleSubmitButtonClick}
           disabled={isSubmitting}
@@ -539,8 +547,6 @@ export default function GapPeriod() {
             "Submit Application"
           )}
         </button>
-
-       
       </div>
 
       <MobileNumberInput

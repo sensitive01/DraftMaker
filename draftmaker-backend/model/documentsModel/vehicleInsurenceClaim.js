@@ -48,6 +48,7 @@ const vehicleAccidentSchema = new mongoose.Schema(
     age: { type: Number },
     address: { type: String },
     aadhaarNo: { type: String },
+    guardianName: { type: String },
 
     // Vehicle Info
     vehicleNo: { type: String },
@@ -109,6 +110,8 @@ const vehicleAccidentSchema = new mongoose.Schema(
       email: { type: String },
     },
     email: { type: String },
+    firstParty: { type: String },
+    secondParty: { type: String },
   },
   {
     timestamps: true,

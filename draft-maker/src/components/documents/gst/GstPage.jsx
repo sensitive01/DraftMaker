@@ -29,6 +29,8 @@ export default function GstPage() {
     day: "1",
     month: "April",
     year: "2025",
+    firstParty: "",
+    secondParty: "",
   };
 
   // Load saved data or use initial data
@@ -128,6 +130,14 @@ export default function GstPage() {
       setValidationError("Please enter the place");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
 
     if (!formData.day.trim()) {
       setValidationError("Please enter the day");

@@ -41,6 +41,8 @@ const PreviewPassportNameChange = () => {
     newSurname: "",
     date: "",
     place: "",
+    firstParty: "",
+    secondParty: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
@@ -115,11 +117,19 @@ const PreviewPassportNameChange = () => {
       setValidationError("Please enter your permanent address line 1");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
 
-    if (!formData.permanentAddress.city.trim()) {
-      setValidationError("Please enter your permanent address city");
-      return false;
-    }
+    // if (!formData.permanentAddress.city.trim()) {
+    //   setValidationError("Please enter your permanent address city");
+    //   return false;
+    // }
 
     if (!formData.permanentAddress.state.trim()) {
       setValidationError("Please enter your permanent address state");

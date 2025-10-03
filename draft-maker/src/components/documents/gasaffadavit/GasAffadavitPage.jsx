@@ -46,6 +46,8 @@ export default function GasAffidavitForm() {
             day: "1",
             month: "",
             year: "2025",
+            firstParty: "",
+            secondParty: "",
           };
     } catch {
       return {};
@@ -132,6 +134,14 @@ export default function GasAffidavitForm() {
     }
     if (!formData.subscriptionVoucher.trim()) {
       setValidationError("Please enter the subscription voucher details");
+      return false;
+    }
+    if (!formData.firstParty) {
+      setValidationError("Please enter who will pay the stamp duty");
+      return false;
+    }
+    if (!formData.secondParty) {
+      setValidationError("Please enter the second party details");
       return false;
     }
     if (!formData.depositAmount.trim()) {
@@ -294,8 +304,6 @@ export default function GasAffidavitForm() {
             "Submit Application"
           )}
         </button>
-
-       
       </div>
 
       <MobileNumberInput

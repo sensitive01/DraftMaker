@@ -69,261 +69,300 @@ const VehicleInsurencePreview = () => {
     setLoading(true);
 
     try {
+      const docChildren = [
+        new Paragraph({
+          text: `${formData.documentType || "AFFIDAVIT"}`,
+          heading: HeadingLevel.HEADING_1,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 300 },
+        }),
+
+        new Paragraph({
+          text: "[To be printed on a stamp paper of appropriate value as per State stamp duty laws]",
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 500 },
+          italics: true,
+        }),
+      ];
+
+      // Add First and Second Party if they exist
+      if (formData.firstParty) {
+        docChildren.push(
+          new Paragraph({
+            spacing: { after: 100 },
+            children: [
+              new TextRun("First Party (Stamp Duty): "),
+              new TextRun({
+                text: formData.firstParty,
+                bold: true,
+              }),
+            ],
+          }),
+          new Paragraph({
+            spacing: { after: 200 },
+            children: [
+              new TextRun({
+                text: "(Responsible for payment of stamp duty charges as per applicable state regulations)",
+                italics: true,
+                size: 20,
+              }),
+            ],
+          }),
+          new Paragraph({
+            spacing: { after: 200 },
+            children: [
+              new TextRun("Second Party: "),
+              new TextRun({
+                text: formData.secondParty || "",
+                bold: true,
+              }),
+            ],
+          })
+        );
+      }
+
+      // Add remaining content
+      docChildren.push(
+        new Paragraph({
+          spacing: { after: 200 },
+          children: [
+            new TextRun("I, "),
+            new TextRun({
+              text: formData.title || "___",
+              bold: true,
+            }),
+            new TextRun(" "),
+            new TextRun({
+              text: formData.name || "_______________",
+              bold: true,
+            }),
+            new TextRun(" "),
+            new TextRun({
+              text: formData.relation || "______",
+              bold: true,
+            }),
+            new TextRun(", Aged: "),
+            new TextRun({
+              text: formData.age || "___",
+              bold: true,
+            }),
+            new TextRun(" Years,"),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { after: 200 },
+          children: [
+            new TextRun("Permanent Address: "),
+            new TextRun({
+              text: formData.address || "_________________",
+              bold: true,
+            }),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { after: 300 },
+          children: [
+            new TextRun("My Aadhaar No: "),
+            new TextRun({
+              text: formData.aadhaar || "__ ____ ____",
+              bold: true,
+            }),
+          ],
+        }),
+
+        new Paragraph({
+          text: "Do hereby solemnly affirm and declare as under:",
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 200, after: 300 },
+          bold: true,
+        }),
+
+        new Paragraph({
+          spacing: { after: 200 },
+          children: [
+            new TextRun("1. I am the owner of the Vehicle No- "),
+            new TextRun({
+              text: formData.vehicleNo || "________",
+              bold: true,
+            }),
+            new TextRun(", VEHICLE MODEL: "),
+            new TextRun({
+              text: formData.vehicleModel || "________",
+              bold: true,
+            }),
+            new TextRun(", Engine No- "),
+            new TextRun({
+              text: formData.engineNo || "________",
+              bold: true,
+            }),
+            new TextRun(", Chassis No: "),
+            new TextRun({
+              text: formData.chassisNo || "________",
+              bold: true,
+            }),
+            new TextRun(" Insured with "),
+            new TextRun({
+              text: formData.insurer || "________",
+              bold: true,
+            }),
+            new TextRun(" Under Policy No: "),
+            new TextRun({
+              text: formData.policyNo || "________",
+              bold: true,
+            }),
+            new TextRun(" for the period "),
+            new TextRun({
+              text: formatDate(formData.policyStart) || "________",
+              bold: true,
+            }),
+            new TextRun(" to "),
+            new TextRun({
+              text: formatDate(formData.policyEnd) || "________",
+              bold: true,
+            }),
+            new TextRun("."),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { before: 200, after: 200 },
+          children: [
+            new TextRun("2. Vehicle was Driven by "),
+            new TextRun({
+              text: formData.driverName || "________",
+              bold: true,
+            }),
+            new TextRun(" and the Vehicle met with an accident as follows:"),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { before: 100, after: 100, left: 400 },
+          children: [
+            new TextRun({
+              text: "DETAILS OF INCIDENT:",
+              bold: true,
+            }),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { before: 100, after: 200, left: 400 },
+          children: [
+            new TextRun({
+              text:
+                formData.accidentDetails ||
+                "Please provide detailed information about the accident including date, time, location, and circumstances",
+              bold: true,
+              italics: true,
+            }),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { before: 200, after: 200 },
+          children: [
+            new TextRun(
+              "3. The above accident was reported to the Police Station and the respective police acknowledgement has been submitted alongside other claim documents."
+            ),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { before: 200, after: 200 },
+          children: [
+            new TextRun(
+              "4. I hereby confirm that no third-party injury / death / property damage is involved in this accident and there will not be any claim from any third party. In the event of any claim from any third party on account of the above accident, it shall be my responsibility to take such claims and the insurer is fully discharged of the liability under the policy by virtue of settlement of my claim for Damage to the Vehicle."
+            ),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { before: 200, after: 300 },
+          children: [
+            new TextRun(
+              "5. I understand that providing false information in this affidavit may result in rejection of my claim and could have legal consequences under applicable laws."
+            ),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { before: 300, after: 300 },
+          children: [
+            new TextRun(
+              "I hereby solemnly declare that the above statement is true to the best of my knowledge and belief and that I have not withheld or misrepresented any material facts."
+            ),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { before: 300, after: 500 },
+          children: [
+            new TextRun("Verified at "),
+            new TextRun({
+              text: formData.place || "________",
+              bold: true,
+            }),
+            new TextRun(" on this "),
+            new TextRun({
+              text: formData.day || "__",
+              bold: true,
+            }),
+            new TextRun(" day of "),
+            new TextRun({
+              text: formData.month || "________",
+              bold: true,
+            }),
+            new TextRun(", "),
+            new TextRun({
+              text: formData.year || "____",
+              bold: true,
+            }),
+            new TextRun(
+              " that the contents of the above said affidavit are true and correct to the best of my knowledge and belief."
+            ),
+          ],
+        }),
+
+        new Paragraph({
+          spacing: { before: 800, after: 100 },
+          text: "Signature of Notary Public",
+          alignment: AlignmentType.LEFT,
+        }),
+
+        new Paragraph({
+          spacing: { before: 0, after: 100 },
+          text: "With Seal",
+          alignment: AlignmentType.LEFT,
+        }),
+
+        new Paragraph({
+          spacing: { before: 800, after: 100 },
+          text: "Signature of the Deponent",
+          alignment: AlignmentType.RIGHT,
+        }),
+
+        new Paragraph({
+          children: [
+            new TextRun({
+              text:
+                formData.title && formData.name
+                  ? formData.title + " " + formData.name
+                  : "",
+              bold: true,
+            }),
+          ],
+          alignment: AlignmentType.RIGHT,
+        })
+      );
+
       const doc = new Document({
         sections: [
           {
             properties: {},
-            children: [
-              new Paragraph({
-                text: `${formData.documentType || "AFFIDAVIT"}`,
-                heading: HeadingLevel.HEADING_1,
-                alignment: AlignmentType.CENTER,
-                spacing: { after: 300 },
-              }),
-
-              new Paragraph({
-                text: "[To be printed on a stamp paper of appropriate value as per State stamp duty laws]",
-                alignment: AlignmentType.CENTER,
-                spacing: { after: 500 },
-                italics: true,
-              }),
-
-              new Paragraph({
-                spacing: { after: 200 },
-                children: [
-                  new TextRun("I, "),
-                  new TextRun({
-                    text: formData.title || "___",
-                    bold: true,
-                  }),
-                  new TextRun(" "),
-                  new TextRun({
-                    text: formData.name || "_______________",
-                    bold: true,
-                  }),
-                  new TextRun(" "),
-                  new TextRun({
-                    text: formData.relation || "______",
-                    bold: true,
-                  }),
-                  new TextRun(", Aged: "),
-                  new TextRun({
-                    text: formData.age || "___",
-                    bold: true,
-                  }),
-                  new TextRun(" Years,"),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { after: 200 },
-                children: [
-                  new TextRun("Permanent Address: "),
-                  new TextRun({
-                    text: formData.address || "_________________",
-                    bold: true,
-                  }),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { after: 300 },
-                children: [
-                  new TextRun("My Aadhaar No: "),
-                  new TextRun({
-                    text: formData.aadhaar || "__ ____ ____",
-                    bold: true,
-                  }),
-                ],
-              }),
-
-              new Paragraph({
-                text: "Do hereby solemnly affirm and declare as under:",
-                alignment: AlignmentType.CENTER,
-                spacing: { before: 200, after: 300 },
-                bold: true,
-              }),
-
-              new Paragraph({
-                spacing: { after: 200 },
-                children: [
-                  new TextRun("1. I am the owner of the Vehicle No- "),
-                  new TextRun({
-                    text: formData.vehicleNo || "________",
-                    bold: true,
-                  }),
-                  new TextRun(", VEHICLE MODEL: "),
-                  new TextRun({
-                    text: formData.vehicleModel || "________",
-                    bold: true,
-                  }),
-                  new TextRun(", Engine No- "),
-                  new TextRun({
-                    text: formData.engineNo || "________",
-                    bold: true,
-                  }),
-                  new TextRun(", Chassis No: "),
-                  new TextRun({
-                    text: formData.chassisNo || "________",
-                    bold: true,
-                  }),
-                  new TextRun(" Insured with "),
-                  new TextRun({
-                    text: formData.insurer || "________",
-                    bold: true,
-                  }),
-                  new TextRun(" Under Policy No: "),
-                  new TextRun({
-                    text: formData.policyNo || "________",
-                    bold: true,
-                  }),
-                  new TextRun(" for the period "),
-                  new TextRun({
-                    text: formatDate(formData.policyStart) || "________",
-                    bold: true,
-                  }),
-                  new TextRun(" to "),
-                  new TextRun({
-                    text: formatDate(formData.policyEnd) || "________",
-                    bold: true,
-                  }),
-                  new TextRun("."),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { before: 200, after: 200 },
-                children: [
-                  new TextRun("2. Vehicle was Driven by "),
-                  new TextRun({
-                    text: formData.driverName || "________",
-                    bold: true,
-                  }),
-                  new TextRun(
-                    " and the Vehicle met with an accident as follows:"
-                  ),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { before: 100, after: 100, left: 400 },
-                children: [
-                  new TextRun({
-                    text: "DETAILS OF INCIDENT:",
-                    bold: true,
-                  }),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { before: 100, after: 200, left: 400 },
-                children: [
-                  new TextRun({
-                    text:
-                      formData.accidentDetails ||
-                      "Please provide detailed information about the accident including date, time, location, and circumstances",
-                    bold: true,
-                    italics: true,
-                  }),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { before: 200, after: 200 },
-                children: [
-                  new TextRun(
-                    "3. The above accident was reported to the Police Station and the respective police acknowledgement has been submitted alongside other claim documents."
-                  ),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { before: 200, after: 200 },
-                children: [
-                  new TextRun(
-                    "4. I hereby confirm that no third-party injury / death / property damage is involved in this accident and there will not be any claim from any third party. In the event of any claim from any third party on account of the above accident, it shall be my responsibility to take such claims and the insurer is fully discharged of the liability under the policy by virtue of settlement of my claim for Damage to the Vehicle."
-                  ),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { before: 200, after: 300 },
-                children: [
-                  new TextRun(
-                    "5. I understand that providing false information in this affidavit may result in rejection of my claim and could have legal consequences under applicable laws."
-                  ),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { before: 300, after: 300 },
-                children: [
-                  new TextRun(
-                    "I hereby solemnly declare that the above statement is true to the best of my knowledge and belief and that I have not withheld or misrepresented any material facts."
-                  ),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { before: 300, after: 500 },
-                children: [
-                  new TextRun("Verified at "),
-                  new TextRun({
-                    text: formData.place || "________",
-                    bold: true,
-                  }),
-                  new TextRun(" on this "),
-                  new TextRun({
-                    text: formData.day || "__",
-                    bold: true,
-                  }),
-                  new TextRun(" day of "),
-                  new TextRun({
-                    text: formData.month || "________",
-                    bold: true,
-                  }),
-                  new TextRun(", "),
-                  new TextRun({
-                    text: formData.year || "____",
-                    bold: true,
-                  }),
-                  new TextRun(
-                    " that the contents of the above said affidavit are true and correct to the best of my knowledge and belief."
-                  ),
-                ],
-              }),
-
-              new Paragraph({
-                spacing: { before: 800, after: 100 },
-                text: "Signature of Notary Public",
-                alignment: AlignmentType.LEFT,
-              }),
-
-              new Paragraph({
-                spacing: { before: 0, after: 100 },
-                text: "With Seal",
-                alignment: AlignmentType.LEFT,
-              }),
-
-              new Paragraph({
-                spacing: { before: 800, after: 100 },
-                text: "Signature of the Deponent",
-                alignment: AlignmentType.RIGHT,
-              }),
-
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text:
-                      formData.title && formData.name
-                        ? formData.title + " " + formData.name
-                        : "",
-                    bold: true,
-                  }),
-                ],
-                alignment: AlignmentType.RIGHT,
-              }),
-            ],
+            children: docChildren,
           },
         ],
       });
@@ -403,6 +442,32 @@ const VehicleInsurencePreview = () => {
       );
 
       currentY += 15;
+
+      // Add First and Second Party if they exist
+      if (formData.firstParty) {
+        currentY = addText(
+          `First Party (Stamp Duty): ${formData.firstParty}`,
+          margin,
+          currentY + 5,
+          { bold: false }
+        );
+
+        currentY = addText(
+          "(Responsible for payment of stamp duty charges as per applicable state regulations)",
+          margin,
+          currentY + 3,
+          { fontSize: 10 }
+        );
+
+        currentY = addText(
+          `Second Party: ${formData.secondParty || ""}`,
+          margin,
+          currentY + 5,
+          { bold: false }
+        );
+
+        currentY += 10;
+      }
 
       // Content
       currentY = addText(
@@ -631,6 +696,28 @@ const VehicleInsurencePreview = () => {
             stamp duty laws]
           </p>
         </div>
+        {formData.firstParty && (
+          <>
+            <div className="mb-5 text-justify leading-relaxed">
+              <span className="font-lg">
+                First Party (Stamp Duty):{" "}
+                <span className="font-bold">{formData.firstParty}</span>
+              </span>
+
+              <br />
+              <span className="text-sm italic">
+                (Responsible for payment of stamp duty charges as per applicable
+                state regulations)
+              </span>
+            </div>
+            <div className="mb-5 text-justify leading-relaxed">
+              <span className="font-lg">
+                Second Party :{" "}
+                <span className="font-bold">{formData.secondParty}</span>
+              </span>
+            </div>
+          </>
+        )}
 
         {/* Content */}
         <div className="space-y-4 text-base leading-relaxed">

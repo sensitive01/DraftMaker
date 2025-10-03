@@ -3,7 +3,7 @@ import BirtCertificateForm from "./BirtCertificateForm";
 import PaymentConfirmation from "../serviceNotification/PaymentConfirmation";
 import ServicePackageNotification from "../serviceNotification/ServicePackageNotification";
 import MobileNumberInput from "../serviceNotification/MobileNumberInput";
-import ErrorNoification from "../serviceNotification/ErrorNoification"; 
+import ErrorNoification from "../serviceNotification/ErrorNoification";
 import {
   birthCerticateNameCorrectionData,
   birthCerticateNameCorrectionPaymentData,
@@ -34,6 +34,8 @@ export default function BirthCertificatePage() {
     day: "1",
     month: "April",
     year: "2025",
+    firstParty: "",
+    secondParty: "",
   };
 
   // Load saved data from sessionStorage or use initial data
@@ -128,6 +130,14 @@ export default function BirthCertificatePage() {
       setValidationError("Please enter the correct name");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
     if (!formData.day.trim()) {
       setValidationError("Please enter the day");
       return false;
@@ -218,7 +228,10 @@ export default function BirthCertificatePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-1 gap-4 sm:gap-6 lg:gap-8">
         <div className="print:hidden">
-          <BirtCertificateForm formData={formData} handleChange={handleChange} />
+          <BirtCertificateForm
+            formData={formData}
+            handleChange={handleChange}
+          />
           {submissionError && (
             <div className="mt-4 p-3 bg-red-100 text-red-700 rounded text-sm">
               {submissionError}

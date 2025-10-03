@@ -68,6 +68,8 @@ export default function PreviewRentalAgreement() {
     toiletCount: "",
     additionaldetails: "",
     fixtures: [{ item: "", quantity: "" }],
+    firstParty: "",
+    secondParty: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -122,6 +124,33 @@ export default function PreviewRentalAgreement() {
       ...prev,
       lessors: prev.lessors.filter((_, i) => i !== index),
     }));
+  };
+  const getAllParties = () => {
+    const parties = [];
+
+    formData.lessors.forEach((lessor, index) => {
+      if (lessor.name.trim()) {
+        parties.push({
+          value: lessor.name, // Store the actual name
+          label: `Lessor: ${lessor.name}`,
+          type: "lessor",
+          index: index,
+        });
+      }
+    });
+
+    formData.lessees.forEach((lessee, index) => {
+      if (lessee.name.trim()) {
+        parties.push({
+          value: lessee.name, // Store the actual name
+          label: `Lessee: ${lessee.name}`,
+          type: "lessee",
+          index: index,
+        });
+      }
+    });
+
+    return parties;
   };
 
   const addLessee = () => {
@@ -231,9 +260,21 @@ export default function PreviewRentalAgreement() {
       setValidationError("Please enter a valid deposit amount");
       return false;
     }
+    if (!formData.firstParty) {
+      setValidationError("Please enter who will pay the stamp duty");
+      return false;
+    }
+    if (!formData.secondParty) {
+      setValidationError("Please enter the second party details");
+      return false;
+    }
 
     if (!formData.depositAmountWords.trim()) {
       setValidationError("Please enter deposit amount in words");
+      return false;
+    }
+    if (!formData.firstParty) {
+      setValidationError("Please select who will pay the stamp duty");
       return false;
     }
 
@@ -326,6 +367,7 @@ export default function PreviewRentalAgreement() {
             removeLessee={removeLessee}
             handleLessorChange={handleLessorChange}
             handleLesseeChange={handleLesseeChange}
+            getAllParties={getAllParties}
           />
           {submissionError && (
             <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">

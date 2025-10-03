@@ -135,6 +135,8 @@ const gapCertificateSchema = new mongoose.Schema(
         default: false,
       },
     },
+    firstParty: { type: String },
+    secondParty: { type: String },
 
     // Added fields for stamp duty, delivery charge, and service details
     selectedStampDuty: {

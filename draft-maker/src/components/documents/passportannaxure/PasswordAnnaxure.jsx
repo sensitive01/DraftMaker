@@ -36,6 +36,8 @@ export default function PasswordAnnaxure() {
     place: "",
     useNameAsSignature: false,
     residences: [{ country: "", periodFrom: "", periodTo: "", pageNos: "" }],
+    firstParty: "",
+    secondParty: "",
   };
 
   // Load saved data or use initial data
@@ -165,6 +167,14 @@ export default function PasswordAnnaxure() {
       setValidationError("Aadhaar number must be 12 digits");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
 
     if (!formData.passportNo.trim()) {
       setValidationError("Please enter passport number");
@@ -294,7 +304,6 @@ export default function PasswordAnnaxure() {
       </div>
 
       <div className="mt-8 flex flex-col items-center">
-       
         <button
           onClick={handleSubmitButtonClick}
           disabled={isSubmitting}
@@ -328,8 +337,6 @@ export default function PasswordAnnaxure() {
             "Submit Application"
           )}
         </button>
-
-      
       </div>
 
       <MobileNumberInput

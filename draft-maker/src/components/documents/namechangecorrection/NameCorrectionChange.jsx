@@ -49,6 +49,8 @@ export default function NameCorrectionChange() {
         day: "1",
         month: "",
         year: "2025",
+        firstParty: "",
+        secondParty: "",
       };
     }
   };
@@ -128,6 +130,14 @@ export default function NameCorrectionChange() {
       setValidationError("Please enter the place");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
     if (
       !formData.day.trim() ||
       isNaN(formData.day) ||
@@ -271,7 +281,6 @@ export default function NameCorrectionChange() {
             "Submit Application"
           )}
         </button>
-
       </div>
 
       <MobileNumberInput

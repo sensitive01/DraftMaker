@@ -3,8 +3,11 @@ import { Document, Packer } from "docx";
 import { saveAs } from "file-saver";
 import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
 import html2pdf from "html2pdf.js";
+import { getAggrementFormData } from "../../../../../../api/service/axiosService";
+import { useParams } from "react-router-dom";
 
 const EnhancedGapPeriodPreview = () => {
+  const { bookingId } = useParams();
   const [data, setFormData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [downloadLoading, setDownloadLoading] = useState(false);
@@ -16,40 +19,15 @@ const EnhancedGapPeriodPreview = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Your existing data fetching logic
-        setTimeout(() => {
-          // Sample data for demonstration
-          setFormData({
-            documentType: "GAP PERIOD AFFIDAVIT",
-            name: "John Doe",
-            relation: "S/O",
-            relationName: "Richard Doe",
-            age: "28",
-            address: "123 Main Street, Apartment 4B, New Delhi, Delhi, 110001",
-            aadhaarNo: "1234 5678 9012",
-            gapPeriods: [
-              {
-                from: "2020-01-01",
-                to: "2020-06-30",
-                reason: "Preparation for higher studies",
-              },
-              {
-                from: "2021-03-15",
-                to: "2021-12-20",
-                reason: "Health issues and recovery",
-              },
-            ],
-            authority: "Delhi University",
-            place: "New Delhi",
-            day: "17",
-            month: "May",
-            year: "2025",
-          });
-          setIsLoading(false);
-        }, 1000);
+        const response = await getAggrementFormData(bookingId);
+        if (response.status === 200) {
+          setFormData(response.data.data);
+        }
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Error loading data");
+        setIsLoading(false);
+      } finally {
         setIsLoading(false);
       }
     };
@@ -128,6 +106,29 @@ const EnhancedGapPeriodPreview = () => {
           <div style="text-align: center; font-weight: bold; font-size: 18pt; margin-bottom: 30px;">
             ${data.documentType || "GAP PERIOD AFFIDAVIT"}
           </div>
+           ${
+             data.firstParty
+               ? `
+      <div style="margin-bottom: 20px; line-height: 1.6;">
+        <p style="margin-bottom: 8px;">
+          <span style="font-size: 12pt;">First Party (Stamp Duty): </span>
+          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+            ${data.firstParty}
+          </strong>
+        </p>
+        <p style="font-size: 10pt; font-style: italic; margin-bottom: 16px;">
+          (Responsible for payment of stamp duty charges as per applicable state regulations)
+        </p>
+        <p style="margin-bottom: 16px;">
+          <span style="font-size: 12pt;">Second Party: </span>
+          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
+            ${data.secondParty}
+          </strong>
+        </p>
+      </div>
+    `
+               : ""
+           }
 
           <p style="margin-bottom: 16px; line-height: 1.6;">
             I, 
@@ -499,6 +500,29 @@ const EnhancedGapPeriodPreview = () => {
             <h1 className="text-center font-bold text-xl mb-6">
               {data.documentType || "GAP PERIOD AFFIDAVIT"}
             </h1>
+
+            {data.firstParty && (
+              <>
+                <div className="mb-5 text-justify leading-relaxed">
+                  <span className="font-lg">
+                    First Party (Stamp Duty):{" "}
+                    <span className="font-bold">{data.firstParty}</span>
+                  </span>
+
+                  <br />
+                  <span className="text-sm italic">
+                    (Responsible for payment of stamp duty charges as per
+                    applicable state regulations)
+                  </span>
+                </div>
+                <div className="mb-5 text-justify leading-relaxed">
+                  <span className="font-lg">
+                    Second Party :{" "}
+                    <span className="font-bold">{data.secondParty}</span>
+                  </span>
+                </div>
+              </>
+            )}
 
             <p className="mb-4">
               I,{" "}

@@ -35,6 +35,8 @@ export default function DobCorrectionPage() {
             day: "1",
             month: "",
             year: "2025",
+            firstParty: "",
+            secondParty: "",
           };
     } catch {
       return {
@@ -159,6 +161,14 @@ export default function DobCorrectionPage() {
       setValidationError("Please enter a valid day (1-31)");
       return false;
     }
+    // if (!formData.firstParty) {
+    //   setValidationError("Please enter who will pay the stamp duty");
+    //   return false;
+    // }
+    // if (!formData.secondParty) {
+    //   setValidationError("Please enter the second party details");
+    //   return false;
+    // }
     if (!formData.month.trim()) {
       setValidationError("Please select a month");
       return false;
