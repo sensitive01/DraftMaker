@@ -53,24 +53,26 @@ const CommercialAggrementPreview = () => {
 
     const element = previewRef.current;
     const opt = {
-      margin: [20, 15, 20, 15], // top, left, bottom, right in mm
+      margin: [15, 15, 15, 15],
       filename: `Commercial_Agreement_${bookingId || "document"}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
         scale: 2,
         useCORS: true,
         letterRendering: true,
-        allowTaint: false,
+        logging: false,
+        scrollY: 0,
+        scrollX: 0,
       },
       jsPDF: {
         unit: "mm",
         format: "a4",
         orientation: "portrait",
-        compressPDF: true,
       },
       pagebreak: {
         mode: ["avoid-all", "css", "legacy"],
         before: ".page-break",
+        after: [".page"],
       },
     };
 
@@ -95,454 +97,64 @@ const CommercialAggrementPreview = () => {
     setDownloadType("word");
 
     try {
-      // Create structured content for Word document
-      const generateWordContent = () => {
-        const lessors = formData.lessors || [
-          {
-            name: "",
-            addressLine1: "",
-            addressLine2: "",
-            city: "",
-            state: "",
-            pinCode: "",
-          },
-        ];
-        const lessees = formData.lessees || [
-          {
-            name: "",
-            aadhaar: "",
-            permanentAddressLine1: "",
-            permanentAddressLine2: "",
-            permanentCity: "",
-            permanentState: "",
-            permanentPinCode: "",
-          },
-        ];
+      const lessors = formData.lessors || [
+        {
+          name: "",
+          addressLine1: "",
+          addressLine2: "",
+          city: "",
+          state: "",
+          pinCode: "",
+        },
+      ];
 
-        return `
-        <div class="title-section">
-          COMMERCIAL LEASE AGREEMENT
-        </div>
-           ${
-             formData.firstParty && formData.secondParty
-               ? `
-<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 11pt;">
-  <tbody>
-    <tr style="background-color: #f3f4f6;">
-      <td style="border: 1px solid #9ca3af; padding: 8px; font-weight: bold; width: 33%;">
-        First Party
-      </td>
-      <td style="border: 1px solid #9ca3af; padding: 8px;">
-        ${formData.firstParty}
-      </td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid #9ca3af; padding: 8px; font-weight: bold;">
-        Second Party
-      </td>
-      <td style="border: 1px solid #9ca3af; padding: 8px;">
-        ${formData.secondParty}
-      </td>
-    </tr>
-    <tr style="background-color: #f3f4f6;">
-      <td style="border: 1px solid #9ca3af; padding: 8px; font-weight: bold;">
-        Stamp Duty Paid By
-      </td>
-      <td style="border: 1px solid #9ca3af; padding: 8px;">
-        ${
-          formData.stampDutyPayer === "First Party"
-            ? formData.firstParty
-            : formData.stampDutyPayer === "Second Party"
-            ? formData.secondParty
-            : "Not Selected"
-        }
-      </td>
-    </tr>
-  </tbody>
-</table>
-`
-               : ""
-           }
+      const lessees = formData.lessees || [
+        {
+          name: "",
+          aadhaar: "",
+          permanentAddressLine1: "",
+          permanentAddressLine2: "",
+          permanentCity: "",
+          permanentState: "",
+          permanentPinCode: "",
+        },
+      ];
 
-        <div class="intro-section">
-          <p class="main-paragraph">
-            This Commercial Lease Agreement is made and executed at <strong>Bangalore</strong>, 
-            on this <span class="highlight-field">${formatDate(
-              formData.agreementDate
-            )}</span>, 
-            by and between:
-          </p>
-        </div>
-
-        <div class="parties-section">
-          <div class="lessor-section">
-            ${lessors
-              .map(
-                (lessor, index) => `
-              <div class="party-info">
-                <strong class="party-name">${
-                  lessor.name || `LESSOR ${index + 1} NAME`
-                }</strong>${index < lessors.length - 1 ? "," : ""}<br/>
-                <div class="address-info">
-                  <strong>Address:</strong> <span class="highlight-field">
-                    ${
-                      lessor.addressLine1 ||
-                      `LESSOR ${index + 1} Address Line 1`
-                    }${lessor.addressLine2 ? ", " + lessor.addressLine2 : ""}${
-                  lessor.city ? ", " + lessor.city : ""
-                }${lessor.state ? ", " + lessor.state : ""}${
-                  lessor.pinCode ? " - " + lessor.pinCode : ""
-                }
-                  </span>
-                </div>
-              </div>
-            `
-              )
-              .join("")}
-            
-            <p class="party-designation">
-              Hereinafter referred to as the <strong>"LESSOR"</strong> of ONE PART.
-            </p>
-          </div>
-
-          <div class="and-divider">AND</div>
-
-          <div class="lessee-section">
-            ${lessees
-              .map(
-                (lessee, index) => `
-              <div class="party-info">
-                <strong class="party-name">${
-                  lessee.name || `LESSEE ${index + 1} NAME`
-                }</strong>${index < lessees.length - 1 ? "," : ""}<br/>
-                <div class="detail-info">
-                  <strong>Aadhaar No:</strong> <span class="highlight-field">${
-                    lessee.aadhaar || "0000 0000 0000"
-                  }</span><br/>
-                  <strong>Permanent Address:</strong> <span class="highlight-field">
-                    ${
-                      lessee.permanentAddressLine1 ||
-                      `LESSEE ${index + 1} Address Line 1`
-                    }${
-                  lessee.permanentAddressLine2
-                    ? ", " + lessee.permanentAddressLine2
-                    : ""
-                }${lessee.permanentCity ? ", " + lessee.permanentCity : ""}${
-                  lessee.permanentState ? ", " + lessee.permanentState : ""
-                }${
-                  lessee.permanentPinCode ? " - " + lessee.permanentPinCode : ""
-                }
-                  </span>
-                </div>
-              </div>
-            `
-              )
-              .join("")}
-            
-            <p class="party-designation">
-              Hereinafter referred to as the <strong>"LESSEE"</strong> of the OTHER PART.
-            </p>
-          </div>
-        </div>
-
-        <div class="whereas-section">
-          <p class="main-paragraph">
-            <strong>WHEREAS</strong> the LESSOR is the sole and absolute owner of the commercial premises 
-            situated at <span class="highlight-field">${
-              formData.propertyAddress || "Complete Property Address"
-            }</span> 
-            more fully described in the Schedule hereto; and the LESSEE having requested the LESSOR 
-            to lease the said premises for commercial purposes, and the LESSOR having agreed to the same 
-            subject to the terms and conditions hereinafter contained.
-          </p>
-        </div>
-
-        <div class="witnesseth-section">
-          NOW THIS AGREEMENT WITNESSETH AS FOLLOWS:
-        </div>
-
-        <div class="terms-section">
-          <div class="term-item">
-            <div class="term-number">1.</div>
-            <div class="term-content">
-              <strong>RENT:</strong> The LESSEE shall pay a monthly rent of Rs. 
-              <span class="highlight-field">${
-                formData.rentAmount || "00,000"
-              }</span>/- 
-              (Rupees <span class="highlight-field">${
-                formData.rentAmountWords || "In Words Only"
-              }</span>) 
-              inclusive of maintenance charges, payable on or before the 5th day of every English calendar month.
-            </div>
-          </div>
-
-          <div class="term-item">
-            <div class="term-number">2.</div>
-            <div class="term-content">
-              <strong>SECURITY DEPOSIT:</strong> The LESSEE has paid a sum of Rs. 
-              <span class="highlight-field">${
-                formData.depositAmount || "00,000"
-              }</span>/- 
-              (Rupees <span class="highlight-field">${
-                formData.depositAmountWords || "In Words Only"
-              }</span>) 
-              as security deposit, which the LESSOR hereby acknowledges receipt of. The said deposit 
-              shall carry no interest and shall be refundable to the LESSEE upon termination of this agreement, 
-              subject to deductions for any damages or outstanding dues.
-            </div>
-          </div>
-
-          <div class="term-item">
-            <div class="term-number">3.</div>
-            <div class="term-content">
-              <strong>TERM OF LEASE:</strong> This lease shall be in force for a period of Eleven (11) months 
-              commencing from <span class="highlight-field">${formatDate(
-                formData.agreementStartDate
-              )}</span>. 
-              Upon expiry of the initial term, the rent shall be increased by 
-              <span class="highlight-field">${
-                formData.rentIncreasePercentage || "00"
-              }%</span> 
-              for any renewal period.
-            </div>
-          </div>
-
-          <div class="term-item">
-            <div class="term-number">4.</div>
-            <div class="term-content">
-              <strong>PERMITTED USE:</strong> The leased premises shall be used exclusively for 
-              <strong>COMMERCIAL PURPOSES</strong> only. The LESSEE shall not use the premises 
-              for any illegal, offensive, or objectionable purpose.
-            </div>
-          </div>
-
-          <div class="term-item">
-            <div class="term-number">5.</div>
-            <div class="term-content">
-              <strong>SUB-LETTING PROHIBITED:</strong> The LESSEE shall not, without the prior written 
-              consent of the LESSOR, sub-let, under-let, assign, or part with possession of the 
-              leased premises or any part thereof to any third party.
-            </div>
-          </div>
-
-          <div class="term-item">
-            <div class="term-number">6.</div>
-            <div class="term-content">
-              <strong>NOTICE FOR TERMINATION:</strong> Either party may terminate this agreement by giving 
-              <span class="highlight-field">${
-                formData.noticePeriod || "One (1)"
-              }</span> month's 
-              prior written notice to the other party.
-            </div>
-          </div>
-
-          <div class="term-item">
-            <div class="term-number">7.</div>
-            <div class="term-content">
-              <strong>MAINTENANCE AND REPAIRS:</strong> The LESSEE shall maintain the premises in good 
-              condition and shall not cause any damage to fixtures, fittings, or the structure. 
-              Any damages caused shall be repaired at the LESSEE's cost.
-            </div>
-          </div>
-
-          <div class="term-item">
-            <div class="term-number">8.</div>
-            <div class="term-content">
-              <strong>DEFAULT AND TERMINATION:</strong> The LESSOR shall have the right to terminate 
-              this agreement if the LESSEE fails to pay rent for 
-              <span class="highlight-field">${
-                formData.defaultPeriod || "Two (2)"
-              }</span> consecutive months 
-              or commits any material breach of the terms herein.
-            </div>
-          </div>
-
-          <div class="term-item">
-            <div class="term-number">9.</div>
-            <div class="term-content">
-              <strong>PAINTING AND CLEANING CHARGES:</strong> Upon vacation of the premises, 
-              the LESSEE shall pay Rs. <span class="highlight-field">${
-                formData.paintingCharges || "5,000"
-              }</span>/- 
-              towards painting and cleaning charges, or the same shall be deducted from the security deposit.
-            </div>
-          </div>
-
-          <div class="term-item">
-            <div class="term-number">10.</div>
-            <div class="term-content">
-              <strong>UTILITIES AND TAXES:</strong> The LESSEE shall bear and pay all electricity charges 
-              as per actual consumption. Property taxes shall be borne by the LESSOR.
-            </div>
-          </div>
-
-          <div class="term-item">
-            <div class="term-number">11.</div>
-            <div class="term-content">
-              <strong>RIGHT OF INSPECTION:</strong> The LESSOR or authorized representatives shall be 
-              entitled to inspect the premises with reasonable prior notice to ensure compliance 
-              with the terms of this agreement.
-            </div>
-          </div>
-
-          <div class="term-item">
-            <div class="term-number">12.</div>
-            <div class="term-content">
-              <strong>VACATION OF PREMISES:</strong> Upon termination or expiry of this agreement, 
-              the LESSEE shall peacefully deliver vacant possession of the premises in the same 
-              condition as received, normal wear and tear excepted.
-            </div>
-          </div>
-
-          ${
-            formData.additionaldetails
-              ? `
-            <div class="term-item">
-              <div class="term-number">13.</div>
-              <div class="term-content">
-                <strong>ADDITIONAL TERMS:</strong> <span class="highlight-field">${formData.additionaldetails}</span>
-              </div>
-            </div>
-          `
-              : ""
-          }
-        </div>
-
-        <div class="schedule-section">
-          <div class="schedule-title">SCHEDULE OF PROPERTY</div>
-          <p class="schedule-content">
-            All that piece and parcel of commercial premises bearing address 
-            <span class="highlight-field">${
-              formData.propertyAddress || "Complete Property Address"
-            }</span>, 
-            consisting of <span class="highlight-field">
-              ${
-                formData.commercialType
-                  ? formData.commercialType.toUpperCase()
-                  : "SHOP/OFFICE"
-              } 
-              SPACE measuring ${formData.squareFeet || "XXX"} Square Feet
-            </span>, complete with electricity and water connections.
-          </p>
-        </div>
-
-        <div class="witness-section">
-          <p class="witness-intro">
-            IN WITNESS WHEREOF, the parties hereto have executed this Agreement on the day, 
-            month and year first above written.
-          </p>
-        </div>
-
-        <div class="signature-section">
-          <div class="signature-block">
-            <div class="witnesses-column">
-              <div class="witness-title">WITNESSES:</div>
-              <div class="witness-line">1. _________________________</div>
-              <div class="witness-line">2. _________________________</div>
-            </div>
-          </div>
-
-          <div class="parties-signature">
-            <div class="lessor-signature">
-              <div class="signature-title">LESSOR:</div>
-              ${lessors
-                .map(
-                  (lessor) => `
-                <div class="signature-name">${
-                  lessor.name || "LESSOR NAME"
-                }</div>
-                <div class="signature-line">_________________________</div>
-                <div class="signature-label">(Signature)</div>
-              `
-                )
-                .join("")}
-            </div>
-
-            <div class="lessee-signature">
-              <div class="signature-title">LESSEE:</div>
-              ${lessees
-                .map(
-                  (lessee) => `
-                <div class="signature-name">${
-                  lessee.name || "LESSEE NAME"
-                }</div>
-                <div class="signature-line">_________________________</div>
-                <div class="signature-label">(Signature)</div>
-              `
-                )
-                .join("")}
-            </div>
-          </div>
-        </div>
-
-        <div class="page-break"></div>
-
-        <div class="annexure-section">
-          <div class="annexure-title">ANNEXURE - I</div>
-          <div class="annexure-subtitle">List of Fixtures and Fittings Provided</div>
-
-          <table class="fixtures-table">
-            <thead>
-              <tr>
-                <th class="sl-header">Sl. No.</th>
-                <th class="item-header">Description of Items</th>
-                <th class="qty-header">Quantity</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${(formData.fixtures && formData.fixtures.length > 0
-                ? formData.fixtures
-                : Array(15).fill({ item: "", quantity: "" })
-              )
-                .slice(0, 15)
-                .map(
-                  (fixture, index) => `
-                  <tr>
-                    <td class="sl-cell">${index + 1}</td>
-                    <td class="item-cell">${fixture.item || ""}</td>
-                    <td class="qty-cell">${fixture.quantity || ""}</td>
-                  </tr>
-                `
-                )
-                .join("")}
-            </tbody>
-          </table>
-        </div>
-      `;
-      };
-
-      // Professional Word document template with proper legal formatting
+      // Generate Word document content with ALL fields
       const wordDocument = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' 
             xmlns:w='urn:schemas-microsoft-com:office:word' 
             xmlns='http://www.w3.org/TR/REC-html40'>
       <head>
         <meta charset='utf-8'>
-        <title>Commercial Lease Agreement</title>
+        <title>Commercial Agreement</title>
         <!--[if gte mso 9]>
         <xml>
           <w:WordDocument>
             <w:View>Print</w:View>
             <w:Zoom>100</w:Zoom>
-            <w:DoNotPromptForConvert/>
-            <w:DoNotShowInsertionsAndDeletions/>
+            <w:DoNotOptimizeForBrowser/>
           </w:WordDocument>
         </xml>
         <![endif]-->
         <style>
           @page {
             size: A4;
-            margin: 1in 0.75in 1in 0.75in;
+            margin: 2cm 1.5cm;
           }
           
           body {
-            font-family: "Times New Roman", Times, serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 12pt;
             line-height: 1.8;
             color: #000000;
             margin: 0;
-            padding: 0;
-            text-align: justify;
+            padding: 20pt;
+          }
+          
+          .page-container {
+            width: 100%;
+            max-width: 210mm;
           }
           
           .title-section {
@@ -551,47 +163,57 @@ const CommercialAggrementPreview = () => {
             font-weight: bold;
             text-decoration: underline;
             letter-spacing: 2px;
-            margin-bottom: 30pt;
-            margin-top: 20pt;
+            margin-bottom: 25pt;
+            margin-top: 10pt;
           }
           
-          .intro-section {
-            margin-bottom: 25pt;
+          .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20pt;
+            font-size: 11pt;
+          }
+          
+          .info-table td {
+            border: 1px solid #000000;
+            padding: 8pt;
+          }
+          
+          .info-table .label-cell {
+            font-weight: bold;
+            width: 35%;
+            background-color: #f0f0f0;
           }
           
           .main-paragraph {
             text-align: justify;
             margin-bottom: 15pt;
-            text-indent: 0;
+            line-height: 1.8;
           }
           
-          .parties-section {
-            margin-bottom: 25pt;
-          }
-          
-          .party-info {
-            margin-bottom: 15pt;
-            padding-left: 20pt;
+          .party-section {
+            margin-bottom: 20pt;
+            padding-left: 10pt;
           }
           
           .party-name {
+            font-weight: bold;
             font-size: 13pt;
-            text-decoration: underline;
           }
           
-          .address-info, .detail-info {
+          .party-details {
             margin-top: 8pt;
             padding-left: 15pt;
+            line-height: 1.6;
           }
           
           .party-designation {
-            margin-top: 15pt;
-            margin-bottom: 20pt;
+            margin-top: 12pt;
             text-align: center;
             font-weight: bold;
           }
           
-          .and-divider {
+          .divider {
             text-align: center;
             font-weight: bold;
             font-size: 14pt;
@@ -599,54 +221,43 @@ const CommercialAggrementPreview = () => {
             letter-spacing: 3px;
           }
           
-          .whereas-section {
-            margin-bottom: 25pt;
-          }
-          
-          .witnesseth-section {
+          .witnesseth {
             text-align: center;
             font-weight: bold;
-            font-size: 14pt;
+            font-size: 13pt;
             margin: 25pt 0;
             text-decoration: underline;
-            letter-spacing: 1px;
           }
           
           .terms-section {
-            margin-bottom: 30pt;
+            margin-bottom: 25pt;
           }
           
           .term-item {
-            display: table;
-            width: 100%;
-            margin-bottom: 18pt;
+            margin-bottom: 15pt;
             page-break-inside: avoid;
           }
           
           .term-number {
-            display: table-cell;
-            width: 30pt;
-            vertical-align: top;
             font-weight: bold;
-            padding-right: 10pt;
+            float: left;
+            width: 30pt;
           }
           
           .term-content {
-            display: table-cell;
-            vertical-align: top;
+            margin-left: 35pt;
             text-align: justify;
+            line-height: 1.8;
           }
           
-          .highlight-field {
-            background-color: #f0f0f0;
-            padding: 2pt 4pt;
-            border: 1px solid #cccccc;
+          .highlight {
             font-weight: bold;
+            background-color: #f5f5f5;
+            padding: 2pt 4pt;
           }
           
           .schedule-section {
-            margin-top: 35pt;
-            margin-bottom: 30pt;
+            margin-top: 30pt;
             page-break-inside: avoid;
           }
           
@@ -655,63 +266,56 @@ const CommercialAggrementPreview = () => {
             font-weight: bold;
             font-size: 14pt;
             text-decoration: underline;
-            margin-bottom: 20pt;
-            letter-spacing: 1px;
+            margin-bottom: 15pt;
           }
           
           .schedule-content {
             text-align: justify;
             padding: 15pt;
-            border: 1px solid #000000;
-          }
-          
-          .witness-section {
-            margin-top: 30pt;
-            margin-bottom: 25pt;
+            border: 2pt solid #000000;
+            line-height: 1.8;
           }
           
           .witness-intro {
             text-align: justify;
+            margin: 25pt 0;
             font-style: italic;
           }
           
           .signature-section {
-            margin-top: 40pt;
+            margin-top: 35pt;
           }
           
-          .signature-block {
-            margin-bottom: 30pt;
-          }
-          
-          .witnesses-column {
+          .witnesses-block {
             margin-bottom: 25pt;
           }
           
           .witness-title {
             font-weight: bold;
-            margin-bottom: 15pt;
+            margin-bottom: 12pt;
           }
           
           .witness-line {
             margin-bottom: 10pt;
           }
           
-          .parties-signature {
+          .signatures-row {
             display: table;
             width: 100%;
+            margin-top: 30pt;
           }
           
-          .lessor-signature, .lessee-signature {
+          .signature-column {
             display: table-cell;
-            width: 50%;
+            width: 48%;
             vertical-align: top;
-            padding: 0 15pt;
+            padding: 0 10pt;
           }
           
           .signature-title {
             font-weight: bold;
-            margin-bottom: 15pt;
             text-decoration: underline;
+            margin-bottom: 15pt;
           }
           
           .signature-name {
@@ -721,7 +325,6 @@ const CommercialAggrementPreview = () => {
           
           .signature-line {
             margin-bottom: 5pt;
-            font-family: monospace;
           }
           
           .signature-label {
@@ -742,26 +345,24 @@ const CommercialAggrementPreview = () => {
             font-weight: bold;
             font-size: 14pt;
             text-decoration: underline;
-            margin-bottom: 15pt;
-            letter-spacing: 1px;
+            margin-bottom: 10pt;
           }
           
           .annexure-subtitle {
             text-align: center;
-            font-weight: bold;
-            margin-bottom: 25pt;
+            margin-bottom: 20pt;
           }
           
           .fixtures-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30pt;
+            margin-bottom: 25pt;
           }
           
-          .fixtures-table th, .fixtures-table td {
+          .fixtures-table th,
+          .fixtures-table td {
             border: 1px solid #000000;
-            padding: 10pt;
-            text-align: left;
+            padding: 8pt;
           }
           
           .fixtures-table th {
@@ -770,29 +371,21 @@ const CommercialAggrementPreview = () => {
             text-align: center;
           }
           
-          .sl-header, .sl-cell {
+          .fixtures-table .sl-col {
             width: 10%;
             text-align: center;
           }
           
-          .item-header, .item-cell {
+          .fixtures-table .item-col {
             width: 65%;
           }
           
-          .qty-header, .qty-cell {
+          .fixtures-table .qty-col {
             width: 25%;
             text-align: center;
           }
           
-          .fixtures-table tr {
-            height: 35pt;
-          }
-          
-          /* Print-specific styles */
           @media print {
-            body {
-              font-size: 11pt;
-            }
             .page-break {
               page-break-before: always;
             }
@@ -800,12 +393,369 @@ const CommercialAggrementPreview = () => {
         </style>
       </head>
       <body>
-        ${generateWordContent()}
+        <div class="page-container">
+          <!-- Title -->
+          <div class="title-section">COMMERCIAL AGREEMENT</div>
+          
+          <!-- Party Information Table -->
+          <table class="info-table">
+            <tr>
+              <td class="label-cell">First Party</td>
+              <td>${formData.firstParty || "Not Specified"}</td>
+            </tr>
+            <tr>
+              <td class="label-cell">Second Party</td>
+              <td>${formData.secondParty || "Not Specified"}</td>
+            </tr>
+            <tr>
+              <td class="label-cell">Stamp Duty Paid By</td>
+              <td>${
+                formData.stampDutyPayer === "First Party"
+                  ? formData.firstParty || "First Party"
+                  : formData.stampDutyPayer === "Second Party"
+                  ? formData.secondParty || "Second Party"
+                  : "Not Selected"
+              }</td>
+            </tr>
+          </table>
+          
+          <!-- Introduction -->
+          <p class="main-paragraph">
+            This Tenancy Agreement is made and executed at <strong>Bangalore</strong>, 
+            on this <span class="highlight">${formatDate(
+              formData.agreementDate
+            )}</span>, by & between:
+          </p>
+          
+          <!-- Lessors -->
+          ${lessors
+            .map(
+              (lessor, index) => `
+            <div class="party-section">
+              <div class="party-name">${
+                lessor.name || `LESSOR ${index + 1} NAME`
+              }</div>
+              <div class="party-details">
+                <strong>Address:</strong> ${
+                  lessor.addressLine1 || `LESSOR ${index + 1} Address Line 1`
+                }${lessor.addressLine2 ? ", " + lessor.addressLine2 : ""}${
+                lessor.city ? ", " + lessor.city : ""
+              }${lessor.state ? ", " + lessor.state : ""}${
+                lessor.pinCode ? " - " + lessor.pinCode : ""
+              }
+              </div>
+            </div>
+          `
+            )
+            .join("")}
+          
+          <p class="party-designation">
+            Hereinafter referred to as the <strong>"LESSOR"</strong> of ONE PART.
+          </p>
+          
+          <p class="divider">AND</p>
+          
+          <!-- Lessees -->
+          ${lessees
+            .map(
+              (lessee, index) => `
+            <div class="party-section">
+              <div class="party-name">${
+                lessee.name || `LESSEE ${index + 1} NAME`
+              }</div>
+              <div class="party-details">
+                <strong>Aadhaar No:</strong> ${
+                  lessee.aadhaar || "0000 0000 0000"
+                }<br/>
+                <strong>Permanent Address:</strong> ${
+                  lessee.permanentAddressLine1 ||
+                  `LESSEE ${index + 1} Address Line 1`
+                }${
+                lessee.permanentAddressLine2
+                  ? ", " + lessee.permanentAddressLine2
+                  : ""
+              }${lessee.permanentCity ? ", " + lessee.permanentCity : ""}${
+                lessee.permanentState ? ", " + lessee.permanentState : ""
+              }${lessee.permanentPinCode ? " - " + lessee.permanentPinCode : ""}
+              </div>
+            </div>
+          `
+            )
+            .join("")}
+          
+          <p class="party-designation">
+            In consideration of the rent hereinafter called as <strong>"LESSEE"</strong>.
+          </p>
+          
+          <!-- Whereas Clause -->
+          <p class="main-paragraph">
+            <strong>WHEREAS</strong> the Owner is the sole and absolute owner of the Premises 
+            situated at <span class="highlight">${
+              formData.propertyAddress || "Complete Property Address"
+            }</span> 
+            more fully described in Schedule. The tenant for want of accommodation requested the owner 
+            to let out premises and Owner has also agreed to let out under the following terms and conditions:
+          </p>
+          
+          <p class="witnesseth">NOW THIS AGREEMENT WITNESSETH AS FOLLOWS:</p>
+          
+          <!-- Terms and Conditions -->
+          <div class="terms-section">
+            <div class="term-item">
+              <div class="term-number">1.</div>
+              <div class="term-content">
+                <strong>Rent:</strong> The LESSEE shall pay a monthly rent of Rs. 
+                <span class="highlight">${
+                  formData.rentAmount || "00,000"
+                }</span>/- 
+                (Rupees <span class="highlight">${
+                  formData.rentAmountWords || "In Words Only"
+                }</span>) 
+                Including Maintenance Charges on or before 5<sup>th</sup> of every month of English calendar.
+              </div>
+            </div>
+            
+            <div class="term-item">
+              <div class="term-number">2.</div>
+              <div class="term-content">
+                <strong>Deposit:</strong> The LESSEE have paid a total sum of Rs. 
+                <span class="highlight">${
+                  formData.depositAmount || "00,000"
+                }</span>/- 
+                (Rupees <span class="highlight">${
+                  formData.depositAmountWords || "In Words Only"
+                }</span>) 
+                Paid Rs <span class="highlight">${
+                  formData.depositAmount || "00,000"
+                }</span> 
+                by way of cash/online as security deposit and advance which the LESSOR hereby acknowledges 
+                the said sum shall carry no interest but refundable to the LESSEE on the termination of the tenancy.
+              </div>
+            </div>
+            
+            <div class="term-item">
+              <div class="term-number">3.</div>
+              <div class="term-content">
+                <strong>Duration:</strong> The Tenancy shall be in force for a period of 11 (Eleven) months 
+                commencing from <span class="highlight">${formatDate(
+                  formData.agreementStartDate
+                )}</span> 
+                and the month of tenancy being the English calendar month. After the expiry of 11 months 
+                the LESSEE shall pay an increase of 
+                <span class="highlight">${
+                  formData.rentIncreasePercentage || "00"
+                }%</span> in the existing rent.
+              </div>
+            </div>
+            
+            <div class="term-item">
+              <div class="term-number">4.</div>
+              <div class="term-content">
+                <strong>Sub-letting:</strong> The LESSEE shall not use the premises for any offensive or 
+                objectionable purpose and shall not have consent of the LESSOR hereby to sublet, under let 
+                or part with the possession to whomsoever or make any alteration.
+              </div>
+            </div>
+            
+            <div class="term-item">
+              <div class="term-number">5.</div>
+              <div class="term-content">
+                <strong>Delivery back of possession:</strong> On termination of the tenancy period to any 
+                renewal thereof, the LESSEE shall deliver back vacant possession of the schedule premises 
+                to the LESSOR in the same condition in which it was handed over at the time of joining.
+              </div>
+            </div>
+            
+            <div class="term-item">
+              <div class="term-number">6.</div>
+              <div class="term-content">
+                <strong>Notice:</strong> If the LESSOR or the LESSEE wishes to terminate the Commercial 
+                Agreement period each party should issue 
+                <span class="highlight">${
+                  formData.noticePeriod || "One (1)"
+                }</span> month notice in writing to each other.
+              </div>
+            </div>
+            
+            <div class="term-item">
+              <div class="term-number">7.</div>
+              <div class="term-content">
+                <strong>Additions and alterations:</strong> The LESSEE shall not cause any damages to the 
+                fixed fixtures on the above said property. Any damages caused shall be repaired at the cost of the LESSEE.
+              </div>
+            </div>
+            
+            <div class="term-item">
+              <div class="term-number">8.</div>
+              <div class="term-content">
+                <strong>Terminate:</strong> The LESSOR shall have the right to terminate the tenancy if the 
+                LESSEE fails to pay the rents regularly for a consecutive period of 
+                <span class="highlight">${
+                  formData.defaultPeriod || "Two (2)"
+                }</span> Months or commits breach 
+                of any of the terms herein mentioned and take possession of the premises.
+              </div>
+            </div>
+            
+            <div class="term-item">
+              <div class="term-number">9.</div>
+              <div class="term-content">
+                <strong>Painting and Cleaning Charges:</strong> At the time of vacating the premises the LESSEE 
+                shall pay <span class="highlight">Rs. ${
+                  formData.paintingCharges || "5,000"
+                }</span> as a painting 
+                and cleaning charges or such amount will be deducted from the deposit amount.
+              </div>
+            </div>
+            
+            <div class="term-item">
+              <div class="term-number">10.</div>
+              <div class="term-content">
+                <strong>Electricity and other Taxes:</strong> The LESSEE shall bear and pay the Electrical charges 
+                consumed as per the meter provided to concerned authorities and the LESSOR shall pay the property taxes.
+              </div>
+            </div>
+            
+            <div class="term-item">
+              <div class="term-number">11.</div>
+              <div class="term-content">
+                <strong>Inspection:</strong> The LESSOR or his representatives shall be entitled to enter the 
+                premises with prior appointment to inspect the same to satisfy himself that the premises if being 
+                and used in accordance with the terms of Agreement.
+              </div>
+            </div>
+            
+            <div class="term-item">
+              <div class="term-number">12.</div>
+              <div class="term-content">
+                The LESSEE shall use the premises for <strong>"COMMERCIAL PURPOSE"</strong> only.
+              </div>
+            </div>
+            
+            ${
+              formData.additionaldetails
+                ? `
+            <div class="term-item">
+              <div class="term-number">13.</div>
+              <div class="term-content">
+                <strong>Additional Terms:</strong> <span class="highlight">${formData.additionaldetails}</span>
+              </div>
+            </div>
+            `
+                : ""
+            }
+          </div>
+          
+          <!-- Schedule -->
+          <div class="schedule-section">
+            <div class="schedule-title">SCHEDULE</div>
+            <div class="schedule-content">
+              All the piece and parcel of the premises at 
+              <span class="highlight">${
+                formData.propertyAddress || "Complete Property Address"
+              }</span> 
+              and consisting of 
+              <span class="highlight">${
+                formData.commercialType
+                  ? formData.commercialType.toUpperCase()
+                  : "SHOP/OFFICE"
+              } 
+              SPACE WITH ${
+                formData.squareFeet || "XX"
+              } SQ.FT</span>, provided with electricity and water facilities.
+            </div>
+          </div>
+          
+          <!-- Witness Clause -->
+          <p class="witness-intro">
+            IN WITNESS WHEREOF the parties have set their respective hands unto this agreement 
+            the day, month and year first above written.
+          </p>
+          
+          <!-- Signatures -->
+          <div class="signature-section">
+            <div class="witnesses-block">
+              <div class="witness-title">WITNESSES:</div>
+              <div class="witness-line">1. _________________________</div>
+              <div class="witness-line">2. _________________________</div>
+            </div>
+            
+            <div class="signatures-row">
+              <div class="signature-column">
+                <div class="signature-title">LESSOR</div>
+                ${lessors
+                  .map(
+                    (lessor) => `
+                  <div class="signature-name">${
+                    lessor.name || "LESSOR NAME"
+                  }</div>
+                  <div class="signature-line">_________________________</div>
+                  <div class="signature-label">(Signature)</div>
+                  <br/>
+                `
+                  )
+                  .join("")}
+              </div>
+              
+              <div class="signature-column">
+                <div class="signature-title">LESSEE</div>
+                ${lessees
+                  .map(
+                    (lessee) => `
+                  <div class="signature-name">${
+                    lessee.name || "LESSEE NAME"
+                  }</div>
+                  <div class="signature-line">_________________________</div>
+                  <div class="signature-label">(Signature)</div>
+                  <br/>
+                `
+                  )
+                  .join("")}
+              </div>
+            </div>
+          </div>
+          
+          <!-- Page Break -->
+          <div class="page-break"></div>
+          
+          <!-- Annexure -->
+          <div class="annexure-section">
+            <div class="annexure-title">ANNEXURE I</div>
+            <div class="annexure-subtitle">List of fixtures and fittings provided</div>
+            
+            <table class="fixtures-table">
+              <thead>
+                <tr>
+                  <th class="sl-col">SL</th>
+                  <th class="item-col">ITEMS</th>
+                  <th class="qty-col">QUANTITY</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${(formData.fixtures && formData.fixtures.length > 0
+                  ? formData.fixtures
+                  : Array(15).fill({ item: "", quantity: "" })
+                )
+                  .slice(0, 15)
+                  .map(
+                    (fixture, index) => `
+                  <tr>
+                    <td class="sl-col">${index + 1}</td>
+                    <td class="item-col">${fixture.item || ""}</td>
+                    <td class="qty-col">${fixture.quantity || ""}</td>
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </body>
       </html>
     `;
 
-      // Create blob and download
+      // Create and download the Word document
       const blob = new Blob([wordDocument], {
         type: "application/msword",
       });
@@ -813,9 +763,7 @@ const CommercialAggrementPreview = () => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `Commercial_Lease_Agreement_${
-        bookingId || "document"
-      }.doc`;
+      link.download = `Commercial_Agreement_${bookingId || "document"}.doc`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

@@ -80,108 +80,378 @@ const RecidentialAggrementPreview = () => {
     setDownloadType("word");
 
     try {
-      // Create structured content for Word document
-      const generateWordContent = () => {
-        const lessors = formData.lessors || [
-          {
-            name: "",
-            addressLine1: "",
-            addressLine2: "",
-            city: "",
-            state: "",
-            pinCode: "",
-          },
-        ];
-        const lessees = formData.lessees || [
-          {
-            name: "",
-            aadhaar: "",
-            permanentAddressLine1: "",
-            permanentAddressLine2: "",
-            permanentCity: "",
-            permanentState: "",
-            permanentPinCode: "",
-          },
-        ];
+      const lessors = formData.lessors || [
+        {
+          name: "",
+          addressLine1: "",
+          addressLine2: "",
+          city: "",
+          state: "",
+          pinCode: "",
+        },
+      ];
 
-        return `
-          <div style="text-align: center; font-weight: bold; font-size: 18pt; margin-bottom: 30px; text-decoration: underline;">
-            RENTAL AGREEMENT
-          </div>
+      const lessees = formData.lessees || [
+        {
+          name: "",
+          aadhaar: "",
+          permanentAddressLine1: "",
+          permanentAddressLine2: "",
+          permanentCity: "",
+          permanentState: "",
+          permanentPinCode: "",
+        },
+      ];
 
-          ${
-            formData.firstParty
-              ? `
-    <div style="margin-bottom: 20px; text-align: justify; line-height: 1.6;">
-      <span style="font-size: 12pt;">
-        First Party (Stamp Duty): 
-        <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-          ${formData.firstParty}
-        </strong>
-      </span>
-      <br />
-      <span style="font-size: 11pt; font-style: italic;">
-        (Responsible for payment of stamp duty charges as per applicable state regulations)
-      </span>
-    </div>
-    <div style="margin-bottom: 20px; text-align: justify; line-height: 1.6;">
-      <span style="font-size: 12pt;">
-        Second Party: 
-        <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-          ${formData.secondParty}
-        </strong>
-      </span>
-    </div>
-  `
-              : ""
+      // Generate Word document content with ALL fields
+      const wordDocument = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+            xmlns:w='urn:schemas-microsoft-com:office:word' 
+            xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <meta charset='utf-8'>
+        <title>Rental Agreement</title>
+        <!--[if gte mso 9]>
+        <xml>
+          <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+          </w:WordDocument>
+        </xml>
+        <![endif]-->
+        <style>
+          @page {
+            size: A4;
+            margin: 2cm 1.5cm;
           }
-
-          <p style="margin-bottom: 20px; text-align: justify; line-height: 1.6;">
-            This Tenancy Agreement is made and executed at Bangalore, on this 
-            <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-              ${formatDate(formData.agreementDate)}
-            </strong>, by & between:
+          
+          body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.8;
+            color: #000000;
+            margin: 0;
+            padding: 20pt;
+          }
+          
+          .page-container {
+            width: 100%;
+            max-width: 210mm;
+          }
+          
+          .title-section {
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            text-decoration: underline;
+            letter-spacing: 2px;
+            margin-bottom: 25pt;
+            margin-top: 10pt;
+          }
+          
+          .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20pt;
+            font-size: 11pt;
+          }
+          
+          .info-table td {
+            border: 1px solid #000000;
+            padding: 8pt;
+          }
+          
+          .info-table .label-cell {
+            font-weight: bold;
+            width: 35%;
+            background-color: #f0f0f0;
+          }
+          
+          .main-paragraph {
+            text-align: justify;
+            margin-bottom: 15pt;
+            line-height: 1.8;
+          }
+          
+          .party-section {
+            margin-bottom: 20pt;
+            padding-left: 10pt;
+          }
+          
+          .party-name {
+            font-weight: bold;
+            font-size: 13pt;
+          }
+          
+          .party-details {
+            margin-top: 8pt;
+            padding-left: 15pt;
+            line-height: 1.6;
+          }
+          
+          .party-designation {
+            margin-top: 12pt;
+            text-align: center;
+            font-weight: bold;
+          }
+          
+          .divider {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14pt;
+            margin: 20pt 0;
+            letter-spacing: 3px;
+          }
+          
+          .witnesseth {
+            text-align: center;
+            font-weight: bold;
+            font-size: 13pt;
+            margin: 25pt 0;
+            text-decoration: underline;
+          }
+          
+          .terms-section {
+            margin-bottom: 25pt;
+          }
+          
+          .term-item {
+            margin-bottom: 15pt;
+            page-break-inside: avoid;
+          }
+          
+          .term-number {
+            font-weight: bold;
+            float: left;
+            width: 30pt;
+          }
+          
+          .term-content {
+            margin-left: 35pt;
+            text-align: justify;
+            line-height: 1.8;
+          }
+          
+          .highlight {
+            font-weight: bold;
+            background-color: #f5f5f5;
+            padding: 2pt 4pt;
+          }
+          
+          .schedule-section {
+            margin-top: 30pt;
+            margin-bottom: 25pt;
+            page-break-inside: avoid;
+          }
+          
+          .schedule-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14pt;
+            text-decoration: underline;
+            margin-bottom: 15pt;
+          }
+          
+          .schedule-content {
+            text-align: justify;
+            padding: 15pt;
+            border: 2pt solid #000000;
+            line-height: 1.8;
+          }
+          
+          .witness-intro {
+            text-align: justify;
+            margin: 25pt 0;
+            font-style: italic;
+          }
+          
+          .signature-section {
+            margin-top: 35pt;
+          }
+          
+          .witnesses-block {
+            margin-bottom: 25pt;
+          }
+          
+          .witness-title {
+            font-weight: bold;
+            margin-bottom: 12pt;
+          }
+          
+          .witness-line {
+            margin-bottom: 10pt;
+          }
+          
+          .signatures-row {
+            display: table;
+            width: 100%;
+            margin-top: 30pt;
+          }
+          
+          .signature-column {
+            display: table-cell;
+            width: 48%;
+            vertical-align: top;
+            padding: 0 10pt;
+          }
+          
+          .signature-title {
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 15pt;
+          }
+          
+          .signature-name {
+            font-weight: bold;
+            margin-bottom: 8pt;
+          }
+          
+          .signature-line {
+            margin-bottom: 5pt;
+          }
+          
+          .signature-label {
+            font-size: 10pt;
+            font-style: italic;
+          }
+          
+          .page-break {
+            page-break-before: always;
+          }
+          
+          .annexure-section {
+            margin-top: 30pt;
+          }
+          
+          .annexure-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14pt;
+            text-decoration: underline;
+            margin-bottom: 10pt;
+          }
+          
+          .annexure-subtitle {
+            text-align: center;
+            margin-bottom: 20pt;
+          }
+          
+          .fixtures-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25pt;
+          }
+          
+          .fixtures-table th,
+          .fixtures-table td {
+            border: 1px solid #000000;
+            padding: 8pt;
+          }
+          
+          .fixtures-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            text-align: center;
+          }
+          
+          .fixtures-table .sl-col {
+            width: 10%;
+            text-align: center;
+          }
+          
+          .fixtures-table .item-col {
+            width: 65%;
+          }
+          
+          .fixtures-table .qty-col {
+            width: 25%;
+            text-align: center;
+          }
+          
+          @media print {
+            .page-break {
+              page-break-before: always;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="page-container">
+          <!-- Title -->
+          <div class="title-section">RENTAL AGREEMENT</div>
+          
+          <!-- Party Information Table -->
+          <table class="info-table">
+            <tr>
+              <td class="label-cell">First Party</td>
+              <td>${formData.firstParty || "Not Specified"}</td>
+            </tr>
+            <tr>
+              <td class="label-cell">Second Party</td>
+              <td>${formData.secondParty || "Not Specified"}</td>
+            </tr>
+            <tr>
+              <td class="label-cell">Stamp Duty Paid By</td>
+              <td>${
+                formData.stampDutyPayer === "First Party"
+                  ? formData.firstParty || "First Party"
+                  : formData.stampDutyPayer === "Second Party"
+                  ? formData.secondParty || "Second Party"
+                  : "Not Selected"
+              }</td>
+            </tr>
+          </table>
+          
+          <!-- Introduction -->
+          <p class="main-paragraph">
+            This Tenancy Agreement is made and executed at <strong>Bangalore</strong>, 
+            on this <span class="highlight">${formatDate(
+              formData.agreementDate
+            )}</span>, by & between:
           </p>
-
+          
+          <!-- Lessors -->
           ${lessors
             .map(
               (lessor, index) => `
-            <div style="margin-bottom: 20px; text-align: justify; line-height: 1.6;">
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${lessor.name || `LESSOR ${index + 1} NAME`}
-              </strong>${index < lessors.length - 1 ? "," : ""}<br/>
-              Address: 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${lessor.addressLine1 || `LESSOR ${index + 1} Address Line 1`}${
-                lessor.addressLine2 ? ", " + lessor.addressLine2 : ""
-              }${lessor.city ? ", " + lessor.city : ""}${
-                lessor.state ? ", " + lessor.state : ""
-              }${lessor.pinCode ? " - " + lessor.pinCode : ""}
-              </strong>
+            <div class="party-section">
+              <div class="party-name">${
+                lessor.name || `LESSOR ${index + 1} NAME`
+              }</div>
+              <div class="party-details">
+                <strong>Address:</strong> ${
+                  lessor.addressLine1 || `LESSOR ${index + 1} Address Line 1`
+                }${lessor.addressLine2 ? ", " + lessor.addressLine2 : ""}${
+                lessor.city ? ", " + lessor.city : ""
+              }${lessor.state ? ", " + lessor.state : ""}${
+                lessor.pinCode ? " - " + lessor.pinCode : ""
+              }
+              </div>
             </div>
           `
             )
             .join("")}
-
-          <p style="margin-bottom: 20px; text-align: justify; line-height: 1.6;">
+          
+          <p class="party-designation">
             Hereinafter referred to as the <strong>"LESSOR"</strong> of ONE PART.
           </p>
-
-          <p style="margin-bottom: 20px; font-weight: bold; text-align: center;">AND</p>
-
+          
+          <p class="divider">AND</p>
+          
+          <!-- Lessees -->
           ${lessees
             .map(
               (lessee, index) => `
-            <div style="margin-bottom: 20px; text-align: justify; line-height: 1.6;">
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${lessee.name || `LESSEE ${index + 1} NAME`}
-              </strong>${index < lessees.length - 1 ? "," : ""}<br/>
-              Aadhaar No: <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">${
-                lessee.aadhaar || "0000 0000 0000"
-              }</strong><br/>
-              Permanent Address: 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${
+            <div class="party-section">
+              <div class="party-name">${
+                lessee.name || `LESSEE ${index + 1} NAME`
+              }</div>
+              <div class="party-details">
+                <strong>Aadhaar No:</strong> ${
+                  lessee.aadhaar || "0000 0000 0000"
+                }<br/>
+                <strong>Permanent Address:</strong> ${
                   lessee.permanentAddressLine1 ||
                   `LESSEE ${index + 1} Address Line 1`
                 }${
@@ -191,253 +461,256 @@ const RecidentialAggrementPreview = () => {
               }${lessee.permanentCity ? ", " + lessee.permanentCity : ""}${
                 lessee.permanentState ? ", " + lessee.permanentState : ""
               }${lessee.permanentPinCode ? " - " + lessee.permanentPinCode : ""}
-              </strong>
+              </div>
             </div>
           `
             )
             .join("")}
-
-          <p style="margin-bottom: 20px; text-align: justify; line-height: 1.6;">
+          
+          <p class="party-designation">
             In consideration of the rent hereinafter called as <strong>"LESSEE"</strong>.
           </p>
-
-          <p style="margin-bottom: 20px; text-align: justify; line-height: 1.6;">
-            WHEREAS the Owner is the sole and absolute owner of the Premises situated at 
-            <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-              ${formData.propertyAddress || "Complete Property Address"}
-            </strong> 
-            more fully described in Schedule. The tenant for want of accommodation requested the owner to let out premises and Owner has also agreed to let out under the following terms and conditions:
+          
+          <!-- Whereas Clause -->
+          <p class="main-paragraph">
+            <strong>WHEREAS</strong> the Owner is the sole and absolute owner of the Premises 
+            situated at <span class="highlight">${
+              formData.propertyAddress || getPropertyAddressString()
+            }</span> 
+            more fully described in Schedule. The tenant for want of accommodation requested the owner 
+            to let out premises and Owner has also agreed to let out under the following terms and conditions:
           </p>
-
-          <p style="margin-bottom: 20px; font-weight: bold; text-align: center;">
-            NOW THIS AGREEMENT WITNESSETH AS FOLLOWS:
-          </p>
-
-          <div style="padding-left: 30px; margin-bottom: 20px;">
-            <div style="margin-bottom: 15px; text-align: justify; line-height: 1.6; display: flex;">
-              <span style="font-weight: bold; margin-right: 10px; flex-shrink: 0;">1.</span>
-              <div>
+          
+          <p class="witnesseth">NOW THIS AGREEMENT WITNESSETH AS FOLLOWS:</p>
+          
+          <!-- Terms and Conditions -->
+          <div class="terms-section">
+            <div class="term-item">
+              <div class="term-number">1.</div>
+              <div class="term-content">
                 <strong>Rent:</strong> The LESSEE shall pay a monthly rent of Rs. 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData.rentAmount || "00,000"}
-                </strong> 
-                /- (Rupees 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData.rentAmountWords || "In Words Only"}
-                </strong>
-                ) Including Maintenance Charges on or before 5<sup>th</sup> of every month of English calendar.
+                <span class="highlight">${
+                  formData.rentAmount || "00,000"
+                }</span>/- 
+                (Rupees <span class="highlight">${
+                  formData.rentAmountWords || "In Words Only"
+                }</span>) 
+                Including Maintenance Charges on or before 5<sup>th</sup> of every month of English calendar.
               </div>
             </div>
-
-            <div style="margin-bottom: 15px; text-align: justify; line-height: 1.6; display: flex;">
-              <span style="font-weight: bold; margin-right: 10px; flex-shrink: 0;">2.</span>
-              <div>
+            
+            <div class="term-item">
+              <div class="term-number">2.</div>
+              <div class="term-content">
                 <strong>Deposit:</strong> The LESSEE have paid a total sum of Rs. 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData.depositAmount || "00,000"}
-                </strong>
-                /- (Rupees 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData.depositAmountWords || "In Words Only"}
-                </strong>
-                ) Paid Rs 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData.depositAmount || "00,000"}
-                </strong> 
-                by way of cash/online as security deposit and advance which the LESSOR hereby acknowledges the said sum shall carry no interest but refundable to the LESSEE on the termination of the tenancy.
+                <span class="highlight">${
+                  formData.depositAmount || "00,000"
+                }</span>/- 
+                (Rupees <span class="highlight">${
+                  formData.depositAmountWords || "In Words Only"
+                }</span>) 
+                Paid Rs <span class="highlight">${
+                  formData.depositAmount || "00,000"
+                }</span> 
+                by way of cash/online as security deposit and advance which the LESSOR hereby acknowledges 
+                the said sum shall carry no interest but refundable to the LESSEE on the termination of the tenancy.
               </div>
             </div>
-
-            <div style="margin-bottom: 15px; text-align: justify; line-height: 1.6; display: flex;">
-              <span style="font-weight: bold; margin-right: 10px; flex-shrink: 0;">3.</span>
-              <div>
-                <strong>Duration:</strong> The Tenancy shall be in force for a period of 11 (Eleven) months commencing from 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formatDate(formData.agreementStartDate)}
-                </strong> 
-                and the month of tenancy being the English calendar month. After the expiry of 11 months the LESSEE shall pay an increase of 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData.rentIncreasePercentage || "00"}%
-                </strong> 
-                in the existing rent.
+            
+            <div class="term-item">
+              <div class="term-number">3.</div>
+              <div class="term-content">
+                <strong>Duration:</strong> The Tenancy shall be in force for a period of 11 (Eleven) months 
+                commencing from <span class="highlight">${formatDate(
+                  formData.agreementStartDate
+                )}</span> 
+                and the month of tenancy being the English calendar month. After the expiry of 11 months 
+                the LESSEE shall pay an increase of 
+                <span class="highlight">${
+                  formData.rentIncreasePercentage || "00"
+                }%</span> in the existing rent.
               </div>
             </div>
-
-            <div style="margin-bottom: 15px; text-align: justify; line-height: 1.6; display: flex;">
-              <span style="font-weight: bold; margin-right: 10px; flex-shrink: 0;">4.</span>
-              <div>
-                <strong>Sub-letting:</strong> The LESSEE shall not use the premises for any offensive or objectionable purpose and shall not have consent of the LESSOR hereby to sublet, under let or part with the possession to whomsoever or make any alteration.
+            
+            <div class="term-item">
+              <div class="term-number">4.</div>
+              <div class="term-content">
+                <strong>Sub-letting:</strong> The LESSEE shall not use the premises for any offensive or 
+                objectionable purpose and shall not have consent of the LESSOR hereby to sublet, under let 
+                or part with the possession to whomsoever or make any alteration.
               </div>
             </div>
-
-            <div style="margin-bottom: 15px; text-align: justify; line-height: 1.6; display: flex;">
-              <span style="font-weight: bold; margin-right: 10px; flex-shrink: 0;">5.</span>
-              <div>
-                <strong>Delivery back of possession:</strong> On termination of the tenancy period to any renewal thereof, the LESSEE shall deliver back vacant possession of the schedule premises to the LESSOR in the same condition in which it was handed over at the time of joining.
+            
+            <div class="term-item">
+              <div class="term-number">5.</div>
+              <div class="term-content">
+                <strong>Delivery back of possession:</strong> On termination of the tenancy period to any 
+                renewal thereof, the LESSEE shall deliver back vacant possession of the schedule premises 
+                to the LESSOR in the same condition in which it was handed over at the time of joining.
               </div>
             </div>
-
-            <div style="margin-bottom: 15px; text-align: justify; line-height: 1.6; display: flex;">
-              <span style="font-weight: bold; margin-right: 10px; flex-shrink: 0;">6.</span>
-              <div>
-                <strong>Notice:</strong> If the LESSOR or the LESSEE wishes to terminate the Commercial Agreement period each party should issue 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData.noticePeriod || "..."}
-                </strong> 
-                month notice in writing to each other.
+            
+            <div class="term-item">
+              <div class="term-number">6.</div>
+              <div class="term-content">
+                <strong>Notice:</strong> If the LESSOR or the LESSEE wishes to terminate the Commercial 
+                Agreement period each party should issue 
+                <span class="highlight">${
+                  formData.noticePeriod || "One (1)"
+                }</span> month notice in writing to each other.
               </div>
             </div>
-
-            <div style="margin-bottom: 15px; text-align: justify; line-height: 1.6; display: flex;">
-              <span style="font-weight: bold; margin-right: 10px; flex-shrink: 0;">7.</span>
-              <div>
-                <strong>Additions and alterations:</strong> The LESSEE shall not cause any damages to the fixed fixtures on the above said property. Any damages caused shall be repaired at the cost of the LESSEE.
+            
+            <div class="term-item">
+              <div class="term-number">7.</div>
+              <div class="term-content">
+                <strong>Additions and alterations:</strong> The LESSEE shall not cause any damages to the 
+                fixed fixtures on the above said property. Any damages caused shall be repaired at the cost of the LESSEE.
               </div>
             </div>
-
-            <div style="margin-bottom: 15px; text-align: justify; line-height: 1.6; display: flex;">
-              <span style="font-weight: bold; margin-right: 10px; flex-shrink: 0;">8.</span>
-              <div>
-                <strong>Terminate:</strong> The LESSOR shall have the right to terminate the tenancy if the LESSEEs fails to pay the rents regularly for a consecutive period of 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData.defaultPeriod || "2"}
-                </strong> 
-                Months or commits breach of any of the terms herein mentioned and take possession of the premises.
+            
+            <div class="term-item">
+              <div class="term-number">8.</div>
+              <div class="term-content">
+                <strong>Terminate:</strong> The LESSOR shall have the right to terminate the tenancy if the 
+                LESSEE fails to pay the rents regularly for a consecutive period of 
+                <span class="highlight">${
+                  formData.defaultPeriod || "Two (2)"
+                }</span> Months or commits breach 
+                of any of the terms herein mentioned and take possession of the premises.
               </div>
             </div>
-
-            <div style="margin-bottom: 15px; text-align: justify; line-height: 1.6; display: flex;">
-              <span style="font-weight: bold; margin-right: 10px; flex-shrink: 0;">9.</span>
-              <div>
-                <strong>Painting and Cleaning Charges:</strong> At the time of vacating the premises the LESSEE shall pay 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  Rs. ${formData.paintingCharges || "..."}
-                </strong> 
-                as a painting and cleaning charges or such amount will be deducted from the deposit amount.
+            
+            <div class="term-item">
+              <div class="term-number">9.</div>
+              <div class="term-content">
+                <strong>Painting and Cleaning Charges:</strong> At the time of vacating the premises the LESSEE 
+                shall pay <span class="highlight">Rs. ${
+                  formData.paintingCharges || "5,000"
+                }</span> as a painting 
+                and cleaning charges or such amount will be deducted from the deposit amount.
               </div>
             </div>
-
-            <div style="margin-bottom: 15px; text-align: justify; line-height: 1.6; display: flex;">
-              <span style="font-weight: bold; margin-right: 10px; flex-shrink: 0;">10.</span>
-              <div>
-                <strong>Electricity and other Taxes:</strong> The LESSEE shall bear and pay the Electrical charges consumed as per the meter provided to concerned authorities and the LESSOR shall pay the property taxes.
+            
+            <div class="term-item">
+              <div class="term-number">10.</div>
+              <div class="term-content">
+                <strong>Electricity and other Taxes:</strong> The LESSEE shall bear and pay the Electrical charges 
+                consumed as per the meter provided to concerned authorities and the LESSOR shall pay the property taxes.
               </div>
             </div>
-
-            <div style="margin-bottom: 15px; text-align: justify; line-height: 1.6; display: flex;">
-              <span style="font-weight: bold; margin-right: 10px; flex-shrink: 0;">11.</span>
-              <div>
-                <strong>Inspection:</strong> The LESSOR or his representatives shall be entitled to enter the premises with prior appointment to inspect the same to satisfy himself that the premises if being and used in accordance with the terms of Agreement.
+            
+            <div class="term-item">
+              <div class="term-number">11.</div>
+              <div class="term-content">
+                <strong>Inspection:</strong> The LESSOR or his representatives shall be entitled to enter the 
+                premises with prior appointment to inspect the same to satisfy himself that the premises if being 
+                and used in accordance with the terms of Agreement.
               </div>
             </div>
-
-            <div style="margin-bottom: 15px; text-align: justify; line-height: 1.6; display: flex;">
-              <span style="font-weight: bold; margin-right: 10px; flex-shrink: 0;">12.</span>
-              <div>
+            
+            <div class="term-item">
+              <div class="term-number">12.</div>
+              <div class="term-content">
                 The LESSEE shall use the premises for <strong>"RESIDENTIAL PURPOSE"</strong> only.
               </div>
             </div>
-
+            
             ${
               formData.additionaldetails
                 ? `
-              <div style="margin-bottom: 15px; text-align: justify; line-height: 1.6; display: flex;">
-                <span style="font-weight: bold; margin-right: 10px; flex-shrink: 0;">13.</span>
-                <div style="font-weight: bold; background-color: #f3f4f6; padding: 2px 4px;">
-                  ${formData.additionaldetails}
-                </div>
+            <div class="term-item">
+              <div class="term-number">13.</div>
+              <div class="term-content">
+                <strong>Additional Terms:</strong> <span class="highlight">${formData.additionaldetails}</span>
               </div>
+            </div>
             `
                 : ""
             }
           </div>
-
-          <div style="margin-top: 40px; margin-bottom: 30px;">
-            <div style="text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 16pt; text-decoration: underline;">
-              SCHEDULE
-            </div>
-            <p style="text-align: justify; line-height: 1.6;">
+          
+          <!-- Schedule -->
+          <div class="schedule-section">
+            <div class="schedule-title">SCHEDULE</div>
+            <div class="schedule-content">
               All the piece and parcel of the premises at 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${getPropertyAddressString()}
-              </strong> 
+              <span class="highlight">${
+                formData.propertyAddress || getPropertyAddressString()
+              }</span> 
               and consisting of 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${formData.bhkConfig || "XBHK"}, ${
-          formData.bedroomCount || "X"
-        } bedroom, ${formData.hallCount || "X"} Hall, ${
-          formData.kitchenCount || "X"
-        } Kitchen with ${formData.toiletCount || "X"} Toilets
-              </strong>
-              , provided with electricity and water facilities.
-            </p> || "X"} Hall, ${formData.kitchenCount || "X"} Kitchen with ${
-          formData.toiletCount || "X"
-        } Toilets
-              </strong>
-              , provided with electricity and water facilities.
-            </p>
+              <span class="highlight">${formData.bhkConfig || "XBHK"}, ${
+        formData.bedroomCount || "X"
+      } bedroom, ${formData.hallCount || "X"} Hall, ${
+        formData.kitchenCount || "X"
+      } Kitchen with ${formData.toiletCount || "X"} Toilets</span>, 
+              provided with electricity and water facilities.
+            </div>
           </div>
-
-          <p style="margin-bottom: 30px; text-align: justify; line-height: 1.6;">
-            IN WITNESS WHEREOF the parties have set their respective hands unto this agreement the day, month and year first above written.
+          
+          <!-- Witness Clause -->
+          <p class="witness-intro">
+            IN WITNESS WHEREOF the parties have set their respective hands unto this agreement 
+            the day, month and year first above written.
           </p>
-
-          <div style="display: table; width: 100%; margin-top: 50px;">
-            <div style="display: table-cell; width: 50%; vertical-align: top; padding-right: 20px;">
-              <div style="font-weight: bold; margin-bottom: 10px;">WITNESSES:</div>
-              <div style="margin-bottom: 10px;">1. ________________________</div>
-              <div style="margin-top: 60px;">
-                <div style="font-weight: bold; margin-bottom: 5px;">LESSOR</div>
+          
+          <!-- Signatures -->
+          <div class="signature-section">
+            <div class="witnesses-block">
+              <div class="witness-title">WITNESSES:</div>
+              <div class="witness-line">1. _________________________</div>
+              <div class="witness-line">2. _________________________</div>
+            </div>
+            
+            <div class="signatures-row">
+              <div class="signature-column">
+                <div class="signature-title">LESSOR</div>
                 ${lessors
                   .map(
                     (lessor) => `
-                  <div style="font-weight: bold; background-color: #f3f4f6; padding: 2px 4px; margin-bottom: 5px;">
-                    ${lessor.name || "LESSOR NAME"}
-                  </div>
+                  <div class="signature-name">${
+                    lessor.name || "LESSOR NAME"
+                  }</div>
+                  <div class="signature-line">_________________________</div>
+                  <div class="signature-label">(Signature)</div>
+                  <br/>
                 `
                   )
                   .join("")}
-                <div>(Signature)</div>
               </div>
-            </div>
-            <div style="display: table-cell; width: 50%; vertical-align: top; padding-left: 20px;">
-              <div style="margin-bottom: 10px;">2. ________________________</div>
-              <div style="margin-top: 60px;">
-                <div style="font-weight: bold; margin-bottom: 5px;">LESSEE</div>
+              
+              <div class="signature-column">
+                <div class="signature-title">LESSEE</div>
                 ${lessees
                   .map(
                     (lessee) => `
-                  <div style="font-weight: bold; background-color: #f3f4f6; padding: 2px 4px; margin-bottom: 5px;">
-                    ${lessee.name || "LESSEE NAME"}
-                  </div>
+                  <div class="signature-name">${
+                    lessee.name || "LESSEE NAME"
+                  }</div>
+                  <div class="signature-line">_________________________</div>
+                  <div class="signature-label">(Signature)</div>
+                  <br/>
                 `
                   )
                   .join("")}
-                <div>(Signature)</div>
               </div>
             </div>
           </div>
-
-          <div style="page-break-before: always;">
-            <div style="text-align: center; margin-top: 30px; margin-bottom: 40px;">
-              <div style="font-weight: bold; margin-bottom: 10px; font-size: 16pt; text-decoration: underline;">
-                ANNEXURE I
-              </div>
-              <div>List of fixtures and fittings provided</div>
-            </div>
-
-            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+          
+          <!-- Page Break -->
+          <div class="page-break"></div>
+          
+          <!-- Annexure -->
+          <div class="annexure-section">
+            <div class="annexure-title">ANNEXURE I</div>
+            <div class="annexure-subtitle">List of fixtures and fittings provided</div>
+            
+            <table class="fixtures-table">
               <thead>
                 <tr>
-                  <th style="border: 1px solid #000; padding: 12px; background-color: #f3f4f6; text-align: center; width: 10%; font-weight: bold;">
-                    SL
-                  </th>
-                  <th style="border: 1px solid #000; padding: 12px; background-color: #f3f4f6; text-align: center; width: 65%; font-weight: bold;">
-                    ITEMS
-                  </th>
-                  <th style="border: 1px solid #000; padding: 12px; background-color: #f3f4f6; text-align: center; width: 25%; font-weight: bold;">
-                    QUANTITY
-                  </th>
+                  <th class="sl-col">SL</th>
+                  <th class="item-col">ITEMS</th>
+                  <th class="qty-col">QUANTITY</th>
                 </tr>
               </thead>
               <tbody>
@@ -448,69 +721,23 @@ const RecidentialAggrementPreview = () => {
                   .slice(0, 15)
                   .map(
                     (fixture, index) => `
-                    <tr>
-                      <td style="border: 1px solid #000; padding: 12px; text-align: center; height: 40px;">
-                        ${index + 1}
-                      </td>
-                      <td style="border: 1px solid #000; padding: 12px; height: 40px;">
-                        <strong style="background-color: #f3f4f6; padding: 2px 4px;">${
-                          fixture.item || ""
-                        }</strong>
-                      </td>
-                      <td style="border: 1px solid #000; padding: 12px; text-align: center; height: 40px;">
-                        <strong style="background-color: #f3f4f6; padding: 2px 4px;">${
-                          fixture.quantity || ""
-                        }</strong>
-                      </td>
-                    </tr>
-                  `
+                  <tr>
+                    <td class="sl-col">${index + 1}</td>
+                    <td class="item-col">${fixture.item || ""}</td>
+                    <td class="qty-col">${fixture.quantity || ""}</td>
+                  </tr>
+                `
                   )
                   .join("")}
               </tbody>
             </table>
           </div>
-        `;
-      };
+        </div>
+      </body>
+      </html>
+    `;
 
-      // Enhanced Word document template with proper A4 styling
-      const wordDocument = `
-        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head>
-          <meta charset='utf-8'>
-          <title>Rental Agreement</title>
-          <!--[if gte mso 9]>
-          <xml>
-            <w:WordDocument>
-              <w:View>Print</w:View>
-              <w:Zoom>90</w:Zoom>
-              <w:DoNotPromptForConvert/>
-              <w:DoNotShowInsertionsAndDeletions/>
-            </w:WordDocument>
-          </xml>
-          <![endif]-->
-          <style>
-            @page {
-              size: A4;
-              margin: 2cm 1.5cm 2cm 1.5cm;
-            }
-            body {
-              font-family: "Times New Roman", Times, serif;
-              font-size: 12pt;
-              line-height: 1.6;
-              color: #000;
-              margin: 0;
-              padding: 20px;
-              max-width: 100%;
-            }
-          </style>
-        </head>
-        <body>
-          ${generateWordContent()}
-        </body>
-        </html>
-      `;
-
-      // Create blob and download
+      // Create and download the Word document
       const blob = new Blob([wordDocument], {
         type: "application/msword",
       });
