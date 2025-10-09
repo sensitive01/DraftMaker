@@ -86,37 +86,105 @@ const VehicleInsurencePreview = () => {
       ];
 
       // Add First and Second Party if they exist
-      if (formData.firstParty) {
+      // Add First and Second Party if they exist
+      if (formData.firstParty && formData.secondParty) {
+        // Create table
+        const table = new Table({
+          width: {
+            size: 100,
+            type: "pct",
+          },
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({ text: "First Party", bold: true }),
+                  ],
+                  shading: { fill: "F3F4F6" },
+                  borders: {
+                    top: { style: BorderStyle.SINGLE, size: 1 },
+                    bottom: { style: BorderStyle.SINGLE, size: 1 },
+                    left: { style: BorderStyle.SINGLE, size: 1 },
+                    right: { style: BorderStyle.SINGLE, size: 1 },
+                  },
+                }),
+                new TableCell({
+                  children: [new Paragraph(formData.firstParty)],
+                  borders: {
+                    top: { style: BorderStyle.SINGLE, size: 1 },
+                    bottom: { style: BorderStyle.SINGLE, size: 1 },
+                    left: { style: BorderStyle.SINGLE, size: 1 },
+                    right: { style: BorderStyle.SINGLE, size: 1 },
+                  },
+                }),
+              ],
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({ text: "Second Party", bold: true }),
+                  ],
+                  borders: {
+                    top: { style: BorderStyle.SINGLE, size: 1 },
+                    bottom: { style: BorderStyle.SINGLE, size: 1 },
+                    left: { style: BorderStyle.SINGLE, size: 1 },
+                    right: { style: BorderStyle.SINGLE, size: 1 },
+                  },
+                }),
+                new TableCell({
+                  children: [new Paragraph(formData.secondParty)],
+                  borders: {
+                    top: { style: BorderStyle.SINGLE, size: 1 },
+                    bottom: { style: BorderStyle.SINGLE, size: 1 },
+                    left: { style: BorderStyle.SINGLE, size: 1 },
+                    right: { style: BorderStyle.SINGLE, size: 1 },
+                  },
+                }),
+              ],
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({ text: "Stamp Duty Paid By", bold: true }),
+                  ],
+                  shading: { fill: "F3F4F6" },
+                  borders: {
+                    top: { style: BorderStyle.SINGLE, size: 1 },
+                    bottom: { style: BorderStyle.SINGLE, size: 1 },
+                    left: { style: BorderStyle.SINGLE, size: 1 },
+                    right: { style: BorderStyle.SINGLE, size: 1 },
+                  },
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph(
+                      formData.stampDutyPayer === "First Party"
+                        ? formData.firstParty
+                        : formData.stampDutyPayer === "Second Party"
+                        ? formData.secondParty
+                        : "Not Selected"
+                    ),
+                  ],
+                  borders: {
+                    top: { style: BorderStyle.SINGLE, size: 1 },
+                    bottom: { style: BorderStyle.SINGLE, size: 1 },
+                    left: { style: BorderStyle.SINGLE, size: 1 },
+                    right: { style: BorderStyle.SINGLE, size: 1 },
+                  },
+                }),
+              ],
+            }),
+          ],
+        });
+
+        docChildren.push(table);
         docChildren.push(
           new Paragraph({
-            spacing: { after: 100 },
-            children: [
-              new TextRun("First Party (Stamp Duty): "),
-              new TextRun({
-                text: formData.firstParty,
-                bold: true,
-              }),
-            ],
-          }),
-          new Paragraph({
-            spacing: { after: 200 },
-            children: [
-              new TextRun({
-                text: "(Responsible for payment of stamp duty charges as per applicable state regulations)",
-                italics: true,
-                size: 20,
-              }),
-            ],
-          }),
-          new Paragraph({
-            spacing: { after: 200 },
-            children: [
-              new TextRun("Second Party: "),
-              new TextRun({
-                text: formData.secondParty || "",
-                bold: true,
-              }),
-            ],
+            text: "",
+            spacing: { after: 300 },
           })
         );
       }
@@ -166,7 +234,7 @@ const VehicleInsurencePreview = () => {
           children: [
             new TextRun("My Aadhaar No: "),
             new TextRun({
-              text: formData.aadhaar || "__ ____ ____",
+              text: formData.aadhaarNo || "__ ____ ____",
               bold: true,
             }),
           ],
@@ -444,27 +512,48 @@ const VehicleInsurencePreview = () => {
       currentY += 15;
 
       // Add First and Second Party if they exist
-      if (formData.firstParty) {
-        currentY = addText(
-          `First Party (Stamp Duty): ${formData.firstParty}`,
-          margin,
-          currentY + 5,
-          { bold: false }
-        );
+      if (formData.firstParty && formData.secondParty) {
+        // Draw table
+        const tableData = [
+          ["First Party", formData.firstParty],
+          ["Second Party", formData.secondParty],
+          [
+            "Stamp Duty Paid By",
+            formData.stampDutyPayer === "First Party"
+              ? formData.firstParty
+              : formData.stampDutyPayer === "Second Party"
+              ? formData.secondParty
+              : "Not Selected",
+          ],
+        ];
 
-        currentY = addText(
-          "(Responsible for payment of stamp duty charges as per applicable state regulations)",
-          margin,
-          currentY + 3,
-          { fontSize: 10 }
-        );
+        const cellWidth = (pageWidth - 2 * margin) / 2;
+        const cellHeight = 10;
 
-        currentY = addText(
-          `Second Party: ${formData.secondParty || ""}`,
-          margin,
-          currentY + 5,
-          { bold: false }
-        );
+        tableData.forEach((row, index) => {
+          const isGrayRow = index === 0 || index === 2;
+
+          // Draw cell backgrounds
+          if (isGrayRow) {
+            pdf.setFillColor(243, 244, 246);
+            pdf.rect(margin, currentY, cellWidth, cellHeight, "F");
+          }
+
+          // Draw borders
+          pdf.setDrawColor(156, 163, 175);
+          pdf.rect(margin, currentY, cellWidth, cellHeight);
+          pdf.rect(margin + cellWidth, currentY, cellWidth, cellHeight);
+
+          // Add text
+          pdf.setFontSize(11);
+          pdf.setFont("helvetica", "bold");
+          pdf.text(row[0], margin + 3, currentY + 7);
+
+          pdf.setFont("helvetica", "normal");
+          pdf.text(row[1], margin + cellWidth + 3, currentY + 7);
+
+          currentY += cellHeight;
+        });
 
         currentY += 10;
       }
@@ -487,7 +576,7 @@ const VehicleInsurencePreview = () => {
       );
 
       currentY = addText(
-        `My Aadhaar No: ${formData.aadhaar || "__ ____ ____"}`,
+        `My Aadhaar No: ${formData.aadhaarNo || "__ ____ ____"}`,
         margin,
         currentY + 8,
         { bold: true }
@@ -696,27 +785,41 @@ const VehicleInsurencePreview = () => {
             stamp duty laws]
           </p>
         </div>
-        {formData.firstParty && (
-          <>
-            <div className="mb-5 text-justify leading-relaxed">
-              <span className="font-lg">
-                First Party (Stamp Duty):{" "}
-                <span className="font-bold">{formData.firstParty}</span>
-              </span>
-
-              <br />
-              <span className="text-sm italic">
-                (Responsible for payment of stamp duty charges as per applicable
-                state regulations)
-              </span>
-            </div>
-            <div className="mb-5 text-justify leading-relaxed">
-              <span className="font-lg">
-                Second Party :{" "}
-                <span className="font-bold">{formData.secondParty}</span>
-              </span>
-            </div>
-          </>
+        {formData.firstParty && formData.secondParty && (
+          <div className="mb-6 relative z-10">
+            <table className="w-full border-collapse border border-gray-400 text-sm">
+              <tbody>
+                <tr className="bg-gray-100">
+                  <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                    First Party
+                  </td>
+                  <td className="border border-gray-400 px-3 py-2">
+                    {formData.firstParty}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                    Second Party
+                  </td>
+                  <td className="border border-gray-400 px-3 py-2">
+                    {formData.secondParty}
+                  </td>
+                </tr>
+                <tr className="bg-gray-100">
+                  <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                    Stamp Duty Paid By
+                  </td>
+                  <td className="border border-gray-400 px-3 py-2">
+                    {formData.stampDutyPayer === "First Party"
+                      ? formData.firstParty
+                      : formData.stampDutyPayer === "Second Party"
+                      ? formData.secondParty
+                      : "Not Selected"}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         )}
 
         {/* Content */}
@@ -741,7 +844,7 @@ const VehicleInsurencePreview = () => {
           <p>
             My Aadhaar No:{" "}
             <span className="font-bold">
-              {formData.aadhaar || "__ ____ ____"}
+              {formData.aadhaarNo || "__ ____ ____"}
             </span>
           </p>
 

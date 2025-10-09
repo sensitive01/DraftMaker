@@ -325,7 +325,7 @@ export default function GapPeriodForm({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-red-600 mb-1">
-                Who will pay the Stamp Duty?
+                First Party Name
               </label>
               <input
                 type="text"
@@ -358,11 +358,28 @@ export default function GapPeriodForm({
                 {formData.secondParty?.length || 0}/50 characters
               </p>
             </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-red-600 mb-1">
+                Who will pay the Stamp Duty?
+              </label>
+              <select
+                name="stampDutyPayer"
+                value={formData.stampDutyPayer || ""}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded text-sm bg-white"
+              >
+                <option value="">Select who will pay the stamp duty</option>
+                <option value="First Party">First Party</option>
+                <option value="Second Party">Second Party</option>
+              </select>
+            </div>
           </div>
 
           <p className="mt-3 text-xs text-red-600 italic">
-            ℹ️ Please enter the names of both parties to the agreement. Only
-            letters, spaces, and commas are allowed (max 50 characters each).
+            ℹ️ Please enter the names of both parties and select who will pay
+            the stamp duty. Only letters, spaces, and commas are allowed (max 50
+            characters each).
           </p>
         </div>
 

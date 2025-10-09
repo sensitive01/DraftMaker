@@ -259,7 +259,7 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-medium text-red-600 mb-1">
-              Who will pay the Stamp Duty? *
+              First Party Name *
             </label>
             <input
               type="text"
@@ -292,11 +292,28 @@ const AddressAffidavitForm = ({ formData, handleChange }) => {
               {formData.secondParty?.length || 0}/50 characters
             </p>
           </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-xs font-medium text-red-600 mb-1">
+              Who will pay the Stamp Duty? *
+            </label>
+            <select
+              name="stampDutyPaidBy"
+              value={formData.stampDutyPaidBy || ""}
+              onChange={handleChange}
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-red-400 focus:border-red-400"
+            >
+              <option value="">Select who will pay the stamp duty</option>
+              <option value="firstParty">First Party</option>
+              <option value="secondParty">Second Party</option>
+            </select>
+          </div>
         </div>
 
         <p className="mt-3 text-xs text-red-600 italic">
-          ℹ️ Please enter the names of both parties to the agreement. Only
-          letters, spaces, and commas are allowed (max 50 characters each).
+          ℹ️ Please enter the names of both parties and select who will pay the
+          stamp duty. Only letters, spaces, and commas are allowed for names
+          (max 50 characters each).
         </p>
       </div>
 

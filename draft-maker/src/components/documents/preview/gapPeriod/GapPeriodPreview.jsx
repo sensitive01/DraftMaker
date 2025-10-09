@@ -41,27 +41,41 @@ export default function AffidavitDisplay({ data, onEdit }) {
         <h2 className="text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6 underline font-serif tracking-wide">
           GAP PERIOD PREVIEW
         </h2>
-        {data.firstParty && (
-          <>
-            <div className="mb-5 text-justify leading-relaxed">
-              <span className="font-lg">
-                First Party (Stamp Duty):{" "}
-                <span className="font-bold">{data.firstParty}</span>
-              </span>
-
-              <br />
-              <span className="text-sm italic">
-                (Responsible for payment of stamp duty charges as per applicable
-                state regulations)
-              </span>
-            </div>
-            <div className="mb-5 text-justify leading-relaxed">
-              <span className="font-lg">
-                Second Party :{" "}
-                <span className="font-bold">{data.secondParty}</span>
-              </span>
-            </div>
-          </>
+        {data.firstParty && data.secondParty && (
+          <div className="mb-6 relative z-10">
+            <table className="w-full border-collapse border border-gray-400 text-sm">
+              <tbody>
+                <tr className="bg-gray-100">
+                  <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                    First Party
+                  </td>
+                  <td className="border border-gray-400 px-3 py-2">
+                    {data.firstParty}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                    Second Party
+                  </td>
+                  <td className="border border-gray-400 px-3 py-2">
+                    {data.secondParty}
+                  </td>
+                </tr>
+                <tr className="bg-gray-100">
+                  <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                    Stamp Duty Paid By
+                  </td>
+                  <td className="border border-gray-400 px-3 py-2">
+                    {data.stampDutyPayer === "First Party"
+                      ? data.firstParty
+                      : data.stampDutyPayer === "Second Party"
+                      ? data.secondParty
+                      : "Not Selected"}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         )}
 
         <p className="mb-3 sm:mb-4 font-serif text-sm sm:text-base leading-relaxed">

@@ -274,14 +274,18 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
         </div>
       </div>
       {/* Party Names & Stamp Duty Section */}
-      <div className="mb-6">
-        <h3 className="text-base sm:text-lg font-medium mb-3 text-indigo-700">
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+        <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+          <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+            📄
+          </span>
           Party Names & Stamp Duty
-        </h3>
-        <div className="space-y-3 sm:space-y-4">
+        </h2>
+
+        <div className="space-y-4">
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-red-600 mb-1">
-              Who will pay the Stamp Duty?
+            <label className="block text-sm font-semibold text-red-600 mb-1">
+              First Party Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -289,7 +293,7 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
               value={formData.firstParty}
               onChange={handlePartyNameChange}
               maxLength={50}
-              className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
               placeholder="Enter first party name (letters, spaces, commas only)"
             />
             <p className="mt-1 text-xs text-gray-500">
@@ -298,8 +302,8 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
           </div>
 
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-red-600 mb-1">
-              Second Party Name
+            <label className="block text-sm font-semibold text-red-600 mb-1">
+              Second Party Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -307,7 +311,7 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
               value={formData.secondParty}
               onChange={handlePartyNameChange}
               maxLength={50}
-              className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
               placeholder="Enter second party name (letters, spaces, commas only)"
             />
             <p className="mt-1 text-xs text-gray-500">
@@ -315,9 +319,27 @@ const JoinKhataTransferForm = ({ formData, handleChange }) => {
             </p>
           </div>
 
+          <div>
+            <label className="block text-sm font-semibold text-red-600 mb-1">
+              Who will pay the Stamp Duty?{" "}
+              <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="stampDutyPayer"
+              value={formData.stampDutyPayer || ""}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200 bg-white"
+            >
+              <option value="">Select who will pay the stamp duty</option>
+              <option value="First Party">First Party</option>
+              <option value="Second Party">Second Party</option>
+            </select>
+          </div>
+
           <p className="text-xs text-red-600 italic">
-            ℹ️ Please enter the names of both parties to the agreement. Only
-            letters, spaces, and commas are allowed (max 50 characters each).
+            ℹ️ Please enter the names of both parties and select who will pay
+            the stamp duty. Only letters, spaces, and commas are allowed (max 50
+            characters each).
           </p>
         </div>
       </div>

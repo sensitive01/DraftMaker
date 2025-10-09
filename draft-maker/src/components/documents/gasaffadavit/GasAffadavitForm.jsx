@@ -130,7 +130,6 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
               </div>
             </div>
           </div>
-
           {/* Connection Details Section - Compact */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
             <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
@@ -268,7 +267,6 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
               </div>
             </div>
           </div>
-
           {/* Additional Information Section - Compact */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
             <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
@@ -379,61 +377,80 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
               </div>
             </div>
           </div>
-
           {/* Party Names & Stamp Duty Section */}
-<div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
-  <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
-    <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
-      📄
-    </span>
-    Party Names & Stamp Duty
-  </h2>
+   
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
+            <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-red-600 text-xs font-bold">
+                📄
+              </span>
+              Party Names & Stamp Duty
+            </h2>
 
-  <div className="space-y-4">
-    <div>
-      <label className="block text-sm font-semibold text-red-600 mb-1">
-        Who will pay the Stamp Duty? <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        name="firstParty"
-        value={formData?.firstParty || ""}
-        onChange={handlePartyNameChange}
-        maxLength={50}
-        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
-        placeholder="Enter first party name (letters, spaces, commas only)"
-        required
-      />
-      <p className="mt-1 text-xs text-gray-500">
-        {formData?.firstParty?.length || 0}/50 characters
-      </p>
-    </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  First Party Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="firstParty"
+                  value={formData?.firstParty || ""}
+                  onChange={handlePartyNameChange}
+                  maxLength={50}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  placeholder="Enter first party name (letters, spaces, commas only)"
+                  required
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {formData?.firstParty?.length || 0}/50 characters
+                </p>
+              </div>
 
-    <div>
-      <label className="block text-sm font-semibold text-red-600 mb-1">
-        Second Party Name <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        name="secondParty"
-        value={formData?.secondParty || ""}
-        onChange={handlePartyNameChange}
-        maxLength={50}
-        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
-        placeholder="Enter second party name (letters, spaces, commas only)"
-        required
-      />
-      <p className="mt-1 text-xs text-gray-500">
-        {formData?.secondParty?.length || 0}/50 characters
-      </p>
-    </div>
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Second Party Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="secondParty"
+                  value={formData?.secondParty || ""}
+                  onChange={handlePartyNameChange}
+                  maxLength={50}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  placeholder="Enter second party name (letters, spaces, commas only)"
+                  required
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {formData?.secondParty?.length || 0}/50 characters
+                </p>
+              </div>
 
-    <p className="mt-3 text-xs text-red-600 italic">
-      ℹ️ Please enter the names of both parties to the agreement. Only letters, spaces, and commas are allowed (max 50 characters each).
-    </p>
-  </div>
-</div>
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Who will pay the Stamp Duty?{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="stampDutyPaidBy"
+                  value={formData?.stampDutyPaidBy || ""}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  required
+                >
+                  <option value="">Select who will pay the stamp duty</option>
+                  <option value="firstParty">First Party</option>
+                  <option value="secondParty">Second Party</option>
+                </select>
+              </div>
 
+              <p className="mt-3 text-xs text-red-600 italic">
+                ℹ️ Please enter the names of both parties and select who will
+                pay the stamp duty. Only letters, spaces, and commas are allowed
+                for names (max 50 characters each).
+              </p>
+            </div>
+          </div>
           {/* Verification Details Section - Compact */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-3 border-red-500">
             <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 flex items-center">

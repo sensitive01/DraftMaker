@@ -18,7 +18,7 @@ const PreviewVehicleInsuranceClamingPage = () => {
     formId: "DM-VIC-11",
     title: "",
     name: "",
-    guardianName:"",
+    guardianName: "",
 
     relation: "",
     age: "",
@@ -40,6 +40,7 @@ const PreviewVehicleInsuranceClamingPage = () => {
     year: "2025",
     firstParty: "",
     secondParty: "",
+    stampDutyPayer: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,6 +101,10 @@ const PreviewVehicleInsuranceClamingPage = () => {
 
     if (!formData.address.trim()) {
       setValidationError("Please enter your address");
+      return false;
+    }
+    if (!formData.stampDutyPayer) {
+      setValidationError("Please select who will pay the stamp duty");
       return false;
     }
 

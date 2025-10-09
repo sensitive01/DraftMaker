@@ -317,11 +317,10 @@ export default function GapPeriodForm({
               Party Names & Stamp Duty
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2">
+            <div className="space-y-4">
+              <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
-                  Who will pay the Stamp Duty?{" "}
-                  <span className="text-red-500">*</span>
+                  First Party Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -337,7 +336,7 @@ export default function GapPeriodForm({
                 </p>
               </div>
 
-              <div className="md:col-span-2">
+              <div>
                 <label className="block text-sm font-semibold text-red-600 mb-1">
                   Second Party Name <span className="text-red-500">*</span>
                 </label>
@@ -354,12 +353,30 @@ export default function GapPeriodForm({
                   {formData.secondParty?.length || 0}/50 characters
                 </p>
               </div>
-            </div>
 
-            <p className="mt-4 text-xs text-red-600 italic">
-              ℹ️ Please enter the names of both parties to the agreement. Only
-              letters, spaces, and commas are allowed (max 50 characters each).
-            </p>
+              <div>
+                <label className="block text-sm font-semibold text-red-600 mb-1">
+                  Who will pay the Stamp Duty?{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="stampDutyPayer"
+                  value={formData.stampDutyPayer || ""}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-all duration-200 bg-white"
+                >
+                  <option value="">Select who will pay the stamp duty</option>
+                  <option value="First Party">First Party</option>
+                  <option value="Second Party">Second Party</option>
+                </select>
+              </div>
+
+              <p className="text-xs text-red-600 italic">
+                ℹ️ Please enter the names of both parties and select who will
+                pay the stamp duty. Only letters, spaces, and commas are allowed
+                (max 50 characters each).
+              </p>
+            </div>
           </div>
 
           {/* Verification Details Section - Compact */}

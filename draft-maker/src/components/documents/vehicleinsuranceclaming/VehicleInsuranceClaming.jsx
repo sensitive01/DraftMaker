@@ -21,7 +21,7 @@ const VehicleInsuranceClaming = () => {
     title: "",
     name: "",
     relation: "",
-    guardianName:"",
+    guardianName: "",
     age: "",
     address: "",
     aadhaarNo: "",
@@ -41,6 +41,7 @@ const VehicleInsuranceClaming = () => {
     year: "2025",
     firstParty: "",
     secondParty: "",
+    stampDutyPayer: "",
   };
 
   // Load saved data or use initial data
@@ -123,12 +124,16 @@ const VehicleInsuranceClaming = () => {
       setValidationError("Please enter your address");
       return false;
     }
-     if (!formData.firstParty) {
+    if (!formData.firstParty) {
       setValidationError("Please enter who will pay the stamp duty");
       return false;
     }
     if (!formData.secondParty) {
       setValidationError("Please enter the second party details");
+      return false;
+    }
+    if (!formData.stampDutyPayer) {
+      setValidationError("Please select who will pay the stamp duty");
       return false;
     }
 

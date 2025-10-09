@@ -349,7 +349,7 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-red-600 mb-1">
-                Who will pay the Stamp Duty?
+                First Party Name
               </label>
               <input
                 type="text"
@@ -385,9 +385,27 @@ const GasAffidavitForm = ({ formData, handleChange }) => {
               </p>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-red-600 mb-1">
+                Who will pay the Stamp Duty?
+              </label>
+              <select
+                name="stampDutyPaidBy"
+                value={formData.stampDutyPaidBy || ""}
+                onChange={handleChange}
+                className="block w-full border border-gray-300 rounded-md shadow-sm p-2.5 focus:ring-blue-500 focus:border-blue-500"
+                required
+              >
+                <option value="">Select who will pay the stamp duty</option>
+                <option value="firstParty">First Party</option>
+                <option value="secondParty">Second Party</option>
+              </select>
+            </div>
+
             <p className="text-xs text-red-600 italic">
-              ℹ️ Please enter the names of both parties to the agreement. Only
-              letters, spaces, and commas are allowed (max 50 characters each).
+              ℹ️ Please enter the names of both parties and select who will pay
+              the stamp duty. Only letters, spaces, and commas are allowed for
+              names (max 50 characters each).
             </p>
           </div>
         </div>

@@ -32,6 +32,7 @@ export default function GapPeriod() {
     gapPeriods: [{ from: "", to: "", reason: "" }],
     firstParty: "",
     secondParty: "",
+    stampDutyPayer: "",
   };
 
   // Load saved data or use initial data
@@ -175,7 +176,7 @@ export default function GapPeriod() {
       setValidationError("Please enter the authority");
       return false;
     }
-     if (!formData.firstParty) {
+    if (!formData.firstParty) {
       setValidationError("Please enter who will pay the stamp duty");
       return false;
     }
@@ -199,6 +200,10 @@ export default function GapPeriod() {
 
     if (!formData.month.trim()) {
       setValidationError("Please select a month");
+      return false;
+    }
+    if (!formData.stampDutyPayer) {
+      setValidationError("Please select who will pay the stamp duty");
       return false;
     }
 

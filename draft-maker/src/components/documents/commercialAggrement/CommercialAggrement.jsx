@@ -63,6 +63,7 @@ export default function CommercialAggrement() {
             commercialType: "",
             squareFeet: "",
             additionaldetails: "",
+            stampDutyPayer: "",
           };
     } catch {
       return {
@@ -267,6 +268,10 @@ export default function CommercialAggrement() {
       parseFloat(formData.depositAmount) <= 0
     ) {
       setValidationError("Please enter a valid deposit amount");
+      return false;
+    }
+    if (!formData.stampDutyPayer) {
+      setValidationError("Please select who will pay the stamp duty");
       return false;
     }
     if (!formData.firstParty) {

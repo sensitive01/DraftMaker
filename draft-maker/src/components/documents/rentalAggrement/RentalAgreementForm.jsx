@@ -69,6 +69,7 @@ export default function RentalAgreementForm() {
             agreeTerms: false,
             firstParty: "",
             secondParty: "",
+            stampDutyPayer: "",
           };
     } catch {
       return {
@@ -269,6 +270,10 @@ export default function RentalAgreementForm() {
     }
     if (!formData.lessors[0].addressLine1.trim()) {
       setValidationError("Please enter lessor address");
+      return false;
+    }
+    if (!formData.stampDutyPayer) {
+      setValidationError("Please select who will pay the stamp duty");
       return false;
     }
 

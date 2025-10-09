@@ -45,6 +45,14 @@ const MatriculationLostPreview = () => {
   const isFilled = (value) => {
     return typeof value === "string" && value.trim() !== "";
   };
+  const getStampDutyPaidByName = () => {
+  if (formData.stampDutyPaidBy === "firstParty") {
+    return formData.firstParty;
+  } else if (formData.stampDutyPaidBy === "secondParty") {
+    return formData.secondParty;
+  }
+  return "Not Selected";
+};
 
   // Highlight empty fields
   const highlightIfEmpty = (value) => {
@@ -52,510 +60,368 @@ const MatriculationLostPreview = () => {
   };
 
   // Generate Word document
-  const generateWordDocument = async () => {
-    setDownloadType("word");
-    setLoading(true);
+const generateWordDocument = async () => {
+  setDownloadType("word");
+  setLoading(true);
 
-    try {
-      const docChildren = [
-        new Paragraph({
-          text: `${formData.documentType || "AFFIDAVIT"}`,
-          heading: HeadingLevel.HEADING_1,
-          alignment: AlignmentType.CENTER,
-          spacing: { after: 300 },
-        }),
-      ];
-
-      // Add First and Second Party if they exist
-      if (formData.firstParty) {
-        docChildren.push(
-          new Paragraph({
-            spacing: { after: 100 },
-            children: [
-              new TextRun("First Party (Stamp Duty): "),
-              new TextRun({
-                text: formData.firstParty,
-                bold: true,
-              }),
-            ],
-          }),
-          new Paragraph({
-            spacing: { after: 200 },
-            children: [
-              new TextRun({
-                text: "(Responsible for payment of stamp duty charges as per applicable state regulations)",
-                italics: true,
-                size: 20,
-              }),
-            ],
-          }),
-          new Paragraph({
-            spacing: { after: 200 },
-            children: [
-              new TextRun("Second Party: "),
-              new TextRun({
-                text: formData.secondParty || "",
-                bold: true,
-              }),
-            ],
-          })
-        );
-      }
-
-      // Add remaining content
-      docChildren.push(
-        new Paragraph({
-          spacing: { after: 200 },
-          children: [
-            new TextRun(`I, `),
-            new TextRun({
-              text:
-                formData.name || "Mr/Mrs/Ms ................................",
-              bold: true,
-            }),
-            new TextRun(
-              ` ${
-                formData.relation ||
-                "D/o, S/o, H/o, W/o ........................"
-              }`
-            ),
-            new TextRun(`, Aged: `),
-            new TextRun({
-              text: formData?.age?.toString() || "......",
-              bold: true,
-            }),
-            new TextRun(` Years,`),
-          ],
-        }),
-
-        new Paragraph({
-          spacing: { after: 200 },
-          children: [
-            new TextRun(`Permanent Address: `),
-            new TextRun({
-              text:
-                formData?.address ||
-                "[Address Line 1, Address Line 2, City, State, Pin Code]",
-              bold: true,
-            }),
-          ],
-        }),
-
-        new Paragraph({
-          spacing: { after: 300 },
-          children: [
-            new TextRun(`My Aadhaar No: `),
-            new TextRun({
-              text: formData?.aadhaar || "0000 0000 0000",
-              bold: true,
-            }),
-          ],
-        }),
-
-        new Paragraph({
-          spacing: { after: 300 },
-          alignment: AlignmentType.CENTER,
-          children: [
-            new TextRun({
-              text: `Do hereby solemnly affirm and declare as under:`,
-              bold: true,
-            }),
-          ],
-        }),
-
-        new Paragraph({
-          spacing: { after: 200 },
-          children: [
-            new TextRun(
-              `Hereby affirm and declare that I have irrecoverable Lost my `
-            ),
-            new TextRun({
-              text: formData.year || "X",
-              bold: true,
-            }),
-            new TextRun(` year, `),
-            new TextRun({
-              text: formData.semester || "X",
-              bold: true,
-            }),
-            new TextRun(` Semester, marks card of `),
-            new TextRun({
-              text: formData.program || "..........................,",
-              bold: true,
-            }),
-            new TextRun(` issued to me by `),
-            new TextRun({
-              text:
-                formData.authority ||
-                "........................................................",
-              bold: true,
-            }),
-          ],
-        }),
-
-        new Paragraph({
-          spacing: { after: 200 },
-          children: [
-            new TextRun(`Name of the college/Institution: `),
-            new TextRun({
-              text: formData.collegeName || "XXXX",
-              bold: true,
-            }),
-          ],
-        }),
-
-        new Paragraph({
-          spacing: { after: 200 },
-          children: [
-            new TextRun(`Batch: In the year `),
-            new TextRun({
-              text: formData.batch || "XXXX",
-              bold: true,
-            }),
-            new TextRun(`.`),
-          ],
-        }),
-
-        new Paragraph({
-          spacing: { after: 300 },
-          children: [
-            new TextRun(`Registration Number: `),
-            new TextRun({
-              text: formData.regNumber || "..........................,",
-              bold: true,
-            }),
-          ],
-        }),
-
-        new Paragraph({
-          spacing: { after: 300 },
-          children: [
-            new TextRun(`In the event of the above mentioned Statement of `),
-            new TextRun({
-              text: formData.documentName || "DOCUMENT NAME",
-              bold: true,
-            }),
-            new TextRun(
-              ` being found subsequently, I hereby undertake to return the duplicate issued. It is at my own risk the Statement of `
-            ),
-            new TextRun({
-              text: formData.documentName || "DOCUMENT NAME",
-              bold: true,
-            }),
-            new TextRun(` may be sent the address given by me.`),
-          ],
-        }),
-
-        new Paragraph({
-          spacing: { before: 300, after: 500 },
-          children: [
-            new TextRun(`Verified at `),
-            new TextRun({
-              text: formData?.place || "PLACE",
-              bold: true,
-            }),
-            new TextRun(` on this `),
-            new TextRun({
-              text: formData?.day || "XX",
-              bold: true,
-            }),
-            new TextRun(` day of `),
-            new TextRun({
-              text: formData?.month || "XXXX",
-              bold: true,
-            }),
-            new TextRun(`, `),
-            new TextRun({
-              text: formData?.year_verification || "XXXX",
-              bold: true,
-            }),
-            new TextRun(
-              ` that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.`
-            ),
-          ],
-        }),
-
-        new Paragraph({
-          spacing: { before: 500 },
-          text: "(Signature of the Deponent)",
-          alignment: AlignmentType.RIGHT,
-        }),
-
-        new Paragraph({
-          text: formData?.name || "................................",
-          alignment: AlignmentType.RIGHT,
-        })
-      );
-
-      // Create a new document
-      const doc = new Document({
-        sections: [
-          {
-            properties: {},
-            children: docChildren,
-          },
-        ],
-      });
-
-      // Generate the document as a blob
-      const buffer = await Packer.toBlob(doc);
-
-      // Save the document with a meaningful filename
-      const fileName = `Matriculation_Lost_Affidavit_${
-        formData.name ? formData.name.replace(/\s+/g, "_") : "User"
-      }.docx`;
-      saveAs(buffer, fileName);
-    } catch (error) {
-      console.error("Error generating Word document:", error);
-      alert("Failed to generate Word document. Please try again.");
-    } finally {
-      setLoading(false);
-      setDownloadType("");
-    }
-  };
-
-  // Generate PDF document
-  const generatePDFDocument = async () => {
-    setDownloadType("pdf");
-    setLoading(true);
-
-    try {
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 20;
-      const lineHeight = 7;
-      let currentY = margin;
-
-      // Helper function to add text with word wrapping
-      const addText = (text, x, y, options = {}) => {
-        const fontSize = options.fontSize || 12;
-        const isBold = options.bold || false;
-        const align = options.align || "left";
-
-        pdf.setFontSize(fontSize);
-        pdf.setFont("helvetica", isBold ? "bold" : "normal");
-
-        const textWidth = pageWidth - 2 * margin;
-        const lines = pdf.splitTextToSize(text, textWidth);
-
-        lines.forEach((line, index) => {
-          if (y + index * lineHeight > pageHeight - margin) {
-            pdf.addPage();
-            y = margin;
+  try {
+    const wordDocument = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+            xmlns:w='urn:schemas-microsoft-com:office:word' 
+            xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <meta charset='utf-8'>
+        <title>Matriculation Lost Affidavit</title>
+        <!--[if gte mso 9]>
+        <xml>
+          <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+            <w:DoNotPromptForConvert/>
+          </w:WordDocument>
+        </xml>
+        <![endif]-->
+        <style>
+          @page {
+            size: 21cm 29.7cm;
+            margin: 2.54cm 2.54cm 2.54cm 2.54cm;
           }
-
-          let xPos = x;
-          if (align === "center") {
-            xPos = pageWidth / 2;
-            pdf.text(line, xPos, y + index * lineHeight, { align: "center" });
-          } else if (align === "right") {
-            xPos = pageWidth - margin;
-            pdf.text(line, xPos, y + index * lineHeight, { align: "right" });
-          } else {
-            pdf.text(line, xPos, y + index * lineHeight);
+          * {
+            margin: 0;
+            padding: 0;
           }
-        });
-
-        return y + lines.length * lineHeight;
-      };
-
-      // Title
-      currentY = addText(
-        formData.documentType || "AFFIDAVIT",
-        margin,
-        currentY + 10,
-        { fontSize: 18, bold: true, align: "center" }
-      );
-
-      currentY += 15;
-
-      // Add First and Second Party if they exist
-      if (formData.firstParty) {
-        currentY = addText(
-          `First Party (Stamp Duty): ${formData.firstParty}`,
-          margin,
-          currentY + 5,
-          { bold: false }
-        );
-
-        currentY = addText(
-          "(Responsible for payment of stamp duty charges as per applicable state regulations)",
-          margin,
-          currentY + 3,
-          { fontSize: 10 }
-        );
-
-        currentY = addText(
-          `Second Party: ${formData.secondParty || ""}`,
-          margin,
-          currentY + 5,
-          { bold: false }
-        );
-
-        currentY += 10;
-      }
-
-      // Content
-      const content = [
-        `I, ${formData.name || "Mr/Mrs/Ms ................................"} ${
-          formData.relation || "D/o, S/o, H/o, W/o ........................"
-        }, Aged: ${formData?.age || "......"} Years,`,
-
-        `Permanent Address: ${
-          formData?.address ||
-          "[Address Line 1, Address Line 2, City, State, Pin Code]"
-        }`,
-
-        `My Aadhaar No: ${formData?.aadhaar || "0000 0000 0000"}`,
-
-        "Do hereby solemnly affirm and declare as under:",
-
-        `Hereby affirm and declare that I have irrecoverable Lost my ${
-          formData.year || "X"
-        } year, ${formData.semester || "X"} Semester, marks card of ${
-          formData.program || "..........................,"
-        }  issued to me by ${
-          formData.authority ||
-          "........................................................"
-        }`,
-
-        `Name of the college/Institution: ${formData.collegeName || "XXXX"}`,
-
-        `Batch: In the year ${formData.batch || "XXXX"}.`,
-
-        `Registration Number: ${
-          formData.regNumber || "..........................,"
-        }`,
-
-        `In the event of the above mentioned Statement of ${
-          formData.documentName || "DOCUMENT NAME"
-        } being found subsequently, I hereby undertake to return the duplicate issued. It is at my own risk the Statement of ${
-          formData.documentName || "DOCUMENT NAME"
-        } may be sent the address given by me.`,
-
-        `Verified at ${formData?.place || "PLACE"} on this ${
-          getDayWithSuffix(formData.day) || "XX"
-        } ${formData?.month || "XXXX"}, ${
-          formData?.year_verification || "XXXX"
-        } that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.`,
-      ];
-
-      // Helper function to make form data bold in PDF
-      const addFormattedText = (text, x, y, options = {}) => {
-        const fontSize = options.fontSize || 12;
-        const align = options.align || "left";
-
-        // Split text into parts and identify form data to make bold
-        const formFields = [
-          formData.name,
-          formData.relation,
-          formData.age?.toString(),
-          formData.address,
-          formData.aadhaar,
-          formData.year,
-          formData.semester,
-          formData.program,
-          formData.authority,
-          formData.collegeName,
-          formData.batch,
-          formData.regNumber,
-          formData.documentName,
-          formData.place,
-          getDayWithSuffix(formData.day),
-          formData.month,
-          formData.year_verification,
-        ].filter(Boolean);
-
-        let currentText = text;
-        let currentY = y;
-        const textWidth = pageWidth - 2 * margin;
-
-        // For simplicity, we'll make the entire content with form data bold
-        // You can enhance this further to selectively bold only form data
-        const hasFormData = formFields.some((field) => text.includes(field));
-
-        pdf.setFontSize(fontSize);
-        pdf.setFont(
-          "helvetica",
-          hasFormData && options.boldFormData
-            ? "bold"
-            : options.bold
-            ? "bold"
-            : "normal"
-        );
-
-        const lines = pdf.splitTextToSize(currentText, textWidth);
-
-        lines.forEach((line, index) => {
-          if (currentY + index * lineHeight > pageHeight - margin) {
-            pdf.addPage();
-            currentY = margin;
+          body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            color: #000;
           }
-
-          let xPos = x;
-          if (align === "center") {
-            xPos = pageWidth / 2;
-            pdf.text(line, xPos, currentY + index * lineHeight, {
-              align: "center",
-            });
-          } else if (align === "right") {
-            xPos = pageWidth - margin;
-            pdf.text(line, xPos, currentY + index * lineHeight, {
-              align: "right",
-            });
-          } else {
-            pdf.text(line, xPos, currentY + index * lineHeight);
+          h1 {
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 20px;
+            text-transform: uppercase;
           }
-        });
+          table.party-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          table.party-table td {
+            border: 1px solid #000;
+            padding: 8px 10px;
+            font-size: 11pt;
+          }
+          table.party-table td:first-child {
+            font-weight: bold;
+            width: 35%;
+            background-color: #f0f0f0;
+          }
+          p {
+            margin-bottom: 12px;
+            text-align: justify;
+            line-height: 1.6;
+          }
+          .center {
+            text-align: center;
+            font-weight: bold;
+            margin: 20px 0;
+          }
+          .signature-section {
+            margin-top: 80px;
+            text-align: right;
+          }
+          strong {
+            font-weight: bold;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>${formData.documentType || "AFFIDAVIT"}</h1>
+        
+        ${
+          formData.firstParty && formData.secondParty
+            ? `
+        <table class="party-table">
+          <tr>
+            <td>First Party</td>
+            <td>${formData.firstParty}</td>
+          </tr>
+          <tr>
+            <td>Second Party</td>
+            <td>${formData.secondParty}</td>
+          </tr>
+          <tr>
+            <td>Stamp Duty Paid By</td>
+            <td>${getStampDutyPaidByName()}</td>
+          </tr>
+        </table>
+        `
+            : ""
+        }
 
-        return currentY + lines.length * lineHeight;
-      };
+        <p>
+          I, <strong>${formData.name || "Mr/Mrs/Ms ................................"}</strong> 
+          ${formData.relation || "D/o, S/o, H/o, W/o ........................"}, 
+          Aged: <strong>${formData?.age || "......"}</strong> Years,
+        </p>
 
-      content.forEach((paragraph, index) => {
-        if (index === 3) {
-          // "Do hereby solemnly affirm..." - make it bold and centered
-          currentY = addFormattedText(paragraph, margin, currentY + 10, {
-            bold: true,
-            align: "center",
-          });
+        <p>
+          Permanent Address: <strong>${formData?.address || "[Address Line 1, Address Line 2, City, State, Pin Code]"}</strong>
+        </p>
+
+        <p>
+          My Aadhaar No: <strong>${formData?.aadhaar || "0000 0000 0000"}</strong>
+        </p>
+
+        <p class="center">Do hereby solemnly affirm and declare as under:</p>
+
+        <p>
+          Hereby affirm and declare that I have irrecoverable Lost my <strong>${formData.year || "X"}</strong> 
+          year, <strong>${formData.semester || "X"}</strong> Semester, marks card of 
+          <strong>${formData.program || "..........................,"}</strong> 
+          issued to me by <strong>${formData.authority || "........................................................"}</strong>
+        </p>
+
+        <p>
+          Name of the college/Institution: <strong>${formData.collegeName || "XXXX"}</strong>
+        </p>
+
+        <p>
+          Batch: In the year <strong>${formData.batch || "XXXX"}</strong>.
+        </p>
+
+        <p>
+          Registration Number: <strong>${formData.regNumber || "..........................,"}</strong>
+        </p>
+
+        <p style="margin-top: 20px;">
+          In the event of the above mentioned Statement of <strong>${formData.documentName || "DOCUMENT NAME"}</strong> 
+          being found subsequently, I hereby undertake to return the duplicate issued. It is at my own risk the Statement of 
+          <strong>${formData.documentName || "DOCUMENT NAME"}</strong> may be sent the address given by me.
+        </p>
+
+        <p style="margin-top: 30px;">
+          Verified at <strong>${formData?.place || "PLACE"}</strong> 
+          on this <strong>${getDayWithSuffix(formData?.day) || "XX"}</strong> 
+          <strong>${formData?.month || "XXXX"}</strong>, 
+          <strong>${formData?.year_verification || "XXXX"}</strong> 
+          that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.
+        </p>
+
+        <div class="signature-section">
+          <p>(Signature of the Deponent)</p>
+          <p style="margin-top: 10px;"><strong>${formData?.name || "................................"}</strong></p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob([wordDocument], {
+      type: "application/msword",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Matriculation_Lost_Affidavit_${
+      formData.name ? formData.name.replace(/\s+/g, "_") : "User"
+    }.doc`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    setLoading(false);
+    setDownloadType("");
+  } catch (error) {
+    console.error("Error generating Word document:", error);
+    alert("Failed to generate Word document. Please try again.");
+    setLoading(false);
+    setDownloadType("");
+  }
+};
+
+// Generate PDF document - REPLACE THIS ENTIRE FUNCTION
+const generatePDFDocument = async () => {
+  setDownloadType("pdf");
+  setLoading(true);
+
+  try {
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 20;
+    const lineHeight = 7;
+    let currentY = margin;
+
+    // Helper function to add text with word wrapping
+    const addText = (text, x, y, options = {}) => {
+      const fontSize = options.fontSize || 12;
+      const isBold = options.bold || false;
+      const align = options.align || "left";
+
+      pdf.setFontSize(fontSize);
+      pdf.setFont("helvetica", isBold ? "bold" : "normal");
+
+      const textWidth = pageWidth - 2 * margin;
+      const lines = pdf.splitTextToSize(text, textWidth);
+
+      lines.forEach((line, index) => {
+        if (y + index * lineHeight > pageHeight - margin) {
+          pdf.addPage();
+          y = margin;
+        }
+
+        let xPos = x;
+        if (align === "center") {
+          xPos = pageWidth / 2;
+          pdf.text(line, xPos, y + index * lineHeight, { align: "center" });
+        } else if (align === "right") {
+          xPos = pageWidth - margin;
+          pdf.text(line, xPos, y + index * lineHeight, { align: "right" });
         } else {
-          // Make paragraphs with form data bold
-          currentY = addFormattedText(paragraph, margin, currentY + 8, {
-            boldFormData: true,
-          });
+          pdf.text(line, xPos, y + index * lineHeight);
         }
       });
 
-      // Signature section
-      currentY += 30;
-      currentY = addFormattedText(
-        "(Signature of the Deponent)",
-        margin,
-        currentY,
-        { align: "right" }
-      );
-      currentY = addFormattedText(
-        formData?.name || "................................",
-        margin,
-        currentY + 5,
-        { align: "right", bold: true }
-      );
+      return y + lines.length * lineHeight;
+    };
 
-      // Save the PDF
-      const fileName = `Matriculation_Lost_Affidavit_${
-        formData.name ? formData.name.replace(/\s+/g, "_") : "User"
-      }.pdf`;
+    // Title
+    currentY = addText(
+      formData.documentType || "AFFIDAVIT",
+      margin,
+      currentY + 10,
+      { fontSize: 16, bold: true, align: "center" }
+    );
 
-      pdf.save(fileName);
-    } catch (error) {
-      console.error("Error generating PDF document:", error);
-      alert("Failed to generate PDF document. Please try again.");
-    } finally {
-      setLoading(false);
-      setDownloadType("");
+    currentY += 10;
+
+    // Add Party Table if data exists
+    if (formData.firstParty && formData.secondParty) {
+      const tableData = [
+        ["First Party", formData.firstParty],
+        ["Second Party", formData.secondParty],
+        ["Stamp Duty Paid By", getStampDutyPaidByName()],
+      ];
+
+      const tableX = margin;
+      const tableY = currentY;
+      const colWidths = [60, 110]; // Column widths
+      const rowHeight = 10;
+
+      // Draw table
+      tableData.forEach((row, rowIndex) => {
+        let cellX = tableX;
+        
+        row.forEach((cell, cellIndex) => {
+          // Draw cell border
+          pdf.rect(cellX, tableY + rowIndex * rowHeight, colWidths[cellIndex], rowHeight);
+          
+          // Add cell text
+          pdf.setFontSize(11);
+          pdf.setFont("helvetica", cellIndex === 0 ? "bold" : "normal");
+          
+          // Add gray background for first column
+          if (cellIndex === 0) {
+            pdf.setFillColor(240, 240, 240);
+            pdf.rect(cellX, tableY + rowIndex * rowHeight, colWidths[cellIndex], rowHeight, 'F');
+            pdf.rect(cellX, tableY + rowIndex * rowHeight, colWidths[cellIndex], rowHeight);
+          }
+          
+          pdf.text(cell, cellX + 3, tableY + rowIndex * rowHeight + 7);
+          cellX += colWidths[cellIndex];
+        });
+      });
+
+      currentY = tableY + tableData.length * rowHeight + 15;
     }
-  };
+
+    // Content
+    const content = [
+      `I, ${formData.name || "Mr/Mrs/Ms ................................"} ${
+        formData.relation || "D/o, S/o, H/o, W/o ........................"
+      }, Aged: ${formData?.age || "......"} Years,`,
+
+      `Permanent Address: ${
+        formData?.address ||
+        "[Address Line 1, Address Line 2, City, State, Pin Code]"
+      }`,
+
+      `My Aadhaar No: ${formData?.aadhaar || "0000 0000 0000"}`,
+
+      "Do hereby solemnly affirm and declare as under:",
+
+      `Hereby affirm and declare that I have irrecoverable Lost my ${
+        formData.year || "X"
+      } year, ${formData.semester || "X"} Semester, marks card of ${
+        formData.program || "..........................,"
+      } issued to me by ${
+        formData.authority || "........................................................"
+      }`,
+
+      `Name of the college/Institution: ${formData.collegeName || "XXXX"}`,
+
+      `Batch: In the year ${formData.batch || "XXXX"}.`,
+
+      `Registration Number: ${formData.regNumber || "...........................,"}`,
+
+      `In the event of the above mentioned Statement of ${
+        formData.documentName || "DOCUMENT NAME"
+      } being found subsequently, I hereby undertake to return the duplicate issued. It is at my own risk the Statement of ${
+        formData.documentName || "DOCUMENT NAME"
+      } may be sent the address given by me.`,
+
+      `Verified at ${formData?.place || "PLACE"} on this ${
+        getDayWithSuffix(formData.day) || "XX"
+      } ${formData?.month || "XXXX"}, ${
+        formData?.year_verification || "XXXX"
+      } that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.`,
+    ];
+
+    content.forEach((paragraph, index) => {
+      if (index === 3) {
+        // "Do hereby solemnly affirm..." - make it bold and centered
+        currentY = addText(paragraph, margin, currentY + 10, {
+          bold: true,
+          align: "center",
+        });
+      } else {
+        currentY = addText(paragraph, margin, currentY + 8);
+      }
+    });
+
+    // Signature section
+    currentY += 30;
+    currentY = addText("(Signature of the Deponent)", margin, currentY, {
+      align: "right",
+    });
+    currentY = addText(
+      formData?.name || "................................",
+      margin,
+      currentY + 5,
+      { align: "right", bold: true }
+    );
+
+    // Save the PDF
+    const fileName = `Matriculation_Lost_Affidavit_${
+      formData.name ? formData.name.replace(/\s+/g, "_") : "User"
+    }.pdf`;
+
+    pdf.save(fileName);
+  } catch (error) {
+    console.error("Error generating PDF document:", error);
+    alert("Failed to generate PDF document. Please try again.");
+  } finally {
+    setLoading(false);
+    setDownloadType("");
+  }
+};
+
+
 
   if (loading && !downloadType) {
     return (
@@ -654,27 +520,41 @@ const MatriculationLostPreview = () => {
                 {formData.documentType || "AFFIDAVIT"}
               </h1>
             </div>
-            {formData.firstParty && (
-              <>
-                <div className="mb-5 text-justify leading-relaxed">
-                  <span className="font-lg">
-                    First Party (Stamp Duty):{" "}
-                    <span className="font-bold">{formData.firstParty}</span>
-                  </span>
-
-                  <br />
-                  <span className="text-sm italic">
-                    (Responsible for payment of stamp duty charges as per
-                    applicable state regulations)
-                  </span>
-                </div>
-                <div className="mb-5 text-justify leading-relaxed">
-                  <span className="font-lg">
-                    Second Party :{" "}
-                    <span className="font-bold">{formData.secondParty}</span>
-                  </span>
-                </div>
-              </>
+            {formData.firstParty && formData.secondParty && (
+              <div className="mb-6">
+                <table className="w-full border-collapse border border-gray-400 text-sm">
+                  <tbody>
+                    <tr className="bg-gray-100">
+                      <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                        First Party
+                      </td>
+                      <td className="border border-gray-400 px-3 py-2">
+                        {formData.firstParty}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                        Second Party
+                      </td>
+                      <td className="border border-gray-400 px-3 py-2">
+                        {formData.secondParty}
+                      </td>
+                    </tr>
+                    <tr className="bg-gray-100">
+                      <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                        Stamp Duty Paid By
+                      </td>
+                      <td className="border border-gray-400 px-3 py-2">
+                        {formData.stampDutyPaidBy === "firstParty"
+                          ? formData.firstParty
+                          : formData.stampDutyPaidBy === "secondParty"
+                          ? formData.secondParty
+                          : "Not Selected"}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             )}
 
             <div className="space-y-4 text-gray-800 leading-relaxed">

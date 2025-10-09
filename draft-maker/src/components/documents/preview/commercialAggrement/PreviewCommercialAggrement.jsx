@@ -73,6 +73,7 @@ export default function PreviewCommercialAggrement() {
     fixtures: [{ item: "", quantity: "" }],
     firstParty: "",
     secondParty: "",
+    stampDutyPayer: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
@@ -234,6 +235,10 @@ export default function PreviewCommercialAggrement() {
       parseInt(formData.noticePeriod) <= 0
     ) {
       setValidationError("Please enter a valid notice period in months");
+      return false;
+    }
+    if (!formData.stampDutyPayer) {
+      setValidationError("Please select who will pay the stamp duty");
       return false;
     }
     if (!formData.firstParty) {

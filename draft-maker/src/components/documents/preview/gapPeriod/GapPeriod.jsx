@@ -30,6 +30,7 @@ export default function PreviewGapPeriod() {
     gapPeriods: [{ from: "", to: "", reason: "" }],
     firstParty: "",
     secondParty: "",
+    stampDutyPayer:"",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -120,6 +121,10 @@ export default function PreviewGapPeriod() {
     }
     if (!formData.secondParty) {
       setValidationError("Please enter the second party details");
+      return false;
+    }
+    if (!formData.stampDutyPayer) {
+      setValidationError("Please select who will pay the stamp duty");
       return false;
     }
 

@@ -82,6 +82,16 @@ export default function AddressAffidavitPreview() {
     return `${relationshipPrefix} ${relatedPersonName}`;
   };
 
+  // Get stamp duty paid by name
+  const getStampDutyPaidByName = () => {
+    if (formData.stampDutyPaidBy === "firstParty") {
+      return formData.firstParty;
+    } else if (formData.stampDutyPaidBy === "secondParty") {
+      return formData.secondParty;
+    }
+    return "Not Selected";
+  };
+
   // PDF Download Function
   const downloadPDF = () => {
     setLoading(true);
@@ -135,29 +145,41 @@ export default function AddressAffidavitPreview() {
           <div style="text-align: center; font-weight: bold; font-size: 18pt; margin-bottom: 40px; text-decoration: underline; text-transform: uppercase; letter-spacing: 1px;">
             ${formData.documentType || "ADDRESS AFFIDAVIT"}
           </div>
-           ${
-             formData.firstParty
-               ? `
-      <div style="margin-bottom: 20px; line-height: 1.6;">
-        <p style="margin-bottom: 8px;">
-          <span style="font-size: 12pt;">First Party (Stamp Duty): </span>
-          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-            ${formData.firstParty}
-          </strong>
-        </p>
-        <p style="font-size: 10pt; font-style: italic; margin-bottom: 16px;">
-          (Responsible for payment of stamp duty charges as per applicable state regulations)
-        </p>
-        <p style="margin-bottom: 16px;">
-          <span style="font-size: 12pt;">Second Party: </span>
-          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-            ${formData.secondParty}
-          </strong>
-        </p>
-      </div>
-    `
-               : ""
-           }
+          
+          ${
+            formData.firstParty && formData.secondParty
+              ? `
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; border: 1px solid #999;">
+            <tbody>
+              <tr style="background-color: #f3f4f6;">
+                <td style="border: 1px solid #999; padding: 8px 12px; font-weight: bold; width: 33%;">
+                  First Party
+                </td>
+                <td style="border: 1px solid #999; padding: 8px 12px;">
+                  ${formData.firstParty}
+                </td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid #999; padding: 8px 12px; font-weight: bold; width: 33%;">
+                  Second Party
+                </td>
+                <td style="border: 1px solid #999; padding: 8px 12px;">
+                  ${formData.secondParty}
+                </td>
+              </tr>
+              <tr style="background-color: #f3f4f6;">
+                <td style="border: 1px solid #999; padding: 8px 12px; font-weight: bold; width: 33%;">
+                  Stamp Duty Paid By
+                </td>
+                <td style="border: 1px solid #999; padding: 8px 12px;">
+                  ${getStampDutyPaidByName()}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          `
+              : ""
+          }
 
           <div style="margin-bottom: 40px; line-height: 1.6;">
             <p style="margin-bottom: 24px; text-align: justify;">
@@ -287,6 +309,15 @@ export default function AddressAffidavitPreview() {
               margin: 0;
               padding: 20px;
               max-width: 100%;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+              margin-bottom: 30px;
+            }
+            table td {
+              border: 1px solid #999;
+              padding: 8px 12px;
             }
             ol {
               counter-reset: item;
@@ -455,27 +486,38 @@ export default function AddressAffidavitPreview() {
             <h2 className="text-center text-2xl font-bold mb-10 underline uppercase tracking-wide">
               {formData.documentType || "ADDRESS AFFIDAVIT"}
             </h2>
-            {formData.firstParty && (
-              <>
-                <div className="mb-5 text-justify leading-relaxed">
-                  <span className="font-lg">
-                    First Party (Stamp Duty):{" "}
-                    <span className="font-bold">{formData.firstParty}</span>
-                  </span>
 
-                  <br />
-                  <span className="text-sm italic">
-                    (Responsible for payment of stamp duty charges as per
-                    applicable state regulations)
-                  </span>
-                </div>
-                <div className="mb-5 text-justify leading-relaxed">
-                  <span className="font-lg">
-                    Second Party :{" "}
-                    <span className="font-bold">{formData.secondParty}</span>
-                  </span>
-                </div>
-              </>
+            {formData.firstParty && formData.secondParty && (
+              <div className="mb-6 relative z-10">
+                <table className="w-full border-collapse border border-gray-400 text-sm">
+                  <tbody>
+                    <tr className="bg-gray-100">
+                      <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                        First Party
+                      </td>
+                      <td className="border border-gray-400 px-3 py-2">
+                        {formData.firstParty}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                        Second Party
+                      </td>
+                      <td className="border border-gray-400 px-3 py-2">
+                        {formData.secondParty}
+                      </td>
+                    </tr>
+                    <tr className="bg-gray-100">
+                      <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                        Stamp Duty Paid By
+                      </td>
+                      <td className="border border-gray-400 px-3 py-2">
+                        {getStampDutyPaidByName()}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             )}
 
             {/* Content */}

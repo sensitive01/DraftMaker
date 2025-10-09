@@ -1,20 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { getAggrementFormData } from "../../../../../../api/service/axiosService";
-import {
-  Document,
-  Packer,
-  Paragraph,
-  TextRun,
-  HeadingLevel,
-  AlignmentType,
-} from "docx";
-import { saveAs } from "file-saver";
 import { getDayWithSuffix } from "../../../../../../utils/dateFormat";
 import html2pdf from "html2pdf.js";
 
 const GasPreview = () => {
-  const pdfTemplateRef = useRef(null);
   const documentRef = useRef(null);
   const { bookingId } = useParams();
   const [formData, setFormData] = useState({});
@@ -43,12 +33,10 @@ const GasPreview = () => {
     fetchData();
   }, [bookingId]);
 
-  // Fixed isFilled function to safely check if a field has content
   const isFilled = (value) => {
     return typeof value === "string" && value.trim() !== "";
   };
 
-  // Format date if available
   const formatDate = (dateString) => {
     try {
       if (!dateString) return ".....................";
@@ -58,6 +46,15 @@ const GasPreview = () => {
     }
   };
 
+  const getStampDutyPaidByName = () => {
+    if (formData.stampDutyPaidBy === "firstParty") {
+      return formData.firstParty;
+    } else if (formData.stampDutyPaidBy === "secondParty") {
+      return formData.secondParty;
+    }
+    return "Not Selected";
+  };
+
   // PDF Download Function
   const downloadPDF = () => {
     setDownloadLoading(true);
@@ -65,23 +62,23 @@ const GasPreview = () => {
 
     const element = documentRef.current;
     const opt = {
-      margin: [20, 15, 20, 15], // top, left, bottom, right in mm
+      margin: [15, 15, 15, 15],
       filename: `Gas_Affidavit_${
         formData.fullName ? formData.fullName.replace(/\s+/g, "_") : "User"
       }.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
-        scale: 2,
+        scale: 3,
         useCORS: true,
         letterRendering: true,
-        allowTaint: false,
+        logging: false,
       },
       jsPDF: {
         unit: "mm",
         format: "a4",
         orientation: "portrait",
-        compressPDF: true,
       },
+      pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     };
 
     html2pdf()
@@ -98,250 +95,273 @@ const GasPreview = () => {
         setDownloadType("");
       });
   };
-
   // Generate Word document
   const generateWordDocument = async () => {
     setDownloadLoading(true);
     setDownloadType("word");
 
     try {
-      // Create structured content for Word document
-      const generateWordContent = () => {
-        return `
-          <div style="text-align: center; font-weight: bold; font-size: 18pt; margin-bottom: 30px; text-decoration: underline;">
-            ${formData.documentType || "GAS AFFIDAVIT"}
-          </div>
-           ${
-             formData.firstParty
-               ? `
-      <div style="margin-bottom: 20px; line-height: 1.6;">
-        <p style="margin-bottom: 8px;">
-          <span style="font-size: 12pt;">First Party (Stamp Duty): </span>
-          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-            ${formData.firstParty}
-          </strong>
-        </p>
-        <p style="font-size: 10pt; font-style: italic; margin-bottom: 16px;">
-          (Responsible for payment of stamp duty charges as per applicable state regulations)
-        </p>
-        <p style="margin-bottom: 16px;">
-          <span style="font-size: 12pt;">Second Party: </span>
-          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-            ${formData.secondParty}
-          </strong>
-        </p>
-      </div>
-    `
-               : ""
-           }
-
-          <p style="margin-bottom: 16px; line-height: 1.6;">
-            I, 
-            <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-              ${formData?.fullName || "..........................."}
-            </strong> 
-            <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-              ${formData?.relation || "..."}
-            </strong>, 
-            <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-              ${formData?.fatherName || "..........................."}
-            </strong> 
-            Aged: 
-            <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-              ${formData?.age?.toString() || "......"}
-            </strong> 
-            Years,
-          </p>
-
-          <p style="margin-bottom: 16px;">
-            Permanent Address 
-            <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-              ${formData?.permanentAddress || "..........................."}
-            </strong>
-          </p>
-
-          <p style="margin-bottom: 16px;">
-            My Aadhaar No: 
-            <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-              ${formData?.aadhaarNo || "..........................."}
-            </strong>
-          </p>
-
-          <p style="margin-bottom: 16px; font-weight: bold;">
-            Do hereby solemnly affirm and declare as under:
-          </p>
-
-          <div style="padding-left: 24px; margin-bottom: 32px;">
-            <ol style="counter-reset: item; padding-left: 0;">
-              <li style="margin-bottom: 16px; counter-increment: item; display: block; padding-left: 1.5em; line-height: 1.6;">
-                That I am / was a consumer of 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData?.gasCompanyName || "..........................."}
-                </strong> 
-                for domestic use at the following address 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData?.serviceAddress || "..........................."}
-                </strong> 
-                since 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formatDate(formData?.connectionDate)}
-                </strong>
-                <br><br>
-                My consumer number is / was 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData?.consumerNumber || "..........................."}
-                </strong> 
-                I was issued with Subscription Voucher No 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${
-                    formData?.subscriptionVoucher ||
-                    "..........................."
-                  }
-                </strong> 
-                by M/s 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData?.gasCompanyName || "..........................."}
-                </strong> 
-                towards 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData?.cylinderCount?.toString() || "..."}
-                </strong> 
-                Gas cylinder and 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData?.regulatorCount?.toString() || "..."}
-                </strong> 
-                regulator on loan for my use against the refundable deposit of Rs 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData?.depositAmount?.toString() || "..."}
-                </strong>
-              </li>
-
-              <li style="margin-bottom: 16px; counter-increment: item; display: block; padding-left: 1.5em; line-height: 1.6;">
-                That I was given the gas cylinder and a regulator when I was residing in 
-                <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                  ${formData?.previousAddress || "..........................."}
-                </strong> 
-                Thereafter, I shifted to my above mentioned residence.
-              </li>
-
-              <li style="margin-bottom: 16px; counter-increment: item; display: block; padding-left: 1.5em; line-height: 1.6;">
-                ${
-                  formData?.reason === "shifting"
-                    ? "That I want to return the Subscription Voucher along with the cylinder(s) and regulator as I am shifting my residence from this town and want to terminate the agreement with the above mentioned Corporation."
-                    : "That I want to terminate the agreement with the above mentioned distributor."
-                }
-              </li>
-
-              <li style="margin-bottom: 16px; counter-increment: item; display: block; padding-left: 1.5em; line-height: 1.6;">
-                ${
-                  formData?.lostItem === "subscription"
-                    ? "That I am not able to produce the Subscription Voucher along with the cylinder and regulator to obtain the refundable deposit as it is misplaced / lost."
-                    : "That I am not able to produce the Termination Voucher as it misplaced / lost."
-                }
-              </li>
-
-              <li style="margin-bottom: 16px; counter-increment: item; display: block; padding-left: 1.5em; line-height: 1.6;">
-                That I have not assigned or transferred the Subscription Voucher / Termination Voucher to any person whomsoever.
-              </li>
-
-              <li style="margin-bottom: 16px; counter-increment: item; display: block; padding-left: 1.5em; line-height: 1.6;">
-                That I undertake to return forthwith the above referred Subscription Voucher / Termination Voucher to M/s. Hindustan Petroleum Corporation Ltd. if found at any time in the future.
-              </li>
-
-              <li style="margin-bottom: 16px; counter-increment: item; display: block; padding-left: 1.5em; line-height: 1.6;">
-                That I shall be liable to M/s. Hindustan Petroleum Corporation Ltd. for any loss or expense incurred by them if any one produces the above referred Subscription Voucher / Termination Voucher to claim any amount from the Corporation.
-              </li>
-            </ol>
-          </div>
-
-          <div style="margin-top: 48px;">
-            <p style="line-height: 1.6;">
-              Verified at 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${formData?.place || "..........................."}
-              </strong> 
-              on this 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${getDayWithSuffix(formData?.day) || "..."}
-              </strong> 
-              day of 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${formData?.month || "..."}
-              </strong>, 
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${formData?.year || "..."}
-              </strong> 
-              that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.
-            </p>
-          </div>
-
-          <div style="margin-top: 96px; text-align: right;">
-            <p>(Signature of the Deponent)</p>
-            <p style="margin-top: 4px;">
-              <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-                ${formData?.fullName || "..........................."}
-              </strong>
-            </p>
-          </div>
-        `;
-      };
-
-      // Enhanced Word document template with proper A4 styling
       const wordDocument = `
-        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head>
-          <meta charset='utf-8'>
-          <title>Gas Affidavit</title>
-          <!--[if gte mso 9]>
-          <xml>
-            <w:WordDocument>
-              <w:View>Print</w:View>
-              <w:Zoom>90</w:Zoom>
-              <w:DoNotPromptForConvert/>
-              <w:DoNotShowInsertionsAndDeletions/>
-            </w:WordDocument>
-          </xml>
-          <![endif]-->
-          <style>
-            @page {
-              size: A4;
-              margin: 2cm 1.5cm 2cm 1.5cm;
-            }
-            body {
-              font-family: "Times New Roman", Times, serif;
-              font-size: 12pt;
-              line-height: 1.6;
-              color: #000;
-              margin: 0;
-              padding: 20px;
-              max-width: 100%;
-            }
-            ol {
-              counter-reset: item;
-              padding-left: 0;
-            }
-            ol > li {
-              display: block;
-              margin-bottom: 1em;
-              padding-left: 2em;
-            }
-            ol > li:before {
-              content: counter(item, decimal) ".";
-              counter-increment: item;
-              font-weight: bold;
-              width: 2em;
-              margin-left: -2em;
-              display: inline-block;
-            }
-          </style>
-        </head>
-        <body>
-          ${generateWordContent()}
-        </body>
-        </html>
-      `;
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+            xmlns:w='urn:schemas-microsoft-com:office:word' 
+            xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <meta charset='utf-8'>
+        <title>Gas Affidavit</title>
+        <!--[if gte mso 9]>
+        <xml>
+          <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+            <w:DoNotPromptForConvert/>
+          </w:WordDocument>
+        </xml>
+        <![endif]-->
+        <style>
+          @page {
+            size: 21cm 29.7cm;
+            margin: 2.54cm 2.54cm 2.54cm 2.54cm;
+          }
+          * {
+            margin: 0;
+            padding: 0;
+          }
+          body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            color: #000;
+          }
+          h1 {
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+          }
+          table.party-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          table.party-table td {
+            border: 1px solid #000;
+            padding: 8px 10px;
+            font-size: 11pt;
+          }
+          table.party-table td:first-child {
+            font-weight: bold;
+            width: 35%;
+            background-color: #f0f0f0;
+          }
+          p {
+            margin-bottom: 12px;
+            text-align: justify;
+            line-height: 1.6;
+          }
+          .center {
+            text-align: center;
+            font-weight: bold;
+            margin: 20px 0;
+          }
+          .list-container {
+            margin: 20px 0;
+          }
+          .list-item {
+            margin-bottom: 15px;
+            display: table;
+            width: 100%;
+          }
+          .list-number {
+            display: table-cell;
+            width: 25px;
+            vertical-align: top;
+            font-weight: bold;
+            padding-right: 10px;
+          }
+          .list-content {
+            display: table-cell;
+            vertical-align: top;
+            text-align: justify;
+            line-height: 1.6;
+          }
+          .signature-section {
+            margin-top: 80px;
+            text-align: right;
+          }
+          strong {
+            font-weight: bold;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>${formData.documentType || "GAS AFFIDAVIT"}</h1>
+        
+        ${
+          formData.firstParty && formData.secondParty
+            ? `
+        <table class="party-table">
+          <tr>
+            <td>First Party</td>
+            <td>${formData.firstParty}</td>
+          </tr>
+          <tr>
+            <td>Second Party</td>
+            <td>${formData.secondParty}</td>
+          </tr>
+          <tr>
+            <td>Stamp Duty Paid By</td>
+            <td>${getStampDutyPaidByName()}</td>
+          </tr>
+        </table>
+        `
+            : ""
+        }
 
-      // Create blob and download
+        <p>
+          I, <strong>${
+            formData?.fullName || "..........................."
+          }</strong> 
+          <strong>${formData?.relation || "..."}</strong>, 
+          <strong>${
+            formData?.fatherName || "..........................."
+          }</strong>, 
+          Aged: <strong>${formData?.age?.toString() || "......"}</strong> Years,
+        </p>
+
+        <p>
+          Permanent Address <strong>${
+            formData?.permanentAddress || "..........................."
+          }</strong>
+        </p>
+
+        <p>
+          My Aadhaar No: <strong>${
+            formData?.aadhaarNo || "..........................."
+          }</strong>
+        </p>
+
+        <p class="center">Do hereby solemnly affirm and declare as under:</p>
+
+        <div class="list-container">
+          <div class="list-item">
+            <div class="list-number">1.</div>
+            <div class="list-content">
+              That I am / was a consumer of <strong>${
+                formData?.gasCompanyName || "..........................."
+              }</strong> 
+              for domestic use at the following address <strong>${
+                formData?.serviceAddress || "..........................."
+              }</strong> 
+              since <strong>${formatDate(formData?.connectionDate)}</strong>.
+              <br><br>
+              My consumer number is / was <strong>${
+                formData?.consumerNumber || "..........................."
+              }</strong>. 
+              I was issued with Subscription Voucher No <strong>${
+                formData?.subscriptionVoucher || "..........................."
+              }</strong> 
+              by M/s <strong>${
+                formData?.gasCompanyName || "..........................."
+              }</strong> 
+              towards <strong>${
+                formData?.cylinderCount?.toString() || "..."
+              }</strong> Gas cylinder and 
+              <strong>${
+                formData?.regulatorCount?.toString() || "..."
+              }</strong> regulator on loan for my use 
+              against the refundable deposit of Rs <strong>${
+                formData?.depositAmount?.toString() || "..."
+              }</strong>.
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-number">2.</div>
+            <div class="list-content">
+              That I was given the gas cylinder and a regulator when I was residing in 
+              <strong>${
+                formData?.previousAddress ||
+                formData?.serviceAddress ||
+                "..........................."
+              }</strong>. 
+              Thereafter, I shifted to my above mentioned residence.
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-number">3.</div>
+            <div class="list-content">
+              ${
+                formData?.reason === "shifting"
+                  ? "That I want to return the Subscription Voucher along with the cylinder(s) and regulator as I am shifting my residence from this town and want to terminate the agreement with the above mentioned Corporation."
+                  : "That I want to terminate the agreement with the above mentioned distributor."
+              }
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-number">4.</div>
+            <div class="list-content">
+              ${
+                formData?.lostItem === "subscription"
+                  ? "That I am not able to produce the Subscription Voucher along with the cylinder and regulator to obtain the refundable deposit as it is misplaced / lost."
+                  : "That I am not able to produce the Termination Voucher as it is misplaced / lost."
+              }
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-number">5.</div>
+            <div class="list-content">
+              That I have not assigned or transferred the Subscription Voucher / Termination Voucher to any person whomsoever.
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-number">6.</div>
+            <div class="list-content">
+              That I undertake to return forthwith the above referred Subscription Voucher / Termination Voucher to 
+              M/s <strong>${
+                formData?.gasCompanyName || "..........................."
+              }</strong> 
+              if found at any time in the future.
+            </div>
+          </div>
+
+          <div class="list-item">
+            <div class="list-number">7.</div>
+            <div class="list-content">
+              That I shall be liable to M/s <strong>${
+                formData?.gasCompanyName || "..........................."
+              }</strong> 
+              for any loss or expense incurred by them if any one produces the above referred Subscription Voucher / 
+              Termination Voucher to claim any amount from the Corporation.
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-top: 30px;">
+          Verified at <strong>${
+            formData?.place || "..........................."
+          }</strong> 
+          on this <strong>${getDayWithSuffix(formData?.day) || "..."}</strong> 
+          day of <strong>${formData?.month || "..."}</strong>, 
+          <strong>${formData?.year || "..."}</strong> 
+          that the contents of the above said affidavit are true and correct to the best of my knowledge and belief.
+        </p>
+
+        <div class="signature-section">
+          <p>(Signature of the Deponent)</p>
+          <p style="margin-top: 10px;"><strong>${
+            formData?.fullName || "..........................."
+          }</strong></p>
+        </div>
+      </body>
+      </html>
+    `;
+
       const blob = new Blob([wordDocument], {
         type: "application/msword",
       });
@@ -488,41 +508,50 @@ const GasPreview = () => {
         </button>
       </div>
 
-      {/* Single page preview with continuous content */}
+      {/* Preview */}
       <div className="bg-white border border-gray-300 shadow font-serif w-full max-w-3xl">
         <div ref={documentRef} className="relative p-8">
-          {/* Corner marks */}
           <div className="absolute top-0 left-0 border-t border-l w-4 h-4 border-gray-400"></div>
           <div className="absolute top-0 right-0 border-t border-r w-4 h-4 border-gray-400"></div>
           <div className="absolute bottom-0 left-0 border-b border-l w-4 h-4 border-gray-400"></div>
           <div className="absolute bottom-0 right-0 border-b border-r w-4 h-4 border-gray-400"></div>
 
-          {/* Content */}
           <div>
-            <h1 className="text-center font-bold text-xl mb-6 underline">
+            <h1 className="text-center font-bold text-xl mb-6 underline uppercase">
               {formData.documentType}
             </h1>
-            {formData.firstParty && (
-              <>
-                <div className="mb-5 text-justify leading-relaxed">
-                  <span className="font-lg">
-                    First Party (Stamp Duty):{" "}
-                    <span className="font-bold">{formData.firstParty}</span>
-                  </span>
 
-                  <br />
-                  <span className="text-sm italic">
-                    (Responsible for payment of stamp duty charges as per
-                    applicable state regulations)
-                  </span>
-                </div>
-                <div className="mb-5 text-justify leading-relaxed">
-                  <span className="font-lg">
-                    Second Party :{" "}
-                    <span className="font-bold">{formData.secondParty}</span>
-                  </span>
-                </div>
-              </>
+            {formData.firstParty && formData.secondParty && (
+              <div className="mb-6">
+                <table className="w-full border-collapse border border-gray-400 text-sm">
+                  <tbody>
+                    <tr className="bg-gray-100">
+                      <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                        First Party
+                      </td>
+                      <td className="border border-gray-400 px-3 py-2">
+                        {formData.firstParty}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                        Second Party
+                      </td>
+                      <td className="border border-gray-400 px-3 py-2">
+                        {formData.secondParty}
+                      </td>
+                    </tr>
+                    <tr className="bg-gray-100">
+                      <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                        Stamp Duty Paid By
+                      </td>
+                      <td className="border border-gray-400 px-3 py-2">
+                        {getStampDutyPaidByName()}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             )}
 
             <p className="mb-4">
@@ -594,12 +623,12 @@ const GasPreview = () => {
               </span>
             </p>
 
-            <p className="mb-4 font-bold">
+            <p className="mb-4 font-bold text-center">
               Do hereby solemnly affirm and declare as under:
             </p>
 
             <ol className="list-decimal pl-6 space-y-4">
-              <li>
+              <li className="text-justify">
                 That I am / was a consumer of{" "}
                 <span
                   className={
@@ -630,6 +659,7 @@ const GasPreview = () => {
                 >
                   {formatDate(formData?.connectionDate)}
                 </span>
+                .
                 <p className="mt-2">
                   My consumer number is / was{" "}
                   <span
@@ -640,8 +670,8 @@ const GasPreview = () => {
                     }
                   >
                     {formData?.consumerNumber || "..........................."}
-                  </span>{" "}
-                  I was issued with Subscription Voucher No{" "}
+                  </span>
+                  . I was issued with Subscription Voucher No{" "}
                   <span
                     className={
                       isFilled(formData?.subscriptionVoucher)
@@ -693,10 +723,11 @@ const GasPreview = () => {
                   >
                     {formData?.depositAmount || "..."}
                   </span>
+                  .
                 </p>
               </li>
 
-              <li>
+              <li className="text-justify">
                 That I was given the gas cylinder and a regulator when I was
                 residing in{" "}
                 <span
@@ -707,62 +738,61 @@ const GasPreview = () => {
                   }
                 >
                   {formData?.previousAddress || "..........................."}
-                </span>{" "}
-                Thereafter, I shifted to my above mentioned residence.
+                </span>
+                . Thereafter, I shifted to my above mentioned residence.
               </li>
 
-              <li>
-                {formData?.reason === "shifting" ? (
-                  <p>
-                    That I want to return the Subscription Voucher along with
-                    the cylinder(s) and regulator as I am shifting my residence
-                    from this town and want to terminate the agreement with the
-                    above mentioned Corporation.
-                  </p>
-                ) : (
-                  <p>
-                    That I want to terminate the agreement with the above
-                    mentioned distributor.
-                  </p>
-                )}
+              <li className="text-justify">
+                {formData?.reason === "shifting"
+                  ? "That I want to return the Subscription Voucher along with the cylinder(s) and regulator as I am shifting my residence from this town and want to terminate the agreement with the above mentioned Corporation."
+                  : "That I want to terminate the agreement with the above mentioned distributor."}
               </li>
 
-              <li>
-                {formData?.lostItem === "subscription" ? (
-                  <p>
-                    That I am not able to produce the Subscription Voucher along
-                    with the cylinder and regulator to obtain the refundable
-                    deposit as it is misplaced / lost.
-                  </p>
-                ) : (
-                  <p>
-                    That I am not able to produce the Termination Voucher as it
-                    misplaced / lost.
-                  </p>
-                )}
+              <li className="text-justify">
+                {formData?.lostItem === "subscription"
+                  ? "That I am not able to produce the Subscription Voucher along with the cylinder and regulator to obtain the refundable deposit as it is misplaced / lost."
+                  : "That I am not able to produce the Termination Voucher as it is misplaced / lost."}
               </li>
 
-              <li>
+              <li className="text-justify">
                 That I have not assigned or transferred the Subscription Voucher
                 / Termination Voucher to any person whomsoever.
               </li>
 
-              <li>
+              <li className="text-justify">
                 That I undertake to return forthwith the above referred
-                Subscription Voucher / Termination Voucher to M/s. Hindustan
-                Petroleum Corporation Ltd. if found at any time in the future.
+                Subscription Voucher / Termination Voucher to M/s{" "}
+                <span
+                  className={
+                    isFilled(formData?.gasCompanyName)
+                      ? "font-bold form-data"
+                      : "bg-yellow-200 px-1 font-bold form-data"
+                  }
+                >
+                  {formData?.gasCompanyName || "..........................."}
+                </span>{" "}
+                if found at any time in the future.
               </li>
 
-              <li>
-                That I shall be liable to M/s. Hindustan Petroleum Corporation
-                Ltd. for any loss or expense incurred by them if any one
-                produces the above referred Subscription Voucher / Termination
-                Voucher to claim any amount from the Corporation.
+              <li className="text-justify">
+                That I shall be liable to M/s{" "}
+                <span
+                  className={
+                    isFilled(formData?.gasCompanyName)
+                      ? "font-bold form-data"
+                      : "bg-yellow-200 px-1 font-bold form-data"
+                  }
+                >
+                  {formData?.gasCompanyName || "..........................."}
+                </span>{" "}
+                for any loss or expense incurred by them if any one produces the
+                above referred Subscription Voucher / Termination Voucher to
+                claim any amount from the Corporation.
               </li>
             </ol>
 
             <div className="mt-12">
-              <p>
+              <p className="text-justify">
                 Verified at{" "}
                 <span
                   className={
@@ -836,7 +866,6 @@ const GasPreview = () => {
           }
         }
 
-        /* Loading animation */
         .animate-spin {
           animation: spin 1s linear infinite;
         }
@@ -850,7 +879,6 @@ const GasPreview = () => {
           }
         }
 
-        /* Transition effects */
         .transition-colors {
           transition-property: background-color, border-color, color, fill,
             stroke;

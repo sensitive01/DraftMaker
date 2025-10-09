@@ -119,6 +119,7 @@ const dualApplicantSchema = new mongoose.Schema(
     email: { type: String },
     firstParty: { type: String },
     secondParty: { type: String },
+      stampDutyPayer: { type: String },
   },
   {
     timestamps: true,

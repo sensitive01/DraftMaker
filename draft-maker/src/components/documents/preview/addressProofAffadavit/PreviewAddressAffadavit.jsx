@@ -41,6 +41,7 @@ const PreviewAddressAffadavit = () => {
     place: "",
     firstParty: "",
     secondParty: "",
+    stampDutyPaidBy: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -154,11 +155,15 @@ const PreviewAddressAffadavit = () => {
       return false;
     }
     if (!formData.firstParty) {
-      setValidationError("Please enter who will pay the stamp duty");
+      setValidationError("Please enter the first party name");
       return false;
     }
     if (!formData.secondParty) {
-      setValidationError("Please enter the second party details");
+      setValidationError("Please enter the second party name");
+      return false;
+    }
+    if (!formData.stampDutyPaidBy) {
+      setValidationError("Please select who will pay the stamp duty");
       return false;
     }
 

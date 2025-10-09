@@ -123,29 +123,46 @@ const CommercialAggrementPreview = () => {
         <div class="title-section">
           COMMERCIAL LEASE AGREEMENT
         </div>
-         ${
-           formData.firstParty
-             ? `
-      <div style="margin-bottom: 20px; line-height: 1.6;">
-        <p style="margin-bottom: 8px;">
-          <span style="font-size: 12pt;">First Party (Stamp Duty): </span>
-          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-            ${formData.firstParty}
-          </strong>
-        </p>
-        <p style="font-size: 10pt; font-style: italic; margin-bottom: 16px;">
-          (Responsible for payment of stamp duty charges as per applicable state regulations)
-        </p>
-        <p style="margin-bottom: 16px;">
-          <span style="font-size: 12pt;">Second Party: </span>
-          <strong style="background-color: #f3f4f6; padding: 2px 4px; font-weight: bold;">
-            ${formData.secondParty}
-          </strong>
-        </p>
-      </div>
-    `
-             : ""
-         }
+           ${
+             formData.firstParty && formData.secondParty
+               ? `
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 11pt;">
+  <tbody>
+    <tr style="background-color: #f3f4f6;">
+      <td style="border: 1px solid #9ca3af; padding: 8px; font-weight: bold; width: 33%;">
+        First Party
+      </td>
+      <td style="border: 1px solid #9ca3af; padding: 8px;">
+        ${formData.firstParty}
+      </td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #9ca3af; padding: 8px; font-weight: bold;">
+        Second Party
+      </td>
+      <td style="border: 1px solid #9ca3af; padding: 8px;">
+        ${formData.secondParty}
+      </td>
+    </tr>
+    <tr style="background-color: #f3f4f6;">
+      <td style="border: 1px solid #9ca3af; padding: 8px; font-weight: bold;">
+        Stamp Duty Paid By
+      </td>
+      <td style="border: 1px solid #9ca3af; padding: 8px;">
+        ${
+          formData.stampDutyPayer === "First Party"
+            ? formData.firstParty
+            : formData.stampDutyPayer === "Second Party"
+            ? formData.secondParty
+            : "Not Selected"
+        }
+      </td>
+    </tr>
+  </tbody>
+</table>
+`
+               : ""
+           }
 
         <div class="intro-section">
           <p class="main-paragraph">
@@ -1039,27 +1056,41 @@ const CommercialAggrementPreview = () => {
               <div className="text-center font-bold text-xl mb-8 underline tracking-wide">
                 COMMERCIAL AGREEMENT
               </div>
-              {formData.firstParty && (
-                <>
-                  <div className="mb-5 text-justify leading-relaxed">
-                    <span className="font-lg">
-                      First Party (Stamp Duty):{" "}
-                      <span className="font-bold">{formData.firstParty}</span>
-                    </span>
-
-                    <br />
-                    <span className="text-sm italic">
-                      (Responsible for payment of stamp duty charges as per
-                      applicable state regulations)
-                    </span>
-                  </div>
-                  <div className="mb-5 text-justify leading-relaxed">
-                    <span className="font-lg">
-                      Second Party :{" "}
-                      <span className="font-bold">{formData.secondParty}</span>
-                    </span>
-                  </div>
-                </>
+              {formData.firstParty && formData.secondParty && (
+                <div className="mb-6 relative z-10">
+                  <table className="w-full border-collapse border border-gray-400 text-sm">
+                    <tbody>
+                      <tr className="bg-gray-100">
+                        <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                          First Party
+                        </td>
+                        <td className="border border-gray-400 px-3 py-2">
+                          {formData.firstParty}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                          Second Party
+                        </td>
+                        <td className="border border-gray-400 px-3 py-2">
+                          {formData.secondParty}
+                        </td>
+                      </tr>
+                      <tr className="bg-gray-100">
+                        <td className="border border-gray-400 px-3 py-2 font-semibold w-1/3">
+                          Stamp Duty Paid By
+                        </td>
+                        <td className="border border-gray-400 px-3 py-2">
+                          {formData.stampDutyPayer === "First Party"
+                            ? formData.firstParty
+                            : formData.stampDutyPayer === "Second Party"
+                            ? formData.secondParty
+                            : "Not Selected"}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               )}
 
               <p className="mb-5 text-justify leading-relaxed">

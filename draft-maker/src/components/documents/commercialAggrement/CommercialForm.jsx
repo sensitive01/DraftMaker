@@ -324,6 +324,7 @@ const CommercialForm = ({
           </div>
 
           {/* Party Names & Stamp Duty */}
+          {/* Party Names & Stamp Duty */}
           <div id="party-stamp" className="mb-6 sm:mb-8">
             <h2 className="text-base sm:text-lg font-medium text-gray-800 mb-3 sm:mb-4 pb-2 border-b">
               Party Names & Stamp Duty
@@ -331,7 +332,7 @@ const CommercialForm = ({
             <div className="space-y-4 sm:space-y-6">
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
-                  Who will pay the Stamp Duty?
+                  First Party Name
                 </label>
                 <input
                   type="text"
@@ -365,8 +366,26 @@ const CommercialForm = ({
                 </p>
               </div>
 
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-red-600 mb-2">
+                  Who will pay the Stamp Duty?
+                </label>
+                <select
+                  name="stampDutyPayer"
+                  value={formData.stampDutyPayer || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 bg-white"
+                >
+                  <option value="">Select who will pay the stamp duty</option>
+                  <option value="First Party">First Party</option>
+                  <option value="Second Party">Second Party</option>
+                </select>
+              </div>
+
               <p className="text-xs text-red-600 italic">
-                ℹ️ Please enter the names of both parties to the agreement. Only letters, spaces, and commas are allowed (max 50 characters each).
+                ℹ️ Please enter the names of both parties and select who will
+                pay the stamp duty. Only letters, spaces, and commas are allowed
+                (max 50 characters each).
               </p>
             </div>
           </div>

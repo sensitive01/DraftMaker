@@ -70,6 +70,7 @@ export default function PreviewRentalAgreement() {
     fixtures: [{ item: "", quantity: "" }],
     firstParty: "",
     secondParty: "",
+    stampDutyPayer: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -266,6 +267,10 @@ export default function PreviewRentalAgreement() {
     }
     if (!formData.secondParty) {
       setValidationError("Please enter the second party details");
+      return false;
+    }
+    if (!formData.stampDutyPayer) {
+      setValidationError("Please select who will pay the stamp duty");
       return false;
     }
 
