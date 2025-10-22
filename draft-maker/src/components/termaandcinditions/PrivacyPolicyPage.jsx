@@ -47,7 +47,7 @@ export default function PrivacyPolicyPage() {
               <span className="mr-2 mt-1">•</span>
               <div>
                 <span className="font-semibold">Personal Information:</span>{" "}
-                name: AJAY KUMAR N, email: draftmakerinfo@gmail.com, phone number: 8088774711, and other details you provide during checkout, or service requests.
+                name, email, phone number, and other details you provide during checkout, or service requests.
               </div>
             </div>
             <div className="flex items-start">
