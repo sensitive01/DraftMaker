@@ -46,16 +46,20 @@ export default function PrivacyPolicyPage() {
             <div className="flex items-start">
               <span className="mr-2 mt-1">•</span>
               <div>
-                <span className="font-semibold">Personal Information:</span>{" "}
-                name, email, phone number, and other details you provide during checkout, or service requests.
+                <span className="font-semibold">Personal Information:</span> We
+                collect personal details such as your name, email address, phone
+                number, and any other information you provide during checkout or
+                when submitting service requests.
               </div>
             </div>
             <div className="flex items-start">
               <span className="mr-2 mt-1">•</span>
               <div>
-                <span className="font-semibold">Payment Information:</span>{" "}
-                [Note: Specify if you collect payment details directly or use
-                third-party payment processors.]
+                <span className="font-semibold">Payment Information:</span> We
+                use <span className="font-semibold">Razorpay</span> as our
+                trusted third-party payment processor. We do not collect or
+                store your payment details directly. All transactions are
+                securely handled through Razorpay’s encrypted payment gateway.
               </div>
             </div>
             <div className="flex items-start">
@@ -238,8 +242,6 @@ export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-       
-
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-8 mb-6">
           <div className="flex items-center justify-center mb-6">
