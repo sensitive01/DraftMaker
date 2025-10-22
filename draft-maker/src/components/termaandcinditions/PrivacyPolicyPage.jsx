@@ -56,7 +56,7 @@ export default function PrivacyPolicyPage() {
               <span className="mr-2 mt-1">•</span>
               <div>
                 <span className="font-semibold">Payment Information:</span> We
-                use <span className="font-semibold">Razorpay</span> as our
+                use <span className="font-semibold">CCAvenue</span> as our
                 trusted third-party payment processor. We do not collect or
                 store your payment details directly. All transactions are
                 securely handled through Razorpay’s encrypted payment gateway.
