@@ -17,6 +17,7 @@ const allowedOrigins = [
  " https://draft-maker.vercel.app/admin/login",
   "http://draftmaker.in",
   "https://draftmaker.in"
+  
 ];
 
 // ✅ CORS Middleware

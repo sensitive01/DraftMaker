@@ -70,17 +70,24 @@ const Footer = () => {
                     <Link to="/">Our Services</Link>
                   </li>
                   <li>
-                    <Link to="#">Terms & Conditions</Link>
+                    <Link to="/home/terms-and-conditions">
+                      Terms & Conditions
+                    </Link>
                   </li>
                   <li>
-                    <Link to="#">Privacy Policy</Link>
+                    <Link to="/home/privacy-policy">Privacy Policy</Link>
+                  </li>
+                  <li>
+                    <Link to="/home/refund-and-cancellation">Refund Policy</Link>
                   </li>
 
                   <li>
                     <Link to="/home/contact-us">Contact Us</Link>
                   </li>
                   <li>
-                    <Link to="/documents/track-my-documents">Track Your Order</Link>
+                    <Link to="/documents/track-my-documents">
+                      Track Your Order
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -96,19 +103,29 @@ const Footer = () => {
                     <Link to="/documents/buy-e-stamp">Buy E-Stamp</Link>
                   </li>
                   <li>
-                    <Link to="/documents/rental/residential-lease">Document Drafting</Link>
+                    <Link to="/documents/rental/residential-lease">
+                      Document Drafting
+                    </Link>
                   </li>
                   <li>
-                    <Link to="/documents/rental/residential-lease">Printing Services</Link>
+                    <Link to="/documents/rental/residential-lease">
+                      Printing Services
+                    </Link>
                   </li>
                   <li>
-                    <Link to="/documents/rental/residential-lease">Document Delivery</Link>
+                    <Link to="/documents/rental/residential-lease">
+                      Document Delivery
+                    </Link>
                   </li>
                   <li>
-                    <Link to="/documents/rental/residential-lease">Notary Services</Link>
+                    <Link to="/documents/rental/residential-lease">
+                      Notary Services
+                    </Link>
                   </li>
                   <li>
-                    <Link to="/documents/rental/residential-lease">PAN & Passport Services</Link>
+                    <Link to="/documents/rental/residential-lease">
+                      PAN & Passport Services
+                    </Link>
                   </li>
                   <li>
                     <Link to="#">Jeevan Pramaan </Link>

@@ -97,6 +97,10 @@ import PreviewGasAffidavitForm from "./components/documents/preview/gasaffadavit
 import PreviewDobCorrectionPage from "./components/documents/preview/dobCorrection/DobCorrectionPage";
 import PreviewNameCorrectionChange from "./components/documents/preview/namechangecorrection/NameCorrectionChange";
 import PreviewDualNameChange from "./components/documents/preview/dualNameChange/DualNameChange";
+import MainPolicies from "./components/termaandcinditions/MainPolicies";
+import TermsAndConditionsPage from "./components/termaandcinditions/TermsAndConditionsPage";
+import PrivacyPolicyPage from "./components/termaandcinditions/PrivacyPolicyPage";
+import RefundCancellationPolicyPage from "./components/termaandcinditions/RefundCancellationPolicyPage";
 
 function MainLayout({ children }) {
   return (
@@ -375,6 +379,136 @@ function ContactUsPage({ children }) {
       </div>
 
       <ContactMePage />
+      {children}
+
+      <NeedSupport />
+      <Footer />
+    </div>
+  );
+}
+
+function PrivacyPolicy({ children }) {
+  return (
+    <div className="page_wrapper">
+      <div className="top_home_wraper white_option">
+        <div className="content-wrapper">
+          <div className="container">
+            <div className="anim_line dark_bg">
+              {/* {[...Array(9)].map((_, index) => (
+                <span key={index}>
+                  <img src="" alt="anim_line" />
+                </span>
+              ))} */}
+            </div>
+          </div>
+          <Header />
+          <div className="container mx-auto text-center ">
+            <div
+              className="bread_crumb"
+              data-aos="fade-in"
+              data-aos-duration="2000"
+              data-aos-delay="100"
+            >
+              <div className="anim_line dark_bg">
+                {[...Array(9)].map((_, index) => (
+                  <span key={index}>
+                    <img src="" alt="anim_line" />
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <PrivacyPolicyPage />
+      {children}
+
+      <NeedSupport />
+      <Footer />
+    </div>
+  );
+}
+
+function TermsAndConditions({ children }) {
+  return (
+    <div className="page_wrapper">
+      <div className="top_home_wraper white_option">
+        <div className="content-wrapper">
+          <div className="container">
+            <div className="anim_line dark_bg">
+              {/* {[...Array(9)].map((_, index) => (
+                <span key={index}>
+                  <img src="" alt="anim_line" />
+                </span>
+              ))} */}
+            </div>
+          </div>
+          <Header />
+          <div className="container mx-auto text-center ">
+            <div
+              className="bread_crumb"
+              data-aos="fade-in"
+              data-aos-duration="2000"
+              data-aos-delay="100"
+            >
+              <div className="anim_line dark_bg">
+                {[...Array(9)].map((_, index) => (
+                  <span key={index}>
+                    <img src="" alt="anim_line" />
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <TermsAndConditionsPage />
+      {children}
+
+      <NeedSupport />
+      <Footer />
+    </div>
+  );
+}
+
+
+function RefundCancellationPolicy({ children }) {
+  return (
+    <div className="page_wrapper">
+      <div className="top_home_wraper white_option">
+        <div className="content-wrapper">
+          <div className="container">
+            <div className="anim_line dark_bg">
+              {/* {[...Array(9)].map((_, index) => (
+                <span key={index}>
+                  <img src="" alt="anim_line" />
+                </span>
+              ))} */}
+            </div>
+          </div>
+          <Header />
+          <div className="container mx-auto text-center ">
+            <div
+              className="bread_crumb"
+              data-aos="fade-in"
+              data-aos-duration="2000"
+              data-aos-delay="100"
+            >
+              <div className="anim_line dark_bg">
+                {[...Array(9)].map((_, index) => (
+                  <span key={index}>
+                    <img src="" alt="anim_line" />
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <RefundCancellationPolicyPage />
       {children}
 
       <NeedSupport />
@@ -669,7 +803,14 @@ function App() {
           <Route path="/documents/home" element={<HomeLayout />} />
           <Route path="/home/about-us" element={<AboutUsPage />} />
           <Route path="/home/contact-us" element={<ContactUsPage />} />
+          <Route path="/home/privacy-policy" element={<PrivacyPolicy />} />
+          <Route
+            path="/home/terms-and-conditions"
+            element={<TermsAndConditions />}
+          />
           <Route path="/home/all-about-us" element={<AboutUsFullPage />} />
+         <Route path="/home/refund-and-cancellation" element={<RefundCancellationPolicy />} />
+
 
           <Route
             path="/documents/rental/:type"
