@@ -286,8 +286,7 @@ const AboutUsContentPage = () => {
               <h3 className="text-2xl font-bold text-gray-800">Our Vision</h3>
             </div>
             <p className="text-gray-600 text-center leading-relaxed">
-              To revolutionize citizen services through complete digital
-              transformation, creating a paperless, cashless, and contactless
+              Our Visionary Founder and Proprietor Nagaraj Ajay Kumar vision is to revolutionize citizen services through complete digital transformation, creating a paperless, cashless, and contactless
               ecosystem where every citizen can access government and business
               services with transparency, accountability, and guaranteed
               delivery — making quality public services a fundamental right
