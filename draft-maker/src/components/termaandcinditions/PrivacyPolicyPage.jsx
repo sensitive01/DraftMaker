@@ -8,8 +8,6 @@ import {
   FileText,
   Clock,
   Mail,
-  Phone,
-  MapPin,
 } from "lucide-react";
 
 export default function PrivacyPolicyPage() {
@@ -21,8 +19,8 @@ export default function PrivacyPolicyPage() {
     contactPhone: "8088774711",
     businessAddress:
       "No 5, 1st floor, Site no 200, Muniraju Complex, Panathur Main Road, Kadubisanahalli, Bengaluru, Karnataka-560103",
+    legalEntity: "NAGARAJ AJAY KUMAR",
     responseDays: "1-3",
-    effectiveDate: "[Insert Date]",
   });
 
   const toggleSection = (section) => {
@@ -46,10 +44,9 @@ export default function PrivacyPolicyPage() {
             <div className="flex items-start">
               <span className="mr-2 mt-1">•</span>
               <div>
-                <span className="font-semibold">Personal Information:</span> We
-                collect personal details such as your name, email address, phone
-                number, and any other information you provide during checkout or
-                when submitting service requests.
+                <span className="font-semibold">Personal Information:</span>{" "}
+                name, email, phone number, and other details you provide during
+                checkout, or service requests.
               </div>
             </div>
             <div className="flex items-start">
@@ -59,7 +56,7 @@ export default function PrivacyPolicyPage() {
                 use <span className="font-semibold">CCAvenue</span> as our
                 trusted third-party payment processor. We do not collect or
                 store your payment details directly. All transactions are
-                securely handled through Razorpay’s encrypted payment gateway.
+                securely handled through Razorpay's encrypted payment gateway.
               </div>
             </div>
             <div className="flex items-start">
@@ -233,6 +230,12 @@ export default function PrivacyPolicyPage() {
                 {businessInfo.businessAddress}
               </div>
             </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-sm">
+              <span className="font-semibold">Legal Entity Name:</span>{" "}
+              {businessInfo.legalEntity}
+            </p>
           </div>
         </div>
       ),

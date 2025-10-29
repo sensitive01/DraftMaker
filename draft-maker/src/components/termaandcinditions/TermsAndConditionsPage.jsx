@@ -12,8 +12,6 @@ import {
   Scale,
   RefreshCw,
   Mail,
-  Phone,
-  MapPin,
 } from "lucide-react";
 
 export default function TermsAndConditionsPage() {
@@ -26,6 +24,7 @@ export default function TermsAndConditionsPage() {
     businessAddress:
       "No 5, 1st floor, Site no 200, Muniraju Complex, Panathur Main Road, Kadubisanahalli, Bengaluru, Karnataka-560103",
     location: "BENGALURU, KARNATAKA",
+    legalEntity: "NAGARAJ AJAY KUMAR",
     minAge: "18",
   });
 
@@ -216,10 +215,6 @@ export default function TermsAndConditionsPage() {
                 disrupting the normal operation of the site.
               </span>
             </div>
-            <div className="flex items-start">
-              <span className="mr-2 mt-1">ix.</span>
-              <span></span>
-            </div>
           </div>
         </div>
       ),
@@ -401,6 +396,12 @@ export default function TermsAndConditionsPage() {
                 {businessInfo.businessAddress}
               </div>
             </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-sm">
+              <span className="font-semibold">Legal Entity Name:</span>{" "}
+              {businessInfo.legalEntity}
+            </p>
           </div>
         </div>
       ),
