@@ -352,7 +352,7 @@ const Footer = () => {
           {/* row start */}
           <div className="row">
             <div className="col-md-4">
-              <p>© Copyrights 2023. All rights reserved.</p>
+              <p>© Copyrights 2025. All rights reserved.</p>
             </div>
             <div className="col-md-4">
               <ul className="social_media">
