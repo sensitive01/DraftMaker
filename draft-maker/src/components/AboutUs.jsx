@@ -1,6 +1,6 @@
 import React from "react";
 import aboutUsImg from "../assets/images/new/about-02 (1).png";
-import { CheckCircle, Shield, Clock, Banknote } from "lucide-react";
+import { CheckCircle, Shield, Clock, Banknote, User } from "lucide-react";
 import WhatWeDo from "./WhatWeDo";
 
 const AboutUs = () => {
@@ -79,6 +79,17 @@ const AboutUs = () => {
                 <span className="text-gray-700">
                   Financial Assistance Services
                 </span>
+              </div>
+            </div>
+
+            {/* Management Information */}
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <div className="flex items-center space-x-3">
+                <User size={20} className="text-red-600" />
+                <p className="text-gray-700">
+                  <span className="font-semibold text-gray-800">Managed by:</span>{" "}
+                  <span className="text-red-700 font-medium">Nagaraj Ajay Kumar</span>
+                </p>
               </div>
             </div>
           </div>

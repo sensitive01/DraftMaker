@@ -269,6 +269,20 @@ const AboutUsContentPage = () => {
                 </p>
               </div>
             </div>
+
+            {/* Management Information */}
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <div className="flex items-center justify-center space-x-2">
+                <p className="text-gray-700 text-base">
+                  <span className="font-semibold text-gray-800">
+                    Managed by:
+                  </span>{" "}
+                  <span style={{ color: "#770000" }} className="font-semibold">
+                    Nagaraj Ajay Kumar
+                  </span>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -286,7 +300,9 @@ const AboutUsContentPage = () => {
               <h3 className="text-2xl font-bold text-gray-800">Our Vision</h3>
             </div>
             <p className="text-gray-600 text-center leading-relaxed">
-              Our Visionary Founder and Proprietor Nagaraj Ajay Kumar vision is to revolutionize citizen services through complete digital transformation, creating a paperless, cashless, and contactless
+              Our Visionary Founder and Proprietor Nagaraj Ajay Kumar vision is
+              to revolutionize citizen services through complete digital
+              transformation, creating a paperless, cashless, and contactless
               ecosystem where every citizen can access government and business
               services with transparency, accountability, and guaranteed
               delivery — making quality public services a fundamental right
