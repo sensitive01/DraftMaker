@@ -78,7 +78,9 @@ const Footer = () => {
                     <Link to="/home/privacy-policy">Privacy Policy</Link>
                   </li>
                   <li>
-                    <Link to="/home/refund-and-cancellation">Refund Policy</Link>
+                    <Link to="/home/refund-and-cancellation">
+                      Refund Policy
+                    </Link>
                   </li>
 
                   <li>
@@ -378,10 +380,7 @@ const Footer = () => {
             </div>
             <div className="col-md-4">
               <p className="developer_text">
-                Design & developed by{" "}
-                <a href="https://sensitive.co.in" target="blank">
-                  Sensitive Technologies
-                </a>
+                Managed by <strong>Nagaraj Ajay Kumar</strong>
               </p>
             </div>
           </div>
