@@ -47,7 +47,7 @@ paymentRouter.post("/ccavenue/response", async (req, res) => {
     try {
         const encResponse = req.body.encResp;
         const decryptedResponse = decrypt(encResponse, workingKey);
-        console.log("Decrypted Response:", decryptedResponse);
+
 
         const params = new URLSearchParams(decryptedResponse);
         const orderStatus = params.get("order_status");
