@@ -1,19 +1,6 @@
-import React, { useState } from "react";
-import { generateCCavenueFormData } from "../../services/ccavenueService";
+import React from "react";
 
-const PaymentModal = ({ 
-  setShowPaymentModal, 
-  requestorName, 
-  setRequestorName, 
-  paymentErrors, 
-  mobileNumber, 
-  setMobileNumber, 
-  handlePayment, 
-  getTotalAmount,
-  onPaymentSuccess,
-  onPaymentError
-}) => {
-  const [isProcessing, setIsProcessing] = useState(false);
+const PaymentModal = ({ setShowPaymentModal, requestorName, setRequestorName, paymentErrors, mobileNumber, setMobileNumber, handlePayment, getTotalAmount }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl p-8 shadow-2xl w-full max-w-md transform transition-all border-t-4 border-red-600">
@@ -123,62 +110,10 @@ const PaymentModal = ({
             Cancel
           </button>
           <button
-            onClick={async () => {
-              if (isProcessing) return;
-              setIsProcessing(true);
-              
-              try {
-                // Prepare order data
-                const orderData = {
-                  amount: getTotalAmount(),
-                  orderId: `ORDER_${Date.now()}`,
-                  customerName: requestorName,
-                  customerEmail: "customer@example.com", // Replace with actual email
-                  customerPhone: mobileNumber,
-                  redirectUrl: `${window.location.origin}/payment/callback`
-                };
-
-                // Generate CCAvenue form data
-                const formData = generateCCavenueFormData(orderData);
-                
-                // Create and submit form
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction';
-                
-                Object.entries(formData).forEach(([key, value]) => {
-                  const input = document.createElement('input');
-                  input.type = 'hidden';
-                  input.name = key;
-                  input.value = value;
-                  form.appendChild(input);
-                });
-                
-                document.body.appendChild(form);
-                form.submit();
-                
-                // Call success callback if provided
-                if (onPaymentSuccess) {
-                  onPaymentSuccess({ status: 'redirecting' });
-                }
-              } catch (error) {
-                console.error('Payment error:', error);
-                if (onPaymentError) {
-                  onPaymentError({ 
-                    message: 'Failed to process payment', 
-                    error: error.message 
-                  });
-                }
-              } finally {
-                setIsProcessing(false);
-              }
-            }}
-            disabled={isProcessing}
-            className={`w-full sm:w-auto px-6 py-2.5 border border-transparent rounded-md shadow-sm text-white ${
-              isProcessing ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'
-            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 font-medium transition duration-200`}
+            onClick={handlePayment}
+            className="w-full sm:w-auto px-6 py-2.5 border border-transparent rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 font-medium transition duration-200"
           >
-            {isProcessing ? 'Processing...' : `Pay ₹${getTotalAmount()}`}
+            Pay ₹{getTotalAmount()}
           </button>
         </div>
       </div>

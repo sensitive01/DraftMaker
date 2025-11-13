@@ -122,6 +122,15 @@ const estampPaymentSchema = new mongoose.Schema(
       pincode: { type: String },
       landmark: { type: String },
     },
+    orderId: {
+      type: String,
+    },
+    ccavenueTrackingId: String,
+    ccavenueBankRefNo: String,
+    ccavenuePaymentMode: String,
+    ccavenueCardName: String,
+    ccavenueStatusMessage: String,
+    ccavenueFailureMessage: String,
   },
   { timestamps: true }
 );

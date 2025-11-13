@@ -101,6 +101,8 @@ import MainPolicies from "./components/termaandcinditions/MainPolicies";
 import TermsAndConditionsPage from "./components/termaandcinditions/TermsAndConditionsPage";
 import PrivacyPolicyPage from "./components/termaandcinditions/PrivacyPolicyPage";
 import RefundCancellationPolicyPage from "./components/termaandcinditions/RefundCancellationPolicyPage";
+import PaymentSuccessPage from "./components/payments/PaymentSuccessPage";
+import PaymentFailurePage from "./components/payments/PaymentFailurePage";
 
 function MainLayout({ children }) {
   return (
@@ -804,6 +806,9 @@ function App() {
           <Route path="/home/about-us" element={<AboutUsPage />} />
           <Route path="/home/contact-us" element={<ContactUsPage />} />
           <Route path="/home/privacy-policy" element={<PrivacyPolicy />} />
+
+          <Route path="/documents/payment-success" element={<PaymentSuccessPage />} />
+          <Route path="/documents/payment-failure" element={<PaymentFailurePage />} />
           <Route
             path="/home/terms-and-conditions"
             element={<TermsAndConditions />}

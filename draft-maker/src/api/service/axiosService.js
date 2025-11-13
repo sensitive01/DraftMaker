@@ -701,29 +701,19 @@ export const getStampAndDeliveryCharges = async () => {
   }
 };
 
-// export const sendTheEstampData = async (orderData) => {
-//   try {
-//     const response = await axiosInstance.post(
-//       `/document-price/save-estamp-data`,
-//       { orderData }
-//     );
-//     return response;
-//   } catch (err) {
-//     return err;
-//   }
-// };
-
 export const sendTheEstampData = async (orderData) => {
   try {
     const response = await axiosInstance.post(
-      `/payment/create-order`,
+      `/document-price/save-estamp-data`,
       { orderData }
     );
     return response;
   } catch (err) {
     return err;
   }
-}
+};
+
+
 
 export const getBookedEstampData = async () => {
   try {

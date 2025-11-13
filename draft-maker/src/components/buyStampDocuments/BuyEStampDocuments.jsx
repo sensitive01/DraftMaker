@@ -6,7 +6,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import AddressLineSection from "./AddressLineSection";
 import PaymentModal from "./PaymentModal";
-import ImportantNotice from "./ImportantNotice";
 
 const BuyEStampDocuments = () => {
   const navigate = useNavigate();
@@ -372,60 +371,167 @@ const BuyEStampDocuments = () => {
       const paymentData = {
         firstPartyName: firstPartyName.trim(),
         secondPartyName: secondPartyName.trim(),
-        stampDutyPayer,
+        stampDutyPayer: stampDutyPayer,
         selectedDocumentId: selectedDocument,
         documentType: selectedDocumentData?.documentType,
-        considerationAmount: parseFloat(considerationAmount),
+        calculationType: selectedDocumentData?.calculationType,
+        considerationAmount:
+          selectedDocumentData?.calculationType === "percentage" ||
+            selectedDocument === "684143fdb333b68bfef00574"
+            ? parseFloat(considerationAmount)
+            : null,
         description: description.trim(),
-        quantity,
+        quantity: quantity,
         stampDutyAmount: calculateStampAmount(),
         serviceCharge: calculateServiceCharge(),
-        deliveryType,
+        deliveryType: deliveryType,
         selectedDeliveryServiceId: selectedDeliveryService || null,
-        deliveryCharge: deliveryType === "delivery" ? selectedDeliveryData?.charge : 0,
+        deliveryServiceName: selectedDeliveryData?.serviceName || null,
+        deliveryCharge:
+          deliveryType === "delivery" && selectedDeliveryData
+            ? selectedDeliveryData.charge
+            : 0,
+        deliveryDescription: selectedDeliveryData?.description || null,
         requestorName: requestorName.trim(),
         mobileNumber: mobileNumber.trim(),
         totalAmount: getTotalAmount(),
         orderDate: new Date().toISOString(),
         paymentMethod: "ccavenue",
         currency: "INR",
+        deliveryAddress:
+          deliveryType === "delivery"
+            ? {
+              addressLine1: deliveryAddress.addressLine1.trim(),
+              addressLine2: deliveryAddress.addressLine2.trim(),
+              city: deliveryAddress.city.trim(),
+              state: deliveryAddress.state.trim(),
+              pincode: deliveryAddress.pincode.trim(),
+              landmark: deliveryAddress.landmark.trim(),
+              email: deliveryAddress.email.trim(),
+            }
+            : null,
       };
 
       try {
-        // 1️⃣ Send order details to backend to get CCAvenue payment URL
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/payment/ccavenue/initiate`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            orderId: "ORD" + Date.now(), // unique ID
-            amount: paymentData.totalAmount,
-            customerName: paymentData.requestorName,
-            customerEmail: deliveryAddress?.email || "noemail@example.com",
-            customerPhone: paymentData.mobileNumber,
-          }),
+        setShowPaymentModal(false);
+
+        // Show loading state
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = 'payment-loading';
+        loadingDiv.innerHTML = `
+        <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+          <div style="background: white; padding: 2rem; border-radius: 0.5rem; text-align: center; max-width: 400px;">
+            <div style="border: 4px solid #f3f4f6; border-top: 4px solid #dc2626; border-radius: 50%; width: 3rem; height: 3rem; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+            <p style="margin-top: 1rem; color: #374151; font-weight: 500;">Initializing payment...</p>
+            <p style="margin-top: 0.5rem; color: #6b7280; font-size: 0.875rem;">Please wait, do not refresh</p>
+          </div>
+        </div>
+        <style>
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        </style>
+      `;
+        document.body.appendChild(loadingDiv);
+
+        console.log('🚀 Initiating CCAvenue Payment');
+        console.log('📦 Payment Data:', paymentData);
+        console.log('🌐 API URL:', import.meta.env.VITE_BASE_ROUTE);
+
+        // Call backend to initiate payment
+        const response = await fetch(`${import.meta.env.VITE_BASE_ROUTE}/payment/initiate-payment`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(paymentData),
         });
 
-        const result = await response.json();
+        console.log('📡 Response Status:', response.status);
+        console.log('📡 Response OK:', response.ok);
 
-        if (result.success && result.url) {
-          // 2️⃣ Save pending order locally (optional)
-          await sendOrderToBackend({
-            ...paymentData,
-            paymentStatus: "pending",
-          });
-
-          // 3️⃣ Redirect user to CCAvenue payment page
-          window.location.href = result.url;
-        } else {
-          alert("Failed to initiate CCAvenue payment. Please try again.");
+        // Check if response is OK
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        const data = await response.json();
+        console.log('✅ Backend Response:', data);
+
+        if (data.success) {
+          console.log('🔐 Encrypted Request Length:', data.encRequest?.length || 0);
+          console.log('🔑 Access Code:', data.accessCode);
+          console.log('📝 Order ID:', data.orderId);
+          console.log('📋 Booking ID:', data.bookingId);
+
+          // Verify we have required data
+          if (!data.encRequest || !data.accessCode) {
+            throw new Error('Missing encRequest or accessCode from backend');
+          }
+
+          // Create form and submit to CCAvenue TEST URL
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = 'https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction';
+
+          console.log('🌐 CCAvenue URL:', form.action);
+
+          // Add encrypted request
+          const encRequestInput = document.createElement('input');
+          encRequestInput.type = 'hidden';
+          encRequestInput.name = 'encRequest';
+          encRequestInput.value = data.encRequest;
+          form.appendChild(encRequestInput);
+          console.log('✅ Added encRequest field');
+
+          // Add access code
+          const accessCodeInput = document.createElement('input');
+          accessCodeInput.type = 'hidden';
+          accessCodeInput.name = 'access_code';
+          accessCodeInput.value = data.accessCode;
+          form.appendChild(accessCodeInput);
+          console.log('✅ Added access_code field');
+
+          // Debug: Log form data
+          console.log('📋 Form Data:');
+          console.log('   - encRequest length:', data.encRequest.length);
+          console.log('   - access_code:', data.accessCode);
+
+          // Add form to body
+          document.body.appendChild(form);
+          console.log('✅ Form added to document');
+
+          // Submit form
+          console.log('📤 Submitting form to CCAvenue...');
+          form.submit();
+
+        } else {
+          // Remove loading
+          const loadingDiv = document.getElementById('payment-loading');
+          if (loadingDiv) {
+            document.body.removeChild(loadingDiv);
+          }
+          console.error('❌ Backend returned error:', data.message);
+          alert('Failed to initiate payment: ' + (data.message || 'Unknown error'));
+        }
+
       } catch (error) {
-        console.error("Error initiating payment:", error);
-        alert("Error while initiating payment. Please try again later.");
+        console.error('❌ Payment Initiation Error:', error);
+        console.error('❌ Error Details:', {
+          message: error.message,
+          stack: error.stack
+        });
+
+        const loadingDiv = document.getElementById('payment-loading');
+        if (loadingDiv) {
+          document.body.removeChild(loadingDiv);
+        }
+
+        alert('Failed to initiate payment: ' + error.message + '\n\nPlease check console for details.');
       }
     }
   };
-
 
   const getCalculationExplanation = () => {
     const selectedDocumentData = getSelectedDocumentData();
@@ -1208,12 +1314,50 @@ const BuyEStampDocuments = () => {
             )}
 
             {/* Important Notice Checkbox */}
-            <ImportantNotice
-              isImportantNoticeAccepted={isImportantNoticeAccepted}
-              setIsImportantNoticeAccepted={setIsImportantNoticeAccepted}
-              setShowImportantNoticePopup={setShowImportantNoticePopup}
-              formErrors={formErrors}
-            />
+            <div className="bg-white mt-4 mb-4 rounded-lg overflow-hidden border border-gray-200">
+              <div className="p-4">
+                <div className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    id="importantNoticeCheckbox"
+                    checked={isImportantNoticeAccepted}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setShowImportantNoticePopup(true);
+                      } else {
+                        setIsImportantNoticeAccepted(false);
+                      }
+                    }}
+                    className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2 mt-1"
+                  />
+                  <div className="flex-1">
+                    <label
+                      htmlFor="importantNoticeCheckbox"
+                      className="text-sm font-medium text-gray-700 cursor-pointer"
+                    >
+                      I have read and agree to the{" "}
+                      <button
+                        type="button"
+                        onClick={() => setShowImportantNoticePopup(true)}
+                        className="text-red-600 hover:text-red-700 underline font-medium"
+                      >
+                        Important Notice
+                      </button>
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Please read the important notice before proceeding with
+                      payment
+                    </p>
+                    {formErrors.importantNotice && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {formErrors.importantNotice}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <div className="flex justify-end mt-2">
               <button
