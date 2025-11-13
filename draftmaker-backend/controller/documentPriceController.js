@@ -402,6 +402,37 @@ const getStampDeiveryChargeData = async (req, res) => {
   }
 };
 
+const createPendingEstampOrder = async (req, res) => {
+  try {
+    const { orderData } = req.body;
+    console.log("Creating Pending Order", orderData);
+
+    const bookingId = generateBookingId();
+
+    const newOrder = new EstampPayment({
+      ...orderData,
+      bookingId,
+      paymentStatus: "pending",
+    });
+
+    await newOrder.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Pending e-stamp order created",
+      orderId: bookingId,
+      data: newOrder,
+    });
+  } catch (err) {
+    console.error("Error creating pending order", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to create pending order",
+      error: err.message,
+    });
+  }
+};
+
 const saveTheEstampData = async (req, res) => {
   try {
     const { orderData } = req.body;
@@ -509,6 +540,32 @@ const updateIndividualStampBookingDataStatus = async (req, res) => {
     });
   }
 };
+const createPendingOrder = async (req, res) => {
+  try {
+    const { orderData } = req.body;  // data from frontend
+    const bookingId = generateBookingId(); // function to generate unique ID
+
+    const newPayment = new EstampPayment(orderData);
+    newPayment.bookingId = bookingId;
+    newPayment.paymentStatus = "pending"; // pending because payment not done yet
+    await newPayment.save();
+
+    // Return bookingId to frontend
+    res.status(201).json({
+      success: true,
+      message: "Pending order created successfully",
+      bookingId,
+      data: newPayment,
+    });
+  } catch (err) {
+    console.error("Error creating pending order", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to create pending order",
+      error: err.message,
+    });
+  }
+};
 
 module.exports = {
   updateIndividualStampBookingDataStatus,
@@ -531,4 +588,5 @@ module.exports = {
   getAllDocumentPricesAdmin,
   getStampDocumentPriceAdmin,
   getAllServiceItemsAdmin,
+  createPendingEstampOrder
 };

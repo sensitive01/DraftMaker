@@ -3,12 +3,14 @@ const dbConnect = require("./config/database/dbConnect");
 const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 5000;
+const { encrypt, decrypt } = require("./utils/ccAvanue");
 
 const adminSignUp = require("./routes/adminSignUpRoute");
 const adminLogin = require("./routes/adminAuthRoute");
 const documentPrice = require("./routes/documentPriceRoute");
 const documentRouter = require("./routes/documentsRoutes");
 const messageRouter = require("./routes/messageRoutes");
+const paymentRoutes = require(  "./routes/paymentRoute");
 
 // ✅ Allowed frontend origins
 const allowedOrigins = [
@@ -48,6 +50,7 @@ app.use("/admin", adminLogin);
 app.use("/document-price", documentPrice);
 app.use("/documents", documentRouter);
 app.use("/message", messageRouter);
+app.use("/payment", paymentRoutes);
 
 
 
