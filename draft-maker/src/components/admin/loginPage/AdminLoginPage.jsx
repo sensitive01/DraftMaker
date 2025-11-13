@@ -17,22 +17,18 @@ export default function AdminLoginPage() {
     setMessage("");
 
     try {
-      console.log("Login attempt:", { username, password });
       const response = await verifyLogin(username, password);
       console.log("response", response);
 
       if (response.status === 200) {
-        // Properly store admin data in localStorage with key
         localStorage.setItem("adminData", JSON.stringify(response.data.admin));
 
-        // Set success message
         setMessage("Login successful! Redirecting to dashboard...");
         setMessageType("success");
 
-        // Navigate to dashboard after a slight delay to show the success message
         setTimeout(() => {
           navigate("/admin/dashboard");
-          window.location.reload(); // Force reload to trigger authentication check
+          window.location.reload();
         }, 1500);
       } else {
         setMessage(response?.response?.data?.message);
@@ -41,7 +37,7 @@ export default function AdminLoginPage() {
     } catch (err) {
       console.log("Error in verify admin", err);
 
-      // Set error message
+
       setMessage(
         err.response?.data?.message || "Login failed. Please try again."
       );
@@ -113,13 +109,12 @@ export default function AdminLoginPage() {
           <div className="h-16 flex items-center justify-center">
             {message && (
               <div
-                className={`w-full p-4 text-center flex items-center justify-center space-x-2 transition-all duration-300 ${
-                  messageType === "success"
+                className={`w-full p-4 text-center flex items-center justify-center space-x-2 transition-all duration-300 ${messageType === "success"
                     ? "bg-green-100 text-green-800 border-l-4 border-green-500"
                     : messageType === "error"
-                    ? "bg-red-100 text-red-800 border-l-4 border-red-500"
-                    : "bg-transparent"
-                }`}
+                      ? "bg-red-100 text-red-800 border-l-4 border-red-500"
+                      : "bg-transparent"
+                  }`}
               >
                 {messageType === "success" && (
                   <div className="flex items-center">

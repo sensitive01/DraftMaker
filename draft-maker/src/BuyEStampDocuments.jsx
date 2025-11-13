@@ -3,6 +3,7 @@ import {
   getStampAndDeliveryCharges,
   sendTheEstampData,
 } from "../../api/service/axiosService";
+import CCAvenuePayment from './components/payments/CCAvenuePayment';
 
 const BuyEStampDocuments = () => {
   const [stampDutyData, setStampDutyData] = useState([]);
@@ -20,6 +21,7 @@ const BuyEStampDocuments = () => {
   const [deliveryType, setDeliveryType] = useState("in-store");
   const [selectedDeliveryService, setSelectedDeliveryService] = useState("");
   const [isConsideration, setIsConsideration] = useState(false);
+
 
   const [deliveryAddress, setDeliveryAddress] = useState({
     addressLine1: "",
@@ -380,109 +382,88 @@ const BuyEStampDocuments = () => {
         orderDate: new Date().toISOString(),
 
         // Additional metadata
-        paymentMethod: "razorpay",
+        paymentMethod: paymentMethod,
         currency: "INR",
 
         deliveryAddress:
           deliveryType === "delivery"
             ? {
-                addressLine1: deliveryAddress.addressLine1.trim(),
-                addressLine2: deliveryAddress.addressLine2.trim(),
-                city: deliveryAddress.city.trim(),
-                state: deliveryAddress.state.trim(),
-                pincode: deliveryAddress.pincode.trim(),
-                landmark: deliveryAddress.landmark.trim(),
-                email: deliveryAddress.email.trim(),
-              }
+              addressLine1: deliveryAddress.addressLine1.trim(),
+              addressLine2: deliveryAddress.addressLine2.trim(),
+              city: deliveryAddress.city.trim(),
+              state: deliveryAddress.state.trim(),
+              pincode: deliveryAddress.pincode.trim(),
+              landmark: deliveryAddress.landmark.trim(),
+              email: deliveryAddress.email.trim(),
+            }
             : null,
       };
 
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: getTotalAmount() * 100,
-        currency: "INR",
-        name: "E-Stamp Service",
-        description: `${selectedDocumentData?.documentType} - ${
-          deliveryType === "delivery" ? "With Delivery" : "In-Store Pickup"
-        }`,
-        handler: function (response) {
-          console.log("=== PAYMENT SUCCESSFUL ===");
-          console.log("Razorpay Response:", response);
-          console.log("=== ORDER DETAILS TO SEND TO BACKEND ===");
-          console.log(JSON.stringify(paymentData, null, 2));
+      // Success handler for CCAvenue payment
+      const handlePaymentSuccess = (paymentResponse) => {
+        console.log("=== PAYMENT SUCCESSFUL ===");
+        console.log("CCAvenue Response:", paymentResponse);
+        
+        const paymentDetails = {
+          ccavenueTrackingId: paymentResponse.tracking_id,
+          ccavenueOrderId: paymentResponse.order_id,
+          ccavenuePaymentMode: paymentResponse.payment_mode,
+          ccavenueStatus: paymentResponse.status_message,
+        };
 
-          const finalPaymentData = {
-            ...paymentData,
-            razorpayPaymentId: response.razorpay_payment_id,
-            razorpayOrderId: response.razorpay_order_id || null,
-            razorpaySignature: response.razorpay_signature || null,
-            paymentStatus: "completed",
-            paymentCompletedAt: new Date().toISOString(),
-          };
+        const finalPaymentData = {
+          ...paymentData,
+          ...paymentDetails,
+          paymentStatus: "completed",
+          paymentCompletedAt: new Date().toISOString(),
+        };
 
-          console.log("=== FINAL PAYLOAD WITH PAYMENT DETAILS ===");
-          console.log(JSON.stringify(finalPaymentData, null, 2));
+        console.log("=== FINAL PAYLOAD WITH PAYMENT DETAILS ===");
+        console.log(JSON.stringify(finalPaymentData, null, 2));
 
-          sendOrderToBackend(finalPaymentData)
-            .then((result) => {
-              console.log("Order saved successfully:", result);
-              alert("Payment successful! Order has been processed.");
-              resetForm();
-            })
-            .catch((error) => {
-              console.error("Error saving order:", error);
-              alert(
-                "Payment successful but there was an issue saving your order. Please contact support."
-              );
-            });
-
-          alert(
-            "Payment successful! Payment ID: " + response.razorpay_payment_id
-          );
-          setShowPaymentModal(false);
-        },
-        prefill: {
-          name: requestorName,
-          contact: mobileNumber,
-        },
-        theme: {
-          color: "#dc2626",
-        },
-        modal: {
-          ondismiss: function () {
-            console.log("Payment modal closed by user");
-          },
-        },
+        sendOrderToBackend(finalPaymentData)
+          .then((result) => {
+            console.log("Order saved successfully:", result);
+            alert("Payment successful! Order has been processed.");
+            resetForm();
+            setShowPaymentModal(false);
+          })
+          .catch((error) => {
+            console.error("Error saving order:", error);
+            alert(
+              "Payment successful but there was an issue saving your order. Please contact support."
+            );
+          });
       };
 
-      const rzp = new window.Razorpay(options);
-      rzp.on("payment.failed", function (response) {
+      // Error handler for CCAvenue payment
+      const handlePaymentError = (error) => {
         console.log("=== PAYMENT FAILED ===");
-        console.log("Error:", response.error);
+        console.error("CCAvenue Error:", error);
 
-        const failedPaymentData = {
+        const errorData = {
           ...paymentData,
           paymentStatus: "failed",
           paymentFailedAt: new Date().toISOString(),
-          errorCode: response.error.code,
-          errorDescription: response.error.description,
-          errorSource: response.error.source,
-          errorStep: response.error.step,
-          errorReason: response.error.reason,
+          errorCode: error.code,
+          errorDescription: error.message,
+          errorSource: 'CCAvenue',
         };
 
         console.log("=== FAILED PAYMENT DATA ===");
-        console.log(JSON.stringify(failedPaymentData, null, 2));
+        console.log(JSON.stringify(errorData, null, 2));
 
-        alert("Payment failed: " + response.error.description);
-      });
+        alert(`Payment failed: ${error.message || 'Unknown error'}`);
+      };
 
-      rzp.open();
+      // Initialize CCAvenue payment
+      // The CCAvenuePayment component will handle the rest
     }
   };
 
   // Helper function to get calculation explanation
   const getCalculationExplanation = () => {
+    // ...
     const selectedDocumentData = getSelectedDocumentData();
     if (!selectedDocumentData) return null;
 
@@ -505,26 +486,24 @@ const BuyEStampDocuments = () => {
       if (minAmount === 0 && maxAmount === 0) {
         return amount <= 100000
           ? `${percentage}% of ₹${amount.toLocaleString(
-              "en-IN"
-            )} = ₹${calculateStampAmount()} (Minimum: ₹100)`
+            "en-IN"
+          )} = ₹${calculateStampAmount()} (Minimum: ₹100)`
           : `${percentage}%of ₹${amount.toLocaleString(
-              "en-IN"
-            )} = ₹${calculateStampAmount()}`;
+            "en-IN"
+          )} = ₹${calculateStampAmount()}`;
       } else {
         if (amount <= 100000) {
           return `${percentage}% of ₹${amount.toLocaleString(
             "en-IN"
-          )} = ₹${calculateStampAmount()}${
-            minAmount > 0 ? ` (Minimum: ₹${minAmount})` : ""
-          }`;
+          )} = ₹${calculateStampAmount()}${minAmount > 0 ? ` (Minimum: ₹${minAmount})` : ""
+            }`;
         } else {
           return maxAmount >= 0
             ? `Fixed amount of ₹${maxAmount} for amounts above ₹1,00,000`
             : `${percentage}% of ₹${amount.toLocaleString(
-                "en-IN"
-              )} = ₹${calculateStampAmount()}${
-                minAmount > 0 ? ` (Minimum: ₹${minAmount})` : ""
-              }`;
+              "en-IN"
+            )} = ₹${calculateStampAmount()}${minAmount > 0 ? ` (Minimum: ₹${minAmount})` : ""
+            }`;
         }
       }
     }
@@ -623,28 +602,26 @@ const BuyEStampDocuments = () => {
                   value={firstPartyName}
                   onChange={handleFirstPartyNameChange}
                   placeholder="Enter first party name"
-                  className={`w-full px-4 py-2.5 border ${
-                    formErrors.firstPartyName || firstPartyName.length > 50
+                  className={`w-full px-4 py-2.5 border ${formErrors.firstPartyName || firstPartyName.length > 50
                       ? "border-red-300"
                       : "border-gray-300"
-                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                 />
                 <div className="flex justify-between items-center mt-1">
                   {(formErrors.firstPartyName ||
                     firstPartyName.length > 50) && (
-                    <p className="text-sm text-red-600">
-                      {formErrors.firstPartyName ||
-                        "First party name must not exceed 50 characters"}
-                    </p>
-                  )}
+                      <p className="text-sm text-red-600">
+                        {formErrors.firstPartyName ||
+                          "First party name must not exceed 50 characters"}
+                      </p>
+                    )}
                   <p
-                    className={`text-xs ml-auto ${
-                      firstPartyName.length > 50
+                    className={`text-xs ml-auto ${firstPartyName.length > 50
                         ? "text-red-500 font-medium"
                         : firstPartyName.length > 45
-                        ? "text-orange-500"
-                        : "text-gray-400"
-                    }`}
+                          ? "text-orange-500"
+                          : "text-gray-400"
+                      }`}
                   >
                     {firstPartyName.length}/50
                   </p>
@@ -665,28 +642,26 @@ const BuyEStampDocuments = () => {
                   value={secondPartyName}
                   onChange={handleSecondPartyNameChange}
                   placeholder="Enter second party name"
-                  className={`w-full px-4 py-2.5 border ${
-                    formErrors.secondPartyName || secondPartyName.length > 50
+                  className={`w-full px-4 py-2.5 border ${formErrors.secondPartyName || secondPartyName.length > 50
                       ? "border-red-300"
                       : "border-gray-300"
-                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                 />
                 <div className="flex justify-between items-center mt-1">
                   {(formErrors.secondPartyName ||
                     secondPartyName.length > 50) && (
-                    <p className="text-sm text-red-600">
-                      {formErrors.secondPartyName ||
-                        "Second party name must not exceed 50 characters"}
-                    </p>
-                  )}
+                      <p className="text-sm text-red-600">
+                        {formErrors.secondPartyName ||
+                          "Second party name must not exceed 50 characters"}
+                      </p>
+                    )}
                   <p
-                    className={`text-xs ml-auto ${
-                      secondPartyName.length > 50
+                    className={`text-xs ml-auto ${secondPartyName.length > 50
                         ? "text-red-500 font-medium"
                         : secondPartyName.length > 45
-                        ? "text-orange-500"
-                        : "text-gray-400"
-                    }`}
+                          ? "text-orange-500"
+                          : "text-gray-400"
+                      }`}
                   >
                     {secondPartyName.length}/50
                   </p>
@@ -707,11 +682,10 @@ const BuyEStampDocuments = () => {
                   id="stampDutyPayer"
                   value={stampDutyPayer}
                   onChange={(e) => setStampDutyPayer(e.target.value)}
-                  className={`w-full px-4 py-2.5 border ${
-                    formErrors.stampDutyPayer
+                  className={`w-full px-4 py-2.5 border ${formErrors.stampDutyPayer
                       ? "border-red-300"
                       : "border-gray-300"
-                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
+                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
                 >
                   <option value="" className="text-gray-500">
                     Select who pays the stamp duty
@@ -758,11 +732,10 @@ const BuyEStampDocuments = () => {
                     setSelectedDocument(e.target.value);
                     setConsiderationAmount(""); // Reset consideration amount when document changes
                   }}
-                  className={`w-full px-4 py-2.5 border ${
-                    formErrors.selectedDocument
+                  className={`w-full px-4 py-2.5 border ${formErrors.selectedDocument
                       ? "border-red-300"
                       : "border-gray-300"
-                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
+                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
                 >
                   <option value="" className="text-gray-500">
                     Select a stamp article
@@ -820,11 +793,10 @@ const BuyEStampDocuments = () => {
                   placeholder="Enter consideration amount"
                   min="0"
                   step="0.01"
-                  className={`w-full px-4 py-2.5 border ${
-                    formErrors.considerationAmount
+                  className={`w-full px-4 py-2.5 border ${formErrors.considerationAmount
                       ? "border-red-300"
                       : "border-gray-300"
-                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                 />
                 {formErrors.considerationAmount && (
                   <p className="mt-1 text-sm text-red-600">
@@ -852,11 +824,10 @@ const BuyEStampDocuments = () => {
                     placeholder="Enter consideration amount"
                     min="0"
                     step="0.01"
-                    className={`w-full px-4 py-2.5 border ${
-                      formErrors.considerationAmount
+                    className={`w-full px-4 py-2.5 border ${formErrors.considerationAmount
                         ? "border-red-300"
                         : "border-gray-300"
-                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                   />
                   {formErrors.considerationAmount && (
                     <p className="mt-1 text-sm text-red-600">
@@ -909,9 +880,8 @@ const BuyEStampDocuments = () => {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Enter document description"
                 rows="3"
-                className={`w-full px-4 py-2.5 border ${
-                  formErrors.description ? "border-red-300" : "border-gray-300"
-                } rounded-md focus:ring-red-500 focus:border-red-500 text-sm resize-vertical`}
+                className={`w-full px-4 py-2.5 border ${formErrors.description ? "border-red-300" : "border-gray-300"
+                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm resize-vertical`}
               />
               {formErrors.description && (
                 <p className="mt-1 text-sm text-red-600">
@@ -927,11 +897,10 @@ const BuyEStampDocuments = () => {
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div
-                  className={`relative border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                    deliveryType === "in-store"
+                  className={`relative border-2 rounded-lg p-4 cursor-pointer transition-all ${deliveryType === "in-store"
                       ? "border-red-500 bg-red-50"
                       : "border-gray-200 hover:border-gray-300"
-                  }`}
+                    }`}
                 >
                   <input
                     id="in-store"
@@ -971,11 +940,10 @@ const BuyEStampDocuments = () => {
                 </div>
 
                 <div
-                  className={`relative border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                    deliveryType === "delivery"
+                  className={`relative border-2 rounded-lg p-4 cursor-pointer transition-all ${deliveryType === "delivery"
                       ? "border-red-500 bg-red-50"
                       : "border-gray-200 hover:border-gray-300"
-                  }`}
+                    }`}
                 >
                   <input
                     id="delivery"
@@ -1030,11 +998,10 @@ const BuyEStampDocuments = () => {
                     id="deliveryService"
                     value={selectedDeliveryService}
                     onChange={(e) => setSelectedDeliveryService(e.target.value)}
-                    className={`w-full px-4 py-2.5 border ${
-                      formErrors.selectedDeliveryService
+                    className={`w-full px-4 py-2.5 border ${formErrors.selectedDeliveryService
                         ? "border-red-300"
                         : "border-gray-300"
-                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
+                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
                   >
                     <option value="" className="text-gray-500">
                       Select a delivery service
@@ -1145,11 +1112,10 @@ const BuyEStampDocuments = () => {
                       value={requestorName}
                       onChange={(e) => setRequestorName(e.target.value)}
                       placeholder="Enter full name"
-                      className={`w-full px-4 py-2.5 border ${
-                        paymentErrors.requestorName
+                      className={`w-full px-4 py-2.5 border ${paymentErrors.requestorName
                           ? "border-red-300"
                           : "border-gray-300"
-                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                        } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                     />
                     {paymentErrors.requestorName && (
                       <p className="mt-1 text-sm text-red-600">
@@ -1176,11 +1142,10 @@ const BuyEStampDocuments = () => {
                         onChange={(e) => setMobileNumber(e.target.value)}
                         placeholder="Enter 10-digit phone number"
                         maxLength="10"
-                        className={`w-full pl-12 pr-4 py-2.5 border ${
-                          paymentErrors.mobileNumber
+                        className={`w-full pl-12 pr-4 py-2.5 border ${paymentErrors.mobileNumber
                             ? "border-red-300"
                             : "border-gray-300"
-                        } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                          } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                       />
                     </div>
                     {paymentErrors.mobileNumber && (
@@ -1207,11 +1172,10 @@ const BuyEStampDocuments = () => {
                           }))
                         }
                         placeholder="Enter Your Email Id"
-                        className={`w-full pl-3 py-2.5 border ${
-                          formErrors.emailId
+                        className={`w-full pl-3 py-2.5 border ${formErrors.emailId
                             ? "border-red-300"
                             : "border-gray-300"
-                        } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                          } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                       />
                     </div>
                     {paymentErrors.email && (
@@ -1238,11 +1202,10 @@ const BuyEStampDocuments = () => {
                         }))
                       }
                       placeholder="House/Flat number, Building name, Street"
-                      className={`w-full px-4 py-2.5 border ${
-                        formErrors.deliveryAddressLine1
+                      className={`w-full px-4 py-2.5 border ${formErrors.deliveryAddressLine1
                           ? "border-red-300"
                           : "border-gray-300"
-                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                        } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                     />
                     {formErrors.deliveryAddressLine1 && (
                       <p className="mt-1 text-sm text-red-600">
@@ -1287,11 +1250,10 @@ const BuyEStampDocuments = () => {
                         }))
                       }
                       placeholder="Enter city"
-                      className={`w-full px-4 py-2.5 border ${
-                        formErrors.deliveryCity
+                      className={`w-full px-4 py-2.5 border ${formErrors.deliveryCity
                           ? "border-red-300"
                           : "border-gray-300"
-                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                        } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                     />
                     {formErrors.deliveryCity && (
                       <p className="mt-1 text-sm text-red-600">
@@ -1315,11 +1277,10 @@ const BuyEStampDocuments = () => {
                         }))
                       }
                       placeholder="Enter state"
-                      className={`w-full px-4 py-2.5 border ${
-                        formErrors.deliveryState
+                      className={`w-full px-4 py-2.5 border ${formErrors.deliveryState
                           ? "border-red-300"
                           : "border-gray-300"
-                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                        } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                     />
                     {formErrors.deliveryState && (
                       <p className="mt-1 text-sm text-red-600">
@@ -1344,11 +1305,10 @@ const BuyEStampDocuments = () => {
                       }
                       placeholder="Enter 6-digit pincode"
                       maxLength="6"
-                      className={`w-full px-4 py-2.5 border ${
-                        formErrors.deliveryPincode
+                      className={`w-full px-4 py-2.5 border ${formErrors.deliveryPincode
                           ? "border-red-300"
                           : "border-gray-300"
-                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                        } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                     />
                     {formErrors.deliveryPincode && (
                       <p className="mt-1 text-sm text-red-600">
@@ -1438,11 +1398,10 @@ const BuyEStampDocuments = () => {
               <button
                 onClick={handleProceedToPayment}
                 disabled={!selectedDocument}
-                className={`px-8 py-3 rounded-md font-medium transition-all duration-200 ${
-                  selectedDocument
+                className={`px-8 py-3 rounded-md font-medium transition-all duration-200 ${selectedDocument
                     ? "bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
+                  }`}
               >
                 Proceed to Payment
               </button>
@@ -1511,11 +1470,10 @@ const BuyEStampDocuments = () => {
                 value={requestorName}
                 onChange={(e) => setRequestorName(e.target.value)}
                 placeholder="Enter your name"
-                className={`w-full px-4 py-2.5 border ${
-                  paymentErrors.requestorName
+                className={`w-full px-4 py-2.5 border ${paymentErrors.requestorName
                     ? "border-red-300"
                     : "border-gray-300"
-                } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
               />
               {paymentErrors.requestorName && (
                 <p className="mt-1 text-sm text-red-600">
@@ -1542,11 +1500,10 @@ const BuyEStampDocuments = () => {
                   value={mobileNumber}
                   onChange={(e) => setMobileNumber(e.target.value)}
                   placeholder="Enter 10-digit mobile number"
-                  className={`w-full pl-12 pr-4 py-2.5 border ${
-                    paymentErrors.mobileNumber
+                  className={`w-full pl-12 pr-4 py-2.5 border ${paymentErrors.mobileNumber
                       ? "border-red-300"
                       : "border-gray-300"
-                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                   maxLength="10"
                 />
               </div>
@@ -1557,20 +1514,46 @@ const BuyEStampDocuments = () => {
               )}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3">
-              <button
-                onClick={() => setShowPaymentModal(false)}
-                className="w-full sm:w-auto px-4 py-2.5 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 font-medium shadow-sm transition duration-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handlePayment}
-                className="w-full sm:w-auto px-6 py-2.5 border border-transparent rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 font-medium transition duration-200"
-              >
-                Pay ₹{getTotalAmount()}
-              </button>
+            {/* Payment Method */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Payment Method
+              </label>
+              <div className="flex items-center p-3 border border-gray-200 rounded-md bg-gray-50">
+                <img 
+                  src="https://www.ccavenue.com/favicon.ico" 
+                  alt="CCAvenue" 
+                  className="h-6 w-6 mr-3"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">CCAvenue</p>
+                  <p className="text-xs text-gray-500">Secure payments via Credit/Debit Cards, Net Banking, Wallets</p>
+                </div>
+              </div>
+            </div>
+
+            {/* CCAvenue Payment Button */}
+            <div className="mt-6">
+              <div className="space-y-4">
+                <CCAvenuePayment
+                  amount={getTotalAmount()}
+                  orderId={`ORDER_${Date.now()}`}
+                  customerName={requestorName}
+                  customerEmail={deliveryAddress.email || "customer@example.com"}
+                  customerPhone={mobileNumber}
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                  onClose={() => setShowPaymentModal(false)}
+                />
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => setShowPaymentModal(false)}
+                    className="text-sm text-gray-600 hover:text-gray-800 font-medium"
+                  >
+                    Cancel Payment
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

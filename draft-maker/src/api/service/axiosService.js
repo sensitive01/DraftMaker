@@ -701,17 +701,29 @@ export const getStampAndDeliveryCharges = async () => {
   }
 };
 
+// export const sendTheEstampData = async (orderData) => {
+//   try {
+//     const response = await axiosInstance.post(
+//       `/document-price/save-estamp-data`,
+//       { orderData }
+//     );
+//     return response;
+//   } catch (err) {
+//     return err;
+//   }
+// };
+
 export const sendTheEstampData = async (orderData) => {
   try {
     const response = await axiosInstance.post(
-      `/document-price/save-estamp-data`,
+      `/payment/create-order`,
       { orderData }
     );
     return response;
   } catch (err) {
     return err;
   }
-};
+}
 
 export const getBookedEstampData = async () => {
   try {
@@ -941,6 +953,17 @@ export const deleteEstampBooking = async ( bookingId) => {
 
 
 export const deleteUploadBooking = async ( bookingId) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/documents/delete-uploading-booking-data/${bookingId}`,
+    );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createOrder = async ( bookingId) => {
   try {
     const response = await axiosInstance.delete(
       `/documents/delete-uploading-booking-data/${bookingId}`,

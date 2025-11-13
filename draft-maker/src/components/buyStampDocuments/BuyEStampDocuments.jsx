@@ -6,6 +6,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import AddressLineSection from "./AddressLineSection";
 import PaymentModal from "./PaymentModal";
+import ImportantNotice from "./ImportantNotice";
 
 const BuyEStampDocuments = () => {
   const navigate = useNavigate();
@@ -363,7 +364,7 @@ const BuyEStampDocuments = () => {
     }
   };
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (validatePaymentForm()) {
       const selectedDocumentData = getSelectedDocumentData();
       const selectedDeliveryData = getSelectedDeliveryData();
@@ -371,147 +372,68 @@ const BuyEStampDocuments = () => {
       const paymentData = {
         firstPartyName: firstPartyName.trim(),
         secondPartyName: secondPartyName.trim(),
-        stampDutyPayer: stampDutyPayer,
-
+        stampDutyPayer,
         selectedDocumentId: selectedDocument,
         documentType: selectedDocumentData?.documentType,
-        calculationType: selectedDocumentData?.calculationType,
-        considerationAmount:
-          selectedDocumentData?.calculationType === "percentage" ||
-          selectedDocument === "684143fdb333b68bfef00574"
-            ? parseFloat(considerationAmount)
-            : null,
+        considerationAmount: parseFloat(considerationAmount),
         description: description.trim(),
-        quantity: quantity,
-
+        quantity,
         stampDutyAmount: calculateStampAmount(),
         serviceCharge: calculateServiceCharge(),
-
-        deliveryType: deliveryType,
+        deliveryType,
         selectedDeliveryServiceId: selectedDeliveryService || null,
-        deliveryServiceName: selectedDeliveryData?.serviceName || null,
-        deliveryCharge:
-          deliveryType === "delivery" && selectedDeliveryData
-            ? selectedDeliveryData.charge
-            : 0,
-        deliveryDescription: selectedDeliveryData?.description || null,
-
+        deliveryCharge: deliveryType === "delivery" ? selectedDeliveryData?.charge : 0,
         requestorName: requestorName.trim(),
         mobileNumber: mobileNumber.trim(),
         totalAmount: getTotalAmount(),
-
         orderDate: new Date().toISOString(),
-
-        paymentMethod: "razorpay",
+        paymentMethod: "ccavenue",
         currency: "INR",
-
-        deliveryAddress:
-          deliveryType === "delivery"
-            ? {
-                addressLine1: deliveryAddress.addressLine1.trim(),
-                addressLine2: deliveryAddress.addressLine2.trim(),
-                city: deliveryAddress.city.trim(),
-                state: deliveryAddress.state.trim(),
-                pincode: deliveryAddress.pincode.trim(),
-                landmark: deliveryAddress.landmark.trim(),
-                email: deliveryAddress.email.trim(),
-              }
-            : null,
       };
 
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: getTotalAmount() * 100,
-        currency: "INR",
-        name: "E-Stamp Service",
-        description: `${selectedDocumentData?.documentType} - ${
-          deliveryType === "delivery" ? "With Delivery" : "In-Store Pickup"
-        }`,
-        handler: function (response) {
-          console.log("=== PAYMENT SUCCESSFUL ===");
-          console.log("Razorpay Response:", response);
-          console.log("=== ORDER DETAILS TO SEND TO BACKEND ===");
-          console.log(JSON.stringify(paymentData, null, 2));
+      try {
+        // 1️⃣ Send order details to backend to get CCAvenue payment URL
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/payment/ccavenue/initiate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: "ORD" + Date.now(), // unique ID
+            amount: paymentData.totalAmount,
+            customerName: paymentData.requestorName,
+            customerEmail: deliveryAddress?.email || "noemail@example.com",
+            customerPhone: paymentData.mobileNumber,
+          }),
+        });
 
-          const finalPaymentData = {
+        const result = await response.json();
+
+        if (result.success && result.url) {
+          // 2️⃣ Save pending order locally (optional)
+          await sendOrderToBackend({
             ...paymentData,
-            razorpayPaymentId: response.razorpay_payment_id,
-            razorpayOrderId: response.razorpay_order_id || null,
-            razorpaySignature: response.razorpay_signature || null,
-            paymentStatus: "completed",
-            paymentCompletedAt: new Date().toISOString(),
-          };
+            paymentStatus: "pending",
+          });
 
-          console.log("=== FINAL PAYLOAD WITH PAYMENT DETAILS ===");
-          console.log(JSON.stringify(finalPaymentData, null, 2));
-
-          sendOrderToBackend(finalPaymentData)
-            .then((result) => {
-              console.log("Order saved successfully:", result);
-              alert("Payment successful! Order has been processed.");
-              resetForm();
-              navigate("/documents/home");
-            })
-            .catch((error) => {
-              console.error("Error saving order:", error);
-              alert(
-                "Payment successful but there was an issue saving your order. Please contact support."
-              );
-            });
-
-          alert(
-            "Payment successful! Payment ID: " + response.razorpay_payment_id
-          );
-          setShowPaymentModal(false);
-        },
-        prefill: {
-          name: requestorName,
-          contact: mobileNumber,
-        },
-        theme: {
-          color: "#dc2626",
-        },
-        modal: {
-          ondismiss: function () {
-            console.log("Payment modal closed by user");
-          },
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.on("payment.failed", function (response) {
-        console.log("=== PAYMENT FAILED ===");
-        console.log("Error:", response.error);
-
-        const failedPaymentData = {
-          ...paymentData,
-          paymentStatus: "failed",
-          paymentFailedAt: new Date().toISOString(),
-          errorCode: response.error.code,
-          errorDescription: response.error.description,
-          errorSource: response.error.source,
-          errorStep: response.error.step,
-          errorReason: response.error.reason,
-        };
-
-        console.log("=== FAILED PAYMENT DATA ===");
-        console.log(JSON.stringify(failedPaymentData, null, 2));
-
-        alert("Payment failed: " + response.error.description);
-      });
-
-      rzp.open();
+          // 3️⃣ Redirect user to CCAvenue payment page
+          window.location.href = result.url;
+        } else {
+          alert("Failed to initiate CCAvenue payment. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error initiating payment:", error);
+        alert("Error while initiating payment. Please try again later.");
+      }
     }
   };
+
 
   const getCalculationExplanation = () => {
     const selectedDocumentData = getSelectedDocumentData();
     if (!selectedDocumentData) return null;
 
     if (selectedDocumentData.calculationType === "fixed") {
-      return `₹${
-        selectedDocumentData.fixedAmount
-      } × ${quantity} = ₹${calculateStampAmount()}`;
+      return `₹${selectedDocumentData.fixedAmount
+        } × ${quantity} = ₹${calculateStampAmount()}`;
     }
 
     if (
@@ -530,21 +452,21 @@ const BuyEStampDocuments = () => {
       if (minAmount === 0 && maxAmount === 0) {
         return amount <= 100000
           ? `${percentage}% of ₹${amount.toLocaleString("en-IN")} = ₹${(
-              (amount * percentage) /
-              100
-            ).toLocaleString(
-              "en-IN"
-            )} × ${quantity} = ₹${calculateStampAmount().toLocaleString(
-              "en-IN"
-            )} (Minimum: ₹100)`
+            (amount * percentage) /
+            100
+          ).toLocaleString(
+            "en-IN"
+          )} × ${quantity} = ₹${calculateStampAmount().toLocaleString(
+            "en-IN"
+          )} (Minimum: ₹100)`
           : `${percentage}% of ₹${amount.toLocaleString("en-IN")} = ₹${(
-              (amount * percentage) /
-              100
-            ).toLocaleString(
-              "en-IN"
-            )} × ${quantity} = ₹${calculateStampAmount().toLocaleString(
-              "en-IN"
-            )}`;
+            (amount * percentage) /
+            100
+          ).toLocaleString(
+            "en-IN"
+          )} × ${quantity} = ₹${calculateStampAmount().toLocaleString(
+            "en-IN"
+          )}`;
       } else {
         if (amount <= 100000) {
           return `${percentage}% of ₹${amount.toLocaleString("en-IN")} = ₹${(
@@ -558,16 +480,16 @@ const BuyEStampDocuments = () => {
         } else {
           return maxAmount >= 0
             ? `Fixed amount of ₹${maxAmount} × ${quantity} = ₹${calculateStampAmount().toLocaleString(
-                "en-IN"
-              )} for amounts above ₹1,00,000`
+              "en-IN"
+            )} for amounts above ₹1,00,000`
             : `${percentage}% of ₹${amount.toLocaleString("en-IN")} = ₹${(
-                (amount * percentage) /
-                100
-              ).toLocaleString(
-                "en-IN"
-              )} × ${quantity} = ₹${calculateStampAmount().toLocaleString(
-                "en-IN"
-              )}${minAmount > 0 ? ` (Minimum: ₹${minAmount})` : ""}`;
+              (amount * percentage) /
+              100
+            ).toLocaleString(
+              "en-IN"
+            )} × ${quantity} = ₹${calculateStampAmount().toLocaleString(
+              "en-IN"
+            )}${minAmount > 0 ? ` (Minimum: ₹${minAmount})` : ""}`;
         }
       }
     }
@@ -774,18 +696,16 @@ const BuyEStampDocuments = () => {
                     onChange={handleFirstPartyNameChange}
                     placeholder="Enter first party name"
                     maxLength="60"
-                    className={`w-full px-4 py-2.5 border ${
-                      formErrors.firstPartyName
-                        ? "border-red-300"
-                        : "border-gray-300"
-                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm pr-16`}
+                    className={`w-full px-4 py-2.5 border ${formErrors.firstPartyName
+                      ? "border-red-300"
+                      : "border-gray-300"
+                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm pr-16`}
                   />
                   <div
-                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-xs ${
-                      firstPartyName.length > 50
-                        ? "text-red-500"
-                        : "text-gray-400"
-                    }`}
+                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-xs ${firstPartyName.length > 50
+                      ? "text-red-500"
+                      : "text-gray-400"
+                      }`}
                   >
                     {firstPartyName.length}/50
                   </div>
@@ -812,18 +732,16 @@ const BuyEStampDocuments = () => {
                     onChange={handleSecondPartyNameChange}
                     placeholder="Enter second party name"
                     maxLength="60"
-                    className={`w-full px-4 py-2.5 border ${
-                      formErrors.secondPartyName
-                        ? "border-red-300"
-                        : "border-gray-300"
-                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm pr-16`}
+                    className={`w-full px-4 py-2.5 border ${formErrors.secondPartyName
+                      ? "border-red-300"
+                      : "border-gray-300"
+                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm pr-16`}
                   />
                   <div
-                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-xs ${
-                      secondPartyName.length > 50
-                        ? "text-red-500"
-                        : "text-gray-400"
-                    }`}
+                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-xs ${secondPartyName.length > 50
+                      ? "text-red-500"
+                      : "text-gray-400"
+                      }`}
                   >
                     {secondPartyName.length}/50
                   </div>
@@ -847,11 +765,10 @@ const BuyEStampDocuments = () => {
                   id="stampDutyPayer"
                   value={stampDutyPayer}
                   onChange={(e) => setStampDutyPayer(e.target.value)}
-                  className={`w-full px-4 py-2.5 border ${
-                    formErrors.stampDutyPayer
-                      ? "border-red-300"
-                      : "border-gray-300"
-                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
+                  className={`w-full px-4 py-2.5 border ${formErrors.stampDutyPayer
+                    ? "border-red-300"
+                    : "border-gray-300"
+                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
                 >
                   <option value="" className="text-gray-500">
                     Select who pays the stamp duty
@@ -897,11 +814,10 @@ const BuyEStampDocuments = () => {
                     setSelectedDocument(e.target.value);
                     setConsiderationAmount("");
                   }}
-                  className={`w-full px-4 py-2.5 border ${
-                    formErrors.selectedDocument
-                      ? "border-red-300"
-                      : "border-gray-300"
-                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
+                  className={`w-full px-4 py-2.5 border ${formErrors.selectedDocument
+                    ? "border-red-300"
+                    : "border-gray-300"
+                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
                 >
                   <option value="" className="text-gray-500">
                     Select a stamp article
@@ -953,11 +869,10 @@ const BuyEStampDocuments = () => {
                     placeholder="Enter consideration amount"
                     min="0"
                     step="0.01"
-                    className={`w-full px-4 py-2.5 border ${
-                      formErrors.considerationAmount
-                        ? "border-red-300"
-                        : "border-gray-300"
-                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                    className={`w-full px-4 py-2.5 border ${formErrors.considerationAmount
+                      ? "border-red-300"
+                      : "border-gray-300"
+                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
                   />
                   {formErrors.considerationAmount && (
                     <p className="mt-1 text-sm text-red-600">
@@ -981,9 +896,8 @@ const BuyEStampDocuments = () => {
                 onChange={(e) => setQuantity(e.target.value)}
                 placeholder="Enter quantity"
                 min="1"
-                className={`w-full px-4 py-2.5 border ${
-                  formErrors.quantity ? "border-red-300" : "border-gray-300"
-                } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
+                className={`w-full px-4 py-2.5 border ${formErrors.quantity ? "border-red-300" : "border-gray-300"
+                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm`}
               />
               {formErrors.quantity && (
                 <p className="mt-1 text-sm text-red-600">
@@ -1030,9 +944,8 @@ const BuyEStampDocuments = () => {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Enter document description"
                 rows="3"
-                className={`w-full px-4 py-2.5 border ${
-                  formErrors.description ? "border-red-300" : "border-gray-300"
-                } rounded-md focus:ring-red-500 focus:border-red-500 text-sm resize-vertical`}
+                className={`w-full px-4 py-2.5 border ${formErrors.description ? "border-red-300" : "border-gray-300"
+                  } rounded-md focus:ring-red-500 focus:border-red-500 text-sm resize-vertical`}
               />
               {formErrors.description && (
                 <p className="mt-1 text-sm text-red-600">
@@ -1047,11 +960,10 @@ const BuyEStampDocuments = () => {
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div
-                  className={`relative border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                    deliveryType === "in-store"
-                      ? "border-red-500 bg-red-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
+                  className={`relative border-2 rounded-lg p-4 cursor-pointer transition-all ${deliveryType === "in-store"
+                    ? "border-red-500 bg-red-50"
+                    : "border-gray-200 hover:border-gray-300"
+                    }`}
                 >
                   <input
                     id="in-store"
@@ -1091,11 +1003,10 @@ const BuyEStampDocuments = () => {
                 </div>
 
                 <div
-                  className={`relative border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                    deliveryType === "delivery"
-                      ? "border-red-500 bg-red-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
+                  className={`relative border-2 rounded-lg p-4 cursor-pointer transition-all ${deliveryType === "delivery"
+                    ? "border-red-500 bg-red-50"
+                    : "border-gray-200 hover:border-gray-300"
+                    }`}
                 >
                   <input
                     id="delivery"
@@ -1149,11 +1060,10 @@ const BuyEStampDocuments = () => {
                     id="deliveryService"
                     value={selectedDeliveryService}
                     onChange={(e) => setSelectedDeliveryService(e.target.value)}
-                    className={`w-full px-4 py-2.5 border ${
-                      formErrors.selectedDeliveryService
-                        ? "border-red-300"
-                        : "border-gray-300"
-                    } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
+                    className={`w-full px-4 py-2.5 border ${formErrors.selectedDeliveryService
+                      ? "border-red-300"
+                      : "border-gray-300"
+                      } rounded-md focus:ring-red-500 focus:border-red-500 text-sm bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors`}
                   >
                     <option value="" className="text-gray-500">
                       Select a delivery service
@@ -1298,60 +1208,21 @@ const BuyEStampDocuments = () => {
             )}
 
             {/* Important Notice Checkbox */}
-            <div className="bg-white mt-4 mb-4 rounded-lg overflow-hidden border border-gray-200">
-              <div className="p-4">
-                <div className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    id="importantNoticeCheckbox"
-                    checked={isImportantNoticeAccepted}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setShowImportantNoticePopup(true);
-                      } else {
-                        setIsImportantNoticeAccepted(false);
-                      }
-                    }}
-                    className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2 mt-1"
-                  />
-                  <div className="flex-1">
-                    <label
-                      htmlFor="importantNoticeCheckbox"
-                      className="text-sm font-medium text-gray-700 cursor-pointer"
-                    >
-                      I have read and agree to the{" "}
-                      <button
-                        type="button"
-                        onClick={() => setShowImportantNoticePopup(true)}
-                        className="text-red-600 hover:text-red-700 underline font-medium"
-                      >
-                        Important Notice
-                      </button>
-                      <span className="text-red-500 ml-1">*</span>
-                    </label>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Please read the important notice before proceeding with
-                      payment
-                    </p>
-                    {formErrors.importantNotice && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {formErrors.importantNotice}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ImportantNotice
+              isImportantNoticeAccepted={isImportantNoticeAccepted}
+              setIsImportantNoticeAccepted={setIsImportantNoticeAccepted}
+              setShowImportantNoticePopup={setShowImportantNoticePopup}
+              formErrors={formErrors}
+            />
 
             <div className="flex justify-end mt-2">
               <button
                 onClick={handleProceedToPayment}
                 disabled={!selectedDocument || !isImportantNoticeAccepted}
-                className={`px-8 py-3 rounded-md font-medium transition-all duration-200 ${
-                  selectedDocument && isImportantNoticeAccepted
-                    ? "bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
+                className={`px-8 py-3 rounded-md font-medium transition-all duration-200 ${selectedDocument && isImportantNoticeAccepted
+                  ? "bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
               >
                 {!isImportantNoticeAccepted
                   ? "Please accept the important notice"
