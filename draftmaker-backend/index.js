@@ -21,7 +21,8 @@ const allowedOrigins = [
   "https://draftmaker.in",
   "https://api.draftmaker.in",
   "https://secure.ccavenue.com",
-  "https://api.ccavenue.com"
+  "https://api.ccavenue.com",
+  "https://api.draftmaker.in/payment/response"
 
 ];
 
