@@ -167,14 +167,43 @@ const handleResponse = async (req, res) => {
         console.log('║   CCAvenue Response Handler           ║');
         console.log('╚════════════════════════════════════════╝\n');
 
-        // Handle both POST and GET parameters
-        const encResponse = req.body.encResp || req.body.encResponse || req.query.encResp || req.query.encResponse;
+        // Log the raw request for debugging
+        console.log('📨 Request received:', {
+            method: req.method,
+            url: req.originalUrl,
+            headers: req.headers,
+            body: req.body,
+            query: req.query
+        });
+
+        // Handle different possible parameter names for the encrypted response
+        const encResponse =
+            req.body.encResp ||
+            req.body.encResponse ||
+            req.body.enc_request ||
+            req.query.encResp ||
+            req.query.encResponse ||
+            req.query.enc_request;
 
         if (!encResponse) {
-            console.error('❌ No encrypted response received');
-            console.log('Request body:', req.body);
-            console.log('Request query:', req.query);
-            return res.redirect(`${process.env.FRONTEND_URL || 'https://draftmaker.in'}/payment-failed?error=No response data received from payment gateway`);
+            const errorMsg = '❌ No encrypted response data found in request';
+            console.error(errorMsg);
+            console.log('Request body keys:', Object.keys(req.body));
+            console.log('Query parameters:', req.query);
+
+            // Try to get the raw body if available
+            if (req.rawBody) {
+                console.log('Raw request body:', req.rawBody.toString());
+            }
+
+            return res.status(400).json({
+                success: false,
+                message: errorMsg,
+                receivedData: {
+                    body: req.body,
+                    query: req.query
+                }
+            });
         }
 
         // Initialize CCAvenue for decryption

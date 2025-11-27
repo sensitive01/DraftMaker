@@ -93,11 +93,25 @@ app.use((req, res, next) => {
 });
 
 
-// Body parser middleware
+// Body parser middleware - must be before any route handlers
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));  // For parsing application/x-www-form-urlencoded
 
 // Connect to DB
 dbConnect();
+
+// Log all requests (for debugging)
+app.use((req, res, next) => {
+  console.log(`\n📨 ${new Date().toISOString()} ${req.method} ${req.path}`);
+  console.log('Headers:', JSON.stringify(req.headers, null, 2));
+  if (Object.keys(req.body).length > 0) {
+    console.log('Body:', JSON.stringify(req.body, null, 2));
+  }
+  if (Object.keys(req.query).length > 0) {
+    console.log('Query:', JSON.stringify(req.query, null, 2));
+  }
+  next();
+});
 
 // Routes
 app.use("/", adminSignUp);
