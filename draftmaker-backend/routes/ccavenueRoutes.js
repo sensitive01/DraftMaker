@@ -1,18 +1,25 @@
 const express = require('express');
 const paymentRouter = express.Router();
 const { initiatePayment, handleResponse } = require('../controller/ccavenueController');
-const cors = require('cors');
 
-// CORS configuration for the response endpoint
+// Middleware to capture raw body for CCAvenue response
+const rawBodyMiddleware = (req, res, next) => {
+    let data = '';
+    req.setEncoding('utf8');
+    req.on('data', chunk => {
+        data += chunk;
+    });
+    req.on('end', () => {
+        req.rawBody = data;
+        next();
+    });
+};
+
+// CORS configuration for CCAvenue response
 const ccAvenueCors = (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Content-Type, *');
     res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
-
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
 
     next();
 };

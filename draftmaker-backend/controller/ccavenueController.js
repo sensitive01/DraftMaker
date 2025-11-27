@@ -172,18 +172,32 @@ const handleResponse = async (req, res) => {
             method: req.method,
             url: req.originalUrl,
             headers: req.headers,
-            body: req.body,
-            query: req.query
+            body: req.body || {},
+            query: req.query || {},
+            rawBody: req.rawBody || 'No raw body'
         });
 
-        // Handle different possible parameter names for the encrypted response
-        const encResponse =
-            req.body.encResp ||
-            req.body.encResponse ||
-            req.body.enc_request ||
-            req.query.encResp ||
-            req.query.encResponse ||
-            req.query.enc_request;
+        // Handle both form data and raw body
+        let encResponse;
+
+        // First try to get from raw body
+        if (req.rawBody) {
+            const rawBody = req.rawBody.toString();
+            try {
+                // Try to parse as URL-encoded form data
+                const params = new URLSearchParams(rawBody);
+                encResponse = params.get('encResp') || params.get('encResponse') || params.get('enc_request');
+            } catch (e) {
+                console.log('Error parsing raw body:', e);
+            }
+        }
+
+        // If not found in raw body, try parsed body and query
+        if (!encResponse) {
+            encResponse =
+                (req.body && (req.body.encResp || req.body.encResponse || req.body.enc_request)) ||
+                (req.query && (req.query.encResp || req.query.encResponse || req.query.enc_request));
+        }
 
         if (!encResponse) {
             const errorMsg = '❌ No encrypted response data found in request';
