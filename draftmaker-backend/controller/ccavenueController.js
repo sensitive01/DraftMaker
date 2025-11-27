@@ -1,25 +1,25 @@
 const CCAvenue = require('../utils/ccAvanue');
-const EstampPayment = require('../model/eStampPaymentSchema'); 
+const EstampPayment = require('../model/eStampPaymentSchema');
 const BookingIdRegistry = require('../model/documentsModel/bookingId');
 require('dotenv').config();
 
 async function generateBookingId() {
-  const prefix = "DM";
-  let unique = false;
-  let bookingId;
+    const prefix = "DM";
+    let unique = false;
+    let bookingId;
 
-  while (!unique) {
-    const randomNumber = Math.floor(1000000 + Math.random() * 9000000);
-    bookingId = `${prefix}${randomNumber}`;
+    while (!unique) {
+        const randomNumber = Math.floor(1000000 + Math.random() * 9000000);
+        bookingId = `${prefix}${randomNumber}`;
 
-    const exists = await BookingIdRegistry.findOne({ bookingId });
-    if (!exists) {
-      await new BookingIdRegistry({ bookingId }).save();
-      unique = true;
+        const exists = await BookingIdRegistry.findOne({ bookingId });
+        if (!exists) {
+            await new BookingIdRegistry({ bookingId }).save();
+            unique = true;
+        }
     }
-  }
 
-  return bookingId;
+    return bookingId;
 }
 
 const initiatePayment = async (req, res) => {
@@ -38,7 +38,7 @@ const initiatePayment = async (req, res) => {
             });
         }
 
-      
+
 
         // INITIALIZE CCAVENUE HERE (NOT AT MODULE LEVEL)
         console.log('\n🔐 Initializing CCAvenue...');
@@ -124,7 +124,7 @@ const initiatePayment = async (req, res) => {
         // Encrypt
         console.log('\n🔒 Encrypting with CCAvenue...');
         console.log('   Using Working Key length:', process.env.CCAVENUE_WORKING_KEY.length);
-        
+
         const encryptedData = ccavenue.encrypt(paramString);
 
         console.log('✅ Encryption successful!');
@@ -157,72 +157,112 @@ const initiatePayment = async (req, res) => {
 };
 
 const handleResponse = async (req, res) => {
+    // Set CORS headers for all responses
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, *');
+    res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+
     try {
         console.log('\n╔════════════════════════════════════════╗');
         console.log('║   CCAvenue Response Handler           ║');
         console.log('╚════════════════════════════════════════╝\n');
-        
-        const encResponse = req.body.encResp;
-        
+
+        // Handle both POST and GET parameters
+        const encResponse = req.body.encResp || req.body.encResponse || req.query.encResp || req.query.encResponse;
+
         if (!encResponse) {
-            console.error('❌ No encrypted response');
-            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=No response`);
+            console.error('❌ No encrypted response received');
+            console.log('Request body:', req.body);
+            console.log('Request query:', req.query);
+            return res.redirect(`${process.env.FRONTEND_URL || 'https://draftmaker.in'}/payment-failed?error=No response data received from payment gateway`);
         }
 
         // Initialize CCAvenue for decryption
         const ccavenue = new CCAvenue(process.env.CCAVENUE_WORKING_KEY);
-        
+
         // Decrypt
-        const decryptedData = ccavenue.decrypt(encResponse);
-        console.log('✅ Response decrypted');
+        console.log('🔐 Encrypted response received, attempting decryption...');
+        let decryptedData;
+        try {
+            decryptedData = ccavenue.decrypt(encResponse);
+            console.log('✅ Response decrypted successfully');
+        } catch (decryptError) {
+            console.error('❌ Decryption failed:', decryptError);
+            return res.redirect(`${process.env.FRONTEND_URL || 'https://draftmaker.in'}/payment-failed?error=Invalid payment response`);
+        }
 
-        // Parse
+        // Parse the decrypted data
         const responseParams = {};
-        decryptedData.split('&').forEach(param => {
-            const [key, value] = param.split('=');
-            responseParams[key] = decodeURIComponent(value || '');
-        });
-
-        console.log('📊 Response:', responseParams);
+        try {
+            decryptedData.split('&').forEach(param => {
+                const [key, value] = param.split('=');
+                if (key) {
+                    responseParams[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
+                }
+            });
+            console.log('📊 Decrypted response params:', JSON.stringify(responseParams, null, 2));
+        } catch (parseError) {
+            console.error('❌ Failed to parse response:', parseError);
+            return res.redirect(`${process.env.FRONTEND_URL || 'https://draftmaker.in'}/payment-failed?error=Failed to process payment response`);
+        }
 
         const orderId = responseParams.order_id;
         const orderStatus = responseParams.order_status;
-        const trackingId = responseParams.tracking_id;
-        const bookingId = responseParams.merchant_param1;
+        const trackingId = responseParams.tracking_id || 'N/A';
+        const bookingId = responseParams.merchant_param1 || 'N/A';
 
+        if (!orderId) {
+            console.error('❌ No order_id in response');
+            return res.redirect(`${process.env.FRONTEND_URL || 'https://draftmaker.in'}/payment-failed?error=Invalid payment response`);
+        }
+
+        console.log(`🔍 Looking up order: ${orderId}`);
         const payment = await EstampPayment.findOne({ orderId: orderId });
 
         if (!payment) {
-            console.error('❌ Order not found');
-            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=Order not found`);
+            console.error(`❌ Order not found: ${orderId}`);
+            return res.redirect(`${process.env.FRONTEND_URL || 'https://draftmaker.in'}/payment-failed?orderId=${orderId}&error=Order not found`);
         }
+
+        // Update payment record
+        payment.ccavenueTrackingId = trackingId;
+        payment.ccavenueStatusMessage = responseParams.status_message || '';
+        payment.ccavenuePaymentMode = responseParams.payment_mode || '';
+        payment.ccavenueBankRefNo = responseParams.bank_ref_no || '';
+        payment.updatedAt = new Date();
 
         if (orderStatus === 'Success') {
             payment.paymentStatus = 'completed';
-            payment.ccavenueTrackingId = trackingId;
-            payment.ccavenueBankRefNo = responseParams.bank_ref_no;
-            payment.ccavenuePaymentMode = responseParams.payment_mode;
-            payment.ccavenueStatusMessage = responseParams.status_message;
             payment.paymentCompletedAt = new Date();
             await payment.save();
 
-            console.log('✅ Payment successful');
-            return res.redirect(`${process.env.FRONTEND_URL}/payment-success?orderId=${orderId}&bookingId=${bookingId}&trackingId=${trackingId}`);
-        } 
-        else {
+            console.log(`✅ Payment successful for order: ${orderId}`);
+            return res.redirect(
+                `${process.env.FRONTEND_URL || 'https://draftmaker.in'}/payment-success?` +
+                `orderId=${encodeURIComponent(orderId)}` +
+                `&bookingId=${encodeURIComponent(bookingId)}` +
+                `&trackingId=${encodeURIComponent(trackingId)}`
+            );
+        } else {
             payment.paymentStatus = 'failed';
-            payment.ccavenueFailureMessage = responseParams.failure_message;
-            payment.ccavenueStatusMessage = responseParams.status_message;
+            payment.ccavenueFailureMessage = responseParams.failure_message || 'Payment failed';
             payment.paymentFailedAt = new Date();
             await payment.save();
 
-            console.log('❌ Payment failed');
-            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?orderId=${orderId}&message=${encodeURIComponent(responseParams.failure_message || 'Payment failed')}`);
+            console.log(`❌ Payment failed for order: ${orderId} - ${responseParams.failure_message || 'Unknown error'}`);
+            return res.redirect(
+                `${process.env.FRONTEND_URL || 'https://draftmaker.in'}/payment-failed?` +
+                `orderId=${encodeURIComponent(orderId)}` +
+                `&message=${encodeURIComponent(responseParams.failure_message || 'Payment failed')}`
+            );
         }
 
     } catch (error) {
-        console.error('❌ Response handler error:', error);
-        return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=Processing error`);
+        console.error('❌ Unhandled error in response handler:', error);
+        return res.redirect(
+            `${process.env.FRONTEND_URL || 'https://draftmaker.in'}/payment-failed?` +
+            `error=${encodeURIComponent(error.message || 'An unexpected error occurred')}`
+        );
     }
 };
 

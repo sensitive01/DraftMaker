@@ -1,15 +1,36 @@
 const express = require('express');
 const paymentRouter = express.Router();
 const { initiatePayment, handleResponse } = require('../controller/ccavenueController');
+const cors = require('cors');
 
-// Initiate payment
-paymentRouter.post('/initiate-payment', initiatePayment);
+// CORS configuration for the response endpoint
+const ccAvenueCors = (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, *');
+    res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
 
-// Handle CCAvenue response (both success and cancel redirects here)
-paymentRouter.post('/response', handleResponse);
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
+    next();
+};
+
+// Initiate payment (with CORS for your frontend)
+paymentRouter.post('/initiate-payment', cors(), initiatePayment);
+
+// Handle CCAvenue response - special CORS handling for CCAvenue's server
+paymentRouter.post('/response', ccAvenueCors, handleResponse);
+
+// Add a GET handler for browser redirects (if any)
 paymentRouter.get('/response', (req, res) => {
-    return res.status(405).send("This route only accepts POST from CCAvenue");
+    res.redirect(process.env.FRONTEND_URL || 'https://draftmaker.in');
+});
+
+// Handle OPTIONS preflight for the response endpoint
+paymentRouter.options('/response', ccAvenueCors, (req, res) => {
+    res.status(200).end();
 });
 
 module.exports = paymentRouter;

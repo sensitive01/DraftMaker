@@ -14,33 +14,81 @@ const paymentRoutes = require("./routes/ccavenueRoutes");
 
 // ✅ Allowed frontend origins
 const allowedOrigins = [
+  // Local development
   "http://localhost:5173",
+  "http://localhost:3000",
+
+  // Production domains
   "https://draft-maker.vercel.app",
   "http://draftmaker.in",
   "https://draftmaker.in",
+  "https://www.draftmaker.in",
   "https://api.draftmaker.in",
+
+  // CCAvenue domains
   "https://secure.ccavenue.com",
+  "https://test.ccavenue.com",
+  "https://test.ccavenue.tech",
+  "https://login.ccavenue.com",
+  "https://api.ccavenue.com"
 ];
 
+// CORS configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
 
-// ✅ CORS Middleware
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // Allow requests with no origin (like mobile apps or Postman)
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  })
-);
+    // Check against allowed origins
+    if (allowedOrigins.includes(origin) ||
+      origin.endsWith('.ccavenue.com') ||
+      origin.endsWith('.ccavenue.tech')) {
+      return callback(null, true);
+    }
 
+    console.warn('⚠️  Blocked by CORS:', origin);
+    return callback(new Error(`Not allowed by CORS: ${origin}`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'x-cc-request-type',
+    'x-cc-merchant-id',
+    'x-cc-access-code',
+    'x-cc-auth-token'
+  ],
+  exposedHeaders: [
+    'Content-Range',
+    'X-Total-Count'
+  ],
+  maxAge: 86400 // 24 hours
+};
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Log CORS and request info for debugging
 app.use((req, res, next) => {
-  console.log("Incoming Origin:", req.headers.origin);
+  console.log('\n🌐 Incoming Request:', {
+    method: req.method,
+    path: req.path,
+    origin: req.headers.origin,
+    'user-agent': req.headers['user-agent'],
+    'content-type': req.headers['content-type']
+  });
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', corsOptions.allowedHeaders.join(','));
+    res.header('Access-Control-Max-Age', '86400');
+    return res.status(200).end();
+  }
+
   next();
 });
 
@@ -64,10 +112,21 @@ app.use("/payment", paymentRoutes);
 
 // ✅ CORS error handler
 app.use((err, req, res, next) => {
-  if (err instanceof Error && err.message === "Not allowed by CORS") {
-    return res
-      .status(403)
-      .json({ message: "CORS error: This origin is not allowed" });
+  if (err instanceof Error && err.message.startsWith('Not allowed by CORS')) {
+    console.error('❌ CORS Error:', {
+      message: err.message,
+      path: req.path,
+      method: req.method,
+      origin: req.headers.origin,
+      referer: req.headers.referer
+    });
+
+    return res.status(403).json({
+      success: false,
+      message: 'CORS error: This origin is not allowed',
+      error: err.message,
+      allowedOrigins: allowedOrigins
+    });
   }
   next(err);
 });
