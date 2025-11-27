@@ -10,17 +10,19 @@ const adminLogin = require("./routes/adminAuthRoute");
 const documentPrice = require("./routes/documentPriceRoute");
 const documentRouter = require("./routes/documentsRoutes");
 const messageRouter = require("./routes/messageRoutes");
-const paymentRoutes = require(  "./routes/ccavenueRoutes");
+const paymentRoutes = require("./routes/ccavenueRoutes");
 
 // ✅ Allowed frontend origins
 const allowedOrigins = [
   "http://localhost:5173",
   "https://draft-maker.vercel.app",
- " https://draft-maker.vercel.app/admin/login",
+  " https://draft-maker.vercel.app/admin/login",
   "http://draftmaker.in",
   "https://draftmaker.in",
-  "https://api.draftmaker.in"
-  
+  "https://api.draftmaker.in",
+  "https://secure.ccavenue.com",
+  "https://api.ccavenue.com"
+
 ];
 
 // ✅ CORS Middleware
