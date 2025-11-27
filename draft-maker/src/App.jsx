@@ -101,8 +101,10 @@ import MainPolicies from "./components/termaandcinditions/MainPolicies";
 import TermsAndConditionsPage from "./components/termaandcinditions/TermsAndConditionsPage";
 import PrivacyPolicyPage from "./components/termaandcinditions/PrivacyPolicyPage";
 import RefundCancellationPolicyPage from "./components/termaandcinditions/RefundCancellationPolicyPage";
-import PaymentSuccessPage from "./components/payments/PaymentSuccessPage";
+import PaymentSuccessPage from "./components/payments/PaymentSuccess";
 import PaymentFailurePage from "./components/payments/PaymentFailurePage";
+import PaymentFailedPage from "./components/paymentModals/PaymentFailedPage";
+import PaymentSuccess from "./components/paymentModals/PaymentSuccess";
 
 function MainLayout({ children }) {
   return (
@@ -1144,6 +1146,22 @@ function App() {
           element={
             <PaymentLayout>
               <TrackMyDocuments />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/home/payment-failed"
+          element={
+            <PaymentLayout>
+              <PaymentFailedPage />
+            </PaymentLayout>
+          }
+        />
+        <Route
+          path="/documents/home/payment-success"
+          element={
+            <PaymentLayout>
+              <PaymentSuccess />
             </PaymentLayout>
           }
         />
