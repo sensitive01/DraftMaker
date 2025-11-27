@@ -77,8 +77,8 @@ const initiatePayment = async (req, res) => {
             order_id: orderId,
             currency: 'INR',
             amount: parseFloat(orderData.totalAmount).toFixed(2),
-            redirect_url: `${process.env.FRONTEND_URL}/payment/response`,
-            cancel_url: `${process.env.FRONTEND_URL}/payment/response`,
+            redirect_url: `${process.env.BACKEND_URL}/payment/response`,
+            cancel_url: `${process.env.BACKEND_URL}/payment/response`,
             language: 'EN',
 
             billing_name: orderData.requestorName || 'Customer',
