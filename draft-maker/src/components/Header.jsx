@@ -277,15 +277,13 @@ const Header = () => {
                     onClick={() => toggleDropdown("agreements")}
                   >
                     <i
-                      className={`icofont-rounded-down ${
-                        activeDropdown === "agreements" ? "rotate-180" : ""
-                      }`}
+                      className={`icofont-rounded-down ${activeDropdown === "agreements" ? "rotate-180" : ""
+                        }`}
                     ></i>
                   </span>
                   <div
-                    className={`sub_menu ${
-                      activeDropdown === "agreements" ? "show-dropdown" : ""
-                    }`}
+                    className={`sub_menu ${activeDropdown === "agreements" ? "show-dropdown" : ""
+                      }`}
                   >
                     <ul>
                       {visibleDocuments.filter(
@@ -326,15 +324,13 @@ const Header = () => {
                     onClick={() => toggleDropdown("affidavits")}
                   >
                     <i
-                      className={`icofont-rounded-down ${
-                        activeDropdown === "affidavits" ? "rotate-180" : ""
-                      }`}
+                      className={`icofont-rounded-down ${activeDropdown === "affidavits" ? "rotate-180" : ""
+                        }`}
                     ></i>
                   </span>
                   <div
-                    className={`sub_menu scrollable-submenu ${
-                      activeDropdown === "affidavits" ? "show-dropdown" : ""
-                    }`}
+                    className={`sub_menu scrollable-submenu ${activeDropdown === "affidavits" ? "show-dropdown" : ""
+                      }`}
                   >
                     <div className="submenu-scroll-container">
                       <ul>
@@ -368,6 +364,7 @@ const Header = () => {
                   >
                     Buy E-Stamp
                   </Link>
+
                 </li>
 
                 {/* Services Dropdown (formerly Newspaper Ad) */}
@@ -387,37 +384,35 @@ const Header = () => {
                     onClick={() => toggleDropdown("services")}
                   >
                     <i
-                      className={`icofont-rounded-down ${
-                        activeDropdown === "services" ? "rotate-180" : ""
-                      }`}
+                      className={`icofont-rounded-down ${activeDropdown === "services" ? "rotate-180" : ""
+                        }`}
                     ></i>
                   </span>
                   <div
-                    className={`sub_menu ${
-                      activeDropdown === "services" ? "show-dropdown" : ""
-                    }`}
+                    className={`sub_menu ${activeDropdown === "services" ? "show-dropdown" : ""
+                      }`}
                   >
                     <ul>
                       {/* Passport Name Change with pricing */}
                       {visibleDocuments.find(
                         (doc) => doc.apiTitle === "Passport Name Change"
                       ) && (
-                        <li>
-                          <Link to="/home/contact-us" onClick={closeMenu}>
-                            News Paper Ad (Passport Name Change - Rs 3000)
-                          </Link>
-                        </li>
-                      )}
+                          <li>
+                            <Link to="/home/contact-us" onClick={closeMenu}>
+                              News Paper Ad (Passport Name Change - Rs 3000)
+                            </Link>
+                          </li>
+                        )}
                       {/* HUF Deed and Pan with pricing */}
                       {visibleDocuments.find(
                         (doc) => doc.apiTitle === "Huf Correction"
                       ) && (
-                        <li>
-                          <Link to="/home/contact-us" onClick={closeMenu}>
-                            HUF Deed and PAN - Rs 1500
-                          </Link>
-                        </li>
-                      )}
+                          <li>
+                            <Link to="/home/contact-us" onClick={closeMenu}>
+                              HUF Deed and PAN - Rs 1500
+                            </Link>
+                          </li>
+                        )}
                     </ul>
                   </div>
                 </li>
@@ -439,15 +434,13 @@ const Header = () => {
                     onClick={() => toggleDropdown("inShopServices")}
                   >
                     <i
-                      className={`icofont-rounded-down ${
-                        activeDropdown === "inShopServices" ? "rotate-180" : ""
-                      }`}
+                      className={`icofont-rounded-down ${activeDropdown === "inShopServices" ? "rotate-180" : ""
+                        }`}
                     ></i>
                   </span>
                   <div
-                    className={`sub_menu ${
-                      activeDropdown === "inShopServices" ? "show-dropdown" : ""
-                    }`}
+                    className={`sub_menu ${activeDropdown === "inShopServices" ? "show-dropdown" : ""
+                      }`}
                   >
                     <ul>
                       <li>

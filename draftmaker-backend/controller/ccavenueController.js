@@ -38,10 +38,7 @@ const initiatePayment = async (req, res) => {
             });
         }
 
-        console.log('✅ Working Key exists');
-        console.log('   Length:', process.env.CCAVENUE_WORKING_KEY.length);
-        console.log('   First 4 chars:', process.env.CCAVENUE_WORKING_KEY.substring(0, 4));
-        console.log('   Last 4 chars:', process.env.CCAVENUE_WORKING_KEY.substring(28));
+      
 
         // INITIALIZE CCAVENUE HERE (NOT AT MODULE LEVEL)
         console.log('\n🔐 Initializing CCAvenue...');
@@ -80,8 +77,8 @@ const initiatePayment = async (req, res) => {
             order_id: orderId,
             currency: 'INR',
             amount: parseFloat(orderData.totalAmount).toFixed(2),
-            redirect_url: `${process.env.BACKEND_URL}/payment/response`,
-            cancel_url: `${process.env.BACKEND_URL}/payment/response`,
+            redirect_url: `${process.env.FRONTEND_URL}/payment/response`,
+            cancel_url: `${process.env.FRONTEND_URL}/payment/response`,
             language: 'EN',
 
             billing_name: orderData.requestorName || 'Customer',
