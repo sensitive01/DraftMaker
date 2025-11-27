@@ -18,7 +18,8 @@ const allowedOrigins = [
   "https://draft-maker.vercel.app",
  " https://draft-maker.vercel.app/admin/login",
   "http://draftmaker.in",
-  "https://draftmaker.in"
+  "https://draftmaker.in",
+  "https://api.draftmaker.in"
   
 ];
 
