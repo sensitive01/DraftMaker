@@ -470,41 +470,33 @@ const BuyEStampDocuments = () => {
             throw new Error('Missing encRequest or accessCode from backend');
           }
 
-          // Create form and submit to CCAvenue TEST URL
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = 'https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction';
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.enctype = "application/x-www-form-urlencoded";
+          form.action =
+            "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
 
-          console.log('🌐 CCAvenue URL:', form.action);
-
-          // Add encrypted request
-          const encRequestInput = document.createElement('input');
-          encRequestInput.type = 'hidden';
-          encRequestInput.name = 'encRequest';
+          // Encrypted request
+          const encRequestInput = document.createElement("input");
+          encRequestInput.type = "hidden";
+          encRequestInput.name = "encRequest";
           encRequestInput.value = data.encRequest;
           form.appendChild(encRequestInput);
-          console.log('✅ Added encRequest field');
 
-          // Add access code
-          const accessCodeInput = document.createElement('input');
-          accessCodeInput.type = 'hidden';
-          accessCodeInput.name = 'access_code';
+          // Access code
+          const accessCodeInput = document.createElement("input");
+          accessCodeInput.type = "hidden";
+          accessCodeInput.name = "access_code";
           accessCodeInput.value = data.accessCode;
           form.appendChild(accessCodeInput);
-          console.log('✅ Added access_code field');
 
-          // Debug: Log form data
-          console.log('📋 Form Data:');
-          console.log('   - encRequest length:', data.encRequest.length);
-          console.log('   - access_code:', data.accessCode);
-
-          // Add form to body
           document.body.appendChild(form);
-          console.log('✅ Form added to document');
-
-          // Submit form
-          console.log('📤 Submitting form to CCAvenue...');
           form.submit();
+
+
+
+
+
 
         } else {
           // Remove loading
