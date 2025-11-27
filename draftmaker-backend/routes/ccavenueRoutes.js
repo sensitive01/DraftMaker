@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const paymentRouter = express.Router();
 const { initiatePayment, handleResponse } = require('../controller/ccavenueController');
 
