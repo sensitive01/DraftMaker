@@ -363,7 +363,7 @@ const Header = () => {
                 <li className="nav-item active">
                   <Link
                     className="nav-link"
-                    to="/documents/buy-e-stamp"
+                    to="/documents/home/buy-e-stamp"
                     onClick={closeMenu}
                   >
                     Buy E-Stamp

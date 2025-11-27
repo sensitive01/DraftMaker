@@ -814,7 +814,7 @@ function App() {
             element={<TermsAndConditions />}
           />
           <Route path="/home/all-about-us" element={<AboutUsFullPage />} />
-         <Route path="/home/refund-and-cancellation" element={<RefundCancellationPolicy />} />
+          <Route path="/home/refund-and-cancellation" element={<RefundCancellationPolicy />} />
 
 
           <Route
@@ -1132,7 +1132,7 @@ function App() {
         {/* ............................................. */}
 
         <Route
-          path="/documents/buy-e-stamp"
+          path="/documents/home/buy-e-stamp"
           element={
             <PaymentLayout>
               <BuyEStampDocuments />
