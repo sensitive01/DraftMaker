@@ -16,15 +16,12 @@ const paymentRoutes = require("./routes/ccavenueRoutes");
 const allowedOrigins = [
   "http://localhost:5173",
   "https://draft-maker.vercel.app",
-  " https://draft-maker.vercel.app/admin/login",
   "http://draftmaker.in",
   "https://draftmaker.in",
   "https://api.draftmaker.in",
   "https://secure.ccavenue.com",
-  "https://api.ccavenue.com",
-  "https://api.draftmaker.in/payment/response"
-
 ];
+
 
 // ✅ CORS Middleware
 app.use(
@@ -41,6 +38,12 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
+
+app.use((req, res, next) => {
+  console.log("Incoming Origin:", req.headers.origin);
+  next();
+});
+
 
 // Body parser middleware
 app.use(express.json());
