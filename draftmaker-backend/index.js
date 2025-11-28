@@ -72,7 +72,7 @@ app.use(cors(corsOptions));
 
 // Log CORS and request info for debugging
 app.use((req, res, next) => {
-  
+
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
@@ -96,24 +96,12 @@ dbConnect();
 
 // Log all requests (for debugging)
 app.use((req, res, next) => {
-  console.log(`\n📨 ${new Date().toISOString()} ${req.method} ${req.path}`);
 
-  // Safely log headers
-  if (req.headers) {
-    console.log('Headers:', JSON.stringify(req.headers, null, 2));
-  }
 
-  // Safely log body
-  if (req.body && typeof req.body === 'object' && Object.keys(req.body).length > 0) {
-    console.log('Body:', JSON.stringify(req.body, null, 2));
-  } else if (req.rawBody) {
-    console.log('Raw body:', req.rawBody);
-  }
 
-  // Safely log query parameters
-  if (req.query && typeof req.query === 'object' && Object.keys(req.query).length > 0) {
-    console.log('Query:', JSON.stringify(req.query, null, 2));
-  }
+
+
+
 
   next();
 });
@@ -132,14 +120,7 @@ app.use("/payment", paymentRoutes);
 // ✅ CORS error handler
 app.use((err, req, res, next) => {
   if (err instanceof Error && err.message.startsWith('Not allowed by CORS')) {
-    console.error('❌ CORS Error:', {
-      message: err.message,
-      path: req.path,
-      method: req.method,
-      origin: req.headers.origin,
-      referer: req.headers.referer
-    });
-
+   
     return res.status(403).json({
       success: false,
       message: 'CORS error: This origin is not allowed',
