@@ -2,135 +2,85 @@ const mongoose = require("mongoose");
 
 const estampPaymentSchema = new mongoose.Schema(
   {
-    bookingId: {
-      type: String,
-    },
-    firstPartyName: {
-      type: String,
-    },
-    secondPartyName: {
-      type: String,
-    },
-    selectedDocumentId: {
-      type: String,
-    },
-    documentType: {
-      type: String,
-    },
+    bookingId: String,
+    firstPartyName: String,
+    secondPartyName: String,
+    selectedDocumentId: String,
+    documentType: String,
     documentCalculationType: {
       type: String,
       enum: ["fixed", "percentage"],
     },
-    documentFixedAmount: {
-      type: Number,
-      default: 0,
-    },
-    documentPercentage: {
-      type: Number,
-      default: 0,
-    },
-    documentMinAmount: {
-      type: Number,
-      default: 0,
-    },
-    documentMaxAmount: {
-      type: Number,
-      default: 0,
-    },
-    stampDutyAmount: {
-      type: Number,
-    },
-    deliveryType: {
-      type: String,
-    },
-    selectedDeliveryServiceId: {
-      type: String,
-    },
-    deliveryServiceName: {
-      type: String,
-    },
-    deliveryCharge: {
-      type: Number,
-      default: 0,
-    },
-    deliveryDescription: {
-      type: String,
-    },
-    requestorName: {
-      type: String,
-    },
-    mobileNumber: {
-      type: String,
-    },
-    totalAmount: {
-      type: Number,
-    },
-    orderDate: {
-      type: Date,
-      default: Date.now,
-    },
-    paymentMethod: {
-      type: String,
-    },
-    currency: {
-      type: String,
-      default: "INR",
-    },
-    razorpayPaymentId: {
-      type: String,
-    },
-    razorpayOrderId: {
-      type: String,
-    },
-    razorpaySignature: {
-      type: String,
-    },
-    paymentStatus: {
-      type: String,
-      default: "Success",
-    },
-    paymentCompletedAt: {
-      type: Date,
-    },
-    considerationAmount: {
-      type: Number,
-    },
-    documentStatus: {
-      type: String,
-      default: "Pending",
-    },
 
-    stampDutyPayer: {
-      type: String,
-    },
+    documentFixedAmount: { type: Number, default: 0 },
+    documentPercentage: { type: Number, default: 0 },
+    documentMinAmount: { type: Number, default: 0 },
+    documentMaxAmount: { type: Number, default: 0 },
 
-    description: {
-      type: String,
-    },
-    serviceCharge: { type: Number },
+    stampDutyAmount: Number,
+    deliveryType: String,
+    selectedDeliveryServiceId: String,
+    deliveryServiceName: String,
+    deliveryCharge: { type: Number, default: 0 },
+    deliveryDescription: String,
 
-    quantity: {
-      type: Number,
-      default: 1,
-    },
+    requestorName: String,
+    mobileNumber: String,
+    totalAmount: Number,
+
+    orderDate: { type: Date, default: Date.now },
+    paymentMethod: String,
+    currency: { type: String, default: "INR" },
+
+    paymentStatus: { type: String, default: "Pending" },
+    paymentCompletedAt: Date,
+
+    considerationAmount: Number,
+    documentStatus: { type: String, default: "Pending" },
+
+    stampDutyPayer: String,
+    description: String,
+    serviceCharge: Number,
+
+    quantity: { type: Number, default: 1 },
+
     deliveryAddress: {
-      email: { type: String },
-      addressLine1: { type: String },
-      addressLine2: { type: String },
-      city: { type: String },
-      state: { type: String },
-      pincode: { type: String },
-      landmark: { type: String },
+      email: String,
+      addressLine1: String,
+      addressLine2: String,
+      city: String,
+      state: String,
+      pincode: String,
+      landmark: String,
     },
-    orderId: {
-      type: String,
-    },
-    ccavenueTrackingId: String,
-    ccavenueBankRefNo: String,
-    ccavenuePaymentMode: String,
-    ccavenueCardName: String,
-    ccavenueStatusMessage: String,
-    ccavenueFailureMessage: String,
+
+    // ----------------------------
+    //   CCAvenue Required Fields
+    // ----------------------------
+
+    orderId: String,                   // ESTAMP_DM7419516_...
+    ccavenueOrderStatus: String,       // order_status → Success/Failure/Aborted
+    ccavenueTrackingId: String,        // tracking_id (THIS IS PAYMENT ID)
+    ccavenueBankRefNo: String,         // bank_ref_no
+
+    ccavenuePaymentMode: String,       // UPI / Card / NetBanking
+    ccavenueCardName: String,          // UPI / VISA
+
+    ccavenueStatusMessage: String,     // Success-NA-0
+    ccavenueFailureMessage: String,    // failure message
+
+    ccavenueCurrency: String,          // INR
+    ccavenueAmount: String,            // 2.00
+    ccavenueTransDate: String,         // "28/11/2025 20:13:31"
+
+    ccavenueResponseCode: String,      // response_code
+    ccavenueMerchantParam1: String,
+    ccavenueMerchantParam2: String,
+    ccavenueMerchantParam3: String,
+    ccavenueMerchantParam4: String,
+    ccavenueMerchantParam5: String,
+
+    ccavenueRawResponse: String,       // full decrypted string (optional)
   },
   { timestamps: true }
 );
