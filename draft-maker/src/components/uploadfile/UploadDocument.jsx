@@ -674,7 +674,7 @@ const DocumentUpload = () => {
 
       // Call backend to initiate CCAvenue payment
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/payment/initiate-upload-payment`,
+        `${import.meta.env.VITE_BASE_ROUTE}/payment/initiate-upload-payment`,
         {
           method: 'POST',
           headers: {
