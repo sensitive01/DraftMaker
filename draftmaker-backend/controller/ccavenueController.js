@@ -557,13 +557,17 @@ const handleCCAVENUEResponse = async (req, res) => {
         }
 
         await order.save();
+     
 
         // Redirect based on payment status
         if (order.paymentStatus === 'SUCCESS' && bookingId) {
+            // return res.redirect(
+            //     `${process.env.FRONTEND_URL}/payment-success?` +
+            //     `orderId=${encodeURIComponent(order.orderId)}` +
+            //     `&bookingId=${encodeURIComponent(bookingId)}`
+            // );
             return res.redirect(
-                `${process.env.FRONTEND_URL}/payment-success?` +
-                `orderId=${encodeURIComponent(order.orderId)}` +
-                `&bookingId=${encodeURIComponent(bookingId)}`
+                `https://draftmaker.in/documents/preview-page/${formId}/${bookingId}`
             );
         } else {
             return res.redirect(

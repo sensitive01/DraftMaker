@@ -388,7 +388,8 @@ const DocumentPaymentPage = () => {
         const form = document.createElement("form");
         form.method = "POST";
         form.enctype = "application/x-www-form-urlencoded";
-        form.action = "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
+        // form.action = "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
+        form.action = "https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
 
         // Add encrypted request
         const encRequestInput = document.createElement("input");
