@@ -3,25 +3,7 @@ const EstampPayment = require('../model/eStampPaymentSchema');
 const BookingIdRegistry = require('../model/documentsModel/bookingId');
 const orderModel = require('../model/order/order');
 
-// Import all the required update functions
-const { updateDualNamePaymentData, saveDualNameCorrection } = require('./documentsController/dualNameCorrectionController');
-const { saveNameCorrectionPaymentData, saveNameCorrection } = require('./documentsController/nameCorrectionController');
-const { saveDobCorrectionPaymentData, createDobCorrection } = require('./documentsController/dobCorrectionController');
-const { saveGasCorrectionPaymentData, createGasCorrection } = require('./documentsController/gasCorrectionController');
-const { saveDocumentLostPaymentData, createDocumentLost } = require('./documentsController/documentLostController');
-const { saveDobParentNameCorrection, createDobParentNameCorrection } = require('./documentsController/dobParentNameCorrectionController');
-const { saveBirthCertificateNameCorrection, createBirthCertificateNameCorrection } = require('./documentsController/birthCertificateNameCorrectionController');
-const { saveGstPaymentData, saveGstData } = require('./documentsController/gstController');
-const { updateMetriculationLostPaymentData, createMetriculationLostData } = require('./documentsController/metriculationLostController');
-const { updateKhataCorrectionPaymentData, createKhataCorrectionData } = require('./documentsController/khataCorrectionController');
-const { updateVehicleInsurencePaymentData, createVehicleInsurenceData } = require('./documentsController/vehicleInsurenceController');
-const { updateHufPaymentData, createHufData } = require('./documentsController/hufController');
-const { updateGapPeriodPaymentData, createGapPeriodData } = require('./documentsController/gapPeriodController');
-const { updatePasswordAnnaxurePaymentData, createPasswordAnnaxureData } = require('./documentsController/passwordAnnaxureController');
-const { updatePassportNameChangePaymentData, createPassportNameChangeData } = require('./documentsController/passportNameChangeController');
-const { updateAdressAffadavitPaymentData, createAdressAffadavitData } = require('./documentsController/addressAffidavitController');
-const { updateCommercialPaymentData, createCommercialData } = require('./documentsController/commercialController');
-const { updateRecidentialPaymentData, createRecidentialData } = require('./documentsController/residentialController');
+const documentController = require("./documentsController")
 require('dotenv').config();
 const ccAvenueConfig = require("../config/ccAvanueConfig")
 
@@ -523,9 +505,9 @@ const handleCCAVENUEResponse = async (req, res) => {
 
             // Find and call the appropriate update function
             const handler = documentUpdateHandlers[formId];
-            if (handler && handler.updateFn) {
+            if (handler && handler.updateFn && documentController[handler.updateFn]) {
                 try {
-                    await exports[handler.updateFn]({
+                    await documentController[handler.updateFn]({
                         body: {
                             data: {
                                 ...order.paymentDetails,
