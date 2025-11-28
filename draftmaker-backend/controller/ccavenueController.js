@@ -717,43 +717,47 @@ const handleUploadResponse = async (req, res) => {
 
         // For successful payments
         try {
-            // Retrieve stored frontend data with enhanced error handling
+            // Parse merchant_param2 as key-value pairs
             let paymentData = {};
             try {
-                const merchantParam = responseParams.merchant_param2 || '{}';
+                const merchantParam = responseParams.merchant_param2 || '';
                 console.log('Raw merchant_param2:', merchantParam);
 
-                // Handle case where merchant_param2 might be URL-encoded
-                let decodedParam = merchantParam;
-                try {
-                    // Try to URL decode if it's encoded
-                    decodedParam = decodeURIComponent(merchantParam);
-                } catch (e) {
-                    console.log('Not a URL-encoded string, using as is');
+                // Parse key-value pairs separated by commas
+                const pairs = merchantParam.split(',');
+                pairs.forEach(pair => {
+                    const equalsIndex = pair.indexOf('=');
+                    if (equalsIndex !== -1) {
+                        const key = pair.substring(0, equalsIndex);
+                        const value = pair.substring(equalsIndex + 1);
+                        paymentData[key] = value;
+                    }
+                });
+
+                // Handle uploadedDocuments specially if it exists
+                if (paymentData.uploadedDocuments) {
+                    try {
+                        paymentData.uploadedDocuments = JSON.parse(paymentData.uploadedDocuments);
+                    } catch (e) {
+                        paymentData.uploadedDocuments = [];
+                    }
                 }
 
-                console.log('Decoded merchant_param2:', decodedParam);
+                // Ensure mobile number is properly set
+                paymentData.mobileNumber = paymentData.mobileNumber || responseParams.billing_tel || '';
 
-                // Handle case where the string might be wrapped in quotes
-                if (decodedParam.startsWith('"') && decodedParam.endsWith('"')) {
-                    decodedParam = decodedParam.slice(1, -1);
-                }
-
-                paymentData = JSON.parse(decodedParam);
-                console.log('Parsed payment data:', JSON.stringify(paymentData, null, 2));
+                console.log('Parsed payment data:', paymentData);
             } catch (e) {
                 console.error('❌ Error parsing merchant_param2:', e.message);
                 console.error('Raw merchant_param2 value:', responseParams.merchant_param2);
-                // Create a minimal paymentData object with default values
                 paymentData = {
-                    fullName: 'Customer',
-                    mobileNumber: '',
+                    fullName: responseParams.billing_name || 'Customer',
+                    mobileNumber: responseParams.billing_tel || '',
                     documentType: 'UPLOAD',
                     emailAddress: responseParams.billing_email || '',
                     totalAmount: responseParams.amount || '0',
                     uploadedDocuments: []
                 };
-                console.log('Using default payment data due to parse error');
             }
 
             // Generate booking ID
@@ -762,19 +766,19 @@ const handleUploadResponse = async (req, res) => {
             // Prepare payload for saving document
             const uploadPayload = {
                 documentData: {
-                    username: paymentData.fullName || 'Customer',
-                    userMobile: paymentData.mobileNumber || '',
+                    username: paymentData.fullName || responseParams.billing_name || 'Customer',
+                    userMobile: paymentData.mobileNumber || responseParams.billing_tel || '',
                     documentType: paymentData.documentType || 'UPLOAD',
                     formId: 'UPLOAD',
                     documents: paymentData.uploadedDocuments || [],
                     totalDocuments: paymentData.uploadedDocuments?.length || 0,
                     submittedAt: new Date(),
-                    emailAddress: paymentData.emailAddress || '',
+                    emailAddress: paymentData.emailAddress || responseParams.billing_email || '',
                     bookingId,
                     payment: {
                         orderId: orderId,
                         paymentId: responseParams.tracking_id || responseParams.bank_ref_no || 'N/A',
-                        totalAmount: paymentData.totalAmount || '0',
+                        totalAmount: paymentData.totalAmount || responseParams.amount || '0',
                         paymentStatus: "success",
                         paymentDate: new Date(),
                     }
