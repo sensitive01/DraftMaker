@@ -669,10 +669,12 @@ const handleUploadResponse = async (req, res) => {
         console.log('╚════════════════════════════════════════╝\n');
 
         // Extract encrypted response
-        let encResponse = req.body.encResp || req.body.encResponse;
+        let encResponse = req.body.encResp || req.body.encResponse || 
+                         (req.rawBody ? new URLSearchParams(req.rawBody.toString()).get('encResp') : null);
 
         if (!encResponse) {
-            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=Missing encrypted response`);
+            console.error('❌ No encrypted response found');
+            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=missing_response`);
         }
 
         const ccavenue = new CCAvenue(process.env.CCAVENUE_WORKING_KEY);
@@ -682,64 +684,107 @@ const handleUploadResponse = async (req, res) => {
         const responseParams = {};
         decrypted.split('&').forEach(pair => {
             const [key, value] = pair.split('=');
-            responseParams[key] = decodeURIComponent(value || '');
+            if (key) {
+                responseParams[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
+            }
         });
 
+        console.log('📊 Decrypted response:', responseParams);
+
+        const orderId = responseParams.order_id;
         const orderStatus = responseParams.order_status;
+        const failureMessage = responseParams.failure_message || 'Payment failed';
 
-        // Retrieve stored frontend data
-        const paymentData = JSON.parse(responseParams.merchant_param2 || '{}');
-
-        // ⭐⭐⭐ GENERATE bookingId HERE
-        const bookingId = await generateBookingId();
-
-        if (orderStatus !== 'Success') {
+        if (!orderId) {
+            console.error('❌ No order ID in response');
             return res.redirect(
-                `${process.env.FRONTEND_URL}/payment-failed?message=${encodeURIComponent('Payment failed')}`
+                `${process.env.FRONTEND_URL}/payment-failed?` +
+                `error=invalid_response&` +
+                `orderId=unknown`
             );
         }
 
-        // Prepare payload for saving document
-        const uploadPayload = {
-            documentData: {
-                username: paymentData.fullName,
-                userMobile: paymentData.mobileNumber,
-                documentType: paymentData.documentType,
-                formId: 'UPLOAD',
+        // For failed payments
+        if (orderStatus !== 'Success') {
+            console.error(`❌ Payment failed for order ${orderId}:`, failureMessage);
+            return res.redirect(
+                `${process.env.FRONTEND_URL}/payment-failed?` +
+                `orderId=${encodeURIComponent(orderId)}&` +
+                `reason=${encodeURIComponent(failureMessage)}`
+            );
+        }
 
-                documents: paymentData.uploadedDocuments || [],
-                totalDocuments: paymentData.uploadedDocuments?.length || 0,
-                submittedAt: new Date(),
-                emailAddress: paymentData.emailAddress,
-
-                bookingId,
-                payment: {
-                    orderId: responseParams.order_id,
-                    paymentId: responseParams.tracking_id,
-                    totalAmount: paymentData.totalAmount,
-                    paymentStatus: "completed",
-                    paymentDate: new Date(),
-                }
+        // For successful payments
+        try {
+            // Retrieve stored frontend data
+            let paymentData = {};
+            try {
+                paymentData = JSON.parse(responseParams.merchant_param2 || '{}');
+            } catch (e) {
+                console.error('❌ Error parsing merchant_param2:', e);
+                throw new Error('Invalid payment data');
             }
-        };
 
-        console.log("Uploading document data...");
+            // Generate booking ID
+            const bookingId = await generateBookingId();
 
-        await axios.post(
-            `${process.env.BACKEND_URL}/documents/upload-document-data`,
-            uploadPayload,
-            { headers: { "Content-Type": "application/json" } }
-        );
+            // Prepare payload for saving document
+            const uploadPayload = {
+                documentData: {
+                    username: paymentData.fullName || 'Customer',
+                    userMobile: paymentData.mobileNumber || '',
+                    documentType: paymentData.documentType || 'UPLOAD',
+                    formId: 'UPLOAD',
+                    documents: paymentData.uploadedDocuments || [],
+                    totalDocuments: paymentData.uploadedDocuments?.length || 0,
+                    submittedAt: new Date(),
+                    emailAddress: paymentData.emailAddress || '',
+                    bookingId,
+                    payment: {
+                        orderId: orderId,
+                        paymentId: responseParams.tracking_id || responseParams.bank_ref_no || 'N/A',
+                        totalAmount: paymentData.totalAmount || '0',
+                        paymentStatus: "success",
+                        paymentDate: new Date(),
+                    }
+                }
+            };
 
-        // Redirect to success
-        return res.redirect(
-            `${process.env.FRONTEND_URL}/upload-success?bookingId=${bookingId}`
-        );
+            console.log('📤 Sending document data to API...');
+            await axios.post(
+                `${process.env.BACKEND_URL}/documents/upload-document-data`,
+                uploadPayload,
+                { 
+                    headers: { 
+                        "Content-Type": "application/json" 
+                    },
+                    timeout: 10000 // 10 second timeout
+                }
+            );
+
+            console.log('✅ Document data saved successfully');
+            return res.redirect(
+                `${process.env.FRONTEND_URL}/payment-success?` +
+                `orderId=${encodeURIComponent(orderId)}&` +
+                `bookingId=${encodeURIComponent(bookingId)}&` +
+                `amount=${encodeURIComponent(paymentData.totalAmount || '0')}`
+            );
+
+        } catch (uploadError) {
+            console.error('❌ Error processing successful payment:', uploadError);
+            // Even if document save fails, we still show success to user but log the error
+            return res.redirect(
+                `${process.env.FRONTEND_URL}/payment-success?` +
+                `orderId=${encodeURIComponent(orderId)}&` +
+                `warning=document_save_failed`
+            );
+        }
 
     } catch (error) {
-        console.error("ERROR:", error);
+        console.error('❌ Unhandled error in handleUploadResponse:', error);
         return res.redirect(
-            `${process.env.FRONTEND_URL}/payment-failed?error=${encodeURIComponent(error.message)}`
+            `${process.env.FRONTEND_URL}/payment-failed?` +
+            `error=${encodeURIComponent(error.message || 'An unexpected error occurred')}`
         );
     }
 };
