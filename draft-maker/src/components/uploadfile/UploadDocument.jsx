@@ -598,16 +598,12 @@ const DocumentUpload = () => {
   // ✅✅✅ CCAvenue Integration - REPLACES RAZORPAY ✅✅✅
   const initiateCCAvenuePayment = async (service, totalPrice, uploadedDocuments) => {
     try {
-      const bookingId = `UPLOAD-${bookingId}_${Date.now()}`;
-
       console.log('\n🔵 Initiating CCAvenue payment for document upload...');
-      console.log('   Booking ID:', bookingId);
       console.log('   Total Amount:', totalPrice);
       console.log('   Service:', service.name);
 
       // Prepare payment data for CCAvenue
       const paymentData = {
-        bookingId: bookingId,
         mobileNumber: formData.contactNumber,
         documentType: selectedDocumentType?.documentType || 'Document Upload',
         formId: 'UPLOAD', // Special formId for uploaded documents
@@ -657,23 +653,23 @@ const DocumentUpload = () => {
       const loadingOverlay = document.createElement('div');
       loadingOverlay.id = 'ccavenue-loading';
       loadingOverlay.innerHTML = `
-        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
-                    background: rgba(0,0,0,0.7); display: flex; align-items: center; 
-                    justify-content: center; z-index: 9999;">
-          <div style="background: white; padding: 2rem; border-radius: 0.5rem; text-align: center;">
-            <div style="width: 50px; height: 50px; border: 3px solid #f3f3f3; 
-                        border-top: 3px solid #dc2626; border-radius: 50%; 
-                        animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
-            <p style="color: #374151; font-size: 1rem;">Redirecting to payment gateway...</p>
-          </div>
+      <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+                  background: rgba(0,0,0,0.7); display: flex; align-items: center; 
+                  justify-content: center; z-index: 9999;">
+        <div style="background: white; padding: 2rem; border-radius: 0.5rem; text-align: center;">
+          <div style="width: 50px; height: 50px; border: 3px solid #f3f3f3; 
+                      border-top: 3px solid #dc2626; border-radius: 50%; 
+                      animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+          <p style="color: #374151; font-size: 1rem;">Redirecting to payment gateway...</p>
         </div>
-        <style>
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        </style>
-      `;
+      </div>
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    `;
       document.body.appendChild(loadingOverlay);
 
       // Call backend to initiate CCAvenue payment
