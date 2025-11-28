@@ -4,6 +4,7 @@ const EstampPayment = require('../model/eStampPaymentSchema');
 const BookingIdRegistry = require('../model/documentsModel/bookingId');
 const orderModel = require('../model/order/order');
 require('dotenv').config();
+const ccAvenueConfig = require("../config/ccAvanueConfig")
 
 async function generateBookingId() {
     const prefix = "DM";
