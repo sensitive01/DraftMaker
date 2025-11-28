@@ -337,6 +337,7 @@ const documentUpdateHandlers = {
 // Initiate CCAvenue Payment
 const initiateCCAVENUEPayment = async (req, res) => {
     try {
+        console.log("initialize the cc avanue for the documents")
         const {
             bookingId,
             documentDetails,
@@ -357,7 +358,7 @@ const initiateCCAVENUEPayment = async (req, res) => {
         } = req.body;
 
         // Generate a unique order ID
-        const orderId = `ORDER_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+        const orderId = `ORDER_${bookingId}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
         // Create order in database
         const order = new orderModel({
@@ -429,6 +430,7 @@ const initiateCCAVENUEPayment = async (req, res) => {
 // Handle CCAvenue Response
 const handleCCAVENUEResponse = async (req, res) => {
     try {
+        console.log("handle payment confirmation")
         const { encResp } = req.body;
         if (!encResp) {
             return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=invalid_response`);
