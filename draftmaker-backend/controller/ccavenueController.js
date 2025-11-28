@@ -512,7 +512,7 @@ const handleCCAVENUEResponse = async (req, res) => {
                             data: {
                                 ...order.paymentDetails,
                                 paymentId: order.transactionId,
-                                status: 'completed',
+                                status: 'success',
                                 bookingId,
                                 formId,
                                 amount: order.amount,
