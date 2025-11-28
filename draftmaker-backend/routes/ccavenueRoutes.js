@@ -32,7 +32,7 @@ paymentRouter.post('/initiate-payment', cors(), initiatePayment);
 paymentRouter.post('/response', ccAvenueCors, handleResponse);
 
 // CCAvenue Payment Routes documents
-paymentRouter.post('/initiate-ccavenue', ccAvanueController.initiateCCAVENUEPayment);
+paymentRouter.post('/initiate-ccavenue-payment', ccAvanueController.initiateCCAVENUEPayment);
 paymentRouter.post('/ccavenue/response', ccAvanueController.handleCCAVENUEResponse);
 paymentRouter.get('/ccavenue/response', ccAvanueController.handleCCAVENUEResponse);
 

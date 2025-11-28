@@ -369,7 +369,7 @@ const DocumentPaymentPage = () => {
       };
 
       // Call your backend API to initiate payment
-      const response = await fetch(`${import.meta.env.VITE_BASE_ROUTE}/payment/initiate-ccavenue`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_ROUTE}/payment/initiate-ccavenue-payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
