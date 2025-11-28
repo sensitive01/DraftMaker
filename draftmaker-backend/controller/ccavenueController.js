@@ -463,10 +463,7 @@ const handleCCAVENUEResponse = async (req, res) => {
             return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=invalid_response`);
         }
 
-        // USE THE SAME CCAvenue CLASS
         const ccavenue = new CCAvenue(process.env.CCAVENUE_WORKING_KEY);
-
-        // Decrypt the response
         const decryptedResponse = ccavenue.decrypt(encResp);
 
         const responseObj = Object.fromEntries(
@@ -478,13 +475,14 @@ const handleCCAVENUEResponse = async (req, res) => {
 
         console.log('📊 Decrypted document payment response:', responseObj);
 
-        // Find the order
         const order = await orderModel.findOne({ orderId: responseObj.order_id });
         if (!order) {
             return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=order_not_found`);
         }
 
-        // Update order status based on response
+        // Declare bookingId in the outer scope
+        let bookingId;
+
         if (responseObj.order_status === 'Success') {
             order.status = 'COMPLETED';
             order.paymentStatus = 'SUCCESS';
@@ -492,7 +490,7 @@ const handleCCAVENUEResponse = async (req, res) => {
             order.paymentResponse = responseObj;
 
             const formId = responseObj.merchant_param1;
-            let bookingId = responseObj.merchant_param2;
+            bookingId = responseObj.merchant_param2; // Assign to outer scope variable
 
             if (!bookingId) {
                 console.error('Booking ID is missing for successful payment');
@@ -503,10 +501,26 @@ const handleCCAVENUEResponse = async (req, res) => {
                 );
             }
 
-            // Find and call the appropriate update function
             const handler = documentUpdateHandlers[formId];
             if (handler && handler.updateFn && documentController[handler.updateFn]) {
                 try {
+                    // Create a mock response object with required methods
+                    const mockRes = {
+                        json: (data) => {
+                            console.log('Payment update response:', data);
+                            return data;
+                        },
+                        status: (code) => {
+                            console.log(`Status code: ${code}`);
+                            return {
+                                json: (data) => {
+                                    console.log(`Response (${code}):`, data);
+                                    return data;
+                                }
+                            };
+                        }
+                    };
+
                     await documentController[handler.updateFn]({
                         body: {
                             data: {
@@ -527,10 +541,12 @@ const handleCCAVENUEResponse = async (req, res) => {
                                 deliveryAddress: order.paymentDetails.deliveryAddress
                             }
                         }
-                    }, { json: () => { } });
+                    }, mockRes); // Pass the mock response object
+
                     console.log(`✅ Document data updated for ${formId}`);
                 } catch (updateError) {
                     console.error('❌ Error updating document data:', updateError);
+                    // Continue with the flow even if update fails
                 }
             }
         } else {
@@ -542,7 +558,7 @@ const handleCCAVENUEResponse = async (req, res) => {
         await order.save();
 
         // Redirect based on payment status
-        if (order.paymentStatus === 'SUCCESS') {
+        if (order.paymentStatus === 'SUCCESS' && bookingId) {
             return res.redirect(
                 `${process.env.FRONTEND_URL}/payment-success?` +
                 `orderId=${encodeURIComponent(order.orderId)}` +
