@@ -750,10 +750,12 @@ const handleUploadResponse = async (req, res) => {
                 }
             };
 
+            const documentData = uploadPayload
+
             console.log('📤 Sending document data to API...');
-            await axios.post(
+            const isuploading = await axios.post(
                 `${process.env.BACKEND_URL}/documents/upload-document-data`,
-                uploadPayload,
+                documentData,
                 { 
                     headers: { 
                         "Content-Type": "application/json" 
@@ -762,7 +764,7 @@ const handleUploadResponse = async (req, res) => {
                 }
             );
 
-            console.log('✅ Document data saved successfully');
+            console.log('✅ Document data saved successfully',isuploading);
             return res.redirect(
                 `${process.env.FRONTEND_URL}/payment-success?` +
                 `orderId=${encodeURIComponent(orderId)}&` +

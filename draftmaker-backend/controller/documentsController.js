@@ -3416,9 +3416,10 @@ const uploadDocumentData = async (req, res) => {
       delivery,
       payment,
       emailAddress,
+      bookingId
     } = req.body.documentData;
 
-    const bookingId = await generateBookingId();
+    // const bookingId = await generateBookingId();
 
     const newUpload = new uploadDocument({
       userName: username,
