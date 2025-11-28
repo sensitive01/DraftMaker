@@ -46,7 +46,7 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    console.warn('⚠️  Blocked by CORS:', origin);
+
     return callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: true,
@@ -72,13 +72,7 @@ app.use(cors(corsOptions));
 
 // Log CORS and request info for debugging
 app.use((req, res, next) => {
-  console.log('\n🌐 Incoming Request:', {
-    method: req.method,
-    path: req.path,
-    origin: req.headers.origin,
-    'user-agent': req.headers['user-agent'],
-    'content-type': req.headers['content-type']
-  });
+  
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
