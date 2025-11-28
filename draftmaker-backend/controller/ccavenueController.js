@@ -669,8 +669,8 @@ const handleUploadResponse = async (req, res) => {
         console.log('╚════════════════════════════════════════╝\n');
 
         // Extract encrypted response
-        let encResponse = req.body.encResp || req.body.encResponse || 
-                         (req.rawBody ? new URLSearchParams(req.rawBody.toString()).get('encResp') : null);
+        let encResponse = req.body.encResp || req.body.encResponse ||
+            (req.rawBody ? new URLSearchParams(req.rawBody.toString()).get('encResp') : null);
 
         if (!encResponse) {
             console.error('❌ No encrypted response found');
@@ -716,13 +716,43 @@ const handleUploadResponse = async (req, res) => {
 
         // For successful payments
         try {
-            // Retrieve stored frontend data
+            // Retrieve stored frontend data with enhanced error handling
             let paymentData = {};
             try {
-                paymentData = JSON.parse(responseParams.merchant_param2 || '{}');
+                const merchantParam = responseParams.merchant_param2 || '{}';
+                console.log('Raw merchant_param2:', merchantParam);
+
+                // Handle case where merchant_param2 might be URL-encoded
+                let decodedParam = merchantParam;
+                try {
+                    // Try to URL decode if it's encoded
+                    decodedParam = decodeURIComponent(merchantParam);
+                } catch (e) {
+                    console.log('Not a URL-encoded string, using as is');
+                }
+
+                console.log('Decoded merchant_param2:', decodedParam);
+
+                // Handle case where the string might be wrapped in quotes
+                if (decodedParam.startsWith('"') && decodedParam.endsWith('"')) {
+                    decodedParam = decodedParam.slice(1, -1);
+                }
+
+                paymentData = JSON.parse(decodedParam);
+                console.log('Parsed payment data:', JSON.stringify(paymentData, null, 2));
             } catch (e) {
-                console.error('❌ Error parsing merchant_param2:', e);
-                throw new Error('Invalid payment data');
+                console.error('❌ Error parsing merchant_param2:', e.message);
+                console.error('Raw merchant_param2 value:', responseParams.merchant_param2);
+                // Create a minimal paymentData object with default values
+                paymentData = {
+                    fullName: 'Customer',
+                    mobileNumber: '',
+                    documentType: 'UPLOAD',
+                    emailAddress: responseParams.billing_email || '',
+                    totalAmount: responseParams.amount || '0',
+                    uploadedDocuments: []
+                };
+                console.log('Using default payment data due to parse error');
             }
 
             // Generate booking ID
@@ -756,15 +786,15 @@ const handleUploadResponse = async (req, res) => {
             const isuploading = await axios.post(
                 `${process.env.BACKEND_URL}/documents/upload-document-data`,
                 documentData,
-                { 
-                    headers: { 
-                        "Content-Type": "application/json" 
+                {
+                    headers: {
+                        "Content-Type": "application/json"
                     },
                     timeout: 10000 // 10 second timeout
                 }
             );
 
-            console.log('✅ Document data saved successfully',isuploading);
+            console.log('✅ Document data saved successfully', isuploading);
             return res.redirect(
                 `${process.env.FRONTEND_URL}/payment-success?` +
                 `orderId=${encodeURIComponent(orderId)}&` +
