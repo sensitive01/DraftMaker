@@ -1,8 +1,27 @@
 const CCAvenue = require('../utils/ccAvanue');
 const EstampPayment = require('../model/eStampPaymentSchema');
-
 const BookingIdRegistry = require('../model/documentsModel/bookingId');
 const orderModel = require('../model/order/order');
+
+// Import all the required update functions
+const { updateDualNamePaymentData, saveDualNameCorrection } = require('./documentsController/dualNameCorrectionController');
+const { saveNameCorrectionPaymentData, saveNameCorrection } = require('./documentsController/nameCorrectionController');
+const { saveDobCorrectionPaymentData, createDobCorrection } = require('./documentsController/dobCorrectionController');
+const { saveGasCorrectionPaymentData, createGasCorrection } = require('./documentsController/gasCorrectionController');
+const { saveDocumentLostPaymentData, createDocumentLost } = require('./documentsController/documentLostController');
+const { saveDobParentNameCorrection, createDobParentNameCorrection } = require('./documentsController/dobParentNameCorrectionController');
+const { saveBirthCertificateNameCorrection, createBirthCertificateNameCorrection } = require('./documentsController/birthCertificateNameCorrectionController');
+const { saveGstPaymentData, saveGstData } = require('./documentsController/gstController');
+const { updateMetriculationLostPaymentData, createMetriculationLostData } = require('./documentsController/metriculationLostController');
+const { updateKhataCorrectionPaymentData, createKhataCorrectionData } = require('./documentsController/khataCorrectionController');
+const { updateVehicleInsurencePaymentData, createVehicleInsurenceData } = require('./documentsController/vehicleInsurenceController');
+const { updateHufPaymentData, createHufData } = require('./documentsController/hufController');
+const { updateGapPeriodPaymentData, createGapPeriodData } = require('./documentsController/gapPeriodController');
+const { updatePasswordAnnaxurePaymentData, createPasswordAnnaxureData } = require('./documentsController/passwordAnnaxureController');
+const { updatePassportNameChangePaymentData, createPassportNameChangeData } = require('./documentsController/passportNameChangeController');
+const { updateAdressAffadavitPaymentData, createAdressAffadavitData } = require('./documentsController/addressAffidavitController');
+const { updateCommercialPaymentData, createCommercialData } = require('./documentsController/commercialController');
+const { updateRecidentialPaymentData, createRecidentialData } = require('./documentsController/residentialController');
 require('dotenv').config();
 const ccAvenueConfig = require("../config/ccAvanueConfig")
 
@@ -491,7 +510,16 @@ const handleCCAVENUEResponse = async (req, res) => {
             order.paymentResponse = responseObj;
 
             const formId = responseObj.merchant_param1;
-            const bookingId = responseObj.merchant_param2;
+            let bookingId = responseObj.merchant_param2;
+
+            if (!bookingId) {
+                console.error('Booking ID is missing for successful payment');
+                return res.redirect(
+                    `${process.env.FRONTEND_URL}/payment-failed?` +
+                    `orderId=${encodeURIComponent(order.orderId)}` +
+                    `&reason=missing_booking_id`
+                );
+            }
 
             // Find and call the appropriate update function
             const handler = documentUpdateHandlers[formId];
