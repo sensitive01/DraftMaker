@@ -23,6 +23,7 @@ import {
 } from "../../api/service/axiosService";
 import SuccessNotification from "../documents/serviceNotification/SuccessNotification";
 import UploadDocumentUi from "./UploadDocumentUi";
+import { uploadCloudinary } from "../../utils/uploadCloudinary";
 
 const DocumentUpload = () => {
   const [formData, setFormData] = useState({
@@ -463,59 +464,63 @@ const DocumentUpload = () => {
     return URL.createObjectURL(file);
   };
 
-  const handleFileSelect = (e) => {
+  const handleFileSelect = async (e) => {
     const selectedFiles = Array.from(e.target.files);
-    const validFiles = [];
-    const rejectedFiles = [];
 
-    selectedFiles.forEach((file) => {
-      let isValid = true;
-      let reason = "";
-
-      if (file.size > MAX_FILE_SIZE) {
-        isValid = false;
-        reason = `File too large (${(file.size / 1024 / 1024).toFixed(
-          2
-        )}MB > 10MB)`;
-      } else if (!isValidFileType(file) && !isValidFileExtension(file.name)) {
-        isValid = false;
-        reason = "Invalid file type. Only images and PDF files are allowed.";
-      }
-
-      if (isValid) {
-        validFiles.push(file);
-      } else {
-        rejectedFiles.push({ name: file.name, reason });
-      }
-    });
-
-    if (rejectedFiles.length > 0) {
-      const rejectionMessage = rejectedFiles
-        ?.map((f) => `${f.name}: ${f.reason}`)
-        .join("\n");
-      alert(`Some files were rejected:\n\n${rejectionMessage}`);
+    // Validate file count
+    if (files.length + selectedFiles.length > 10) {
+      setErrors(prev => ({
+        ...prev,
+        files: "You can upload a maximum of 10 files"
+      }));
+      return;
     }
 
-    const newFiles = validFiles?.map((file) => ({
-      id: Date.now() + Math.random(),
-      file,
-      status: "pending",
-      cloudinaryUrl: null,
-      previewUrl: createFilePreviewUrl(file),
-      progress: 0,
-      error: null,
+    // Reset file error if any
+    if (errors.files) {
+      setErrors(prev => ({ ...prev, files: "" }));
+    }
+
+    // Process each file
+    const newFiles = await Promise.all(selectedFiles.map(async (file) => {
+      const fileId = Math.random().toString(36).substr(2, 9);
+      const previewUrl = URL.createObjectURL(file);
+
+      // Set initial file state
+      const newFile = {
+        id: fileId,
+        file,
+        previewUrl,
+        status: "uploading",
+        progress: 0,
+        error: null,
+        cloudinaryUrl: null
+      };
+
+      try {
+        // Upload to Cloudinary
+        const result = await uploadCloudinary(file, selectedDocumentType?.documentType || 'documents');
+        console.log('File uploaded to Cloudinary:', result.url);
+
+        return {
+          ...newFile,
+          status: "uploaded",
+          progress: 100,
+          cloudinaryUrl: result.url
+        };
+      } catch (error) {
+        console.error('Error uploading file to Cloudinary:', error);
+        return {
+          ...newFile,
+          status: "error",
+          error: error.message || "Failed to upload file"
+        };
+      }
     }));
 
-    setFiles((prev) => [...prev, ...newFiles]);
-
-    if (errors.files) {
-      setErrors((prev) => ({
-        ...prev,
-        files: "",
-      }));
-    }
-
-    e.target.value = "";
+    // Update state with new files
+    setFiles(prev => [...prev, ...newFiles]);
+    e.target.value = ""; // Reset file input
   };
 
   const removeFile = (fileId) => {
