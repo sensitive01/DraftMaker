@@ -5,7 +5,7 @@ module.exports = {
     merchantId: process.env.CCAVENUE_MERCHANT_ID,
     workingKey: process.env.CCAVENUE_WORKING_KEY,
     accessCode: process.env.CCAVENUE_ACCESS_CODE,
-    redirectUrl: `${process.env.BASE_URL}/api/documents/payment/ccavenue/response`,
+    redirectUrl: `${process.env.BASE_URL}/payment/ccavenue/response`,
     cancelUrl: `${process.env.BASE_URL}/payment-failed`,
 
     encrypt: function (plainText) {

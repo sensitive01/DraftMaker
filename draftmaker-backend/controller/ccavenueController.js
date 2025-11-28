@@ -335,10 +335,22 @@ const documentUpdateHandlers = {
     'DM-RFD-18': { updateFn: 'updateRecidentialPaymentData', saveFn: 'createRecidentialData' }
 };
 
-// Initiate CCAvenue Payment
+// Replace the initiateCCAVENUEPayment function
 const initiateCCAVENUEPayment = async (req, res) => {
     try {
-        console.log("initialize the cc avanue for the documents")
+        console.log("initialize the cc avenue for the documents");
+
+        // VERIFY WORKING KEY
+        if (!process.env.CCAVENUE_WORKING_KEY) {
+            return res.status(500).json({
+                success: false,
+                message: 'CCAvenue Working Key is not configured'
+            });
+        }
+
+        // USE THE SAME CCAvenue CLASS AS E-STAMP
+        const ccavenue = new CCAvenue(process.env.CCAVENUE_WORKING_KEY);
+
         const {
             bookingId,
             documentDetails,
@@ -386,36 +398,49 @@ const initiateCCAVENUEPayment = async (req, res) => {
 
         await order.save();
 
-        // Prepare CCAvenue request parameters
+        // Prepare CCAvenue request parameters (SAME AS E-STAMP)
         const params = {
-            merchant_id: ccAvenueConfig.merchantId,
+            merchant_id: process.env.CCAVENUE_MERCHANT_ID,
             order_id: orderId,
             currency: 'INR',
             amount: totalAmount.toString(),
             redirect_url: `${process.env.BACKEND_URL}/payment/ccavenue/response`,
             cancel_url: `${process.env.BACKEND_URL}/payment/ccavenue/response`,
             language: 'EN',
+
             billing_name: userName || 'Customer',
             billing_tel: mobileNumber,
             billing_email: emailAddress || 'customer@example.com',
-            merchant_param1: formId, // Store formId to identify document type in response
+            billing_address: deliveryAddress?.addressLine1 || 'NA',
+            billing_city: deliveryAddress?.city || 'NA',
+            billing_state: deliveryAddress?.state || 'NA',
+            billing_zip: deliveryAddress?.pincode || '000000',
+            billing_country: 'India',
+
+            merchant_param1: formId,
             merchant_param2: bookingId,
         };
 
-        // Create form data string
-        const formDataStr = Object.entries(params)
-            .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-            .join('&');
+        // Build parameter string (SAME METHOD AS E-STAMP)
+        const queryParams = [];
+        for (const [key, value] of Object.entries(params)) {
+            if (value !== undefined && value !== null && value !== '') {
+                queryParams.push(`${key}=${encodeURIComponent(value)}`);
+            }
+        }
+        const paramString = queryParams.join('&');
 
-        // Encrypt the form data
-        const encRequest = ccAvenueConfig.encrypt(formDataStr);
+        // Encrypt using the same method as E-stamp
+        const encRequest = ccavenue.encrypt(paramString);
+
+        console.log('✅ Document payment initiation successful');
 
         res.status(200).json({
             success: true,
             encRequest,
-            accessCode: ccAvenueConfig.accessCode,
+            accessCode: process.env.CCAVENUE_ACCESS_CODE,
             orderId,
-            redirectUrl: ccAvenueConfig.redirectUrl
+            bookingId
         });
 
     } catch (error) {
@@ -428,23 +453,29 @@ const initiateCCAVENUEPayment = async (req, res) => {
     }
 };
 
-// Handle CCAvenue Response
 const handleCCAVENUEResponse = async (req, res) => {
     try {
-        console.log("handle payment confirmation")
+        console.log("handle payment confirmation for documents");
+
         const { encResp } = req.body;
         if (!encResp) {
             return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=invalid_response`);
         }
 
+        // USE THE SAME CCAvenue CLASS
+        const ccavenue = new CCAvenue(process.env.CCAVENUE_WORKING_KEY);
+
         // Decrypt the response
-        const decryptedResponse = ccAvenueConfig.decrypt(encResp);
+        const decryptedResponse = ccavenue.decrypt(encResp);
+
         const responseObj = Object.fromEntries(
             decryptedResponse.split('&').map(pair => {
                 const [key, value] = pair.split('=');
-                return [key, decodeURIComponent(value)];
+                return [key, decodeURIComponent(value.replace(/\+/g, ' '))];
             })
         );
+
+        console.log('📊 Decrypted document payment response:', responseObj);
 
         // Find the order
         const order = await orderModel.findOne({ orderId: responseObj.order_id });
@@ -456,38 +487,41 @@ const handleCCAVENUEResponse = async (req, res) => {
         if (responseObj.order_status === 'Success') {
             order.status = 'COMPLETED';
             order.paymentStatus = 'SUCCESS';
-            order.transactionId = responseObj.bank_ref_no;
+            order.transactionId = responseObj.bank_ref_no || responseObj.tracking_id;
             order.paymentResponse = responseObj;
 
-            // Get the formId from merchant_param1
             const formId = responseObj.merchant_param1;
             const bookingId = responseObj.merchant_param2;
 
-            // Find the appropriate update function
+            // Find and call the appropriate update function
             const handler = documentUpdateHandlers[formId];
             if (handler && handler.updateFn) {
-                // Call the appropriate update function
-                await exports[handler.updateFn]({
-                    body: {
-                        data: {
-                            ...order.paymentDetails,
-                            paymentId: order.transactionId,
-                            status: 'completed',
-                            bookingId,
-                            formId,
-                            amount: order.amount,
-                            documentType: order.paymentDetails.documentType,
-                            serviceType: order.paymentDetails.serviceType,
-                            serviceName: order.paymentDetails.serviceName,
-                            includesNotary: order.paymentDetails.includesNotary,
-                            selectedStampDuty: order.paymentDetails.selectedStampDuty,
-                            selectedDeliveryCharge: order.paymentDetails.selectedDeliveryCharge,
-                            serviceDetails: order.paymentDetails.serviceDetails,
-                            emailAddress: order.paymentDetails.emailAddress,
-                            deliveryAddress: order.paymentDetails.deliveryAddress
+                try {
+                    await exports[handler.updateFn]({
+                        body: {
+                            data: {
+                                ...order.paymentDetails,
+                                paymentId: order.transactionId,
+                                status: 'completed',
+                                bookingId,
+                                formId,
+                                amount: order.amount,
+                                documentType: order.paymentDetails.documentType,
+                                serviceType: order.paymentDetails.serviceType,
+                                serviceName: order.paymentDetails.serviceName,
+                                includesNotary: order.paymentDetails.includesNotary,
+                                selectedStampDuty: order.paymentDetails.selectedStampDuty,
+                                selectedDeliveryCharge: order.paymentDetails.selectedDeliveryCharge,
+                                serviceDetails: order.paymentDetails.serviceDetails,
+                                emailAddress: order.paymentDetails.emailAddress,
+                                deliveryAddress: order.paymentDetails.deliveryAddress
+                            }
                         }
-                    }
-                }, { json: () => { } });
+                    }, { json: () => { } });
+                    console.log(`✅ Document data updated for ${formId}`);
+                } catch (updateError) {
+                    console.error('❌ Error updating document data:', updateError);
+                }
             }
         } else {
             order.status = 'FAILED';
@@ -497,11 +531,19 @@ const handleCCAVENUEResponse = async (req, res) => {
 
         await order.save();
 
-        // Redirect to success or failure page
+        // Redirect based on payment status
         if (order.paymentStatus === 'SUCCESS') {
-            return res.redirect(`${process.env.FRONTEND_URL}/payment-success?orderId=${order.orderId}`);
+            return res.redirect(
+                `${process.env.FRONTEND_URL}/payment-success?` +
+                `orderId=${encodeURIComponent(order.orderId)}` +
+                `&bookingId=${encodeURIComponent(bookingId)}`
+            );
         } else {
-            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?orderId=${order.orderId}&reason=${responseObj.failure_message || 'Payment failed'}`);
+            return res.redirect(
+                `${process.env.FRONTEND_URL}/payment-failed?` +
+                `orderId=${encodeURIComponent(order.orderId)}` +
+                `&reason=${encodeURIComponent(responseObj.failure_message || 'Payment failed')}`
+            );
         }
     } catch (error) {
         console.error('Error processing CCAvenue response:', error);
