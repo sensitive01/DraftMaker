@@ -3,6 +3,8 @@ const cors = require('cors');
 const paymentRouter = express.Router();
 const { initiatePayment, handleResponse } = require('../controller/ccavenueController');
 
+const ccAvanueController =require("../controller/ccavenueController")
+
 // Middleware to capture raw body for CCAvenue response
 const rawBodyMiddleware = (req, res, next) => {
     let data = '';
@@ -25,13 +27,15 @@ const ccAvenueCors = (req, res, next) => {
     next();
 };
 
-// Initiate payment (with CORS for your frontend)
-paymentRouter.post('/initiate-payment', cors(), initiatePayment);
 
-// Handle CCAvenue response - special CORS handling for CCAvenue's server
+paymentRouter.post('/initiate-payment', cors(), initiatePayment);
 paymentRouter.post('/response', ccAvenueCors, handleResponse);
 
-// Add a GET handler for browser redirects (if any)
+// CCAvenue Payment Routes documents
+paymentRouter.post('/initiate-ccavenue', ccAvanueController.initiateCCAVENUEPayment);
+paymentRouter.post('/ccavenue/response', ccAvanueController.handleCCAVENUEResponse);
+paymentRouter.get('/ccavenue/response', ccAvanueController.handleCCAVENUEResponse);
+
 paymentRouter.get('/response', (req, res) => {
     res.redirect(process.env.FRONTEND_URL || 'https://draftmaker.in');
 });

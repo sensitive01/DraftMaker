@@ -296,272 +296,15 @@ const DocumentPaymentPage = () => {
 
     return true;
   };
+  // Replace the existing Razorpay integration with this CCAvenue implementation
 
-  // Razorpay Integration Functions
-  const initializeRazorpay = async (service, totalPrice) => {
-    try {
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: totalPrice * 100,
-        currency: "INR",
-        name: "Draft Maker",
-        description: `${documentDetails.documentType} - ${service.name}`,
-        handler: function (response) {
-          console.log("razorpay response", response);
-          handlePaymentSuccess({
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-            bookingId: bookingId,
-            mobileNumber: mobileNumber,
-            documentType: documentDetails.documentType,
-            fullName: formData?.fullName || userName,
-            serviceType: service.id,
-            serviceName: service.name,
-            amount: totalPrice,
-            includesNotary: service.hasNotary && includeNotary, // MODIFIED: Check both conditions
-            userName: userName,
-            emailAddress: emailAddress, // Include email in payment data
-            // Additional selected service details
-            selectedStampDuty: selectedStampDuty,
-            selectedDeliveryCharge: selectedDeliveryCharge,
-            serviceDetails: {
-              basePrice: service.price,
-              notaryCharge:
-                service.hasNotary && includeNotary ? service.notaryCharge : 0, // MODIFIED
-              stampDutyAmount: selectedStampDuty
-                ? calculateStampDutyAmount(selectedStampDuty)
-                : 0,
-              deliveryCharge: selectedDeliveryCharge
-                ? selectedDeliveryCharge.charge
-                : 0,
-              requiresStamp: service.requiresStamp,
-              requiresDelivery: service.requiresDelivery,
-              deliveryAddress: selectedService?.requiresDelivery
-                ? JSON.stringify(deliveryAddress)
-                : null,
-              considerationAmount: considerationAmount,
-              quantity: quantity,
-              serviceCharge: SERVICE_CHARGE_PER_DOCUMENT * quantity,
-            },
-          });
-        },
-        prefill: {
-          name: userName,
-          contact: mobileNumber,
-          email: emailAddress, // Prefill email if provided
-        },
-        notes: {
-          bookingId: bookingId,
-          serviceType: service.id,
-          serviceName: service.name,
-          stampDutyId: selectedStampDuty?._id || null,
-          deliveryChargeId: selectedDeliveryCharge?._id || null,
-          documentType: documentDetails.documentType,
-          emailAddress: emailAddress,
-          includesNotary: includeNotary, // NEW: Include notary state
-        },
-        theme: {
-          color: "#dc2626",
-        },
-        modal: {
-          ondismiss: function () {
-            console.log("Checkout form closed");
-          },
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-
-      razorpay.on("payment.failed", function (response) {
-        fetch("/api/payment-failed", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            error: response.error,
-            bookingId: bookingId,
-            mobileNumber: mobileNumber,
-            serviceType: service.id,
-            serviceName: service.name,
-            userName: userName,
-            emailAddress: emailAddress,
-            status: "failed",
-            selectedStampDuty: selectedStampDuty,
-            selectedDeliveryCharge: selectedDeliveryCharge,
-            includesNotary: includeNotary, // NEW
-          }),
-        }).catch((error) => {
-          console.error("Error logging payment failure:", error);
-        });
-
-        console.error("Payment failed:", response.error);
-        alert(`Payment failed: ${response.error.description}`);
-      });
-    } catch (error) {
-      console.error("Error in Razorpay initialization:", error);
-      alert("Payment initialization failed. Please try again.");
-    }
-  };
-
-  const handlePaymentSuccess = async (paymentData) => {
-    try {
-      const paymentConfirmationData = {
-        paymentId: paymentData.razorpay_payment_id,
-        orderId: paymentData.razorpay_order_id,
-        signature: paymentData.razorpay_signature,
-        bookingId: paymentData.bookingId,
-        mobileNumber: paymentData.mobileNumber,
-        documentType: documentDetails.documentType,
-        fullName: formData?.fullName || userName,
-        serviceType: paymentData.serviceType,
-        serviceName: paymentData.serviceName,
-        amount: paymentData.amount,
-        includesNotary: paymentData.includesNotary,
-        status: "success",
-        userName: userName,
-        emailAddress: paymentData.emailAddress, // Include email
-        // Additional service details
-        selectedStampDuty: paymentData.selectedStampDuty,
-        selectedDeliveryCharge: paymentData.selectedDeliveryCharge,
-        serviceDetails: paymentData.serviceDetails,
-        deliveryAddress: selectedService?.requiresDelivery
-          ? deliveryAddress
-          : null,
-        considerationAmount: considerationAmount,
-        quantity: quantity,
-      };
-      let confirmationResponse;
-
-      if (formId === "DM-DNC-1") {
-        confirmationResponse = await createDualNameChangePaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId == "DM-NC-2") {
-        confirmationResponse = await createNameChangePaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-DOBC-3") {
-        confirmationResponse = await createDobCorrectionPaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-GAS-5") {
-        confirmationResponse = await createGassAffadavitPaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-DOC-LOST-5") {
-        confirmationResponse = await createDocumentLostPaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-BCNCP-6") {
-        confirmationResponse = await createDobParentNameCorrectionPaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-BC-MNC-7") {
-        confirmationResponse = await birthCerticateNameCorrectionPaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-GST-8") {
-        confirmationResponse = await gstPaymentData(paymentConfirmationData);
-      }
-      if (formId === "DM-MAL-9") {
-        confirmationResponse = await createMetriculationLostPaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-KH-10") {
-        confirmationResponse = await updateKhataCorrectionPaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-VIC-11") {
-        confirmationResponse = await createVehicleInsurencePaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-HUF-12") {
-        confirmationResponse = await createHufPaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-GP-13") {
-        confirmationResponse = await createGapPeriodPaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-PAF-14") {
-        confirmationResponse = await createPasswordAnnaxurePaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-PNC-15") {
-        confirmationResponse = await createPassportnameChangePaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-AAF-16") {
-        confirmationResponse = await createAddressAffadavitPaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-CFD-17") {
-        confirmationResponse = await createCommercialPaymentData(
-          paymentConfirmationData
-        );
-      }
-      if (formId === "DM-RFD-18") {
-        confirmationResponse = await createRecidentailPaymentData(
-          paymentConfirmationData
-        );
-      }
-
-      if (confirmationResponse.status === 200) {
-        const { bookingId, formId } = confirmationResponse.data.data;
-        setShowSuccessNotification(true);
-        setSuccessNotification(confirmationResponse.data.message);
-
-        if (formId === "DM-PNC-15") {
-          setShowNameChangePopup(true);
-        } else {
-          setTimeout(() => {
-            // window.location.href = `/documents/name/name-correction`;
-            window.location.href = `/documents/preview-page/${formId}/${bookingId}`;
-          }, 1500);
-        }
-      } else {
-        const errorData = confirmationResponse.data.data;
-        throw new Error(errorData.message || "Failed to confirm payment");
-      }
-    } catch (error) {
-      console.error("Error confirming payment:", error);
-      setErrorMessage(true);
-      setShowErrorNotification(
-        error.response.data.message || "Failed to confirm payment"
-      );
-    }
-  };
-
-  const handlePayment = async () => {
+  const handleCCAVENUEPayment = async () => {
     if (!canProceedToPayment()) {
-      let errorMessage =
-        "Please complete all required selections before proceeding to payment.";
+      let errorMessage = "Please complete all required selections before proceeding to payment.";
 
       if (!isImportantNoticeAccepted) {
-        errorMessage =
-          "Please read and accept the important terms & conditions";
-      } else if (
-        selectedService?.requiresEmail &&
-        (!emailAddress || !isValidEmail(emailAddress))
-      ) {
+        errorMessage = "Please read and accept the important terms & conditions";
+      } else if (selectedService?.requiresEmail && (!emailAddress || !isValidEmail(emailAddress))) {
         errorMessage = "Please enter a valid email address to continue.";
       }
 
@@ -570,30 +313,118 @@ const DocumentPaymentPage = () => {
     }
 
     try {
+      // Show loading state
+      const loadingDiv = document.createElement('div');
+      loadingDiv.id = 'payment-loading';
+      loadingDiv.innerHTML = `
+      <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+        <div style="background: white; padding: 2rem; border-radius: 0.5rem; text-align: center; max-width: 400px;">
+          <div style="border: 4px solid #f3f4f6; border-top: 4px solid #dc2626; border-radius: 50%; width: 3rem; height: 3rem; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+          <p style="margin-top: 1rem; color: #374151; font-weight: 500;">Initializing payment...</p>
+          <p style="margin-top: 0.5rem; color: #6b7280; font-size: 0.875rem;">Please wait, do not refresh</p>
+        </div>
+      </div>
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    `;
+      document.body.appendChild(loadingDiv);
+
       const totalPrice = calculateTotalAmount();
 
-      if (!window.Razorpay) {
-        const script = document.createElement("script");
-        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      // Prepare payment data
+      const paymentData = {
+        bookingId,
+        documentDetails,
+        formData,
+        formId,
+        mobileNumber,
+        userName,
+        selectedService,
+        selectedStampDuty,
+        selectedDeliveryCharge,
+        emailAddress,
+        includeNotary,
+        deliveryAddress,
+        quantity: quantity || 1,
+        considerationAmount,
+        totalAmount: totalPrice,
+        paymentMethod: "ccavenue",
+        currency: "INR",
+        serviceDetails: {
+          basePrice: selectedService.price,
+          notaryCharge: selectedService.hasNotary && includeNotary ? selectedService.notaryCharge : 0,
+          stampDutyAmount: selectedStampDuty ? calculateStampDutyAmount(selectedStampDuty) : 0,
+          deliveryCharge: selectedDeliveryCharge ? selectedDeliveryCharge.charge : 0,
+          requiresStamp: selectedService.requiresStamp,
+          requiresDelivery: selectedService.requiresDelivery,
+          deliveryAddress: selectedService.requiresDelivery ? JSON.stringify(deliveryAddress) : null,
+          considerationAmount: considerationAmount,
+          quantity: quantity,
+          serviceCharge: SERVICE_CHARGE_PER_DOCUMENT * quantity,
+        }
+      };
 
-        script.onload = () => {
-          initializeRazorpay(selectedService, totalPrice);
-        };
+      // Call your backend API to initiate payment
+      const response = await fetch(`${import.meta.env.VITE_BASE_ROUTE}/payment/initiate-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(paymentData),
+      });
 
-        script.onerror = () => {
-          console.error("Razorpay SDK failed to load");
-          alert("Payment gateway failed to load. Please try again later.");
-        };
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-        document.body.appendChild(script);
+      const data = await response.json();
+
+      if (data.success) {
+        // Create and submit form to CCAvenue
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.enctype = "application/x-www-form-urlencoded";
+        form.action = "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
+
+        // Add encrypted request
+        const encRequestInput = document.createElement("input");
+        encRequestInput.type = "hidden";
+        encRequestInput.name = "encRequest";
+        encRequestInput.value = data.encRequest;
+        form.appendChild(encRequestInput);
+
+        // Add access code
+        const accessCodeInput = document.createElement("input");
+        accessCodeInput.type = "hidden";
+        accessCodeInput.name = "access_code";
+        accessCodeInput.value = data.accessCode;
+        form.appendChild(accessCodeInput);
+
+        // Submit the form
+        document.body.appendChild(form);
+        form.submit();
       } else {
-        initializeRazorpay(selectedService, totalPrice);
+        throw new Error(data.message || 'Failed to initiate payment');
       }
     } catch (error) {
-      console.error("Error initializing payment:", error);
-      alert("Payment initialization failed. Please try again.");
+      console.error('Payment Error:', error);
+      // Remove loading
+      const loadingDiv = document.getElementById('payment-loading');
+      if (loadingDiv) {
+        document.body.removeChild(loadingDiv);
+      }
+      // Show error to user
+      setErrorMessage(error.message || 'Failed to process payment. Please try again.');
+      setShowErrorNotification(true);
     }
   };
+
+
+
 
   const goBack = () => {
     navigate(-1);
@@ -876,11 +707,10 @@ const DocumentPaymentPage = () => {
                 <button
                   key={service.id}
                   onClick={() => handlePackageSelect(service)}
-                  className={`bg-white border-2 ${
-                    selectedService?.id === service.id
-                      ? "border-red-500 ring-2 ring-red-100 shadow-md"
-                      : "border-gray-200 hover:border-red-300 hover:shadow-sm"
-                  } rounded-lg p-4 flex flex-col text-left transition-all duration-200 group relative`}
+                  className={`bg-white border-2 ${selectedService?.id === service.id
+                    ? "border-red-500 ring-2 ring-red-100 shadow-md"
+                    : "border-gray-200 hover:border-red-300 hover:shadow-sm"
+                    } rounded-lg p-4 flex flex-col text-left transition-all duration-200 group relative`}
                 >
                   {selectedService?.id === service.id && (
                     <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full p-1 shadow-md">
@@ -961,8 +791,8 @@ const DocumentPaymentPage = () => {
                           <span className="font-medium text-gray-800">
                             {selectedStampDuty
                               ? `₹${calculateStampDutyAmount(
-                                  selectedStampDuty
-                                )}`
+                                selectedStampDuty
+                              )}`
                               : "Select below"}
                           </span>
                         </div>
@@ -1076,11 +906,10 @@ const DocumentPaymentPage = () => {
                     type="email"
                     value={emailAddress}
                     onChange={(e) => setEmailAddress(e.target.value)}
-                    className={`w-full px-3 py-2 border-2 ${
-                      emailAddress && !isValidEmail(emailAddress)
-                        ? "border-red-300 focus:border-red-500 focus:ring-red-100"
-                        : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
-                    } rounded-md focus:ring-2 transition-all text-sm`}
+                    className={`w-full px-3 py-2 border-2 ${emailAddress && !isValidEmail(emailAddress)
+                      ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                      : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
+                      } rounded-md focus:ring-2 transition-all text-sm`}
                     placeholder="your.email@example.com"
                   />
                   {emailAddress && !isValidEmail(emailAddress) && (
@@ -1406,7 +1235,7 @@ const DocumentPaymentPage = () => {
 
               {canProceedToPayment() ? (
                 <button
-                  onClick={handlePayment}
+                  onClick={handleCCAVENUEPayment}
                   className="px-6 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors flex items-center font-medium text-base shadow-md hover:shadow-lg"
                 >
                   <svg
@@ -1430,11 +1259,11 @@ const DocumentPaymentPage = () => {
                   {!selectedService
                     ? "Please select a service package to continue"
                     : !isImportantNoticeAccepted
-                    ? "Please read and accept the important notice"
-                    : selectedService.requiresEmail &&
-                      (!emailAddress || !isValidEmail(emailAddress))
-                    ? "Please enter a valid email address"
-                    : "Please complete all required selections"}
+                      ? "Please read and accept the important notice"
+                      : selectedService.requiresEmail &&
+                        (!emailAddress || !isValidEmail(emailAddress))
+                        ? "Please enter a valid email address"
+                        : "Please complete all required selections"}
                 </div>
               )}
             </div>

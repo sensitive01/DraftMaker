@@ -1,6 +1,8 @@
 const CCAvenue = require('../utils/ccAvanue');
 const EstampPayment = require('../model/eStampPaymentSchema');
+
 const BookingIdRegistry = require('../model/documentsModel/bookingId');
+const orderModel = require('../model/order/order');
 require('dotenv').config();
 
 async function generateBookingId() {
@@ -309,7 +311,204 @@ const handleResponse = async (req, res) => {
     }
 };
 
+
+// Map formId to the corresponding update function
+const documentUpdateHandlers = {
+    'DM-DNC-1': { updateFn: 'updateDualNamePaymentData', saveFn: 'saveDualNameCorrection' },
+    'DM-NC-2': { updateFn: 'saveNameCorrectionPaymentData', saveFn: 'saveNameCorrection' },
+    'DM-DOBC-3': { updateFn: 'saveDobCorrectionPaymentData', saveFn: 'createDobCorrection' },
+    'DM-GAS-5': { updateFn: 'saveGasCorrectionPaymentData', saveFn: 'createGasCorrection' },
+    'DM-DOC-LOST-5': { updateFn: 'saveDocumentLostPaymentData', saveFn: 'createDocumentLost' },
+    'DM-BCNCP-6': { updateFn: 'saveDobParentNameCorrection', saveFn: 'createDobParentNameCorrection' },
+    'DM-BC-MNC-7': { updateFn: 'saveBirthCertificateNameCorrection', saveFn: 'createBirthCertificateNameCorrection' },
+    'DM-GST-8': { updateFn: 'saveGstPaymentData', saveFn: 'saveGstData' },
+    'DM-MAL-9': { updateFn: 'updateMetriculationLostPaymentData', saveFn: 'createMetriculationLostData' },
+    'DM-KH-10': { updateFn: 'updateKhataCorrectionPaymentData', saveFn: 'createKhataCorrectionData' },
+    'DM-VIC-11': { updateFn: 'updateVehicleInsurencePaymentData', saveFn: 'createVehicleInsurenceData' },
+    'DM-HUF-12': { updateFn: 'updateHufPaymentData', saveFn: 'createHufData' },
+    'DM-GP-13': { updateFn: 'updateGapPeriodPaymentData', saveFn: 'createGapPeriodData' },
+    'DM-PAF-14': { updateFn: 'updatePasswordAnnaxurePaymentData', saveFn: 'createPasswordAnnaxureData' },
+    'DM-PNC-15': { updateFn: 'updatePassportNameChangePaymentData', saveFn: 'createPassportNameChangeData' },
+    'DM-AAF-16': { updateFn: 'updateAdressAffadavitPaymentData', saveFn: 'createAdressAffadavitData' },
+    'DM-CFD-17': { updateFn: 'updateCommercialPaymentData', saveFn: 'createCommercialData' },
+    'DM-RFD-18': { updateFn: 'updateRecidentialPaymentData', saveFn: 'createRecidentialData' }
+};
+
+// Initiate CCAvenue Payment
+const initiateCCAVENUEPayment = async (req, res) => {
+    try {
+        const {
+            bookingId,
+            documentDetails,
+            formData,
+            formId,
+            mobileNumber,
+            userName,
+            selectedService,
+            selectedStampDuty,
+            selectedDeliveryCharge,
+            emailAddress,
+            includeNotary,
+            deliveryAddress,
+            quantity = 1,
+            considerationAmount,
+            totalAmount,
+            serviceDetails
+        } = req.body;
+
+        // Generate a unique order ID
+        const orderId = `ORDER_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
+        // Create order in database
+        const order = new orderModel({
+            orderId,
+            bookingId,
+            formId,
+            amount: totalAmount,
+            currency: 'INR',
+            paymentMethod: 'ccavenue',
+            status: 'PENDING',
+            paymentStatus: 'PENDING',
+            paymentDetails: {
+                documentType: documentDetails?.documentType,
+                serviceType: selectedService?.serviceType,
+                serviceName: selectedService?.name,
+                includesNotary: includeNotary || false,
+                selectedStampDuty,
+                selectedDeliveryCharge,
+                serviceDetails,
+                emailAddress,
+                deliveryAddress
+            }
+        });
+
+        await order.save();
+
+        // Prepare CCAvenue request parameters
+        const params = {
+            merchant_id: ccAvenueConfig.merchantId,
+            order_id: orderId,
+            currency: 'INR',
+            amount: totalAmount.toString(),
+            redirect_url: ccAvenueConfig.redirectUrl,
+            cancel_url: ccAvenueConfig.cancelUrl,
+            language: 'EN',
+            billing_name: userName || 'Customer',
+            billing_tel: mobileNumber,
+            billing_email: emailAddress || 'customer@example.com',
+            merchant_param1: formId, // Store formId to identify document type in response
+            merchant_param2: bookingId,
+        };
+
+        // Create form data string
+        const formDataStr = Object.entries(params)
+            .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+            .join('&');
+
+        // Encrypt the form data
+        const encRequest = ccAvenueConfig.encrypt(formDataStr);
+
+        res.status(200).json({
+            success: true,
+            encRequest,
+            accessCode: ccAvenueConfig.accessCode,
+            orderId,
+            redirectUrl: ccAvenueConfig.redirectUrl
+        });
+
+    } catch (error) {
+        console.error('Error initiating CCAvenue payment:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to initiate payment',
+            error: error.message
+        });
+    }
+};
+
+// Handle CCAvenue Response
+const handleCCAVENUEResponse = async (req, res) => {
+    try {
+        const { encResp } = req.body;
+        if (!encResp) {
+            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=invalid_response`);
+        }
+
+        // Decrypt the response
+        const decryptedResponse = ccAvenueConfig.decrypt(encResp);
+        const responseObj = Object.fromEntries(
+            decryptedResponse.split('&').map(pair => {
+                const [key, value] = pair.split('=');
+                return [key, decodeURIComponent(value)];
+            })
+        );
+
+        // Find the order
+        const order = await orderModel.findOne({ orderId: responseObj.order_id });
+        if (!order) {
+            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=order_not_found`);
+        }
+
+        // Update order status based on response
+        if (responseObj.order_status === 'Success') {
+            order.status = 'COMPLETED';
+            order.paymentStatus = 'SUCCESS';
+            order.transactionId = responseObj.bank_ref_no;
+            order.paymentResponse = responseObj;
+
+            // Get the formId from merchant_param1
+            const formId = responseObj.merchant_param1;
+            const bookingId = responseObj.merchant_param2;
+
+            // Find the appropriate update function
+            const handler = documentUpdateHandlers[formId];
+            if (handler && handler.updateFn) {
+                // Call the appropriate update function
+                await exports[handler.updateFn]({
+                    body: {
+                        data: {
+                            ...order.paymentDetails,
+                            paymentId: order.transactionId,
+                            status: 'completed',
+                            bookingId,
+                            formId,
+                            amount: order.amount,
+                            documentType: order.paymentDetails.documentType,
+                            serviceType: order.paymentDetails.serviceType,
+                            serviceName: order.paymentDetails.serviceName,
+                            includesNotary: order.paymentDetails.includesNotary,
+                            selectedStampDuty: order.paymentDetails.selectedStampDuty,
+                            selectedDeliveryCharge: order.paymentDetails.selectedDeliveryCharge,
+                            serviceDetails: order.paymentDetails.serviceDetails,
+                            emailAddress: order.paymentDetails.emailAddress,
+                            deliveryAddress: order.paymentDetails.deliveryAddress
+                        }
+                    }
+                }, { json: () => { } });
+            }
+        } else {
+            order.status = 'FAILED';
+            order.paymentStatus = 'FAILED';
+            order.paymentResponse = responseObj;
+        }
+
+        await order.save();
+
+        // Redirect to success or failure page
+        if (order.paymentStatus === 'SUCCESS') {
+            return res.redirect(`${process.env.FRONTEND_URL}/payment-success?orderId=${order.orderId}`);
+        } else {
+            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?orderId=${order.orderId}&reason=${responseObj.failure_message || 'Payment failed'}`);
+        }
+    } catch (error) {
+        console.error('Error processing CCAvenue response:', error);
+        res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=processing_error`);
+    }
+};
+
 module.exports = {
     initiatePayment,
-    handleResponse
+    handleResponse,
+    handleCCAVENUEResponse,
+    initiateCCAVENUEPayment
 };

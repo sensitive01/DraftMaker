@@ -22,6 +22,10 @@ const eStampPaymentData = require("../model/eStampPaymentSchema");
 const uploadDocument = require("../model/upload/uploadDocument");
 const BookingIdRegistry = require("../model/documentsModel/bookingId");
 
+const ccAvenueConfig = require('../config/ccAvanueConfig');
+const Order = require('../model/order/order');
+const { v4: uuidv4 } = require('uuid');
+
 const sendEmail = require("../utils/sendEmail");
 
 const getDocumentNameData = async (req, res) => {
@@ -3760,6 +3764,14 @@ const deleteUploadingBookingData = async (req, res) => {
       .json({ success: false, message: "Internal Server Error" });
   }
 };
+
+
+
+
+
+
+
+
 
 module.exports = {
   deleteUploadingBookingData,
