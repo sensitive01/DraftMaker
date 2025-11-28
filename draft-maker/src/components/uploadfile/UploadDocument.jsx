@@ -595,18 +595,15 @@ const DocumentUpload = () => {
     return updatedFiles;
   };
 
-  // ✅✅✅ CCAvenue Integration - REPLACES RAZORPAY ✅✅✅
   const initiateCCAvenuePayment = async (service, totalPrice, uploadedDocuments) => {
     try {
       console.log('\n🔵 Initiating CCAvenue payment for document upload...');
-      console.log('   Total Amount:', totalPrice);
-      console.log('   Service:', service.name);
 
-      // Prepare payment data for CCAvenue
       const paymentData = {
+        bookingId: null, // <-- FRONTEND NEVER GENERATES IT
         mobileNumber: formData.contactNumber,
-        documentType: selectedDocumentType?.documentType || 'Document Upload',
-        formId: 'UPLOAD', // Special formId for uploaded documents
+        documentType: selectedDocumentType?.documentType || "Document Upload",
+        formId: "UPLOAD",
         fullName: formData.userName,
         userName: formData.userName,
         serviceType: service.id,
@@ -616,119 +613,67 @@ const DocumentUpload = () => {
         notaryCharge: service.hasNotary && includeNotary ? service.notaryCharge : 0,
         emailAddress: emailAddress,
 
-        // Stamp duty details
-        selectedStampDutyId: selectedStampDuty?._id || null,
-        stampDutyDocumentType: selectedStampDuty?.documentType || null,
-        stampDutyCalculationType: selectedStampDuty?.calculationType || null,
+        selectedStampDutyId: selectedStampDuty?._id,
+        stampDutyDocumentType: selectedStampDuty?.documentType,
+        stampDutyCalculationType: selectedStampDuty?.calculationType,
         stampDutyAmount: selectedStampDuty ? calculateStampDutyAmount(selectedStampDuty) : 0,
         considerationAmount: parseFloat(considerationAmount) || 0,
         quantity: quantity,
         serviceCharge: getServiceChargePerDocument() * quantity,
 
-        // Delivery details
-        selectedDeliveryServiceId: selectedDeliveryCharge?._id || null,
-        deliveryServiceName: selectedDeliveryCharge?.serviceName || null,
+        selectedDeliveryServiceId: selectedDeliveryCharge?._id,
+        deliveryServiceName: selectedDeliveryCharge?.serviceName,
         deliveryCharge: selectedDeliveryCharge?.charge || 0,
-        deliveryDescription: selectedDeliveryCharge?.description || null,
+        deliveryDescription: selectedDeliveryCharge?.description,
         deliveryAddress: selectedService?.requiresDelivery ? deliveryAddress : null,
 
-        // Total amount
         totalAmount: totalPrice,
         orderDate: new Date().toISOString(),
-        paymentMethod: 'ccavenue',
-        currency: 'INR',
+        paymentMethod: "ccavenue",
+        currency: "INR",
 
-        // Store uploaded documents info
-        uploadedDocuments: uploadedDocuments?.map(file => ({
+        uploadedDocuments: uploadedDocuments?.map((file) => ({
           url: file.cloudinaryUrl,
           fileName: file.file.name,
           fileType: file.file.type,
-          fileSize: file.file.size
-        }))
+          fileSize: file.file.size,
+        })),
       };
 
-      console.log('📦 Payment Data:', paymentData);
+      console.log("📦 Payment Data:", paymentData);
 
-      // Show loading overlay
-      const loadingOverlay = document.createElement('div');
-      loadingOverlay.id = 'ccavenue-loading';
-      loadingOverlay.innerHTML = `
-      <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
-                  background: rgba(0,0,0,0.7); display: flex; align-items: center; 
-                  justify-content: center; z-index: 9999;">
-        <div style="background: white; padding: 2rem; border-radius: 0.5rem; text-align: center;">
-          <div style="width: 50px; height: 50px; border: 3px solid #f3f3f3; 
-                      border-top: 3px solid #dc2626; border-radius: 50%; 
-                      animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
-          <p style="color: #374151; font-size: 1rem;">Redirecting to payment gateway...</p>
-        </div>
-      </div>
-      <style>
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      </style>
-    `;
-      document.body.appendChild(loadingOverlay);
-
-      // Call backend to initiate CCAvenue payment
       const response = await fetch(
         `${import.meta.env.VITE_BASE_ROUTE}/payment/initiate-upload-payment`,
         {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(paymentData),
         }
       );
 
       const data = await response.json();
+      if (!data.success) throw new Error(data.message);
 
-      console.log('🔐 CCAvenue Response:', data);
+      // Submit form to CCAvenue
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action =
+        "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
 
-      if (!data.success) {
-        throw new Error(data.message || 'Failed to initiate payment');
-      }
-
-      // Remove loading overlay
-      document.body.removeChild(loadingOverlay);
-
-      // Create and submit CCAvenue form
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = 'https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction';
-
-      const encRequestInput = document.createElement('input');
-      encRequestInput.type = 'hidden';
-      encRequestInput.name = 'encRequest';
-      encRequestInput.value = data.encRequest;
-      form.appendChild(encRequestInput);
-
-      const accessCodeInput = document.createElement('input');
-      accessCodeInput.type = 'hidden';
-      accessCodeInput.name = 'access_code';
-      accessCodeInput.value = data.accessCode;
-      form.appendChild(accessCodeInput);
+      form.innerHTML = `
+      <input type="hidden" name="encRequest" value="${data.encRequest}" />
+      <input type="hidden" name="access_code" value="${data.accessCode}" />
+    `;
 
       document.body.appendChild(form);
-      console.log('✅ Submitting to CCAvenue...');
       form.submit();
 
     } catch (error) {
-      console.error('❌ Error in CCAvenue initialization:', error);
-
-      // Remove loading overlay if present
-      const loadingOverlay = document.getElementById('ccavenue-loading');
-      if (loadingOverlay) {
-        document.body.removeChild(loadingOverlay);
-      }
-
-      alert('Payment initialization failed: ' + error.message);
-      setSubmitting(false);
+      console.error("❌ CCAvenue init error:", error);
+      alert("Payment failed: " + error.message);
     }
   };
+
 
   // Main submit handler - UPDATED for CCAvenue
   const handleSubmit = async () => {

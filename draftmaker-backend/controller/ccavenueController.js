@@ -586,7 +586,6 @@ const initiateUploadPayment = async (req, res) => {
         console.log('╚════════════════════════════════════════╝\n');
 
         if (!process.env.CCAVENUE_WORKING_KEY) {
-            console.error('❌ CCAVENUE_WORKING_KEY is not set!');
             return res.status(500).json({
                 success: false,
                 message: 'CCAvenue Working Key is not configured'
@@ -597,74 +596,37 @@ const initiateUploadPayment = async (req, res) => {
         const paymentData = req.body;
 
         console.log('\n📦 Upload Payment Details:');
-        console.log('   Booking ID:', paymentData.bookingId);
         console.log('   Amount:', paymentData.totalAmount);
         console.log('   Document Type:', paymentData.documentType);
 
-        const orderId = `UPLOAD_${paymentData.bookingId}_${Date.now()}`;
+        // ❌ REMOVE bookingId
+        // ❌ DO NOT use bookingId in orderId
 
+        const orderId = `UPLOAD_${Date.now()}`;
         console.log('\n🔢 Generated Order ID:', orderId);
 
-        // Prepare CCAvenue parameters
+        // Prepare CCAvenue parameters (NO BOOKING ID)
         const ccavenueParams = {
             merchant_id: process.env.CCAVENUE_MERCHANT_ID,
             order_id: orderId,
             currency: 'INR',
             amount: parseFloat(paymentData.totalAmount).toFixed(2),
             redirect_url: `${process.env.BACKEND_URL}/payment/ccavenue-response-upload`,
-            cancel_url: `${process.env.BACKEND_URL}/payment/ccavenue-cancel-upload`,
+            cancel_url: `${process.env.BACKEND_URL}/payment/ccavenue-response-upload`,
             language: 'EN',
 
-            billing_name: paymentData.fullName || 'Customer',
-            billing_tel: paymentData.mobileNumber || '0000000000',
+            billing_name: paymentData.fullName,
+            billing_tel: paymentData.mobileNumber,
             billing_email: paymentData.emailAddress || 'noreply@example.com',
-            billing_address: paymentData.deliveryAddress?.addressLine1 || 'NA',
-            billing_city: paymentData.deliveryAddress?.city || 'NA',
-            billing_state: paymentData.deliveryAddress?.state || 'NA',
-            billing_zip: paymentData.deliveryAddress?.pincode || '000000',
-            billing_country: 'India',
 
-            delivery_name: paymentData.fullName || 'Customer',
-            delivery_address: paymentData.deliveryAddress?.addressLine1 || 'NA',
-            delivery_city: paymentData.deliveryAddress?.city || 'NA',
-            delivery_state: paymentData.deliveryAddress?.state || 'NA',
-            delivery_zip: paymentData.deliveryAddress?.pincode || '000000',
-            delivery_country: 'India',
-            delivery_tel: paymentData.mobileNumber || '0000000000',
-
-            // Store all payment data in merchant params
-            merchant_param1: paymentData.bookingId,
-            merchant_param2: 'UPLOAD', // Special identifier
-            merchant_param3: JSON.stringify({
-                documentType: paymentData.documentType,
-                serviceName: paymentData.serviceName,
-                serviceType: paymentData.serviceType,
-                emailAddress: paymentData.emailAddress,
-                basePrice: paymentData.basePrice,
-                includesNotary: paymentData.includesNotary,
-                notaryCharge: paymentData.notaryCharge
-            }),
-            merchant_param4: JSON.stringify({
-                selectedStampDutyId: paymentData.selectedStampDutyId,
-                stampDutyDocumentType: paymentData.stampDutyDocumentType,
-                stampDutyCalculationType: paymentData.stampDutyCalculationType,
-                stampDutyAmount: paymentData.stampDutyAmount,
-                considerationAmount: paymentData.considerationAmount,
-                quantity: paymentData.quantity,
-                serviceCharge: paymentData.serviceCharge
-            }),
-            merchant_param5: JSON.stringify({
-                selectedDeliveryServiceId: paymentData.selectedDeliveryServiceId,
-                deliveryServiceName: paymentData.deliveryServiceName,
-                deliveryCharge: paymentData.deliveryCharge,
-                deliveryAddress: paymentData.deliveryAddress,
-                uploadedDocuments: paymentData.uploadedDocuments
-            })
+            // Important: Store entire data safely in merchant params
+            merchant_param1: 'UPLOAD_DOCS',
+            merchant_param2: JSON.stringify(paymentData),  // Save all document info
         };
 
         console.log('\n🔐 CCAvenue Parameters prepared');
 
-        // Build parameter string
+        // Build & encrypt parameter string
         const queryParams = [];
         for (const [key, value] of Object.entries(ccavenueParams)) {
             if (value !== undefined && value !== null && value !== '') {
@@ -678,17 +640,16 @@ const initiateUploadPayment = async (req, res) => {
 
         console.log('✅ Upload payment initiation successful\n');
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             encRequest: encryptedData,
             accessCode: process.env.CCAVENUE_ACCESS_CODE,
-            orderId: orderId,
-            bookingId: paymentData.bookingId
+            orderId: orderId
         });
 
     } catch (error) {
         console.error('\n❌ ERROR in initiateUploadPayment:', error.message);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Failed to initiate upload payment',
             error: error.message
@@ -696,7 +657,7 @@ const initiateUploadPayment = async (req, res) => {
     }
 };
 
-// Function 2: Handle Upload Payment Response
+
 const handleUploadResponse = async (req, res) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Content-Type, *');
@@ -707,181 +668,82 @@ const handleUploadResponse = async (req, res) => {
         console.log('║   CCAvenue Upload Response Handler    ║');
         console.log('╚════════════════════════════════════════╝\n');
 
-        // Get encrypted response
-        let encResponse;
-        if (req.rawBody) {
-            const rawBody = req.rawBody.toString();
-            try {
-                const params = new URLSearchParams(rawBody);
-                encResponse = params.get('encResp') || params.get('encResponse') || params.get('enc_request');
-            } catch (e) {
-                console.log('Error parsing raw body:', e);
-            }
-        }
+        // Extract encrypted response
+        let encResponse = req.body.encResp || req.body.encResponse;
 
         if (!encResponse) {
-            encResponse =
-                (req.body && (req.body.encResp || req.body.encResponse || req.body.enc_request)) ||
-                (req.query && (req.query.encResp || req.query.encResponse || req.query.enc_request));
-        }
-
-        if (!encResponse) {
-            console.error('❌ No encrypted response data found');
-            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=No payment response`);
+            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=Missing encrypted response`);
         }
 
         const ccavenue = new CCAvenue(process.env.CCAVENUE_WORKING_KEY);
+        const decrypted = ccavenue.decrypt(encResponse);
 
-        console.log('🔐 Decrypting response...');
-        let decryptedData;
-        try {
-            decryptedData = ccavenue.decrypt(encResponse);
-            console.log('✅ Response decrypted successfully');
-        } catch (decryptError) {
-            console.error('❌ Decryption failed:', decryptError);
-            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=Invalid payment response`);
-        }
-
-        // Parse the decrypted data
+        // Convert decrypted string to object
         const responseParams = {};
-        try {
-            decryptedData.split('&').forEach(param => {
-                const [key, value] = param.split('=');
-                if (key) {
-                    responseParams[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
-                }
-            });
-            console.log('📊 Response params parsed');
-        } catch (parseError) {
-            console.error('❌ Failed to parse response:', parseError);
-            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=Failed to process payment response`);
-        }
+        decrypted.split('&').forEach(pair => {
+            const [key, value] = pair.split('=');
+            responseParams[key] = decodeURIComponent(value || '');
+        });
 
-        const orderId = responseParams.order_id;
         const orderStatus = responseParams.order_status;
-        const trackingId = responseParams.tracking_id || 'N/A';
-        const bookingId = responseParams.merchant_param1;
 
-        // Parse merchant params back
-        let serviceData = {};
-        let stampDutyData = {};
-        let deliveryData = {};
-        try {
-            if (responseParams.merchant_param3) {
-                serviceData = JSON.parse(responseParams.merchant_param3);
-            }
-            if (responseParams.merchant_param4) {
-                stampDutyData = JSON.parse(responseParams.merchant_param4);
-            }
-            if (responseParams.merchant_param5) {
-                deliveryData = JSON.parse(responseParams.merchant_param5);
-            }
-        } catch (e) {
-            console.error('Error parsing merchant params:', e);
-        }
+        // Retrieve stored frontend data
+        const paymentData = JSON.parse(responseParams.merchant_param2 || '{}');
 
-        console.log(`📋 Payment Details:`, { orderId, bookingId, orderStatus });
+        // ⭐⭐⭐ GENERATE bookingId HERE
+        const bookingId = await generateBookingId();
 
-        if (orderStatus === 'Success') {
-            console.log(`✅ Upload payment successful for order: ${orderId}`);
-
-            // ✅✅✅ CALL YOUR EXISTING uploadDocumentData ENDPOINT ✅✅✅
-            try {
-                const uploadPayload = {
-                    documentData: {
-                        username: responseParams.billing_name,
-                        userMobile: responseParams.billing_tel,
-                        documentType: serviceData.documentType,
-                        formId: 'UPLOAD',
-                        documents: deliveryData.uploadedDocuments?.map(doc => doc.url) || [],
-                        totalDocuments: deliveryData.uploadedDocuments?.length || 0,
-                        submittedAt: new Date().toISOString(),
-                        emailAddress: serviceData.emailAddress,
-
-                        selectedService: {
-                            serviceId: serviceData.serviceType,
-                            serviceName: serviceData.serviceName,
-                            basePrice: serviceData.basePrice,
-                            hasNotary: serviceData.includesNotary,
-                            notaryCharge: serviceData.notaryCharge,
-                            includeNotary: serviceData.includesNotary
-                        },
-
-                        stampDuty: stampDutyData.selectedStampDutyId ? {
-                            stampDutyId: stampDutyData.selectedStampDutyId,
-                            documentType: stampDutyData.stampDutyDocumentType,
-                            calculationType: stampDutyData.stampDutyCalculationType,
-                            calculatedAmount: stampDutyData.stampDutyAmount,
-                            quantity: stampDutyData.quantity,
-                            considerationAmount: stampDutyData.considerationAmount,
-                            serviceCharge: stampDutyData.serviceCharge
-                        } : null,
-
-                        delivery: deliveryData.selectedDeliveryServiceId ? {
-                            deliveryChargeId: deliveryData.selectedDeliveryServiceId,
-                            serviceName: deliveryData.deliveryServiceName,
-                            charge: deliveryData.deliveryCharge,
-                            address: deliveryData.deliveryAddress
-                        } : null,
-
-                        payment: {
-                            totalAmount: parseFloat(responseParams.amount),
-                            paymentId: trackingId,
-                            orderId: orderId,
-                            signature: responseParams.bank_ref_no,
-                            paymentStatus: 'completed',
-                            paymentDate: new Date(),
-                            paymentMode: responseParams.payment_mode
-                        }
-                    }
-                };
-
-                console.log('🔄 Calling /documents/upload-document-data endpoint...');
-
-                const uploadResponse = await axios.post(
-                    `${process.env.BACKEND_URL}/documents/upload-document-data`,
-                    uploadPayload,
-                    { headers: { 'Content-Type': 'application/json' } }
-                );
-
-                console.log('✅ Document upload data saved successfully');
-
-                // Redirect to success page
-                return res.redirect(
-                    `${process.env.FRONTEND_URL}/upload-success?` +
-                    `bookingId=${encodeURIComponent(bookingId)}` +
-                    `&orderId=${encodeURIComponent(orderId)}` +
-                    `&trackingId=${encodeURIComponent(trackingId)}`
-                );
-
-            } catch (uploadError) {
-                console.error('❌ Error calling upload endpoint:', uploadError.message);
-                // Payment was successful but upload failed - redirect with warning
-                return res.redirect(
-                    `${process.env.FRONTEND_URL}/payment-success-pending?` +
-                    `orderId=${encodeURIComponent(orderId)}` +
-                    `&message=Payment successful but processing pending`
-                );
-            }
-
-        } else {
-            // Payment failed
-            console.log(`❌ Upload payment failed for order: ${orderId}`);
+        if (orderStatus !== 'Success') {
             return res.redirect(
-                `${process.env.FRONTEND_URL}/payment-failed?` +
-                `orderId=${encodeURIComponent(orderId)}` +
-                `&message=${encodeURIComponent(responseParams.failure_message || 'Payment failed')}`
+                `${process.env.FRONTEND_URL}/payment-failed?message=${encodeURIComponent('Payment failed')}`
             );
         }
 
-    } catch (error) {
-        console.error('❌ Unhandled error in upload response handler:', error);
+        // Prepare payload for saving document
+        const uploadPayload = {
+            documentData: {
+                username: paymentData.fullName,
+                userMobile: paymentData.mobileNumber,
+                documentType: paymentData.documentType,
+                formId: 'UPLOAD',
+
+                documents: paymentData.uploadedDocuments || [],
+                totalDocuments: paymentData.uploadedDocuments?.length || 0,
+                submittedAt: new Date(),
+                emailAddress: paymentData.emailAddress,
+
+                bookingId,
+                payment: {
+                    orderId: responseParams.order_id,
+                    paymentId: responseParams.tracking_id,
+                    totalAmount: paymentData.totalAmount,
+                    paymentStatus: "completed",
+                    paymentDate: new Date(),
+                }
+            }
+        };
+
+        console.log("Uploading document data...");
+
+        await axios.post(
+            `${process.env.BACKEND_URL}/documents/upload-document-data`,
+            uploadPayload,
+            { headers: { "Content-Type": "application/json" } }
+        );
+
+        // Redirect to success
         return res.redirect(
-            `${process.env.FRONTEND_URL}/payment-failed?` +
-            `error=${encodeURIComponent(error.message || 'An unexpected error occurred')}`
+            `${process.env.FRONTEND_URL}/upload-success?bookingId=${bookingId}`
+        );
+
+    } catch (error) {
+        console.error("ERROR:", error);
+        return res.redirect(
+            `${process.env.FRONTEND_URL}/payment-failed?error=${encodeURIComponent(error.message)}`
         );
     }
 };
+
 
 // Function 3: Handle Upload Payment Cancel
 const handleUploadCancel = async (req, res) => {
