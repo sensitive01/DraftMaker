@@ -209,7 +209,7 @@ const DocumentUpload = () => {
         hasNotary: (selectedDocumentType.draftNotaryCharge || 0) > 0,
         notaryCharge: selectedDocumentType.draftNotaryCharge || 0,
         requiresStamp: true,
-        requiresDelivery: true, // CHANGED: Now requires delivery (scan service)
+        requiresDelivery: true,
         requiresEmail: true,
       },
       {
@@ -250,36 +250,33 @@ const DocumentUpload = () => {
     return 0;
   };
 
-  // Calculate total amount - UPDATED to use dynamic service charge
-const calculateTotalAmount = () => {
-  if (!selectedService) return 0;
+  // Calculate total amount
+  const calculateTotalAmount = () => {
+    if (!selectedService) return 0;
 
-  const qty = parseInt(quantity) || 1; // Ensure quantity is a number
-  let total = 0;
+    const qty = parseInt(quantity) || 1;
+    let total = 0;
 
-  // Base service price multiplied by quantity
-  total += (selectedService.price || 0) * qty;
+    // Base service price multiplied by quantity
+    total += (selectedService.price || 0) * qty;
 
-  // Add notary charge multiplied by quantity (only if checkbox is checked AND service has notary)
-  if (selectedService.hasNotary && includeNotary) {
-    total += (selectedService.notaryCharge || 0) * qty;
-  }
+    // Add notary charge multiplied by quantity (only if checkbox is checked AND service has notary)
+    if (selectedService.hasNotary && includeNotary) {
+      total += (selectedService.notaryCharge || 0) * qty;
+    }
 
-  // Add stamp duty and service charge multiplied by quantity
-  if (selectedService.requiresStamp && selectedStampDuty) {
-    total += calculateStampDutyAmount(selectedStampDuty); // This already includes quantity
-  
-  }
+    // Add stamp duty and service charge multiplied by quantity
+    if (selectedService.requiresStamp && selectedStampDuty) {
+      total += calculateStampDutyAmount(selectedStampDuty);
+    }
 
-  // Delivery charge is NOT multiplied by quantity (single delivery regardless of quantity)
-  if (selectedService.requiresDelivery && selectedDeliveryCharge) {
-    total += selectedDeliveryCharge.charge || 0;
-  }
+    // Delivery charge is NOT multiplied by quantity
+    if (selectedService.requiresDelivery && selectedDeliveryCharge) {
+      total += selectedDeliveryCharge.charge || 0;
+    }
 
-  return total;
-};
-
-
+    return total;
+  };
 
   // Check if can proceed to payment
   const canProceedToPayment = () => {
@@ -300,9 +297,8 @@ const calculateTotalAmount = () => {
     if (selectedService.requiresDelivery && !selectedDeliveryCharge)
       return false;
 
-    // Check delivery address - UPDATED: Only for courier services
+    // Check delivery address
     if (selectedService.requiresDelivery && selectedDeliveryCharge) {
-      // Only require address for courier services, not scan-only services
       if (
         selectedDeliveryCharge.serviceType === "scan_courier" ||
         selectedDeliveryCharge.serviceType === "courier_only"
@@ -316,7 +312,7 @@ const calculateTotalAmount = () => {
       }
     }
 
-    // Validate consideration amount for percentage-based stamps ONLY if service requires stamp
+    // Validate consideration amount for percentage-based stamps
     if (
       selectedService.requiresStamp &&
       selectedStampDuty?.calculationType === "percentage" &&
@@ -353,7 +349,6 @@ const calculateTotalAmount = () => {
       newErrors.files = "Please upload at least one document";
     }
 
-    // Check email validation
     if (
       selectedService?.requiresEmail &&
       (!emailAddress || !isValidEmail(emailAddress))
@@ -395,7 +390,7 @@ const calculateTotalAmount = () => {
       setSelectedStampDuty(null);
       setSelectedService(null);
       setIncludeNotary(false);
-      setSelectedDeliveryCharge(null); // NEW: Clear delivery selection
+      setSelectedDeliveryCharge(null);
       return;
     }
 
@@ -405,7 +400,7 @@ const calculateTotalAmount = () => {
     setSelectedService(null);
     setSelectedStampDuty(null);
     setIncludeNotary(false);
-    setSelectedDeliveryCharge(null); // NEW: Clear delivery selection
+    setSelectedDeliveryCharge(null);
 
     if (errors.documentType) {
       setErrors((prev) => ({
@@ -418,10 +413,7 @@ const calculateTotalAmount = () => {
   const handleServiceSelect = (service) => {
     console.log("Service selected:", service);
     setSelectedService(service);
-
     setIncludeNotary(false);
-
-    // NEW: Clear delivery selection when service changes
     setSelectedDeliveryCharge(null);
 
     if (errors.service) {
@@ -603,224 +595,146 @@ const calculateTotalAmount = () => {
     return updatedFiles;
   };
 
-  // Razorpay integration - UPDATED to include dynamic service charge
-  const initializeRazorpay = async (service, totalPrice, uploadedDocuments) => {
+  // ✅✅✅ CCAvenue Integration - REPLACES RAZORPAY ✅✅✅
+  const initiateCCAvenuePayment = async (service, totalPrice, uploadedDocuments) => {
     try {
-      const bookingId = `DOC-${Date.now()}`;
+      const bookingId = `UPLOAD-${bookingId}_${Date.now()}`;
 
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: totalPrice * 100,
-        currency: "INR",
-        name: "Draft Maker",
-        description: `${selectedDocumentType?.documentType || "Document"} - ${
-          service.name
-        }`,
-        handler: function (response) {
-          console.log("razorpay response", response);
-          handlePaymentSuccess({
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-            bookingId: bookingId,
-            mobileNumber: formData.contactNumber,
-            documentType: selectedDocumentType?.documentType,
-            fullName: formData.userName,
-            serviceType: service.id,
-            serviceName: service.name,
-            amount: totalPrice,
-            includesNotary: service.hasNotary && includeNotary,
-            userName: formData.userName,
-            emailAddress: emailAddress,
-            uploadedDocuments: uploadedDocuments,
-            selectedStampDuty: selectedStampDuty,
-            selectedDeliveryCharge: selectedDeliveryCharge,
-            serviceDetails: {
-              basePrice: service.price,
-              notaryCharge:
-                service.hasNotary && includeNotary ? service.notaryCharge : 0,
-              stampDutyAmount: selectedStampDuty
-                ? calculateStampDutyAmount(selectedStampDuty)
-                : 0,
-              deliveryCharge: selectedDeliveryCharge
-                ? selectedDeliveryCharge.charge
-                : 0,
-              requiresStamp: service.requiresStamp,
-              requiresDelivery: service.requiresDelivery,
-              deliveryAddress: selectedService?.requiresDelivery
-                ? JSON.stringify(deliveryAddress)
-                : null,
-              considerationAmount: considerationAmount,
-              quantity: quantity,
-              emailAddress,
-              serviceCharge: getServiceChargePerDocument() * (quantity || 1), // Use dynamic service charge
-              includeNotary: includeNotary,
-            },
-          });
-        },
-        prefill: {
-          name: formData.userName || "",
-          contact: formData.contactNumber || "",
-          email: emailAddress,
-        },
-        notes: {
-          bookingId: bookingId,
-          serviceType: service.id,
-          serviceName: service.name,
-          stampDutyId: selectedStampDuty?._id || null,
-          deliveryChargeId: selectedDeliveryCharge?._id || null,
-          documentType: selectedDocumentType?.documentType,
-          emailAddress: emailAddress,
-          includeNotary: includeNotary,
-        },
-        theme: {
-          color: "#dc2626",
-        },
-        modal: {
-          ondismiss: function () {
-            console.log("Checkout form closed");
-          },
-        },
-      };
+      console.log('\n🔵 Initiating CCAvenue payment for document upload...');
+      console.log('   Booking ID:', bookingId);
+      console.log('   Total Amount:', totalPrice);
+      console.log('   Service:', service.name);
 
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-
-      razorpay.on("payment.failed", function (response) {
-        console.error("Payment failed:", response.error);
-        alert(
-          `Payment failed: ${response.error.description || "Unknown error"}`
-        );
-        setSubmitting(false);
-      });
-    } catch (error) {
-      console.error("Error in Razorpay initialization:", error);
-      alert("Payment initialization failed. Please try again.");
-      setSubmitting(false);
-    }
-  };
-
-  // Handle payment success - UPDATED to include dynamic service charge
-  const handlePaymentSuccess = async (paymentData) => {
-    try {
-      const paymentConfirmationData = {
-        paymentId: paymentData.razorpay_payment_id,
-        orderId: paymentData.razorpay_order_id,
-        signature: paymentData.razorpay_signature,
-        bookingId: paymentData.bookingId,
-        mobileNumber: paymentData.mobileNumber,
-        documentType: selectedDocumentType?.documentType,
-        formId: selectedDocumentType?.formId,
+      // Prepare payment data for CCAvenue
+      const paymentData = {
+        bookingId: bookingId,
+        mobileNumber: formData.contactNumber,
+        documentType: selectedDocumentType?.documentType || 'Document Upload',
+        formId: 'UPLOAD', // Special formId for uploaded documents
         fullName: formData.userName,
-        serviceType: paymentData.serviceType,
-        serviceName: paymentData.serviceName,
-        amount: paymentData.amount,
-        includesNotary: paymentData.includesNotary,
-        status: "success",
         userName: formData.userName,
-        emailAddress: paymentData.emailAddress,
-        uploadedDocuments: paymentData.uploadedDocuments,
-        selectedStampDuty: paymentData.selectedStampDuty,
-        selectedDeliveryCharge: paymentData.selectedDeliveryCharge,
-        serviceDetails: paymentData.serviceDetails,
-        deliveryAddress: selectedService?.requiresDelivery
-          ? deliveryAddress
-          : null,
-        considerationAmount: considerationAmount,
-        quantity: quantity,
-        documents: paymentData.uploadedDocuments?.map(
-          (file) => file.cloudinaryUrl
-        ),
-        totalDocuments: files.length,
-      };
-
-      // Fallback to original document submission - UPDATED with dynamic service charge
-      const documentUrls = paymentData?.uploadedDocuments?.map(
-        (file) => file.cloudinaryUrl
-      );
-      const submitData = {
-        username: formData.userName,
-        userMobile: formData.contactNumber,
-        documentType: selectedDocumentType?.documentType,
-        formId: selectedDocumentType?.formId,
-        documents: documentUrls,
-        totalDocuments: files.length,
+        serviceType: service.id,
+        serviceName: service.name,
+        basePrice: service.price,
+        includesNotary: service.hasNotary && includeNotary,
+        notaryCharge: service.hasNotary && includeNotary ? service.notaryCharge : 0,
         emailAddress: emailAddress,
-        selectedService: {
-          serviceId: selectedService.id,
-          serviceName: selectedService.name,
-          basePrice: selectedService.price,
-          hasNotary: selectedService.hasNotary,
-          notaryCharge: selectedService.notaryCharge,
-          requiresStamp: selectedService.requiresStamp,
-          requiresDelivery: selectedService.requiresDelivery,
-          requiresEmail: selectedService.requiresEmail,
-          includeNotary: includeNotary,
-        },
-        stampDuty: selectedStampDuty
-          ? {
-              stampDutyId: selectedStampDuty._id,
-              documentType: selectedStampDuty.documentType,
-              articleNo: selectedStampDuty.articleNo,
-              calculationType: selectedStampDuty.calculationType,
-              fixedAmount: selectedStampDuty.fixedAmount,
-              percentage: selectedStampDuty.percentage,
-              quantity: quantity,
-              considerationAmount: parseFloat(considerationAmount) || 0,
-              calculatedAmount: calculateStampDutyAmount(selectedStampDuty),
-              serviceCharge: getServiceChargePerDocument() * quantity, // Use dynamic service charge
-            }
-          : null,
-        delivery: selectedDeliveryCharge
-          ? {
-              deliveryChargeId: selectedDeliveryCharge._id,
-              serviceName: selectedDeliveryCharge.serviceName,
-              charge: selectedDeliveryCharge.charge,
-              address: deliveryAddress,
-            }
-          : null,
-        payment: {
-          totalAmount: paymentData.amount,
-          paymentId: paymentData.razorpay_payment_id,
-          orderId: paymentData.razorpay_order_id,
-          signature: paymentData.razorpay_signature,
-          paymentStatus: "completed",
-          paymentDate: new Date(),
-        },
-        bookingId: paymentData.bookingId,
-        submittedAt: new Date().toISOString(),
-        includeNotary: includeNotary,
+
+        // Stamp duty details
+        selectedStampDutyId: selectedStampDuty?._id || null,
+        stampDutyDocumentType: selectedStampDuty?.documentType || null,
+        stampDutyCalculationType: selectedStampDuty?.calculationType || null,
+        stampDutyAmount: selectedStampDuty ? calculateStampDutyAmount(selectedStampDuty) : 0,
+        considerationAmount: parseFloat(considerationAmount) || 0,
+        quantity: quantity,
+        serviceCharge: getServiceChargePerDocument() * quantity,
+
+        // Delivery details
+        selectedDeliveryServiceId: selectedDeliveryCharge?._id || null,
+        deliveryServiceName: selectedDeliveryCharge?.serviceName || null,
+        deliveryCharge: selectedDeliveryCharge?.charge || 0,
+        deliveryDescription: selectedDeliveryCharge?.description || null,
+        deliveryAddress: selectedService?.requiresDelivery ? deliveryAddress : null,
+
+        // Total amount
+        totalAmount: totalPrice,
+        orderDate: new Date().toISOString(),
+        paymentMethod: 'ccavenue',
+        currency: 'INR',
+
+        // Store uploaded documents info
+        uploadedDocuments: uploadedDocuments?.map(file => ({
+          url: file.cloudinaryUrl,
+          fileName: file.file.name,
+          fileType: file.file.type,
+          fileSize: file.file.size
+        }))
       };
 
-      const response = await sendDocumentsToBackend(submitData);
+      console.log('📦 Payment Data:', paymentData);
 
-      if (response.status === 201 || response.status === 200) {
-        setSuccess(true);
-        setSuccessMessage("Payment and document submission successful!");
+      // Show loading overlay
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.id = 'ccavenue-loading';
+      loadingOverlay.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+                    background: rgba(0,0,0,0.7); display: flex; align-items: center; 
+                    justify-content: center; z-index: 9999;">
+          <div style="background: white; padding: 2rem; border-radius: 0.5rem; text-align: center;">
+            <div style="width: 50px; height: 50px; border: 3px solid #f3f3f3; 
+                        border-top: 3px solid #dc2626; border-radius: 50%; 
+                        animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+            <p style="color: #374151; font-size: 1rem;">Redirecting to payment gateway...</p>
+          </div>
+        </div>
+        <style>
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        </style>
+      `;
+      document.body.appendChild(loadingOverlay);
 
-        // Reset form
-        setFormData({ userName: "", contactNumber: "" });
-        setFiles([]);
-        setSelectedDocumentType(null);
-        setSelectedService(null);
-        setEmailAddress("");
-        setIncludeNotary(false);
-
-        setTimeout(() => {
-          setSuccess(false);
-        }, 5000);
-      }
-    } catch (error) {
-      console.error("Error confirming payment:", error);
-      alert(
-        "Payment was processed but we couldn't update your booking. Our team will contact you shortly."
+      // Call backend to initiate CCAvenue payment
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/payment/initiate-upload-payment`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(paymentData),
+        }
       );
-    } finally {
+
+      const data = await response.json();
+
+      console.log('🔐 CCAvenue Response:', data);
+
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to initiate payment');
+      }
+
+      // Remove loading overlay
+      document.body.removeChild(loadingOverlay);
+
+      // Create and submit CCAvenue form
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction';
+
+      const encRequestInput = document.createElement('input');
+      encRequestInput.type = 'hidden';
+      encRequestInput.name = 'encRequest';
+      encRequestInput.value = data.encRequest;
+      form.appendChild(encRequestInput);
+
+      const accessCodeInput = document.createElement('input');
+      accessCodeInput.type = 'hidden';
+      accessCodeInput.name = 'access_code';
+      accessCodeInput.value = data.accessCode;
+      form.appendChild(accessCodeInput);
+
+      document.body.appendChild(form);
+      console.log('✅ Submitting to CCAvenue...');
+      form.submit();
+
+    } catch (error) {
+      console.error('❌ Error in CCAvenue initialization:', error);
+
+      // Remove loading overlay if present
+      const loadingOverlay = document.getElementById('ccavenue-loading');
+      if (loadingOverlay) {
+        document.body.removeChild(loadingOverlay);
+      }
+
+      alert('Payment initialization failed: ' + error.message);
       setSubmitting(false);
     }
   };
 
-  // Main submit handler
+  // Main submit handler - UPDATED for CCAvenue
   const handleSubmit = async () => {
     if (!validateForm()) {
       return;
@@ -861,25 +775,9 @@ const calculateTotalAmount = () => {
       // Calculate total price
       const totalPrice = calculateTotalAmount();
 
-      // Initialize Razorpay payment
-      if (!window.Razorpay) {
-        const script = document.createElement("script");
-        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      // ✅ Initiate CCAvenue payment (replaces Razorpay)
+      await initiateCCAvenuePayment(selectedService, totalPrice, uploadedFiles);
 
-        script.onload = () => {
-          initializeRazorpay(selectedService, totalPrice, uploadedFiles);
-        };
-
-        script.onerror = () => {
-          console.error("Razorpay SDK failed to load");
-          alert("Payment gateway failed to load. Please try again later.");
-          setSubmitting(false);
-        };
-
-        document.body.appendChild(script);
-      } else {
-        initializeRazorpay(selectedService, totalPrice, uploadedFiles);
-      }
     } catch (error) {
       console.error("Submission error:", error);
       alert("Error processing your request. Please try again.");
@@ -948,7 +846,7 @@ const calculateTotalAmount = () => {
       selectedService={selectedService}
       selectedDeliveryCharge={selectedDeliveryCharge}
       setSelectedDeliveryCharge={setSelectedDeliveryCharge}
-      deliveryChargeOptions={getFilteredDeliveryOptions()} // UPDATED: Pass filtered options
+      deliveryChargeOptions={getFilteredDeliveryOptions()}
       deliveryAddress={deliveryAddress}
       handleAddressChange={handleAddressChange}
       getServiceChargePerDocument={getServiceChargePerDocument}

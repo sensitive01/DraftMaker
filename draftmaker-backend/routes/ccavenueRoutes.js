@@ -36,13 +36,14 @@ paymentRouter.post('/initiate-ccavenue-payment', ccAvanueController.initiateCCAV
 paymentRouter.post('/ccavenue/response', ccAvanueController.handleCCAVENUEResponse);
 paymentRouter.get('/ccavenue/response', ccAvanueController.handleCCAVENUEResponse);
 
-paymentRouter.get('/response', (req, res) => {
-    res.redirect(process.env.FRONTEND_URL || 'https://draftmaker.in');
-});
 
-// Handle OPTIONS preflight for the response endpoint
-paymentRouter.options('/response', ccAvenueCors, (req, res) => {
-    res.status(200).end();
-});
+paymentRouter.post('/initiate-upload-payment',  ccAvanueController.initiateUploadPayment);
+paymentRouter.post('/ccavenue-response-upload', ccAvanueController.handleUploadResponse);
+paymentRouter.post('/ccavenue-cancel-upload',  ccAvanueController.handleUploadCancel);
+
+
+
+
+
 
 module.exports = paymentRouter;
