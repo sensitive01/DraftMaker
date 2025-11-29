@@ -22,12 +22,24 @@ const uploadDocumentSchema = new mongoose.Schema(
       type: String,
 
     },
-    documents: [
-      {
-        type: String,
-
-      },
-    ],
+  documents: [{
+    url: {
+      type: String,
+      required: true
+    },
+    fileName: {
+      type: String,
+      required: true
+    },
+    fileType: {
+      type: String,
+      default: 'application/pdf'
+    },
+    fileSize: {
+      type: Number,
+      default: 0
+    }
+  }],
     totalDocuments: {
       type: Number,
 
