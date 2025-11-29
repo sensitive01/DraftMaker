@@ -634,13 +634,35 @@ const initiateUploadPayment = async (req, res) => {
         console.log('   Amount:', paymentData.totalAmount);
         console.log('   Document Type:', paymentData.documentType);
 
-        // ❌ REMOVE bookingId
-        // ❌ DO NOT use bookingId in orderId
-
         const orderId = `UPLOAD_${Date.now()}`;
         console.log('\n🔢 Generated Order ID:', orderId);
 
-        // Prepare CCAvenue parameters (NO BOOKING ID)
+        // ✅ PROPERLY FORMAT merchant_param2 with clear key=value pairs
+        const merchantData = {
+            bookingId: paymentData.bookingId || 'PENDING',
+            mobileNumber: paymentData.mobileNumber || '',
+            documentType: paymentData.documentType || '',
+            formId: paymentData.formId || 'UPLOAD',
+            fullName: paymentData.fullName || '',
+            userName: paymentData.userName || paymentData.fullName || '',
+            emailAddress: paymentData.emailAddress || '',
+            serviceType: paymentData.serviceType || '',
+            serviceName: paymentData.serviceName || '',
+            basePrice: paymentData.basePrice || 0,
+            totalAmount: paymentData.totalAmount || 0,
+            uploadedDocuments: paymentData.uploadedDocuments || [],
+            totalDocuments: paymentData.totalDocuments || 0,
+            selectedStampDutyId: paymentData.selectedStampDutyId || '',
+            stampDutyDocumentType: paymentData.stampDutyDocumentType || '',
+            selectedDeliveryServiceId: paymentData.selectedDeliveryServiceId || '',
+            deliveryServiceName: paymentData.deliveryServiceName || '',
+            deliveryCharge: paymentData.deliveryCharge || 0
+        };
+
+        // ✅ Convert to JSON string for safe transmission
+        const merchantParam2 = JSON.stringify(merchantData);
+
+        // Prepare CCAvenue parameters
         const ccavenueParams = {
             merchant_id: process.env.CCAVENUE_MERCHANT_ID,
             order_id: orderId,
@@ -654,12 +676,13 @@ const initiateUploadPayment = async (req, res) => {
             billing_tel: paymentData.mobileNumber,
             billing_email: paymentData.emailAddress || 'noreply@example.com',
 
-            // Important: Store entire data safely in merchant params
+            // Store data as JSON string
             merchant_param1: 'UPLOAD_DOCS',
-            merchant_param2: JSON.stringify(paymentData),  // Save all document info
+            merchant_param2: merchantParam2,
         };
 
         console.log('\n🔐 CCAvenue Parameters prepared');
+        console.log('Merchant Param2:', merchantParam2);
 
         // Build & encrypt parameter string
         const queryParams = [];
@@ -729,130 +752,82 @@ const handleUploadResponse = async (req, res) => {
         const orderId = responseParams.order_id;
         const orderStatus = responseParams.order_status;
 
-        // Parse merchant_param2 as key-value pairs without '='
+        // ✅ PROPERLY PARSE merchant_param2 as JSON
         let uploadData = {};
         try {
-            const merchantParam2 = responseParams.merchant_param2 || '';
+            const merchantParam2 = responseParams.merchant_param2 || '{}';
             console.log('Raw merchant_param2:', merchantParam2);
 
-            // Known field names we expect to find in merchant_param2
-            const knownFields = [
-                'bookingId', 'mobileNumber', 'documentType', 'formId',
-                'fullName', 'userName', 'emailAddress', 'uploadedDocuments',
-                'totalDocuments', 'documentUrls'
-            ];
-
-            // First, try to handle the case where merchant_param2 is in format keyvalue,keyvalue,...
-            const keyValuePairs = [];
-            const regex = /([a-zA-Z]+)([^,]*?)(?=,[a-zA-Z]|$)/g;
-            let match;
-
-            while ((match = regex.exec(merchantParam2 + ',')) !== null) {
-                const key = match[1];
-                const value = match[2].startsWith(',') ? match[2].substring(1) : match[2];
-                if (key && value !== undefined) {
-                    keyValuePairs.push({ key, value: value.endsWith(',') ? value.slice(0, -1) : value });
-                }
-            }
-
-            // Convert array of key-value pairs to object
-            uploadData = keyValuePairs.reduce((acc, { key, value }) => {
-                // Clean up the value (remove any trailing commas or whitespace)
-                const cleanValue = value.replace(/^[,\s]+|[,\s]+$/g, '');
-
-                // Special handling for uploadedDocuments which contains document info
-                if (key === 'uploadedDocuments' && cleanValue) {
-                    try {
-                        // Handle the case where document info is in key-value pairs without separators
-                        if (cleanValue.includes('urlhttp') && cleanValue.includes('fileName') &&
-                            cleanValue.includes('fileType') && cleanValue.includes('fileSize')) {
-
-                            // Extract URL (starts after 'urlhttp' and ends before ',fileName')
-                            let url = cleanValue.substring(cleanValue.indexOf('urlhttp') + 3); // +3 to skip 'url'
-                            url = url.substring(0, url.indexOf(',fileName'));
-
-                            // Extract fileName
-                            let fileName = cleanValue.substring(cleanValue.indexOf('fileName') + 8);
-                            fileName = fileName.substring(0, fileName.indexOf(',fileType'));
-
-                            // Extract fileType
-                            let fileType = cleanValue.substring(cleanValue.indexOf('fileType') + 8);
-                            fileType = fileType.substring(0, fileType.indexOf(',fileSize'));
-
-                            // Extract fileSize
-                            let fileSize = cleanValue.substring(cleanValue.indexOf('fileSize') + 8);
-
-                            // Create document object
-                            acc[key] = [{
-                                url: 'https:' + url, // Add https: to make it a valid URL
-                                fileName: fileName,
-                                fileType: fileType,
-                                fileSize: parseInt(fileSize) || 0
-                            }];
-                        } else {
-                            // Fallback to JSON parsing if the format is different
-                            acc[key] = JSON.parse(cleanValue);
-                        }
-                    } catch (e) {
-                        console.error('Error parsing uploadedDocuments:', e);
-                        acc[key] = [];
-                    }
-                } else if (key === 'documentUrls' && cleanValue) {
-                    try {
-                        acc[key] = JSON.parse(cleanValue);
-                    } catch (e) {
-                        console.error('Error parsing documentUrls:', e);
-                        acc[key] = [];
-                    }
-                } else if (key === 'totalDocuments') {
-                    acc[key] = parseInt(cleanValue) || 0;
-                } else {
-                    acc[key] = cleanValue;
-                }
-                return acc;
-            }, {});
-
-            console.log('Parsed upload data:', uploadData);
+            // Parse JSON string
+            uploadData = JSON.parse(merchantParam2);
+            console.log('✅ Parsed upload data:', uploadData);
 
         } catch (e) {
             console.error('❌ Error parsing merchant_param2:', e.message);
             console.error('Raw merchant_param2 value:', responseParams.merchant_param2);
+
             // Fallback to empty object if parsing fails
             uploadData = {
                 fullName: responseParams.billing_name || 'Customer',
                 mobileNumber: responseParams.billing_tel || '',
                 emailAddress: responseParams.billing_email || '',
                 documentType: 'UPLOAD',
-                formId: 'UPLOAD'
+                formId: 'UPLOAD',
+                uploadedDocuments: [],
+                totalDocuments: 0
             };
         }
 
-        // Generate booking ID if not present
-        let bookingId = uploadData.bookingId || (await generateBookingId());
-
-        // Ensure bookingId doesn't have trailing comma
-        if (typeof bookingId === 'string') {
-            bookingId = bookingId.replace(/[,\s]+$/, '');
+        // Generate booking ID if not present or is 'PENDING'
+        let bookingId = uploadData.bookingId;
+        if (!bookingId || bookingId === 'PENDING' || bookingId === 'null') {
+            bookingId = await generateBookingId();
         }
 
-        // Prepare document data with proper field names to match documentsController
+        // ✅ Prepare document data with correct field mapping
         const documentData = {
-            // Using username (lowercase) to match documentsController
             username: (uploadData.fullName || uploadData.userName || responseParams.billing_name || 'Customer').trim(),
             userMobile: (uploadData.mobileNumber || responseParams.billing_tel || '').trim(),
             documentType: (uploadData.documentType || 'UPLOAD').trim(),
             formId: (uploadData.formId || 'UPLOAD').trim(),
-            documents: Array.isArray(uploadData.uploadedDocuments) ?
-                uploadData.uploadedDocuments :
-                (uploadData.documentUrls ? uploadData.documentUrls.map(url => ({
-                    url: url,
-                    fileName: url.split('/').pop() || 'document',
-                    fileType: url.split('.').pop() || 'pdf',
-                    fileSize: 0
-                })) : []),
-            totalDocuments: uploadData.totalDocuments || (Array.isArray(uploadData.uploadedDocuments) ? uploadData.uploadedDocuments.length : 0) || 0,
+
+            // ✅ PROPERLY FORMAT DOCUMENTS ARRAY
+            documents: Array.isArray(uploadData.uploadedDocuments)
+                ? uploadData.uploadedDocuments.map(doc => ({
+                    url: doc.url || '',
+                    fileName: doc.fileName || doc.name || 'document',
+                    fileType: doc.fileType || doc.type || 'application/pdf',
+                    fileSize: doc.fileSize || doc.size || 0
+                }))
+                : [],
+
+            totalDocuments: uploadData.totalDocuments ||
+                (Array.isArray(uploadData.uploadedDocuments) ? uploadData.uploadedDocuments.length : 0),
+
             emailAddress: (uploadData.emailAddress || responseParams.billing_email || '').trim(),
             bookingId: bookingId,
+
+            // ✅ Include service details
+            selectedService: {
+                serviceType: uploadData.serviceType || '',
+                serviceName: uploadData.serviceName || '',
+                basePrice: parseFloat(uploadData.basePrice) || 0
+            },
+
+            // ✅ Include stamp duty details
+            stampDuty: uploadData.selectedStampDutyId ? {
+                stampDutyId: uploadData.selectedStampDutyId,
+                documentType: uploadData.stampDutyDocumentType || '',
+                amount: parseFloat(uploadData.stampDutyAmount) || 0
+            } : {},
+
+            // ✅ Include delivery details
+            delivery: uploadData.selectedDeliveryServiceId ? {
+                deliveryServiceId: uploadData.selectedDeliveryServiceId,
+                serviceName: uploadData.deliveryServiceName || '',
+                charge: parseFloat(uploadData.deliveryCharge) || 0
+            } : {},
+
             payment: {
                 orderId: orderId,
                 paymentId: responseParams.tracking_id || responseParams.bank_ref_no || '',
@@ -886,31 +861,22 @@ const handleUploadResponse = async (req, res) => {
         console.log('Document data:', JSON.stringify(documentData, null, 2));
 
         try {
-            // Clean up any fields that might have trailing commas
-            Object.keys(documentData).forEach(key => {
-                if (typeof documentData[key] === 'string') {
-                    documentData[key] = documentData[key].replace(/,\s*$/, '');
-                }
-            });
-
-            console.log('📤 Sending document data to API...');
-            console.log('Document data:', JSON.stringify(documentData, null, 2));
-
             const response = await axios.post(
                 `${process.env.BACKEND_URL}/documents/upload-document-data`,
-                {documentData}, // Send documentData directly, not wrapped in a data property
+                { documentData },
                 {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    timeout: 10000 // 10 second timeout
+                    timeout: 10000
                 }
             );
 
             console.log('✅ Document data saved successfully', response.data);
+
         } catch (error) {
             console.error('❌ Error saving document data:', error.response?.data || error.message);
-            throw error; // Re-throw to be caught by the outer try-catch
+            throw error;
         }
 
         if (orderStatus === 'Success') {
@@ -930,15 +896,6 @@ const handleUploadResponse = async (req, res) => {
 
     } catch (error) {
         console.error('❌ Error in handleUploadResponse:', error);
-        if (error.response) {
-            console.error('Response data:', error.response.data);
-            console.error('Response status:', error.response.status);
-            console.error('Response headers:', error.response.headers);
-        } else if (error.request) {
-            console.error('No response received:', error.request);
-        } else {
-            console.error('Error details:', error.message);
-        }
         return res.redirect(
             `${process.env.FRONTEND_URL}/payment-failed?` +
             `error=${encodeURIComponent(error.message || 'Payment processing failed')}`
