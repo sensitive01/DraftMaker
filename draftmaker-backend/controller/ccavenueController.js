@@ -842,7 +842,7 @@ const handleUploadResponse = async (req, res) => {
         try {
             const response = await axios.post(
                 `${process.env.BACKEND_URL}/documents/upload-document-data`,
-                {documentData},  // Send documentData directly, not wrapped in an object
+                { documentData },  // Send documentData directly, not wrapped in an object
                 {
                     headers: {
                         "Content-Type": "application/json"
@@ -859,7 +859,10 @@ const handleUploadResponse = async (req, res) => {
 
         if (orderStatus === 'Success') {
             return res.redirect(
-                `${process.env.FRONTEND_URL}`
+                `${process.env.FRONTEND_URL}/payment-success?` +
+                `orderId=${encodeURIComponent(orderId)}` +
+                `&bookingId=${encodeURIComponent(bookingId)}` +
+                `&trackingId=${encodeURIComponent(responseParams.tracking_id || '')}`
             );
         } else {
             return res.redirect(
