@@ -729,27 +729,53 @@ const handleUploadResponse = async (req, res) => {
         const orderId = responseParams.order_id;
         const orderStatus = responseParams.order_status;
 
-        // Parse merchant_param2 to get the original upload data
+        // Parse merchant_param2 as key-value pairs
         let uploadData = {};
         try {
-            uploadData = JSON.parse(responseParams.merchant_param2 || '{}');
+            const merchantParam2 = responseParams.merchant_param2 || '';
+            console.log('Raw merchant_param2:', merchantParam2);
+
+            // Parse key-value pairs separated by commas
+            const pairs = merchantParam2.split(',');
+            pairs.forEach(pair => {
+                const equalsIndex = pair.indexOf('=');
+                if (equalsIndex !== -1) {
+                    const key = pair.substring(0, equalsIndex);
+                    const value = pair.substring(equalsIndex + 1);
+                    uploadData[key] = value;
+                }
+            });
+
+            console.log('Parsed upload data:', uploadData);
+
+            // Handle special cases
+            if (uploadData.uploadedDocuments) {
+                try {
+                    uploadData.uploadedDocuments = JSON.parse(uploadData.uploadedDocuments);
+                } catch (e) {
+                    uploadData.uploadedDocuments = [];
+                }
+            }
+
         } catch (e) {
-            console.error('Error parsing merchant_param2:', e);
-            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=invalid_upload_data`);
+            console.error('❌ Error parsing merchant_param2:', e.message);
+            console.error('Raw merchant_param2 value:', responseParams.merchant_param2);
+            // Fallback to empty object if parsing fails
+            uploadData = {};
         }
 
-        // Generate a new booking ID
-        const bookingId = await generateBookingId();
+        // Generate booking ID if not present
+        const bookingId = uploadData.bookingId || (await generateBookingId());
 
-        // Prepare the upload document data
-        const uploadDoc = new UploadDocument({
-            userName: uploadData.fullName || 'Customer',
-            userMobile: uploadData.mobileNumber || '',
-            emailAddress: uploadData.emailAddress || '',
+        // Prepare document data
+        const documentData = {
+            userName: uploadData.fullName || responseParams.billing_name || 'Customer',
+            userMobile: uploadData.mobileNumber || responseParams.billing_tel || '',
             documentType: uploadData.documentType || 'UPLOAD',
-            formId: 'UPLOAD',
+            formId: uploadData.formId || 'UPLOAD',
             documents: uploadData.uploadedDocuments || [],
             totalDocuments: uploadData.uploadedDocuments?.length || 0,
+            emailAddress: uploadData.emailAddress || responseParams.billing_email || '',
             bookingId: bookingId,
             payment: {
                 orderId: orderId,
@@ -778,9 +804,21 @@ const handleUploadResponse = async (req, res) => {
                     rawResponse: decrypted
                 }
             }
-        });
+        };
 
-        await uploadDoc.save();
+        console.log('📤 Sending document data to API...');
+        const response = await axios.post(
+            `${process.env.BACKEND_URL}/documents/upload-document-data`,
+            { documentData },
+            {
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                timeout: 10000 // 10 second timeout
+            }
+        );
+
+        console.log('✅ Document data saved successfully', response.data);
 
         if (orderStatus === 'Success') {
             return res.redirect(
