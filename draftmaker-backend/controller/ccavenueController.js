@@ -740,9 +740,11 @@ const handleUploadResponse = async (req, res) => {
             pairs.forEach(pair => {
                 const equalsIndex = pair.indexOf('=');
                 if (equalsIndex !== -1) {
-                    const key = pair.substring(0, equalsIndex);
-                    const value = pair.substring(equalsIndex + 1);
-                    uploadData[key] = value;
+                    const key = pair.substring(0, equalsIndex).trim();
+                    const value = pair.substring(equalsIndex + 1).trim();
+                    if (key && value) {
+                        uploadData[key] = value;
+                    }
                 }
             });
 
@@ -761,15 +763,21 @@ const handleUploadResponse = async (req, res) => {
             console.error('❌ Error parsing merchant_param2:', e.message);
             console.error('Raw merchant_param2 value:', responseParams.merchant_param2);
             // Fallback to empty object if parsing fails
-            uploadData = {};
+            uploadData = {
+                fullName: responseParams.billing_name || 'Customer',
+                mobileNumber: responseParams.billing_tel || '',
+                emailAddress: responseParams.billing_email || '',
+                documentType: 'UPLOAD',
+                formId: 'UPLOAD'
+            };
         }
 
         // Generate booking ID if not present
         const bookingId = uploadData.bookingId || (await generateBookingId());
 
-        // Prepare document data
+        // Prepare document data with proper fallbacks
         const documentData = {
-            userName: uploadData.fullName || responseParams.billing_name || 'Customer',
+            userName: uploadData.fullName || uploadData.userName || responseParams.billing_name || 'Customer',
             userMobile: uploadData.mobileNumber || responseParams.billing_tel || '',
             documentType: uploadData.documentType || 'UPLOAD',
             formId: uploadData.formId || 'UPLOAD',
@@ -807,6 +815,8 @@ const handleUploadResponse = async (req, res) => {
         };
 
         console.log('📤 Sending document data to API...');
+        console.log('Document data:', JSON.stringify(documentData, null, 2));
+
         const response = await axios.post(
             `${process.env.BACKEND_URL}/documents/upload-document-data`,
             { documentData },
@@ -834,6 +844,15 @@ const handleUploadResponse = async (req, res) => {
 
     } catch (error) {
         console.error('❌ Error in handleUploadResponse:', error);
+        if (error.response) {
+            console.error('Response data:', error.response.data);
+            console.error('Response status:', error.response.status);
+            console.error('Response headers:', error.response.headers);
+        } else if (error.request) {
+            console.error('No response received:', error.request);
+        } else {
+            console.error('Error details:', error.message);
+        }
         return res.redirect(
             `${process.env.FRONTEND_URL}/payment-failed?` +
             `error=${encodeURIComponent(error.message || 'Payment processing failed')}`
