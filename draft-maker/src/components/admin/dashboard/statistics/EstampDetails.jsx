@@ -125,6 +125,19 @@ const EstampDetails = () => {
         </div>
       </div>
 
+      {/* Order ID Banner */}
+      {estampData.orderId && (
+        <div className="mb-6 bg-purple-50 border border-purple-200 rounded-lg p-4">
+          <div className="flex items-center justify-center space-x-2">
+            <Hash className="h-5 w-5 text-purple-600" />
+            <span className="text-purple-600 font-medium">Order ID:</span>
+            <span className="text-purple-800 font-bold text-sm">
+              {estampData.orderId}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Party Information */}
@@ -205,6 +218,61 @@ const EstampDetails = () => {
           </div>
         </div>
 
+        {/* Document Calculation Details */}
+        {(estampData.documentFixedAmount > 0 ||
+          estampData.documentPercentage > 0 ||
+          estampData.documentMinAmount > 0 ||
+          estampData.documentMaxAmount > 0) && (
+            <div className="bg-gray-50 rounded-lg p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <IndianRupee className="h-5 w-5 mr-2 text-red-600" />
+                Document Calculation Details
+              </h2>
+              <div className="space-y-3">
+                {estampData.documentFixedAmount > 0 && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Fixed Amount
+                    </label>
+                    <p className="text-gray-900 font-medium">
+                      {formatCurrency(estampData.documentFixedAmount)}
+                    </p>
+                  </div>
+                )}
+                {estampData.documentPercentage > 0 && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Percentage
+                    </label>
+                    <p className="text-gray-900 font-medium">
+                      {estampData.documentPercentage}%
+                    </p>
+                  </div>
+                )}
+                {estampData.documentMinAmount > 0 && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Minimum Amount
+                    </label>
+                    <p className="text-gray-900 font-medium">
+                      {formatCurrency(estampData.documentMinAmount)}
+                    </p>
+                  </div>
+                )}
+                {estampData.documentMaxAmount > 0 && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Maximum Amount
+                    </label>
+                    <p className="text-gray-900 font-medium">
+                      {formatCurrency(estampData.documentMaxAmount)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
         {/* Contact Information */}
         <div className="bg-gray-50 rounded-lg p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
@@ -256,30 +324,36 @@ const EstampDetails = () => {
                 {estampData.deliveryType}
               </p>
             </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600">
-                Service Name
-              </label>
-              <p className="text-gray-900 font-medium">
-                {estampData.deliveryServiceName}
-              </p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600">
-                Service ID
-              </label>
-              <p className="text-gray-900 font-mono text-sm">
-                {estampData.selectedDeliveryServiceId}
-              </p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600">
-                Description
-              </label>
-              <p className="text-gray-900 text-sm">
-                {estampData.deliveryDescription}
-              </p>
-            </div>
+            {estampData.deliveryServiceName && (
+              <div>
+                <label className="text-sm font-medium text-gray-600">
+                  Service Name
+                </label>
+                <p className="text-gray-900 font-medium">
+                  {estampData.deliveryServiceName}
+                </p>
+              </div>
+            )}
+            {estampData.selectedDeliveryServiceId && (
+              <div>
+                <label className="text-sm font-medium text-gray-600">
+                  Service ID
+                </label>
+                <p className="text-gray-900 font-mono text-sm">
+                  {estampData.selectedDeliveryServiceId}
+                </p>
+              </div>
+            )}
+            {estampData.deliveryDescription && (
+              <div>
+                <label className="text-sm font-medium text-gray-600">
+                  Description
+                </label>
+                <p className="text-gray-900 text-sm">
+                  {estampData.deliveryDescription}
+                </p>
+              </div>
+            )}
             <div>
               <label className="text-sm font-medium text-gray-600">
                 Delivery Charge
@@ -363,7 +437,7 @@ const EstampDetails = () => {
               {formatCurrency(estampData.stampDutyAmount)}
             </p>
           </div>
-           <div>
+          <div>
             <label className="text-sm font-medium text-gray-600">
               Quantity
             </label>
@@ -371,6 +445,16 @@ const EstampDetails = () => {
               {estampData.quantity}
             </p>
           </div>
+          {estampData.serviceCharge > 0 && (
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                Service Charge
+              </label>
+              <p className="text-lg font-bold text-red-600">
+                {formatCurrency(estampData.serviceCharge)}
+              </p>
+            </div>
+          )}
           <div>
             <label className="text-sm font-medium text-gray-600">
               Total Amount
@@ -387,6 +471,14 @@ const EstampDetails = () => {
               {estampData.paymentMethod}
             </p>
           </div>
+          <div>
+            <label className="text-sm font-medium text-gray-600">
+              Currency
+            </label>
+            <p className="text-gray-900 font-medium">{estampData.currency}</p>
+          </div>
+
+          {/* Razorpay Payment Details */}
           {estampData.razorpayPaymentId && (
             <div>
               <label className="text-sm font-medium text-gray-600">
@@ -417,12 +509,48 @@ const EstampDetails = () => {
               </p>
             </div>
           )}
-          <div>
-            <label className="text-sm font-medium text-gray-600">
-              Currency
-            </label>
-            <p className="text-gray-900 font-medium">{estampData.currency}</p>
-          </div>
+
+          {/* CCAvenue Payment Details */}
+          {estampData.ccavenueTrackingId && (
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                CCAvenue Tracking ID
+              </label>
+              <p className="text-gray-900 font-mono text-sm">
+                {estampData.ccavenueTrackingId}
+              </p>
+            </div>
+          )}
+          {estampData.ccavenueBankRefNo && (
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                CCAvenue Bank Ref No
+              </label>
+              <p className="text-gray-900 font-mono text-sm">
+                {estampData.ccavenueBankRefNo}
+              </p>
+            </div>
+          )}
+          {estampData.ccavenuePaymentMode && (
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                CCAvenue Payment Mode
+              </label>
+              <p className="text-gray-900 font-medium">
+                {estampData.ccavenuePaymentMode}
+              </p>
+            </div>
+          )}
+          {estampData.ccavenueStatusMessage && (
+            <div>
+              <label className="text-sm font-medium text-gray-600">
+                CCAvenue Status
+              </label>
+              <p className="text-gray-900 font-medium">
+                {estampData.ccavenueStatusMessage}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -433,19 +561,41 @@ const EstampDetails = () => {
           Timeline
         </h2>
         <div className="space-y-4">
+          {estampData.orderDate && (
+            <div className="flex justify-between items-center border-b border-gray-200 pb-2">
+              <span className="text-gray-600">Order Date</span>
+              <span className="text-gray-900 font-medium">
+                {formatDate(estampData.orderDate)}
+              </span>
+            </div>
+          )}
           <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-            <span className="text-gray-600">Booking Date</span>
+            <span className="text-gray-600">Booking Created</span>
             <span className="text-gray-900 font-medium">
               {formatDate(estampData.createdAt)}
+            </span>
+          </div>
+          {estampData.paymentCompletedAt && (
+            <div className="flex justify-between items-center border-b border-gray-200 pb-2">
+              <span className="text-gray-600">Payment Completed</span>
+              <span className="text-gray-900 font-medium">
+                {formatDate(estampData.paymentCompletedAt)}
+              </span>
+            </div>
+          )}
+          <div className="flex justify-between items-center border-b border-gray-200 pb-2">
+            <span className="text-gray-600">Last Updated</span>
+            <span className="text-gray-900 font-medium">
+              {formatDate(estampData.updatedAt)}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Order ID */}
+      {/* MongoDB ID */}
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-500">
-          Order ID:{" "}
+          Record ID:{" "}
           <span className="font-mono text-gray-700">{estampData._id}</span>
         </p>
       </div>

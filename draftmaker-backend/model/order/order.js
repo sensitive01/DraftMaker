@@ -19,6 +19,26 @@ const orderSchema = new mongoose.Schema({
         default: 'PENDING'
     },
     transactionId: { type: String },
+    ccavenueResponse: {
+        orderStatus: String,
+        trackingId: String,
+        bankRefNo: String,
+        paymentMode: String,
+        cardName: String,
+        statusMessage: String,
+        currency: { type: String, default: 'INR' },
+        amount: Number,
+        transDate: String,
+        responseCode: String,
+        merchantParams: {
+            param1: String,
+            param2: String,
+            param3: String,
+            param4: String,
+            param5: String
+        },
+        rawResponse: String
+    },
     paymentDetails: { type: Object },
     paymentResponse: { type: Object },
     createdAt: { type: Date, default: Date.now },

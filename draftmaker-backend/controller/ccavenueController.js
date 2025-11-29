@@ -273,10 +273,23 @@ const handleResponse = async (req, res) => {
         }
 
         // Update payment record
+        // Update payment record with all CCAvenue response data
+        payment.ccavenueOrderStatus = responseParams.order_status || '';
         payment.ccavenueTrackingId = trackingId;
         payment.ccavenueStatusMessage = responseParams.status_message || '';
         payment.ccavenuePaymentMode = responseParams.payment_mode || '';
         payment.ccavenueBankRefNo = responseParams.bank_ref_no || '';
+        payment.ccavenueCardName = responseParams.card_name || '';
+        payment.ccavenueCurrency = responseParams.currency || 'INR';
+        payment.ccavenueAmount = responseParams.amount || '';
+        payment.ccavenueTransDate = responseParams.trans_date || '';
+        payment.ccavenueResponseCode = responseParams.response_code || '';
+        payment.ccavenueMerchantParam1 = responseParams.merchant_param1 || '';
+        payment.ccavenueMerchantParam2 = responseParams.merchant_param2 || '';
+        payment.ccavenueMerchantParam3 = responseParams.merchant_param3 || '';
+        payment.ccavenueMerchantParam4 = responseParams.merchant_param4 || '';
+        payment.ccavenueMerchantParam5 = responseParams.merchant_param5 || '';
+        payment.ccavenueRawResponse = decryptedData || ''; // Store the full decrypted response
         payment.updatedAt = new Date();
 
         if (orderStatus === 'Success') {
@@ -481,17 +494,14 @@ const handleCCAVENUEResponse = async (req, res) => {
             return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=order_not_found`);
         }
 
-        // Declare bookingId in the outer scope
+        // Declare formId and bookingId in outer scope
         let bookingId;
+        let formId;
 
         if (responseObj.order_status === 'Success') {
-            order.status = 'COMPLETED';
-            order.paymentStatus = 'SUCCESS';
-            order.transactionId = responseObj.bank_ref_no || responseObj.tracking_id;
-            order.paymentResponse = responseObj;
-
-            const formId = responseObj.merchant_param1;
-            bookingId = responseObj.merchant_param2; // Assign to outer scope variable
+            // Assign values
+            formId = responseObj.merchant_param1;
+            bookingId = responseObj.merchant_param2;
 
             if (!bookingId) {
                 console.error('Booking ID is missing for successful payment');
@@ -502,24 +512,50 @@ const handleCCAVENUEResponse = async (req, res) => {
                 );
             }
 
+            // Update order details
+            order.status = 'COMPLETED';
+            order.paymentStatus = 'SUCCESS';
+            order.transactionId = responseObj.bank_ref_no || responseObj.tracking_id;
+
+            order.ccavenueResponse = {
+                orderStatus: responseObj.order_status,
+                trackingId: responseObj.tracking_id,
+                bankRefNo: responseObj.bank_ref_no,
+                paymentMode: responseObj.payment_mode,
+                cardName: responseObj.card_name,
+                statusMessage: responseObj.status_message,
+                currency: responseObj.currency || 'INR',
+                amount: parseFloat(responseObj.amount) || order.amount,
+                transDate: responseObj.trans_date,
+                responseCode: responseObj.response_code,
+                merchantParams: {
+                    param1: responseObj.merchant_param1,
+                    param2: responseObj.merchant_param2,
+                    param3: responseObj.merchant_param3,
+                    param4: responseObj.merchant_param4,
+                    param5: responseObj.merchant_param5
+                },
+                rawResponse: decryptedResponse
+            };
+
+            // Keep original response
+            order.paymentResponse = responseObj;
+
+            // Update document data using controller
             const handler = documentUpdateHandlers[formId];
             if (handler && handler.updateFn && documentController[handler.updateFn]) {
                 try {
-                    // Create a mock response object with required methods
                     const mockRes = {
                         json: (data) => {
                             console.log('Payment update response:', data);
                             return data;
                         },
-                        status: (code) => {
-                            console.log(`Status code: ${code}`);
-                            return {
-                                json: (data) => {
-                                    console.log(`Response (${code}):`, data);
-                                    return data;
-                                }
-                            };
-                        }
+                        status: (code) => ({
+                            json: (data) => {
+                                console.log(`Response (${code}):`, data);
+                                return data;
+                            }
+                        })
                     };
 
                     await documentController[handler.updateFn]({
@@ -542,12 +578,11 @@ const handleCCAVENUEResponse = async (req, res) => {
                                 deliveryAddress: order.paymentDetails.deliveryAddress
                             }
                         }
-                    }, mockRes); // Pass the mock response object
+                    }, mockRes);
 
                     console.log(`✅ Document data updated for ${formId}`);
                 } catch (updateError) {
                     console.error('❌ Error updating document data:', updateError);
-                    // Continue with the flow even if update fails
                 }
             }
         } else {
@@ -557,15 +592,9 @@ const handleCCAVENUEResponse = async (req, res) => {
         }
 
         await order.save();
-     
 
         // Redirect based on payment status
-        if (order.paymentStatus === 'SUCCESS' && bookingId) {
-            // return res.redirect(
-            //     `${process.env.FRONTEND_URL}/payment-success?` +
-            //     `orderId=${encodeURIComponent(order.orderId)}` +
-            //     `&bookingId=${encodeURIComponent(bookingId)}`
-            // );
+        if (order.paymentStatus === 'SUCCESS' && bookingId && formId) {
             return res.redirect(
                 `https://draftmaker.in/documents/preview-page/${formId}/${bookingId}`
             );
@@ -581,6 +610,7 @@ const handleCCAVENUEResponse = async (req, res) => {
         res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=processing_error`);
     }
 };
+
 
 
 
@@ -698,134 +728,77 @@ const handleUploadResponse = async (req, res) => {
 
         const orderId = responseParams.order_id;
         const orderStatus = responseParams.order_status;
-        const failureMessage = responseParams.failure_message || 'Payment failed';
 
-        if (!orderId) {
-            console.error('❌ No order ID in response');
-            return res.redirect(
-                `${process.env.FRONTEND_URL}/payment-failed?` +
-                `error=invalid_response&` +
-                `orderId=unknown`
-            );
-        }
-
-        // For failed payments
-        if (orderStatus !== 'Success') {
-            console.error(`❌ Payment failed for order ${orderId}:`, failureMessage);
-            return res.redirect(
-                `${process.env.FRONTEND_URL}/payment-failed?` +
-                `orderId=${encodeURIComponent(orderId)}&` +
-                `reason=${encodeURIComponent(failureMessage)}`
-            );
-        }
-
-        // For successful payments
+        // Parse merchant_param2 to get the original upload data
+        let uploadData = {};
         try {
-            // Parse merchant_param2 as key-value pairs
-            let paymentData = {};
-            try {
-                const merchantParam = responseParams.merchant_param2 || '';
-                console.log('Raw merchant_param2:', merchantParam);
+            uploadData = JSON.parse(responseParams.merchant_param2 || '{}');
+        } catch (e) {
+            console.error('Error parsing merchant_param2:', e);
+            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?error=invalid_upload_data`);
+        }
 
-                // Parse key-value pairs separated by commas
-                const pairs = merchantParam.split(',');
-                pairs.forEach(pair => {
-                    const equalsIndex = pair.indexOf('=');
-                    if (equalsIndex !== -1) {
-                        const key = pair.substring(0, equalsIndex);
-                        const value = pair.substring(equalsIndex + 1);
-                        paymentData[key] = value;
-                    }
-                });
+        // Generate a new booking ID
+        const bookingId = await generateBookingId();
 
-                // Handle uploadedDocuments specially if it exists
-                if (paymentData.uploadedDocuments) {
-                    try {
-                        paymentData.uploadedDocuments = JSON.parse(paymentData.uploadedDocuments);
-                    } catch (e) {
-                        paymentData.uploadedDocuments = [];
-                    }
-                }
-
-                // Ensure mobile number is properly set
-                paymentData.mobileNumber = paymentData.mobileNumber || responseParams.billing_tel || '';
-
-                console.log('Parsed payment data:', paymentData);
-            } catch (e) {
-                console.error('❌ Error parsing merchant_param2:', e.message);
-                console.error('Raw merchant_param2 value:', responseParams.merchant_param2);
-                paymentData = {
-                    fullName: responseParams.billing_name || 'Customer',
-                    mobileNumber: responseParams.billing_tel || '',
-                    documentType: 'UPLOAD',
-                    emailAddress: responseParams.billing_email || '',
-                    totalAmount: responseParams.amount || '0',
-                    uploadedDocuments: []
-                };
-            }
-
-            // Generate booking ID
-            const bookingId = await generateBookingId();
-
-            // Prepare payload for saving document
-            const uploadPayload = {
-                documentData: {
-                    username: paymentData.fullName || responseParams.billing_name || 'Customer',
-                    userMobile: paymentData.mobileNumber || responseParams.billing_tel || '',
-                    documentType: paymentData.documentType || 'UPLOAD',
-                    formId: 'UPLOAD',
-                    documents: paymentData.uploadedDocuments || [],
-                    totalDocuments: paymentData.uploadedDocuments?.length || 0,
-                    submittedAt: new Date(),
-                    emailAddress: paymentData.emailAddress || responseParams.billing_email || '',
-                    bookingId,
-                    payment: {
-                        orderId: orderId,
-                        paymentId: responseParams.tracking_id || responseParams.bank_ref_no || 'N/A',
-                        totalAmount: paymentData.totalAmount || responseParams.amount || '0',
-                        paymentStatus: "success",
-                        paymentDate: new Date(),
-                    }
-                }
-            };
-
-            const documentData = uploadPayload
-
-            console.log('📤 Sending document data to API...');
-            const isuploading = await axios.post(
-                `${process.env.BACKEND_URL}/documents/upload-document-data`,
-                documentData,
-                {
-                    headers: {
-                        "Content-Type": "application/json"
+        // Prepare the upload document data
+        const uploadDoc = new UploadDocument({
+            userName: uploadData.fullName || 'Customer',
+            userMobile: uploadData.mobileNumber || '',
+            emailAddress: uploadData.emailAddress || '',
+            documentType: uploadData.documentType || 'UPLOAD',
+            formId: 'UPLOAD',
+            documents: uploadData.uploadedDocuments || [],
+            totalDocuments: uploadData.uploadedDocuments?.length || 0,
+            bookingId: bookingId,
+            payment: {
+                orderId: orderId,
+                paymentId: responseParams.tracking_id || responseParams.bank_ref_no || '',
+                totalAmount: parseFloat(responseParams.amount) || 0,
+                paymentStatus: orderStatus === 'Success' ? 'SUCCESS' : 'FAILED',
+                paymentDate: new Date(),
+                ccavenueResponse: {
+                    orderStatus: responseParams.order_status,
+                    trackingId: responseParams.tracking_id,
+                    bankRefNo: responseParams.bank_ref_no,
+                    paymentMode: responseParams.payment_mode,
+                    cardName: responseParams.card_name,
+                    statusMessage: responseParams.status_message,
+                    currency: responseParams.currency || 'INR',
+                    amount: parseFloat(responseParams.amount) || 0,
+                    transDate: responseParams.trans_date,
+                    responseCode: responseParams.response_code,
+                    merchantParams: {
+                        param1: responseParams.merchant_param1,
+                        param2: responseParams.merchant_param2,
+                        param3: responseParams.merchant_param3,
+                        param4: responseParams.merchant_param4,
+                        param5: responseParams.merchant_param5
                     },
-                    timeout: 10000 // 10 second timeout
+                    rawResponse: decrypted
                 }
-            );
+            }
+        });
 
-            console.log('✅ Document data saved successfully', isuploading);
-            return res.redirect(
-                `${process.env.FRONTEND_URL}/payment-success?` +
-                `orderId=${encodeURIComponent(orderId)}&` +
-                `bookingId=${encodeURIComponent(bookingId)}&` +
-                `amount=${encodeURIComponent(paymentData.totalAmount || '0')}`
-            );
+        await uploadDoc.save();
 
-        } catch (uploadError) {
-            console.error('❌ Error processing successful payment:', uploadError);
-            // Even if document save fails, we still show success to user but log the error
+        if (orderStatus === 'Success') {
             return res.redirect(
-                `${process.env.FRONTEND_URL}/payment-success?` +
-                `orderId=${encodeURIComponent(orderId)}&` +
-                `warning=document_save_failed`
+                `${process.env.FRONTEND_URL}/documents/preview-page/UPLOAD/${bookingId}`
+            );
+        } else {
+            return res.redirect(
+                `${process.env.FRONTEND_URL}/payment-failed?` +
+                `orderId=${encodeURIComponent(orderId)}` +
+                `&reason=${encodeURIComponent(responseParams.failure_message || 'Payment failed')}`
             );
         }
 
     } catch (error) {
-        console.error('❌ Unhandled error in handleUploadResponse:', error);
+        console.error('❌ Error in handleUploadResponse:', error);
         return res.redirect(
             `${process.env.FRONTEND_URL}/payment-failed?` +
-            `error=${encodeURIComponent(error.message || 'An unexpected error occurred')}`
+            `error=${encodeURIComponent(error.message || 'Payment processing failed')}`
         );
     }
 };

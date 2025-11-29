@@ -58,29 +58,25 @@ const estampPaymentSchema = new mongoose.Schema(
     //   CCAvenue Required Fields
     // ----------------------------
 
-    orderId: String,                   // ESTAMP_DM7419516_...
-    ccavenueOrderStatus: String,       // order_status → Success/Failure/Aborted
-    ccavenueTrackingId: String,        // tracking_id (THIS IS PAYMENT ID)
-    ccavenueBankRefNo: String,         // bank_ref_no
 
-    ccavenuePaymentMode: String,       // UPI / Card / NetBanking
-    ccavenueCardName: String,          // UPI / VISA
-
-    ccavenueStatusMessage: String,     // Success-NA-0
-    ccavenueFailureMessage: String,    // failure message
-
-    ccavenueCurrency: String,          // INR
-    ccavenueAmount: String,            // 2.00
-    ccavenueTransDate: String,         // "28/11/2025 20:13:31"
-
-    ccavenueResponseCode: String,      // response_code
+    orderId: String,
+    ccavenueOrderStatus: String,
+    ccavenueTrackingId: String,
+    ccavenueBankRefNo: String,
+    ccavenuePaymentMode: String,
+    ccavenueCardName: String,
+    ccavenueStatusMessage: String,
+    ccavenueFailureMessage: String,
+    ccavenueCurrency: String,
+    ccavenueAmount: String,
+    ccavenueTransDate: String,
+    ccavenueResponseCode: String,
     ccavenueMerchantParam1: String,
     ccavenueMerchantParam2: String,
     ccavenueMerchantParam3: String,
     ccavenueMerchantParam4: String,
     ccavenueMerchantParam5: String,
-
-    ccavenueRawResponse: String,       // full decrypted string (optional)
+    ccavenueRawResponse: String,       
   },
   { timestamps: true }
 );

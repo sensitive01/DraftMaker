@@ -74,12 +74,36 @@ const uploadDocumentSchema = new mongoose.Schema(
       },
     },
     payment: {
-      totalAmount: Number,
-      paymentId: String,
-      paymentStatus: String,
-      paymentDate: Date,
-      paymentStatus: { type: String, default: "Success" },
-    },
+        orderId: String,
+        paymentId: String,
+        totalAmount: Number,
+        paymentStatus: {
+            type: String,
+            enum: ['PENDING', 'SUCCESS', 'FAILED', 'CANCELLED'],
+            default: 'PENDING'
+        },
+        paymentDate: Date,
+        ccavenueResponse: {
+            orderStatus: String,
+            trackingId: String,
+            bankRefNo: String,
+            paymentMode: String,
+            cardName: String,
+            statusMessage: String,
+            currency: { type: String, default: 'INR' },
+            amount: Number,
+            transDate: String,
+            responseCode: String,
+            merchantParams: {
+                param1: String,
+                param2: String,
+                param3: String,
+                param4: String,
+                param5: String
+            },
+            rawResponse: String
+        }
+    }
   },
   {
     timestamps: true,

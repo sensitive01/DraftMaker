@@ -114,7 +114,7 @@ const EstampBookingTable = () => {
             createdDateTime: formatDateTime(booking.createdAt),
             status: safeDisplay(booking.documentStatus, "Pending"),
             paymentStatus: safeDisplay(booking.paymentStatus, "Pending"),
-            paymentId: safeDisplay(booking.razorpayPaymentId),
+            paymentId: safeDisplay(booking.ccavenueTrackingId),
             deliveryType: safeDisplay(booking.deliveryType),
             selectedDocumentId: booking.selectedDocumentId || "",
             documentCalculationType: booking.documentCalculationType || "",
@@ -537,7 +537,7 @@ const EstampBookingTable = () => {
                   className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
                   style={{ minWidth: "150px" }}
                 >
-                  Payment ID
+                  CC Avenue Tracking ID
                 </th>
                 <th
                   className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
