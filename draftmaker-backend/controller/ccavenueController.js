@@ -859,7 +859,7 @@ const handleUploadResponse = async (req, res) => {
 
         if (orderStatus === 'Success') {
             return res.redirect(
-                `${process.env.FRONTEND_URL}/documents/preview-page/UPLOAD/${bookingId}`
+                `${process.env.FRONTEND_URL}`
             );
         } else {
             return res.redirect(
