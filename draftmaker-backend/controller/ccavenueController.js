@@ -729,24 +729,45 @@ const handleUploadResponse = async (req, res) => {
         const orderId = responseParams.order_id;
         const orderStatus = responseParams.order_status;
 
-        // Parse merchant_param2 as key-value pairs
+        // Parse merchant_param2 as key-value pairs without '='
         let uploadData = {};
         try {
             const merchantParam2 = responseParams.merchant_param2 || '';
             console.log('Raw merchant_param2:', merchantParam2);
 
-            // Parse key-value pairs separated by commas
-            const pairs = merchantParam2.split(',');
-            pairs.forEach(pair => {
-                const equalsIndex = pair.indexOf('=');
-                if (equalsIndex !== -1) {
-                    const key = pair.substring(0, equalsIndex).trim();
-                    const value = pair.substring(equalsIndex + 1).trim();
-                    if (key && value) {
-                        uploadData[key] = value;
+            // Known field names we expect to find in merchant_param2
+            const knownFields = [
+                'bookingId', 'mobileNumber', 'documentType', 'formId',
+                'fullName', 'userName', 'emailAddress', 'uploadedDocuments'
+            ];
+
+            // Process each field
+            let remaining = merchantParam2;
+            for (const field of knownFields) {
+                if (remaining.includes(field)) {
+                    const startIndex = remaining.indexOf(field) + field.length;
+                    let nextField = null;
+                    let nextFieldIndex = -1;
+
+                    // Find the start of the next field
+                    for (const next of knownFields) {
+                        if (next !== field && remaining.includes(next)) {
+                            const idx = remaining.indexOf(next);
+                            if (idx > startIndex && (nextFieldIndex === -1 || idx < nextFieldIndex)) {
+                                nextField = next;
+                                nextFieldIndex = idx;
+                            }
+                        }
                     }
+
+                    // Extract the value (everything until next field or end of string)
+                    const value = nextFieldIndex !== -1
+                        ? remaining.substring(startIndex, nextFieldIndex)
+                        : remaining.substring(startIndex);
+
+                    uploadData[field] = value.trim();
                 }
-            });
+            }
 
             console.log('Parsed upload data:', uploadData);
 
@@ -775,9 +796,10 @@ const handleUploadResponse = async (req, res) => {
         // Generate booking ID if not present
         const bookingId = uploadData.bookingId || (await generateBookingId());
 
-        // Prepare document data with proper fallbacks
+        // Prepare document data with proper field names to match documentsController
         const documentData = {
-            userName: uploadData.fullName || uploadData.userName || responseParams.billing_name || 'Customer',
+            // Using username (lowercase) instead of userName to match documentsController
+            username: uploadData.fullName || uploadData.userName || responseParams.billing_name || 'Customer',
             userMobile: uploadData.mobileNumber || responseParams.billing_tel || '',
             documentType: uploadData.documentType || 'UPLOAD',
             formId: uploadData.formId || 'UPLOAD',
@@ -817,18 +839,23 @@ const handleUploadResponse = async (req, res) => {
         console.log('📤 Sending document data to API...');
         console.log('Document data:', JSON.stringify(documentData, null, 2));
 
-        const response = await axios.post(
-            `${process.env.BACKEND_URL}/documents/upload-document-data`,
-            { documentData },
-            {
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                timeout: 10000 // 10 second timeout
-            }
-        );
+        try {
+            const response = await axios.post(
+                `${process.env.BACKEND_URL}/documents/upload-document-data`,
+                documentData,  // Send documentData directly, not wrapped in an object
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    timeout: 10000 // 10 second timeout
+                }
+            );
 
-        console.log('✅ Document data saved successfully', response.data);
+            console.log('✅ Document data saved successfully', response.data);
+        } catch (error) {
+            console.error('❌ Error saving document data:', error.response?.data || error.message);
+            throw error; // Re-throw to be caught by the outer try-catch
+        }
 
         if (orderStatus === 'Success') {
             return res.redirect(
