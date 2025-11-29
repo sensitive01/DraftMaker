@@ -637,7 +637,7 @@ const initiateUploadPayment = async (req, res) => {
         const orderId = `UPLOAD_${Date.now()}`;
         console.log('\n🔢 Generated Order ID:', orderId);
 
-        // ✅ PROPERLY FORMAT merchant_param2 with clear key=value pairs
+        // ✅ Prepare merchant data object
         const merchantData = {
             bookingId: paymentData.bookingId || 'PENDING',
             mobileNumber: paymentData.mobileNumber || '',
@@ -651,16 +651,22 @@ const initiateUploadPayment = async (req, res) => {
             basePrice: paymentData.basePrice || 0,
             totalAmount: paymentData.totalAmount || 0,
             uploadedDocuments: paymentData.uploadedDocuments || [],
-            totalDocuments: paymentData.totalDocuments || 0,
+            totalDocuments: Array.isArray(paymentData.uploadedDocuments) ? paymentData.uploadedDocuments.length : 0,
             selectedStampDutyId: paymentData.selectedStampDutyId || '',
             stampDutyDocumentType: paymentData.stampDutyDocumentType || '',
+            stampDutyAmount: paymentData.stampDutyAmount || 0,
             selectedDeliveryServiceId: paymentData.selectedDeliveryServiceId || '',
             deliveryServiceName: paymentData.deliveryServiceName || '',
-            deliveryCharge: paymentData.deliveryCharge || 0
+            deliveryCharge: paymentData.deliveryCharge || 0,
+            deliveryDescription: paymentData.deliveryDescription || ''
         };
 
-        // ✅ Convert to JSON string for safe transmission
-        const merchantParam2 = JSON.stringify(merchantData);
+        // ✅ Convert to JSON and then Base64 encode to preserve structure
+        const merchantDataJSON = JSON.stringify(merchantData);
+        const merchantParam2Base64 = Buffer.from(merchantDataJSON).toString('base64');
+
+        console.log('\n📦 Merchant Data:', merchantData);
+        console.log('\n🔐 Base64 Encoded Length:', merchantParam2Base64.length);
 
         // Prepare CCAvenue parameters
         const ccavenueParams = {
@@ -676,13 +682,12 @@ const initiateUploadPayment = async (req, res) => {
             billing_tel: paymentData.mobileNumber,
             billing_email: paymentData.emailAddress || 'noreply@example.com',
 
-            // Store data as JSON string
+            // Store Base64 encoded data
             merchant_param1: 'UPLOAD_DOCS',
-            merchant_param2: merchantParam2,
+            merchant_param2: merchantParam2Base64,
         };
 
         console.log('\n🔐 CCAvenue Parameters prepared');
-        console.log('Merchant Param2:', merchantParam2);
 
         // Build & encrypt parameter string
         const queryParams = [];
@@ -752,14 +757,18 @@ const handleUploadResponse = async (req, res) => {
         const orderId = responseParams.order_id;
         const orderStatus = responseParams.order_status;
 
-        // ✅ PROPERLY PARSE merchant_param2 as JSON
+        // ✅ Decode Base64 and parse JSON
         let uploadData = {};
         try {
-            const merchantParam2 = responseParams.merchant_param2 || '{}';
+            const merchantParam2 = responseParams.merchant_param2 || '';
             console.log('Raw merchant_param2:', merchantParam2);
 
-            // Parse JSON string
-            uploadData = JSON.parse(merchantParam2);
+            // Decode from Base64
+            const decodedJSON = Buffer.from(merchantParam2, 'base64').toString('utf-8');
+            console.log('Decoded JSON:', decodedJSON);
+
+            // Parse JSON
+            uploadData = JSON.parse(decodedJSON);
             console.log('✅ Parsed upload data:', uploadData);
 
         } catch (e) {
@@ -825,7 +834,8 @@ const handleUploadResponse = async (req, res) => {
             delivery: uploadData.selectedDeliveryServiceId ? {
                 deliveryServiceId: uploadData.selectedDeliveryServiceId,
                 serviceName: uploadData.deliveryServiceName || '',
-                charge: parseFloat(uploadData.deliveryCharge) || 0
+                charge: parseFloat(uploadData.deliveryCharge) || 0,
+                description: uploadData.deliveryDescription || ''
             } : {},
 
             payment: {
