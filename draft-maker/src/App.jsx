@@ -1166,7 +1166,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/upload-document"
+          path="/documents/home/upload-document"
           element={
             <PaymentLayout>
               <DocumentUpload />

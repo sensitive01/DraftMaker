@@ -480,7 +480,7 @@ const Header = () => {
                 <li className="nav-item active">
                   <Link
                     className="nav-link dark_btn"
-                    to="/documents/upload-document"
+                    to="/documents/home/upload-document"
                     onClick={closeMenu}
                   >
                     Upload Document{" "}
