@@ -645,7 +645,7 @@ const DocumentUpload = () => {
         })),
       };
 
-      console.log("📦 Payment Data:", paymentData);
+
 
       const response = await fetch(
         `${import.meta.env.VITE_BASE_ROUTE}/payment/initiate-upload-payment`,
