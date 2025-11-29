@@ -11,6 +11,7 @@ const documentPrice = require("./routes/documentPriceRoute");
 const documentRouter = require("./routes/documentsRoutes");
 const messageRouter = require("./routes/messageRoutes");
 const paymentRoutes = require("./routes/ccavenueRoutes");
+const uploadRoutes = require("./routes/uploadedRoute")
 
 // ✅ Allowed frontend origins
 const allowedOrigins = [
@@ -113,6 +114,7 @@ app.use("/document-price", documentPrice);
 app.use("/documents", documentRouter);
 app.use("/message", messageRouter);
 app.use("/payment", paymentRoutes);
+app.use('/upload', uploadRoutes); 
 
 
 
