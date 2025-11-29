@@ -5,32 +5,32 @@ const uploadDocumentSchema = new mongoose.Schema(
   {
     userName: {
       type: String,
-      required: true,
+
       trim: true,
     },
     userMobile: {
       type: String,
-      required: true,
+
       trim: true,
     },
     emailAddress: { type: String },
     documentType: {
       type: String,
-      required: true,
+
     },
     formId: {
       type: String,
-      required: true,
+
     },
     documents: [
       {
         type: String,
-        required: true,
+
       },
     ],
     totalDocuments: {
       type: Number,
-      required: true,
+
     },
     documentStatus: {
       type: String,
@@ -74,35 +74,35 @@ const uploadDocumentSchema = new mongoose.Schema(
       },
     },
     payment: {
-        orderId: String,
-        paymentId: String,
-        totalAmount: Number,
-        paymentStatus: {
-            type: String,
-            enum: ['PENDING', 'SUCCESS', 'FAILED', 'CANCELLED'],
-            default: 'PENDING'
+      orderId: String,
+      paymentId: String,
+      totalAmount: Number,
+      paymentStatus: {
+        type: String,
+        enum: ['PENDING', 'SUCCESS', 'FAILED', 'CANCELLED'],
+        default: 'PENDING'
+      },
+      paymentDate: Date,
+      ccavenueResponse: {
+        orderStatus: String,
+        trackingId: String,
+        bankRefNo: String,
+        paymentMode: String,
+        cardName: String,
+        statusMessage: String,
+        currency: { type: String, default: 'INR' },
+        amount: Number,
+        transDate: String,
+        responseCode: String,
+        merchantParams: {
+          param1: String,
+          param2: String,
+          param3: String,
+          param4: String,
+          param5: String
         },
-        paymentDate: Date,
-        ccavenueResponse: {
-            orderStatus: String,
-            trackingId: String,
-            bankRefNo: String,
-            paymentMode: String,
-            cardName: String,
-            statusMessage: String,
-            currency: { type: String, default: 'INR' },
-            amount: Number,
-            transDate: String,
-            responseCode: String,
-            merchantParams: {
-                param1: String,
-                param2: String,
-                param3: String,
-                param4: String,
-                param5: String
-            },
-            rawResponse: String
-        }
+        rawResponse: String
+      }
     }
   },
   {
