@@ -3410,7 +3410,14 @@ const updateRecidentialPaymentData = async (req, res) => {
 
 const uploadDocumentData = async (req, res) => {
   try {
-    console.log("Upload", req.body);
+    console.log("📥 Incoming Upload Data:", req.body);
+
+    if (!req.body.documentData) {
+      return res.status(400).json({
+        success: false,
+        message: "documentData is missing",
+      });
+    }
 
     const {
       username,
@@ -3423,52 +3430,69 @@ const uploadDocumentData = async (req, res) => {
       selectedService,
       stampDuty,
       delivery,
-      payment,
+      payment = {}, // safe default
       emailAddress,
       bookingId
     } = req.body.documentData;
 
-    // const bookingId = await generateBookingId();
+    // Basic validation
+    if (!username || !userMobile || !documentType || !formId) {
+      return res.status(400).json({
+        success: false,
+        message: "Required fields missing (username, userMobile, documentType, formId)"
+      });
+    }
 
     const newUpload = new uploadDocument({
       userName: username,
       userMobile,
       documentType,
       formId,
-      documents,
-      totalDocuments,
-      submittedAt,
+      documents: documents || [],
+      totalDocuments: totalDocuments || 0,
+      submittedAt: submittedAt || Date.now(),
       bookingId,
-      selectedService,
-      stampDuty,
-      delivery,
-      payment,
-      emailAddress,
+      selectedService: selectedService || {},
+      stampDuty: stampDuty || {},
+      delivery: delivery || {},
+      payment: {
+        orderId: payment.orderId || "",
+        paymentId: payment.paymentId || "",
+        totalAmount: payment.totalAmount || 0,
+        paymentStatus: payment.paymentStatus || "PENDING",
+        paymentDate: payment.paymentDate || null,
+        ccavenueResponse: payment.ccavenueResponse || {}
+      },
+      emailAddress: emailAddress || "",
     });
 
     await newUpload.save();
 
+    // Send email notification
     await sendEmail("draftmakerinfo@gmail.com", "uploadDocuments", {
       bookingId: bookingId,
       agreementName: documentType,
       dateTime: newUpload.createdAt,
       userName: username,
       mobile: userMobile,
-      paymentId: payment.paymentId,
-      paymentStatus: payment.paymentStatus,
-      amount: payment.totalAmount,
+      paymentId: payment.paymentId || "N/A",
+      paymentStatus: payment.paymentStatus || "PENDING",
+      amount: payment.totalAmount || 0,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Document data uploaded successfully",
       data: newUpload,
     });
+
   } catch (err) {
-    console.error("Error uploading document data:", err);
-    res.status(500).json({
+    console.error("❌ Error uploading document data:", err);
+
+    return res.status(500).json({
       success: false,
       message: "Failed to upload document data",
+      error: err.message,
     });
   }
 };
