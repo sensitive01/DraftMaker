@@ -898,7 +898,7 @@ const handleUploadResponse = async (req, res) => {
 
             const response = await axios.post(
                 `${process.env.BACKEND_URL}/documents/upload-document-data`,
-                documentData, // Send documentData directly, not wrapped in a data property
+                {documentData}, // Send documentData directly, not wrapped in a data property
                 {
                     headers: {
                         "Content-Type": "application/json"
