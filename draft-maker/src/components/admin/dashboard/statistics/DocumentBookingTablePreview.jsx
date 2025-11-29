@@ -16,6 +16,12 @@ import {
   X,
   Truck,
   Receipt,
+  Mail,
+  Building,
+  Home,
+  Calendar,
+  Hash,
+  Users,
 } from "lucide-react";
 import {
   getBookingTablePreviewData,
@@ -27,6 +33,7 @@ const DocumentBookingTablePreview = () => {
   const navigate = useNavigate();
 
   const [booking, setBooking] = useState(null);
+  const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -66,6 +73,7 @@ const DocumentBookingTablePreview = () => {
 
         if (response.status === 200) {
           setBooking(response.data.data);
+          setOrderDetails(response.data.orderDetails || null);
         } else {
           setError("Failed to fetch booking details");
         }
@@ -184,7 +192,9 @@ const DocumentBookingTablePreview = () => {
   const hasData = (data) => {
     if (!data) return false;
     if (typeof data === "object") {
-      return Object.keys(data).length > 0;
+      return Object.values(data).some(
+        (val) => val !== null && val !== undefined && val !== ""
+      );
     }
     return data !== null && data !== undefined && data !== "";
   };
@@ -210,21 +220,31 @@ const DocumentBookingTablePreview = () => {
                       size={28}
                       className="mr-3 text-red-600 flex-shrink-0"
                     />
-                    Document Booking
+                    {booking.documentType || "Document Booking"}
                   </h1>
-                  {booking.bookingId && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <span className="text-sm font-medium">Booking ID:</span>
-                      <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
-                        {booking.bookingId}
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex flex-wrap items-center gap-4 text-gray-600">
+                    {booking.bookingId && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">Booking ID:</span>
+                        <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
+                          {booking.bookingId}
+                        </span>
+                      </div>
+                    )}
+                    {booking.formId && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">Form ID:</span>
+                        <span className="text-sm font-mono bg-blue-100 px-2 py-1 rounded text-blue-700">
+                          {booking.formId}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Right Side - Status and Action */}
-              {/* <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 {booking.doumentStatus && (
                   <div className="flex items-center">
                     <span
@@ -244,7 +264,7 @@ const DocumentBookingTablePreview = () => {
                   <Edit size={16} />
                   Update Status
                 </button>
-              </div> */}
+              </div>
             </div>
           </div>
         </div>
@@ -254,7 +274,7 @@ const DocumentBookingTablePreview = () => {
           {/* Left Column - Main Information */}
           <div className="xl:col-span-8 space-y-8">
             {/* Customer Information Card */}
-            {(booking.userName || booking.mobileNumber) && (
+            {(booking.userName || booking.mobileNumber || booking.email) && (
               <div className="bg-white rounded-xl shadow-sm border">
                 <div className="px-6 py-5 border-b border-gray-200">
                   <h2 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -283,6 +303,193 @@ const DocumentBookingTablePreview = () => {
                         <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium flex items-center">
                           <Phone size={16} className="mr-2 text-gray-500" />
                           {booking.mobileNumber}
+                        </div>
+                      </div>
+                    )}
+
+                    {booking.email && (
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Email Address
+                        </label>
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 flex items-center">
+                          <Mail size={16} className="mr-2 text-gray-500" />
+                          {booking.email}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Parties Information Card */}
+            {(booking.firstParty || booking.secondParty) && (
+              <div className="bg-white rounded-xl shadow-sm border">
+                <div className="px-6 py-5 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <Users size={20} className="mr-3 text-red-600" />
+                    Party Information
+                  </h2>
+                </div>
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {booking.firstParty && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          First Party
+                        </label>
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium">
+                          {booking.firstParty}
+                        </div>
+                      </div>
+                    )}
+
+                    {booking.secondParty && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Second Party
+                        </label>
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium">
+                          {booking.secondParty}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Form-Specific Details Card */}
+            {(booking.ownerName ||
+              booking.aadhaarNo ||
+              booking.ownerAddress ||
+              booking.premisesAddress ||
+              booking.tenantName ||
+              booking.companyName ||
+              booking.officeAddress) && (
+                <div className="bg-white rounded-xl shadow-sm border">
+                  <div className="px-6 py-5 border-b border-gray-200">
+                    <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                      <FileText size={20} className="mr-3 text-red-600" />
+                      Document Details
+                    </h2>
+                  </div>
+                  <div className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {booking.ownerName && (
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700">
+                            Owner Name
+                          </label>
+                          <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium">
+                            {booking.ownerName}
+                          </div>
+                        </div>
+                      )}
+
+                      {booking.aadhaarNo && (
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700">
+                            Aadhaar Number
+                          </label>
+                          <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-mono">
+                            {booking.aadhaarNo}
+                          </div>
+                        </div>
+                      )}
+
+                      {booking.ownerAddress && (
+                        <div className="space-y-2 md:col-span-2">
+                          <label className="block text-sm font-semibold text-gray-700">
+                            Owner Address
+                          </label>
+                          <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900">
+                            {booking.ownerAddress}
+                          </div>
+                        </div>
+                      )}
+
+                      {booking.premisesAddress && (
+                        <div className="space-y-2 md:col-span-2">
+                          <label className="block text-sm font-semibold text-gray-700">
+                            Premises Address
+                          </label>
+                          <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900">
+                            {booking.premisesAddress}
+                          </div>
+                        </div>
+                      )}
+
+                      {booking.tenantName && (
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700">
+                            Tenant Name
+                          </label>
+                          <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium">
+                            {booking.tenantName}
+                          </div>
+                        </div>
+                      )}
+
+                      {booking.companyName && (
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700 flex items-center">
+                            <Building size={14} className="mr-1" />
+                            Company Name
+                          </label>
+                          <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium">
+                            {booking.companyName}
+                          </div>
+                        </div>
+                      )}
+
+                      {booking.officeAddress && (
+                        <div className="space-y-2 md:col-span-2">
+                          <label className="block text-sm font-semibold text-gray-700">
+                            Office Address
+                          </label>
+                          <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900">
+                            {booking.officeAddress}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            {/* Date and Place Information */}
+            {(booking.place || booking.day || booking.month || booking.year) && (
+              <div className="bg-white rounded-xl shadow-sm border">
+                <div className="px-6 py-5 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <Calendar size={20} className="mr-3 text-red-600" />
+                    Date & Place Information
+                  </h2>
+                </div>
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {booking.place && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Place
+                        </label>
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium">
+                          {booking.place}
+                        </div>
+                      </div>
+                    )}
+
+                    {(booking.day || booking.month || booking.year) && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Date
+                        </label>
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium">
+                          {booking.day && `${booking.day} `}
+                          {booking.month && `${booking.month} `}
+                          {booking.year && booking.year}
                         </div>
                       </div>
                     )}
@@ -356,14 +563,218 @@ const DocumentBookingTablePreview = () => {
                         </div>
                       </div>
                     )}
+                  </div>
+                </div>
+              </div>
+            )}
 
-                    {booking.deliveryAddress.email && (
+            {/* CCAvenue Payment Response Card */}
+            {orderDetails?.ccavenueResponse && (
+              <div className="bg-white rounded-xl shadow-sm border">
+                <div className="px-6 py-5 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <CreditCard size={20} className="mr-3 text-red-600" />
+                    CCAvenue Payment Details
+                  </h2>
+                </div>
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {orderDetails.ccavenueResponse.trackingId && (
                       <div className="space-y-2">
                         <label className="block text-sm font-semibold text-gray-700">
-                          Email Address
+                          Tracking ID
                         </label>
-                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-mono">
-                          {booking.deliveryAddress.email}
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-mono text-sm">
+                          {orderDetails.ccavenueResponse.trackingId}
+                        </div>
+                      </div>
+                    )}
+
+                    {orderDetails.ccavenueResponse.bankRefNo && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Bank Reference No
+                        </label>
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-mono text-sm">
+                          {orderDetails.ccavenueResponse.bankRefNo}
+                        </div>
+                      </div>
+                    )}
+
+                    {orderDetails.ccavenueResponse.orderStatus && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Order Status
+                        </label>
+                        <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3">
+                          <span className="text-green-800 font-semibold">
+                            {orderDetails.ccavenueResponse.orderStatus}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {orderDetails.ccavenueResponse.paymentMode && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Payment Mode
+                        </label>
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium">
+                          {orderDetails.ccavenueResponse.paymentMode}
+                        </div>
+                      </div>
+                    )}
+
+                    {orderDetails.ccavenueResponse.cardName && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Card/Payment Type
+                        </label>
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium">
+                          {orderDetails.ccavenueResponse.cardName}
+                        </div>
+                      </div>
+                    )}
+
+                    {orderDetails.ccavenueResponse.statusMessage && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Status Message
+                        </label>
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900">
+                          {orderDetails.ccavenueResponse.statusMessage}
+                        </div>
+                      </div>
+                    )}
+
+                    {orderDetails.ccavenueResponse.transDate && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Transaction Date
+                        </label>
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium">
+                          {orderDetails.ccavenueResponse.transDate}
+                        </div>
+                      </div>
+                    )}
+
+                    {orderDetails.ccavenueResponse.amount && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Transaction Amount
+                        </label>
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+                          <span className="text-blue-900 font-bold text-lg">
+                            ₹{orderDetails.ccavenueResponse.amount}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Merchant Parameters */}
+                  {orderDetails.ccavenueResponse.merchantParams && (
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <h3 className="text-md font-semibold text-gray-900 mb-4">
+                        Merchant Parameters
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {Object.entries(
+                          orderDetails.ccavenueResponse.merchantParams
+                        ).map(
+                          ([key, value]) =>
+                            value && (
+                              <div key={key} className="space-y-1">
+                                <label className="block text-xs font-semibold text-gray-600 uppercase">
+                                  {key}
+                                </label>
+                                <div className="bg-gray-50 border border-gray-200 rounded px-3 py-2 text-gray-900 text-sm font-mono">
+                                  {value}
+                                </div>
+                              </div>
+                            )
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Order Details Card */}
+            {orderDetails && (
+              <div className="bg-white rounded-xl shadow-sm border">
+                <div className="px-6 py-5 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <Hash size={20} className="mr-3 text-red-600" />
+                    Order Information
+                  </h2>
+                </div>
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {orderDetails.orderId && (
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Order ID
+                        </label>
+                        <div className="bg-purple-50 border border-purple-200 rounded-lg px-4 py-3 text-purple-900 font-mono text-sm">
+                          {orderDetails.orderId}
+                        </div>
+                      </div>
+                    )}
+
+                    {orderDetails.transactionId && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Transaction ID
+                        </label>
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-mono text-sm">
+                          {orderDetails.transactionId}
+                        </div>
+                      </div>
+                    )}
+
+                    {orderDetails.paymentMethod && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Payment Method
+                        </label>
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium uppercase">
+                          {orderDetails.paymentMethod}
+                        </div>
+                      </div>
+                    )}
+
+                    {orderDetails.status && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Order Status
+                        </label>
+                        <div
+                          className={`rounded-lg px-4 py-3 border ${getStatusBadgeColor(
+                            orderDetails.status
+                          )}`}
+                        >
+                          <span className="font-semibold">
+                            {orderDetails.status}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {orderDetails.paymentStatus && (
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Payment Status
+                        </label>
+                        <div
+                          className={`rounded-lg px-4 py-3 border ${getStatusBadgeColor(
+                            orderDetails.paymentStatus
+                          )}`}
+                        >
+                          <span className="font-semibold">
+                            {orderDetails.paymentStatus}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -475,11 +886,10 @@ const DocumentBookingTablePreview = () => {
                         Notary Service
                       </span>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          booking.paymentDetails.includesNotary
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${booking.paymentDetails.includesNotary
                             ? "bg-green-100 text-green-800"
                             : "bg-gray-100 text-gray-600"
-                        }`}
+                          }`}
                       >
                         {booking.paymentDetails.includesNotary
                           ? "Included"
@@ -544,17 +954,8 @@ const DocumentBookingTablePreview = () => {
                       </span>
                     </div>
                   )}
-                  {booking.serviceDetails.notaryCharge !== undefined && (
-                    <div className="flex items-center justify-between py-1.5">
-                      <span className="text-sm font-medium text-gray-700">
-                        Quantity
-                      </span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        No.{booking.serviceDetails.quantity}
-                      </span>
-                    </div>
-                  )}
-                  {booking.serviceDetails.notaryCharge !== undefined && (
+
+                  {booking.serviceDetails.serviceCharge !== undefined && (
                     <div className="flex items-center justify-between py-1.5">
                       <span className="text-sm font-medium text-gray-700">
                         Service Charge
@@ -564,59 +965,118 @@ const DocumentBookingTablePreview = () => {
                       </span>
                     </div>
                   )}
-                  {booking.serviceDetails.notaryCharge !== undefined && (
+
+                  {booking.serviceDetails.quantity !== undefined && (
                     <div className="flex items-center justify-between py-1.5">
                       <span className="text-sm font-medium text-gray-700">
-                        Consideration Amount
+                        Quantity
                       </span>
                       <span className="text-sm font-semibold text-gray-900">
-                        ₹{booking.serviceDetails.considerationAmount}
+                        {booking.serviceDetails.quantity}
                       </span>
                     </div>
                   )}
 
+                  {booking.serviceDetails.considerationAmount !== undefined &&
+                    booking.serviceDetails.considerationAmount !== null &&
+                    booking.serviceDetails.considerationAmount !== "" && (
+                      <div className="flex items-center justify-between py-1.5">
+                        <span className="text-sm font-medium text-gray-700">
+                          Consideration Amount
+                        </span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          ₹{booking.serviceDetails.considerationAmount}
+                        </span>
+                      </div>
+                    )}
 
                   {(booking.serviceDetails.requiresStamp !== undefined ||
                     booking.serviceDetails.requiresDelivery !== undefined) && (
-                    <div className="border-t border-gray-200 pt-3 mt-3">
-                      {booking.serviceDetails.requiresStamp !== undefined && (
-                        <div className="flex items-center justify-between py-1">
-                          <span className="text-sm font-medium text-gray-700">
-                            Stamp Required
-                          </span>
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              booking.serviceDetails.requiresStamp
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-gray-100 text-gray-600"
-                            }`}
-                          >
-                            {booking.serviceDetails.requiresStamp
-                              ? "Yes"
-                              : "No"}
-                          </span>
-                        </div>
-                      )}
+                      <div className="border-t border-gray-200 pt-3 mt-3">
+                        {booking.serviceDetails.requiresStamp !== undefined && (
+                          <div className="flex items-center justify-between py-1">
+                            <span className="text-sm font-medium text-gray-700">
+                              Stamp Required
+                            </span>
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${booking.serviceDetails.requiresStamp
+                                  ? "bg-blue-100 text-blue-800"
+                                  : "bg-gray-100 text-gray-600"
+                                }`}
+                            >
+                              {booking.serviceDetails.requiresStamp
+                                ? "Yes"
+                                : "No"}
+                            </span>
+                          </div>
+                        )}
 
-                      {booking.serviceDetails.requiresDelivery !==
-                        undefined && (
-                        <div className="flex items-center justify-between py-1">
-                          <span className="text-sm font-medium text-gray-700">
-                            Delivery Required
-                          </span>
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              booking.serviceDetails.requiresDelivery
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-gray-100 text-gray-600"
-                            }`}
-                          >
-                            {booking.serviceDetails.requiresDelivery
-                              ? "Yes"
-                              : "No"}
-                          </span>
-                        </div>
-                      )}
+                        {booking.serviceDetails.requiresDelivery !==
+                          undefined && (
+                            <div className="flex items-center justify-between py-1">
+                              <span className="text-sm font-medium text-gray-700">
+                                Delivery Required
+                              </span>
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${booking.serviceDetails.requiresDelivery
+                                    ? "bg-blue-100 text-blue-800"
+                                    : "bg-gray-100 text-gray-600"
+                                  }`}
+                              >
+                                {booking.serviceDetails.requiresDelivery
+                                  ? "Yes"
+                                  : "No"}
+                              </span>
+                            </div>
+                          )}
+                      </div>
+                    )}
+                </div>
+              </div>
+            )}
+
+            {/* Stamp Duty Details Card */}
+            {hasData(booking.selectedStampDuty) && (
+              <div className="bg-white rounded-xl shadow-sm border">
+                <div className="px-4 py-3 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <FileText size={20} className="mr-2 text-red-600" />
+                    Stamp Duty Details
+                  </h2>
+                </div>
+                <div className="p-4">
+                  {booking.selectedStampDuty.serviceName && (
+                    <div className="mb-3">
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        Service Name
+                      </label>
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-900 text-sm font-medium">
+                        {booking.selectedStampDuty.serviceName}
+                      </div>
+                    </div>
+                  )}
+
+                  {booking.selectedStampDuty.description && (
+                    <div className="mb-3">
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        Description
+                      </label>
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-700 text-xs">
+                        {booking.selectedStampDuty.description}
+                      </div>
+                    </div>
+                  )}
+
+                  {booking.selectedStampDuty.charge !== undefined && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold text-blue-800">
+                          Stamp Duty Charge
+                        </span>
+                        <span className="text-lg font-bold text-blue-900">
+                          ₹{booking.selectedStampDuty.charge}
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -664,6 +1124,67 @@ const DocumentBookingTablePreview = () => {
                         <span className="text-lg font-bold text-blue-900">
                           ₹{booking.selectedDeliveryCharge.charge}
                         </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Timeline Card */}
+            {(booking.createdAt || booking.updatedAt) && (
+              <div className="bg-white rounded-xl shadow-sm border">
+                <div className="px-4 py-3 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <Clock size={20} className="mr-2 text-red-600" />
+                    Timeline
+                  </h2>
+                </div>
+                <div className="p-4 space-y-3">
+                  {booking.createdAt && (
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">
+                        Created At
+                      </label>
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-900 text-sm">
+                        {booking.createdAt}
+                      </div>
+                    </div>
+                  )}
+
+                  {booking.updatedAt && (
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">
+                        Last Updated
+                      </label>
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-900 text-sm">
+                        {new Date(booking.updatedAt).toLocaleString("en-IN", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {orderDetails?.createdAt && (
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">
+                        Order Created
+                      </label>
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-900 text-sm">
+                        {new Date(orderDetails.createdAt).toLocaleString(
+                          "en-IN",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}
                       </div>
                     </div>
                   )}

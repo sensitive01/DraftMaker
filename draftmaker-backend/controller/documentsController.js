@@ -887,8 +887,13 @@ const getBookingDataPreview = async (req, res) => {
       recidentialSchema,
     ];
 
+    // Fetch order details (if exists)
+    const orderDetails = await Order.findOne({ bookingId });
+    console.log("orderDetails", orderDetails);
+
     let bookingData = null;
 
+    // Search for booking data
     for (const model of collections) {
       const found = await model.findOne({ bookingId });
       if (found) {
@@ -904,7 +909,7 @@ const getBookingDataPreview = async (req, res) => {
       });
     }
 
-    // Format createdAt
+    // Format createdAt date
     const date = new Date(bookingData.createdAt);
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -927,16 +932,20 @@ const getBookingDataPreview = async (req, res) => {
       createdAt: formattedDateTime,
     };
 
+    // SUCCESS RESPONSE (includes orderDetails if present)
     res.status(200).json({
       success: true,
       message: "Booking data fetched successfully",
       data: formattedData,
+      orderDetails: orderDetails || null, // <-- Added this
     });
+
   } catch (err) {
     console.error("Error in getBookingDataPreview:", err);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
 
 const getDocumentFormData = async (req, res) => {
   try {

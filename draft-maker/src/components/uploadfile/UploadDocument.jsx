@@ -662,8 +662,7 @@ const DocumentUpload = () => {
       // Submit form to CCAvenue
       const form = document.createElement("form");
       form.method = "POST";
-      form.action =
-        "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
+      form.action = "https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
 
       form.innerHTML = `
       <input type="hidden" name="encRequest" value="${data.encRequest}" />
