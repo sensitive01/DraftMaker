@@ -114,7 +114,7 @@ app.use("/document-price", documentPrice);
 app.use("/documents", documentRouter);
 app.use("/message", messageRouter);
 app.use("/payment", paymentRoutes);
-app.use('/upload', uploadRoutes); 
+// app.use('/upload', uploadRoutes); 
 
 
 
