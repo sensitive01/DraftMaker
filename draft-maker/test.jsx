@@ -76,22 +76,22 @@ function App() {
               ))}
             </div>
           </div>
-            <div className="container">
-              <div className="bred_text">
-                <h1>Draft Document</h1>
-                <ul>
-                  <li>
-                    <a href="/">Document</a>
-                  </li>
-                  <li>
-                    <span>»</span>
-                  </li>
-                  <li>
-                    <a href="/rental-lease">Rental / Lease Agreement</a>
-                  </li>
-                </ul>
-              </div>
+          <div className="container">
+            <div className="bred_text">
+              <h1>Draft Document</h1>
+              <ul>
+                <li>
+                  <a href="/">Document</a>
+                </li>
+                <li>
+                  <span>»</span>
+                </li>
+                <li>
+                  <a href="/rental-lease">Rental / Lease Agreement</a>
+                </li>
+              </ul>
             </div>
+          </div>
         </div>
 
         <Routes>

@@ -1,29 +1,34 @@
 import axios from "axios";
 
-const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-
 export const uploadCloudinary = async (file, fileType = 'documents') => {
   const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
-  console.log("Cloudinary Config:", {
-    cloudName,
-    uploadPreset,
-    fileType: file.type,
-    fileSize: (file.size / 1024 / 1024).toFixed(2) + 'MB'
-  });
+  const isPDF = file.type === "application/pdf";
 
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', uploadPreset);
-  formData.append('folder', `draft-documents/${new Date().toISOString().split('T')[0]}/${fileType}`);
+  formData.append(
+    'folder',
+    `draft-documents/${new Date().toISOString().split('T')[0]}/${fileType}`
+  );
+
+  // keep raw for pdf upload
+  const uploadType = isPDF ? "raw" : "auto";
 
   try {
     const response = await axios.post(
-      `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
+      `https://api.cloudinary.com/v1_1/${cloudName}/${uploadType}/upload`,
       formData
     );
-    return response.data;
+
+    // ⭐ THIS IS THE IMPORTANT FIX ⭐
+    return {
+      ...response.data,
+      view_url: `https://res.cloudinary.com/${cloudName}/image/upload/${response.data.public_id}`
+    };
+
   } catch (error) {
     console.error('Cloudinary Error:', {
       status: error.response?.status,

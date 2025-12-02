@@ -15,6 +15,7 @@ import {
   Download,
   Link,
   ChevronDown,
+  XCircle,
 } from "lucide-react";
 import React, { useState } from "react";
 import SuccessNotification from "../documents/serviceNotification/SuccessNotification";
@@ -65,6 +66,23 @@ const UploadDocumentUi = ({
     useState(false);
   const [showImportantNoticePopup, setShowImportantNoticePopup] =
     useState(false);
+
+  // Function to handle file preview
+  const handleFilePreview = (file) => {
+    if (file.type === 'application/pdf') {
+      // Create object URL for the file
+      const fileUrl = URL.createObjectURL(file);
+      // Open in new tab
+      window.open(fileUrl, '_blank');
+      // Clean up the object URL after use
+      URL.revokeObjectURL(fileUrl);
+    } else if (file.type.startsWith('image/')) {
+      // For images, open in a new tab
+      const fileUrl = URL.createObjectURL(file);
+      window.open(fileUrl, '_blank');
+      URL.revokeObjectURL(fileUrl);
+    }
+  };
 
   const handleDocumentSelect = (docType) => {
     const event = {
@@ -298,9 +316,8 @@ const UploadDocumentUi = ({
                       : "-- Select Document Type --"}
                   </span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform ${
-                      isDropdownOpen ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform ${isDropdownOpen ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -419,9 +436,16 @@ const UploadDocumentUi = ({
                       <div className="flex items-center gap-2 flex-1">
                         {getFileIcon(fileObj)}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleFilePreview(fileObj.file);
+                            }}
+                            className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline truncate text-left"
+                            title="Click to view file"
+                          >
                             {fileObj.file.name}
-                          </p>
+                          </button>
                           <p className="text-sm text-gray-500">
                             {(fileObj.file.size / 1024 / 1024).toFixed(2)} MB
                           </p>
@@ -451,11 +475,10 @@ const UploadDocumentUi = ({
                     <button
                       key={service.id}
                       onClick={() => handleServiceSelect(service)}
-                      className={`border-2 ${
-                        selectedService?.id === service.id
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-200 hover:border-red-300"
-                      } rounded-md p-3 text-left transition-all relative`}
+                      className={`border-2 ${selectedService?.id === service.id
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-200 hover:border-red-300"
+                        } rounded-md p-3 text-left transition-all relative`}
                     >
                       {selectedService?.id === service.id && (
                         <CheckCircle className="absolute -top-1 -right-1 h-4 w-4 text-green-500" />
@@ -538,9 +561,8 @@ const UploadDocumentUi = ({
                     Calculation:{" "}
                     {selectedStampDuty.calculationType === "fixed"
                       ? `₹${selectedStampDuty.fixedAmount} × ${quantity}`
-                      : `${selectedStampDuty.percentage}% of ₹${
-                          considerationAmount || "0"
-                        } × ${quantity}`}
+                      : `${selectedStampDuty.percentage}% of ₹${considerationAmount || "0"
+                      } × ${quantity}`}
                   </p>
                   <p className="font-bold text-blue-600 text-sm mt-1">
                     Stamp Duty: ₹{calculateStampDutyAmount(selectedStampDuty)}
@@ -642,11 +664,10 @@ const UploadDocumentUi = ({
                     type="email"
                     value={emailAddress}
                     onChange={(e) => setEmailAddress(e.target.value)}
-                    className={`w-full px-3 py-2 text-sm border-2 ${
-                      emailAddress && !isValidEmail(emailAddress)
-                        ? "border-red-300 focus:border-red-500 focus:ring-red-100"
-                        : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
-                    } rounded-md focus:ring-1 transition-all`}
+                    className={`w-full px-3 py-2 text-sm border-2 ${emailAddress && !isValidEmail(emailAddress)
+                      ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                      : "border-gray-200 focus:border-blue-500 focus:ring-blue-100"
+                      } rounded-md focus:ring-1 transition-all`}
                     placeholder="your.email@example.com"
                     required
                   />
@@ -714,9 +735,8 @@ const UploadDocumentUi = ({
                           : "Select Delivery Service"}
                       </span>
                       <ChevronDown
-                        className={`w-4 h-4 transition-transform ${
-                          isDeliveryDropdownOpen ? "rotate-180" : ""
-                        }`}
+                        className={`w-4 h-4 transition-transform ${isDeliveryDropdownOpen ? "rotate-180" : ""
+                          }`}
                       />
                     </button>
 
@@ -934,14 +954,13 @@ const UploadDocumentUi = ({
                   submitting ||
                   uploading
                 }
-                className={`px-6 py-3 text-white font-bold rounded-md transition-all flex items-center gap-2 mx-auto ${
-                  canProceedToPayment() &&
+                className={`px-6 py-3 text-white font-bold rounded-md transition-all flex items-center gap-2 mx-auto ${canProceedToPayment() &&
                   isImportantNoticeAccepted &&
                   !submitting &&
                   !uploading
-                    ? "bg-red-600 hover:bg-red-700 shadow-lg"
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
+                  ? "bg-red-600 hover:bg-red-700 shadow-lg"
+                  : "bg-gray-400 cursor-not-allowed"
+                  }`}
               >
                 {submitting || uploading ? (
                   <>

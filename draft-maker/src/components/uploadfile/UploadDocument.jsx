@@ -500,7 +500,7 @@ const DocumentUpload = () => {
       try {
         // Upload to Cloudinary
         const result = await uploadCloudinary(file, selectedDocumentType?.documentType || 'documents');
-        console.log('File uploaded to Cloudinary:', result.url);
+        console.log('File uploaded to Cloudinary:', result);
 
         return {
           ...newFile,
