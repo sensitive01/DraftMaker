@@ -731,7 +731,6 @@ const handleUploadResponse = async (req, res) => {
         console.log('║   CCAvenue Upload Response Handler    ║');
         console.log('╚════════════════════════════════════════╝\n');
 
-        // Extract encrypted response
         let encResponse = req.body.encResp || req.body.encResponse ||
             (req.rawBody ? new URLSearchParams(req.rawBody.toString()).get('encResp') : null);
 
@@ -743,7 +742,6 @@ const handleUploadResponse = async (req, res) => {
         const ccavenue = new CCAvenue(process.env.CCAVENUE_WORKING_KEY);
         const decrypted = ccavenue.decrypt(encResponse);
 
-        // Convert decrypted string to object
         const responseParams = {};
         decrypted.split('&').forEach(pair => {
             const [key, value] = pair.split('=');
@@ -757,25 +755,16 @@ const handleUploadResponse = async (req, res) => {
         const orderId = responseParams.order_id;
         const orderStatus = responseParams.order_status;
 
-        // ✅ Decode Base64 and parse JSON
+        // Decode JSON
         let uploadData = {};
         try {
             const merchantParam2 = responseParams.merchant_param2 || '';
-            console.log('Raw merchant_param2:', merchantParam2);
-
-            // Decode from Base64
             const decodedJSON = Buffer.from(merchantParam2, 'base64').toString('utf-8');
-            console.log('Decoded JSON:', decodedJSON);
-
-            // Parse JSON
             uploadData = JSON.parse(decodedJSON);
             console.log('✅ Parsed upload data:', uploadData);
-
         } catch (e) {
             console.error('❌ Error parsing merchant_param2:', e.message);
-            console.error('Raw merchant_param2 value:', responseParams.merchant_param2);
 
-            // Fallback to empty object if parsing fails
             uploadData = {
                 fullName: responseParams.billing_name || 'Customer',
                 mobileNumber: responseParams.billing_tel || '',
@@ -787,108 +776,63 @@ const handleUploadResponse = async (req, res) => {
             };
         }
 
-        // Generate booking ID if not present or is 'PENDING'
         let bookingId = uploadData.bookingId;
-        if (!bookingId || bookingId === 'PENDING' || bookingId === 'null') {
-            bookingId = await generateBookingId();
-        }
 
-        // ✅ Prepare document data with correct field mapping
-        const documentData = {
-            username: (uploadData.fullName || uploadData.userName || responseParams.billing_name || 'Customer').trim(),
-            userMobile: (uploadData.mobileNumber || responseParams.billing_tel || '').trim(),
-            documentType: (uploadData.documentType || 'UPLOAD').trim(),
-            formId: (uploadData.formId || 'UPLOAD').trim(),
-
-            // ✅ PROPERLY FORMAT DOCUMENTS ARRAY
-            documents: Array.isArray(uploadData.uploadedDocuments)
-                ? uploadData.uploadedDocuments.map(doc => ({
-                    url: doc.url || '',
-                    fileName: doc.fileName || doc.name || 'document',
-                    fileType: doc.fileType || doc.type || 'application/pdf',
-                    fileSize: doc.fileSize || doc.size || 0
-                }))
-                : [],
-
-            totalDocuments: uploadData.totalDocuments ||
-                (Array.isArray(uploadData.uploadedDocuments) ? uploadData.uploadedDocuments.length : 0),
-
-            emailAddress: (uploadData.emailAddress || responseParams.billing_email || '').trim(),
-            bookingId: bookingId,
-
-            // ✅ Include service details
-            selectedService: {
-                serviceType: uploadData.serviceType || '',
-                serviceName: uploadData.serviceName || '',
-                basePrice: parseFloat(uploadData.basePrice) || 0
-            },
-
-            // ✅ Include stamp duty details
-            stampDuty: uploadData.selectedStampDutyId ? {
-                stampDutyId: uploadData.selectedStampDutyId,
-                documentType: uploadData.stampDutyDocumentType || '',
-                amount: parseFloat(uploadData.stampDutyAmount) || 0
-            } : {},
-
-            // ✅ Include delivery details
-            delivery: uploadData.selectedDeliveryServiceId ? {
-                deliveryServiceId: uploadData.selectedDeliveryServiceId,
-                serviceName: uploadData.deliveryServiceName || '',
-                charge: parseFloat(uploadData.deliveryCharge) || 0,
-                description: uploadData.deliveryDescription || ''
-            } : {},
-
-            payment: {
-                orderId: orderId,
-                paymentId: responseParams.tracking_id || responseParams.bank_ref_no || '',
-                totalAmount: parseFloat(responseParams.amount) || 0,
-                paymentStatus: orderStatus === 'Success' ? 'SUCCESS' : 'FAILED',
-                paymentDate: new Date(),
-                ccavenueResponse: {
-                    orderStatus: responseParams.order_status,
-                    trackingId: responseParams.tracking_id,
-                    bankRefNo: responseParams.bank_ref_no,
-                    paymentMode: responseParams.payment_mode,
-                    cardName: responseParams.card_name,
-                    statusMessage: responseParams.status_message,
-                    currency: responseParams.currency || 'INR',
-                    amount: parseFloat(responseParams.amount) || 0,
-                    transDate: responseParams.trans_date,
-                    responseCode: responseParams.response_code,
-                    merchantParams: {
-                        param1: responseParams.merchant_param1,
-                        param2: responseParams.merchant_param2,
-                        param3: responseParams.merchant_param3,
-                        param4: responseParams.merchant_param4,
-                        param5: responseParams.merchant_param5
-                    },
-                    rawResponse: decrypted
-                }
+        // BUILD PAYMENT DATA ONLY
+        const paymentUpdate = {
+            orderId: orderId,
+            paymentId: responseParams.tracking_id || responseParams.bank_ref_no || '',
+            totalAmount: parseFloat(responseParams.amount) || 0,
+            paymentStatus: orderStatus === 'Success' ? 'SUCCESS' : 'FAILED',
+            paymentDate: new Date(),
+            ccavenueResponse: {
+                orderStatus: responseParams.order_status,
+                trackingId: responseParams.tracking_id,
+                bankRefNo: responseParams.bank_ref_no,
+                paymentMode: responseParams.payment_mode,
+                cardName: responseParams.card_name,
+                statusMessage: responseParams.status_message,
+                currency: responseParams.currency || 'INR',
+                amount: parseFloat(responseParams.amount) || 0,
+                transDate: responseParams.trans_date,
+                responseCode: responseParams.response_code,
+                merchantParams: {
+                    param1: responseParams.merchant_param1,
+                    param2: responseParams.merchant_param2,
+                    param3: responseParams.merchant_param3,
+                    param4: responseParams.merchant_param4,
+                    param5: responseParams.merchant_param5
+                },
+                rawResponse: decrypted
             }
         };
 
-        console.log('📤 Sending document data to API...');
-        console.log('Document data:', JSON.stringify(documentData, null, 2));
+        console.log("🟦 Updating payment details in DB...");
+        console.log(paymentUpdate);
 
+     
         try {
-            const response = await axios.post(
-                `${process.env.BACKEND_URL}/documents/upload-document-data`,
-                { documentData },
+            const updated = await UploadDocumentModel.findOneAndUpdate(
+                { bookingId: bookingId },     
                 {
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    timeout: 10000
-                }
+                    $set: {
+                        payment: paymentUpdate,
+                        paymentStatus: paymentUpdate.paymentStatus
+                    }
+                },
+                { new: true }
             );
 
-            console.log('✅ Document data saved successfully', response.data);
-
-        } catch (error) {
-            console.error('❌ Error saving document data:', error.response?.data || error.message);
-            throw error;
+            if (!updated) {
+                console.error("❌ No document found for bookingId:", bookingId);
+            } else {
+                console.log("✅ Payment updated:", updated.payment.paymentStatus);
+            }
+        } catch (err) {
+            console.error("❌ Error updating payment status:", err.message);
         }
 
+        // REDIRECT BASED ON PAYMENT STATUS
         if (orderStatus === 'Success') {
             return res.redirect(
                 `${process.env.FRONTEND_URL}/payment-success?` +
@@ -914,7 +858,8 @@ const handleUploadResponse = async (req, res) => {
 };
 
 
-// Function 3: Handle Upload Payment Cancel
+
+
 const handleUploadCancel = async (req, res) => {
     try {
         console.log('❌ Upload payment cancelled');

@@ -4,18 +4,17 @@ export const uploadCloudinary = async (file, fileType = 'documents') => {
   const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
-  const isPDF = file.type === "application/pdf";
+  const safeFolder = fileType.replace(/\s+/g, "_");  // FIX SPACES
 
   const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', uploadPreset);
+  formData.append("file", file);
+  formData.append("upload_preset", uploadPreset);
   formData.append(
-    'folder',
-    `draft-documents/${new Date().toISOString().split('T')[0]}/${fileType}`
+    "folder",
+    `draft-documents/${new Date().toISOString().split("T")[0]}/${safeFolder}`
   );
 
-  // keep raw for pdf upload
-  const uploadType = isPDF ? "raw" : "auto";
+  const uploadType = "auto"; // FIX RAW upload issue
 
   try {
     const response = await axios.post(
@@ -23,18 +22,12 @@ export const uploadCloudinary = async (file, fileType = 'documents') => {
       formData
     );
 
-    // ⭐ THIS IS THE IMPORTANT FIX ⭐
     return {
       ...response.data,
-      view_url: `https://res.cloudinary.com/${cloudName}/image/upload/${response.data.public_id}`
+      view_url: response.data.secure_url, // PDF & image view
     };
-
   } catch (error) {
-    console.error('Cloudinary Error:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
-    throw new Error(error.response?.data?.error?.message || 'Upload failed');
+    console.error("Cloudinary Error:", error.response?.data || error);
+    throw new Error(error.response?.data?.error?.message || "Upload failed");
   }
 };

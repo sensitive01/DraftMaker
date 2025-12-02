@@ -3412,83 +3412,85 @@ const uploadDocumentData = async (req, res) => {
   try {
     console.log("📥 Incoming Upload Data:", req.body);
 
-    if (!req.body.documentData) {
+    const data = req.body.documentData;
+    if (!data) {
       return res.status(400).json({
         success: false,
-        message: "documentData is missing",
+        message: "documentData missing",
       });
     }
+     const bookingId = await generateBookingId();
 
-    const {
-      username,
-      userMobile,
-      documentType,
-      formId,
-      documents,
-      totalDocuments,
-      submittedAt,
-      selectedService,
-      stampDuty,
-      delivery,
-      payment = {}, // safe default
-      emailAddress,
-      bookingId
-    } = req.body.documentData;
-
-    // Basic validation
-    if (!username || !userMobile || !documentType || !formId) {
-      return res.status(400).json({
-        success: false,
-        message: "Required fields missing (username, userMobile, documentType, formId)"
-      });
-    }
-
+    // CREATE A NEW DOCUMENT BASED ON FRONTEND FIELDS
     const newUpload = new uploadDocument({
-      userName: username,
-      userMobile,
-      documentType,
-      formId,
-      documents: documents || [],
-      totalDocuments: totalDocuments || 0,
-      submittedAt: submittedAt || Date.now(),
       bookingId,
-      selectedService: selectedService || {},
-      stampDuty: stampDuty || {},
-      delivery: delivery || {},
+
+      // USER INFO
+      mobileNumber: data.mobileNumber,
+      fullName: data.fullName,
+      userName: data.userName,
+      emailAddress: data.emailAddress,
+
+      // DOCUMENT INFO
+      documentType: data.documentType,
+      formId: data.formId,
+
+      // SERVICE INFO
+      serviceType: data.serviceType,
+      serviceName: data.serviceName,
+      basePrice: data.basePrice,
+      includesNotary: data.includesNotary,
+      notaryCharge: data.notaryCharge,
+
+      // STAMP DUTY
+      selectedStampDutyId: data.selectedStampDutyId,
+      stampDutyDocumentType: data.stampDutyDocumentType,
+      stampDutyCalculationType: data.stampDutyCalculationType,
+      stampDutyAmount: data.stampDutyAmount,
+      considerationAmount: data.considerationAmount,
+      quantity: data.quantity,
+      serviceCharge: data.serviceCharge,
+
+      // DELIVERY INFO
+      selectedDeliveryServiceId: data.selectedDeliveryServiceId,
+      deliveryServiceName: data.deliveryServiceName,
+      deliveryCharge: data.deliveryCharge,
+      deliveryDescription: data.deliveryDescription,
+      deliveryAddress: data.deliveryAddress,
+
+      // PAYMENT INFO (FRONTEND SIDE)
+      totalAmount: data.totalAmount,
+      orderDate: data.orderDate,
+      paymentMethod: data.paymentMethod,
+      currency: data.currency,
+
+      // PAYMENT BLOCK (BACKEND SIDE)
       payment: {
-        orderId: payment.orderId || "",
-        paymentId: payment.paymentId || "",
-        totalAmount: payment.totalAmount || 0,
-        paymentStatus: payment.paymentStatus || "PENDING",
-        paymentDate: payment.paymentDate || null,
-        ccavenueResponse: payment.ccavenueResponse || {}
+        orderId: data.payment?.orderId || "",
+        paymentId: data.payment?.paymentId || "",
+        totalAmount: data.payment?.totalAmount || data.totalAmount || 0,
+        paymentStatus: data.payment?.paymentStatus || "PENDING",
+        paymentDate: data.payment?.paymentDate || null,
+        ccavenueResponse: data.payment?.ccavenueResponse || {},
       },
-      emailAddress: emailAddress || "",
+
+      // UPLOADED DOCUMENTS
+      uploadedDocuments: data.uploadedDocuments || [],
     });
 
+    // SAVE
     await newUpload.save();
 
-    // Send email notification
-    await sendEmail("draftmakerinfo@gmail.com", "uploadDocuments", {
-      bookingId: bookingId,
-      agreementName: documentType,
-      dateTime: newUpload.createdAt,
-      userName: username,
-      mobile: userMobile,
-      paymentId: payment.paymentId || "N/A",
-      paymentStatus: payment.paymentStatus || "PENDING",
-      amount: payment.totalAmount || 0,
-    });
-
+    // SEND EMAIL
+   
     return res.status(201).json({
       success: true,
-      message: "Document data uploaded successfully",
+      message: "Document data stored successfully",
       data: newUpload,
     });
 
   } catch (err) {
     console.error("❌ Error uploading document data:", err);
-
     return res.status(500).json({
       success: false,
       message: "Failed to upload document data",
@@ -3515,6 +3517,18 @@ const updateUploadedDocumentStatus = async (req, res) => {
     if (!updatedDocument) {
       return res.status(404).json({ message: "Document not found" });
     }
+
+     await sendEmail("draftmakerinfo@gmail.com", "uploadDocuments", {
+      bookingId: updatedDocument.bookingId,
+      agreementName: updatedDocument.documentType,
+      dateTime: updatedDocument.createdAt,
+      userName: updatedDocument.fullName,
+      mobile: updatedDocument.mobileNumber,
+      paymentId: newUpload.payment.paymentId || "N/A",
+      paymentStatus: newUpload.payment.paymentStatus,
+      amount: newUpload.totalAmount,
+    });
+
 
     res.status(200).json({
       success: true,

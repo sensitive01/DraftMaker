@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Worker } from '@react-pdf-viewer/core';
+import { Viewer } from '@react-pdf-viewer/core';
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+import '@react-pdf-viewer/core/lib/styles/index.css';
+import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import {
   ArrowLeft,
   Calendar,
@@ -39,6 +44,18 @@ const ViewUploadDetails = () => {
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [newStatus, setNewStatus] = useState("");
   const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  // State for PDF viewer
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [isPdfViewerOpen, setIsPdfViewerOpen] = useState(false);
+
+  // Ensure URL uses HTTPS
+  const ensureHttps = (url) => {
+    if (!url) return url;
+    return url.replace(/^http:\/\//i, 'https://');
+  };
+
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   const formatDateTime = (dateString) => {
     if (!dateString) return "N/A";
@@ -103,7 +120,7 @@ const ViewUploadDetails = () => {
   }, [bookingId]);
 
   const handleUpdateStatus = () => {
-    setNewStatus(booking.documentStatus);
+    setNewStatus(booking.documentStatus || "Pending");
     setIsStatusModalOpen(true);
   };
 
@@ -155,38 +172,81 @@ const ViewUploadDetails = () => {
   };
 
   const getFileIcon = (url) => {
-    if (!url) return <File size={16} />;
+    if (!url) return <File size={16} className="text-gray-500" />;
 
-    const extension = url.split(".").pop().toLowerCase();
+    // Ensure URL uses HTTPS and handle both URLs and file objects
+    const secureUrl = ensureHttps(url);
+    const extension = secureUrl.split('.').pop()?.split('?')[0].toLowerCase();
+
     switch (extension) {
-      case "pdf":
-        return <File size={16} className="text-red-500" />;
-      case "jpg":
-      case "jpeg":
-      case "png":
-      case "gif":
-      case "webp":
+      case 'pdf':
+        return <FileText size={16} className="text-red-500" />;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'webp':
         return <FileImage size={16} className="text-blue-500" />;
+      case 'doc':
+      case 'docx':
+        return <FileText size={16} className="text-blue-600" />;
       default:
         return <File size={16} className="text-gray-500" />;
     }
   };
 
+  const handleViewDocument = (url, fileName) => {
+    try {
+      // Ensure URL uses HTTPS
+      const secureUrl = ensureHttps(url);
+
+      // Always open in a new tab for all document types
+      window.open(secureUrl, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      console.error('Error opening document:', error);
+      // If opening in new tab fails, try to download
+      handleDownload(url, fileName);
+    }
+  };
+
   const handleDownload = async (url, filename) => {
     try {
-      const response = await fetch(url);
+      // Ensure URL uses HTTPS
+      const secureUrl = ensureHttps(url);
+
+      // If it's a data URL or blob URL, handle it directly
+      if (secureUrl.startsWith('data:') || secureUrl.startsWith('blob:')) {
+        const link = document.createElement('a');
+        link.href = secureUrl;
+        link.download = filename || 'document';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+      }
+
+      // For remote URLs, fetch and create a blob
+      const response = await fetch(secureUrl, { mode: 'cors' });
+      if (!response.ok) throw new Error('Network response was not ok');
+
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
+      const link = document.createElement('a');
+
       link.href = downloadUrl;
-      link.download = filename || "document";
+      link.download = filename || 'document';
       document.body.appendChild(link);
       link.click();
-      link.remove();
-      window.URL.revokeObjectURL(downloadUrl);
+
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(downloadUrl);
+      }, 100);
     } catch (error) {
-      console.error("Download failed:", error);
-      window.open(url, "_blank");
+      console.error('Download failed:', error);
+      // Fallback to opening in a new tab if download fails
+      window.open(secureUrl, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -241,6 +301,9 @@ const ViewUploadDetails = () => {
     );
   }
 
+  // Get the current status (default to "Pending" if not set)
+  const currentStatus = booking.documentStatus || "Pending";
+
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-6xl mx-auto">
@@ -268,11 +331,11 @@ const ViewUploadDetails = () => {
             <div className="flex items-center gap-3">
               <span
                 className={`px-3 py-2 rounded-full text-sm font-medium flex items-center ${getStatusBadgeColor(
-                  booking.documentStatus
+                  currentStatus
                 )}`}
               >
-                {getStatusIcon(booking.documentStatus)}
-                {booking.documentStatus}
+                {getStatusIcon(currentStatus)}
+                {currentStatus}
               </span>
               <button
                 onClick={handleUpdateStatus}
@@ -328,7 +391,7 @@ const ViewUploadDetails = () => {
                   </label>
                   <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm flex items-center">
                     <Calendar size={14} className="mr-2" />
-                    {formatDateTime(booking.submittedAt)}
+                    {formatDateTime(booking.createdAt)}
                   </div>
                 </div>
               </div>
@@ -346,7 +409,7 @@ const ViewUploadDetails = () => {
                     User Name
                   </label>
                   <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
-                    {booking.userName}
+                    {booking.userName || booking.fullName}
                   </div>
                 </div>
 
@@ -356,7 +419,7 @@ const ViewUploadDetails = () => {
                   </label>
                   <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm flex items-center">
                     <Smartphone size={14} className="mr-2" />
-                    {booking.userMobile}
+                    {booking.mobileNumber}
                   </div>
                 </div>
 
@@ -373,80 +436,123 @@ const ViewUploadDetails = () => {
             </div>
 
             {/* Service Information */}
-            {booking.selectedService && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <Package size={20} className="mr-2" />
-                  Service Information
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Service Name
-                    </label>
-                    <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
-                      {booking.selectedService.serviceName || "N/A"}
-                    </div>
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <Package size={20} className="mr-2" />
+                Service Information
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Service Name
+                  </label>
+                  <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
+                    {booking.serviceName || "N/A"}
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Base Price
-                    </label>
-                    <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
-                      {formatCurrency(booking.selectedService.basePrice || 0)}
-                    </div>
-                  </div>
-
-                  {booking.selectedService.serviceType && (
-                    <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Service Type
-                      </label>
-                      <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
-                        {booking.selectedService.serviceType}
-                      </div>
-                    </div>
-                  )}
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Base Price
+                  </label>
+                  <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
+                    {formatCurrency(booking.basePrice || 0)}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Service Type
+                  </label>
+                  <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
+                    {booking.serviceType || "N/A"}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Quantity
+                  </label>
+                  <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
+                    {booking.quantity || 1}
+                  </div>
+                </div>
+
+                {booking.includesNotary && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Notary Charge
+                    </label>
+                    <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
+                      {formatCurrency(booking.notaryCharge || 0)}
+                    </div>
+                  </div>
+                )}
+
+                {booking.serviceCharge > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Service Charge
+                    </label>
+                    <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
+                      {formatCurrency(booking.serviceCharge || 0)}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
             {/* Stamp Duty Information */}
-            {booking.stampDuty && Object.keys(booking.stampDuty).length > 0 && (
+            {booking.selectedStampDutyId && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                   <FileText size={20} className="mr-2" />
                   Stamp Duty Information
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {booking.stampDuty.stampDutyId && (
-                    <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Stamp Duty ID
-                      </label>
-                      <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-mono text-xs">
-                        {booking.stampDuty.stampDutyId}
-                      </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Stamp Duty ID
+                    </label>
+                    <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-mono text-xs">
+                      {booking.selectedStampDutyId}
                     </div>
-                  )}
+                  </div>
 
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Document Type
                     </label>
                     <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
-                      {booking.stampDuty.documentType || "N/A"}
+                      {booking.stampDutyDocumentType || "N/A"}
                     </div>
                   </div>
 
-                  {booking.stampDuty.amount && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Calculation Type
+                    </label>
+                    <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm capitalize">
+                      {booking.stampDutyCalculationType || "N/A"}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Stamp Duty Amount
+                    </label>
+                    <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-semibold text-green-600">
+                      {formatCurrency(booking.stampDutyAmount || 0)}
+                    </div>
+                  </div>
+
+                  {booking.considerationAmount > 0 && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Stamp Duty Amount
+                        Consideration Amount
                       </label>
-                      <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-semibold text-green-600">
-                        {formatCurrency(booking.stampDuty.amount)}
+                      <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
+                        {formatCurrency(booking.considerationAmount)}
                       </div>
                     </div>
                   )}
@@ -455,30 +561,28 @@ const ViewUploadDetails = () => {
             )}
 
             {/* Delivery Information */}
-            {booking.delivery && Object.keys(booking.delivery).length > 0 && (
+            {booking.selectedDeliveryServiceId && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                   <MapPin size={20} className="mr-2" />
                   Delivery Information
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {booking.delivery.deliveryServiceId && (
-                    <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Delivery Service ID
-                      </label>
-                      <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-mono text-xs">
-                        {booking.delivery.deliveryServiceId}
-                      </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Delivery Service ID
+                    </label>
+                    <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-mono text-xs">
+                      {booking.selectedDeliveryServiceId}
                     </div>
-                  )}
+                  </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Service Name
                     </label>
                     <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
-                      {booking.delivery.serviceName || "N/A"}
+                      {booking.deliveryServiceName || "N/A"}
                     </div>
                   </div>
 
@@ -487,17 +591,33 @@ const ViewUploadDetails = () => {
                       Delivery Charge
                     </label>
                     <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-semibold text-green-600">
-                      {formatCurrency(booking.delivery.charge || 0)}
+                      {formatCurrency(booking.deliveryCharge || 0)}
                     </div>
                   </div>
 
-                  {booking.delivery.description && (
+                  {booking.deliveryDescription && (
                     <div className="sm:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Description
                       </label>
                       <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
-                        {booking.delivery.description}
+                        {booking.deliveryDescription}
+                      </div>
+                    </div>
+                  )}
+
+                  {booking.deliveryAddress && (
+                    <div className="sm:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Delivery Address
+                      </label>
+                      <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
+                        {booking.deliveryAddress.addressLine1}
+                        {booking.deliveryAddress.addressLine2 && (
+                          <>, {booking.deliveryAddress.addressLine2}</>
+                        )}
+                        <br />
+                        {booking.deliveryAddress.city}, {booking.deliveryAddress.state} - {booking.deliveryAddress.pincode}
                       </div>
                     </div>
                   )}
@@ -516,23 +636,27 @@ const ViewUploadDetails = () => {
                   Payment Information
                 </h2>
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Order ID
-                    </label>
-                    <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-mono text-xs">
-                      {booking.payment.orderId || "N/A"}
+                  {booking.payment.orderId && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Order ID
+                      </label>
+                      <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-mono text-xs">
+                        {booking.payment.orderId}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Payment ID
-                    </label>
-                    <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-mono text-xs">
-                      {booking.payment.paymentId || "N/A"}
+                  {booking.payment.paymentId && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Payment ID
+                      </label>
+                      <div className="bg-gray-50 p-3 rounded border border-gray-200 text-sm font-mono text-xs">
+                        {booking.payment.paymentId}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {booking.payment.ccavenueResponse?.trackingId && (
                     <div>
@@ -590,7 +714,7 @@ const ViewUploadDetails = () => {
                       Total Amount
                     </label>
                     <div className="bg-gray-50 p-3 rounded border border-gray-200 text-lg font-bold text-green-600">
-                      {formatCurrency(booking.payment.totalAmount || 0)}
+                      {formatCurrency(booking.payment.totalAmount || booking.totalAmount || 0)}
                     </div>
                   </div>
 
@@ -634,12 +758,12 @@ const ViewUploadDetails = () => {
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <FileText size={20} className="mr-2" />
-                Documents ({booking.totalDocuments})
+                Documents ({booking.uploadedDocuments?.length || 0})
               </h2>
 
               <div className="space-y-4">
-                {booking.documents && booking.documents.length > 0 ? (
-                  booking.documents.map((doc, index) => {
+                {booking.uploadedDocuments && booking.uploadedDocuments.length > 0 ? (
+                  booking.uploadedDocuments.map((doc, index) => {
                     const fileName = doc.fileName || `Document_${index + 1}_${booking.bookingId}`;
                     const fileExtension = doc.fileType?.split('/').pop() || doc.url.split(".").pop().toLowerCase();
 
@@ -663,15 +787,17 @@ const ViewUploadDetails = () => {
                             </div>
                           </div>
                           <div className="flex gap-2 ml-2">
-                            <a
-                              href={doc.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleViewDocument(doc.url, doc.fileName);
+                              }}
                               className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded"
                               title="View Document"
                             >
                               <ExternalLink size={16} />
-                            </a>
+                            </button>
                             <button
                               onClick={() =>
                                 handleDownload(doc.url, fileName)
@@ -703,10 +829,10 @@ const ViewUploadDetails = () => {
                           ) ? (
                             <div className="relative">
                               <img
-                                src={doc.url}
+                                src={ensureHttps(doc.url)}
                                 alt={fileName}
                                 className="w-full h-20 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
-                                onClick={() => window.open(doc.url, "_blank")}
+                                onClick={() => window.open(ensureHttps(doc.url), "_blank")}
                                 onError={(e) => {
                                   e.target.style.display = "none";
                                   e.target.nextSibling.style.display = "flex";
@@ -786,11 +912,11 @@ const ViewUploadDetails = () => {
                     <div className="bg-gray-50 p-3 rounded border border-gray-200">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium flex items-center w-fit ${getStatusBadgeColor(
-                          booking.documentStatus
+                          currentStatus
                         )}`}
                       >
-                        {getStatusIcon(booking.documentStatus)}
-                        {booking.documentStatus}
+                        {getStatusIcon(currentStatus)}
+                        {currentStatus}
                       </span>
                     </div>
                   </div>
@@ -824,7 +950,7 @@ const ViewUploadDetails = () => {
                   <button
                     onClick={handleStatusSubmit}
                     disabled={
-                      updatingStatus || newStatus === booking.documentStatus
+                      updatingStatus || newStatus === currentStatus
                     }
                     className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
@@ -843,7 +969,7 @@ const ViewUploadDetails = () => {
           </div>
         )}
       </div>
-    </div >
+    </div>
   );
 };
 

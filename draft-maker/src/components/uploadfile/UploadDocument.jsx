@@ -57,10 +57,6 @@ const DocumentUpload = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const CLOUDINARY_UPLOAD_PRESET = import.meta.env
-    .VITE_CLOUDINARY_UPLOAD_PRESET;
-  const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-
   // File upload states
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -498,7 +494,7 @@ const DocumentUpload = () => {
       };
 
       try {
-        // Upload to Cloudinary
+        // Upload to Cloudinary using the utility function
         const result = await uploadCloudinary(file, selectedDocumentType?.documentType || 'documents');
         console.log('File uploaded to Cloudinary:', result);
 
@@ -531,88 +527,14 @@ const DocumentUpload = () => {
     setFiles((prev) => prev.filter((file) => file.id !== fileId));
   };
 
-  // Cloudinary upload function
-  const uploadToCloudinary = async (fileObj) => {
-    const formData = new FormData();
-    formData.append("file", fileObj.file);
-    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-
-    if (fileObj.file.type === "application/pdf") {
-      formData.append("resource_type", "raw");
-    }
-
-    try {
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || "Upload failed");
-      }
-
-      const data = await response.json();
-
-      if (!data.secure_url) {
-        throw new Error("No URL returned from Cloudinary");
-      }
-
-      return data.secure_url;
-    } catch (error) {
-      console.error("Cloudinary upload error:", error);
-      throw error;
-    }
-  };
-
-  // Upload all files to Cloudinary
-  const uploadFiles = async () => {
-    setUploading(true);
-    const updatedFiles = [...files];
-
-    for (let i = 0; i < updatedFiles.length; i++) {
-      if (updatedFiles[i].status === "pending") {
-        try {
-          updatedFiles[i].status = "uploading";
-          updatedFiles[i].error = null;
-          setFiles([...updatedFiles]);
-
-          const cloudinaryUrl = await uploadToCloudinary(updatedFiles[i]);
-
-          updatedFiles[i].status = "uploaded";
-          updatedFiles[i].cloudinaryUrl = cloudinaryUrl;
-          updatedFiles[i].progress = 100;
-
-          setFiles([...updatedFiles]);
-        } catch (error) {
-          updatedFiles[i].status = "error";
-          updatedFiles[i].error = error.message;
-          updatedFiles[i].progress = 0;
-          setFiles([...updatedFiles]);
-        }
-      }
-    }
-
-    setUploading(false);
-    return updatedFiles;
-  };
-
-  const initiateCCAvenuePayment = async (service, totalPrice, uploadedDocuments) => {
+  const initiateCCAvenuePayment = async (service, totalPrice, uploadedDocuments, bookingId) => {
     try {
       console.log('\n🔵 Initiating CCAvenue payment for document upload...');
 
       const paymentData = {
-        bookingId: null, // <-- FRONTEND NEVER GENERATES IT
         mobileNumber: formData.contactNumber,
-        documentType: selectedDocumentType?.documentType || "Document Upload",
-        formId: "UPLOAD",
         fullName: formData.userName,
         userName: formData.userName,
-        serviceType: service.id,
-        serviceName: service.name,
         basePrice: service.price,
         includesNotary: service.hasNotary && includeNotary,
         notaryCharge: service.hasNotary && includeNotary ? service.notaryCharge : 0,
@@ -626,26 +548,15 @@ const DocumentUpload = () => {
         quantity: quantity,
         serviceCharge: getServiceChargePerDocument() * quantity,
 
-        selectedDeliveryServiceId: selectedDeliveryCharge?._id,
-        deliveryServiceName: selectedDeliveryCharge?.serviceName,
-        deliveryCharge: selectedDeliveryCharge?.charge || 0,
-        deliveryDescription: selectedDeliveryCharge?.description,
-        deliveryAddress: selectedService?.requiresDelivery ? deliveryAddress : null,
+
 
         totalAmount: totalPrice,
         orderDate: new Date().toISOString(),
         paymentMethod: "ccavenue",
         currency: "INR",
 
-        uploadedDocuments: uploadedDocuments?.map((file) => ({
-          url: file.cloudinaryUrl,
-          fileName: file.file.name,
-          fileType: file.file.type,
-          fileSize: file.file.size,
-        })),
+
       };
-
-
 
       const response = await fetch(
         `${import.meta.env.VITE_BASE_ROUTE}/payment/initiate-upload-payment`,
@@ -680,8 +591,7 @@ const DocumentUpload = () => {
     }
   };
 
-
-  // Main submit handler - UPDATED for CCAvenue
+  // Main submit handler - Check all files are uploaded before payment
   const handleSubmit = async () => {
     if (!validateForm()) {
       return;
@@ -705,15 +615,14 @@ const DocumentUpload = () => {
     setSubmitting(true);
 
     try {
-      // Upload files first
-      const uploadedFiles = await uploadFiles();
-
-      const failedUploads = uploadedFiles.filter(
-        (file) => file.status === "error"
+      // Check if all files are uploaded successfully
+      const failedUploads = files.filter(
+        (file) => file.status === "error" || file.status === "uploading"
       );
+
       if (failedUploads.length > 0) {
         alert(
-          `${failedUploads.length} file(s) failed to upload. Please check the errors and try again.`
+          `${failedUploads.length} file(s) failed to upload or are still uploading. Please check the errors and try again.`
         );
         setSubmitting(false);
         return;
@@ -721,9 +630,67 @@ const DocumentUpload = () => {
 
       // Calculate total price
       const totalPrice = calculateTotalAmount();
+      const data = {
+        // User Information
+        mobileNumber: formData.contactNumber,
+        fullName: formData.userName,
+        userName: formData.userName,
+        emailAddress: emailAddress,
 
-      // ✅ Initiate CCAvenue payment (replaces Razorpay)
-      await initiateCCAvenuePayment(selectedService, totalPrice, uploadedFiles);
+        // Document Information
+        documentType: selectedDocumentType?.documentType || "Document Upload",
+        formId: selectedDocumentType?.formId || "UPLOAD",
+
+        // Service Information
+        serviceType: selectedService.id,
+        serviceName: selectedService.name,
+        basePrice: selectedService.price,
+        includesNotary: selectedService.hasNotary && includeNotary,
+        notaryCharge: selectedService.hasNotary && includeNotary ? selectedService.notaryCharge : 0,
+
+        // Stamp Duty Information
+        selectedStampDutyId: selectedStampDuty?._id,
+        stampDutyDocumentType: selectedStampDuty?.documentType,
+        stampDutyCalculationType: selectedStampDuty?.calculationType,
+        stampDutyAmount: selectedStampDuty ? calculateStampDutyAmount(selectedStampDuty) : 0,
+        considerationAmount: parseFloat(considerationAmount) || 0,
+        quantity: quantity,
+        serviceCharge: getServiceChargePerDocument() * quantity,
+
+        // Delivery Information
+        selectedDeliveryServiceId: selectedDeliveryCharge?._id,
+        deliveryServiceName: selectedDeliveryCharge?.serviceName,
+        deliveryCharge: selectedDeliveryCharge?.charge || 0,
+        deliveryDescription: selectedDeliveryCharge?.description,
+        deliveryAddress: selectedService?.requiresDelivery && selectedDeliveryCharge &&
+          (selectedDeliveryCharge.serviceType === "scan_courier" ||
+            selectedDeliveryCharge.serviceType === "courier_only")
+          ? deliveryAddress
+          : null,
+
+        // Payment Information
+        totalAmount: totalPrice,
+        orderDate: new Date().toISOString(),
+        paymentMethod: "ccavenue",
+        currency: "INR",
+
+        // Uploaded Documents
+        uploadedDocuments: files?.map((file) => ({
+          url: file.cloudinaryUrl,
+          fileName: file.file.name,
+          fileType: file.file.type,
+          fileSize: file.file.size,
+        })),
+      };
+
+      const response = await sendDocumentsToBackend(data)
+      if (response.status === 201) {
+        console.log(response, response.data.data.bookingId)
+
+        await initiateCCAvenuePayment(selectedService, totalPrice, files, response?.data?.data?.bookingId);
+      }
+
+      // ✅ Initiate CCAvenue payment
 
     } catch (error) {
       console.error("Submission error:", error);
