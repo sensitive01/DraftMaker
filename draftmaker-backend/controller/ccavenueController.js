@@ -647,6 +647,7 @@ const initiateUploadPayment = async (req, res) => {
         console.log('\n📦 Upload Payment Details:');
         console.log('   Amount:', paymentData.totalAmount);
         console.log('   Document Type:', paymentData.documentType);
+        console.log('   paymentData', paymentData);
 
         const orderId = `UPLOAD_${Date.now()}`;
         console.log('\n🔢 Generated Order ID:', orderId);
@@ -721,7 +722,8 @@ const initiateUploadPayment = async (req, res) => {
             success: true,
             encRequest: encryptedData,
             accessCode: process.env.CCAVENUE_ACCESS_CODE,
-            orderId: orderId
+            orderId: orderId,
+            bookingId: paymentData.bookingId,
         });
 
     } catch (error) {
@@ -744,6 +746,8 @@ const handleUploadResponse = async (req, res) => {
         console.log('\n╔════════════════════════════════════════╗');
         console.log('║   CCAvenue Upload Response Handler    ║');
         console.log('╚════════════════════════════════════════╝\n');
+
+        console.log("req.body", req.body)
 
         let encResponse = req.body.encResp || req.body.encResponse ||
             (req.rawBody ? new URLSearchParams(req.rawBody.toString()).get('encResp') : null);
@@ -768,6 +772,7 @@ const handleUploadResponse = async (req, res) => {
 
         const orderId = responseParams.order_id;
         const orderStatus = responseParams.order_status;
+        const newBookingId = responseParams.bookingId;
 
         // Decode JSON
         let uploadData = {};
@@ -790,7 +795,8 @@ const handleUploadResponse = async (req, res) => {
             };
         }
 
-        let bookingId = uploadData.bookingId;
+        let bookingId = uploadData?.bookingId||newBookingId;
+        console.log("bookingId---->",bookingId)
 
         // BUILD PAYMENT DATA ONLY
         const paymentUpdate = {
