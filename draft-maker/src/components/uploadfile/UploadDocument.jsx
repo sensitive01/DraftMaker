@@ -532,6 +532,8 @@ const DocumentUpload = () => {
       console.log('\n🔵 Initiating CCAvenue payment for document upload...');
 
       const paymentData = {
+        bookingId,
+        uploadedDocuments,
         mobileNumber: formData.contactNumber,
         fullName: formData.userName,
         userName: formData.userName,

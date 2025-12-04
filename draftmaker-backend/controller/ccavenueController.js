@@ -653,7 +653,7 @@ const initiateUploadPayment = async (req, res) => {
 
         // ✅ Prepare merchant data object
         const merchantData = {
-            bookingId: paymentData.bookingId || 'PENDING',
+            bookingId: paymentData.bookingId,
             mobileNumber: paymentData.mobileNumber || '',
             documentType: paymentData.documentType || '',
             formId: paymentData.formId || 'UPLOAD',
