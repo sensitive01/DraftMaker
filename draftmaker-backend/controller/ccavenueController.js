@@ -685,6 +685,7 @@ const initiateUploadPayment = async (req, res) => {
 
         // Prepare CCAvenue parameters
         const ccavenueParams = {
+            bookingId:paymentData.bookingId,
             merchant_id: process.env.CCAVENUE_MERCHANT_ID,
             order_id: orderId,
             currency: 'INR',
