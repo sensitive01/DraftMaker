@@ -118,14 +118,15 @@ const UploadDocumentBookings = () => {
         if (response.status === 200) {
           const formattedBookings = response.data.data.map((booking) => ({
             ...booking,
-            username: safeDisplay(booking.userName, "Unknown"),
-            userMobile: safeDisplay(booking.userMobile),
-            documents: booking.documents || [],
-            totalDocuments: booking.totalDocuments || 0,
-            documentStatus: safeDisplay(booking.documentStatus, "Pending"),
+            username: safeDisplay(booking.userName || booking.fullName, "Unknown"),
+            userMobile: safeDisplay(booking.mobileNumber),
+            documents: booking.uploadedDocuments || [],
+            totalDocuments: (booking.uploadedDocuments || []).length,
+            documentStatus: safeDisplay(booking.documentStatus || "Pending", "Pending"),
+            paymentStatus: safeDisplay(booking.payment?.paymentStatus, "PENDING"),
             bookingId: safeDisplay(booking.bookingId),
-            submittedAt: formatHumanDate(booking.submittedAt),
-            submittedTime: formatHumanTime(booking.submittedAt),
+            submittedAt: formatHumanDate(booking.createdAt),
+            submittedTime: formatHumanTime(booking.createdAt),
             documentType: safeDisplay(booking.documentType),
             formId: safeDisplay(booking.formId),
           }));
@@ -228,7 +229,7 @@ const UploadDocumentBookings = () => {
 
         setBookings(updatedBookings);
         handleCloseStatusModal();
-        
+
         toast.success(
           response?.data?.message || `Status updated to ${newStatus} successfully!`,
           {
@@ -291,7 +292,7 @@ const UploadDocumentBookings = () => {
       setDeleteLoading(false);
       toast.error(
         error?.response?.data?.message ||
-          "Failed to delete booking. Please try again.",
+        "Failed to delete booking. Please try again.",
         {
           duration: 4000,
           position: "top-right",
@@ -603,9 +604,15 @@ const UploadDocumentBookings = () => {
                 </th>
                 <th
                   className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
-                  style={{ minWidth: "120px" }}
+                  style={{ minWidth: "160px" }}
                 >
-                  Status
+                  Document Status
+                </th>
+                <th
+                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
+                  style={{ minWidth: "150px" }}
+                >
+                  Payment Status
                 </th>
                 <th
                   className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
@@ -673,6 +680,16 @@ const UploadDocumentBookings = () => {
                       >
                         {getStatusIcon(booking.documentStatus)}
                         {booking.documentStatus}
+                      </span>
+                    </td>
+                    <td className="p-3 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 rounded-full text-xs font-medium items-center ${getStatusBadgeColor(
+                          booking.paymentStatus
+                        )}`}
+                      >
+                        {getStatusIcon(booking.paymentStatus)}
+                        {booking.paymentStatus}
                       </span>
                     </td>
                     <td className="p-3">
@@ -970,11 +987,10 @@ const UploadDocumentBookings = () => {
                 disabled={
                   deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
                 }
-                className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center ${
-                  deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
+                className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center ${deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+                  }`}
               >
                 {deleteLoading ? (
                   <>

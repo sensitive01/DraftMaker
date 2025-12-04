@@ -48,7 +48,7 @@ const paymentSchema = new mongoose.Schema({
 const uploadDocumentSchema = new mongoose.Schema(
   {
     bookingId: String,
-    
+
     // USER INFO (FROM FRONTEND)
     mobileNumber: String,
     fullName: String,
@@ -93,6 +93,11 @@ const uploadDocumentSchema = new mongoose.Schema(
 
     // UPLOADED DOCUMENTS
     uploadedDocuments: [documentFileSchema],
+    documentStatus: {
+      type: String,
+
+      default: "Pending",
+    },
   },
   {
     timestamps: true,

@@ -453,10 +453,10 @@ const trackMyDocumentStatus = async (req, res) => {
     });
 
     const uploadedData = await uploadDocument.find(
-      { userMobile: mobile },
+      { mobileNumber: mobile },
       {
         userName: 1,
-        userMobile: 1,
+        mobileNumber: 1,
         documentStatus: 1,
         bookingId: 1,
         createdAt: 1,
@@ -3419,7 +3419,7 @@ const uploadDocumentData = async (req, res) => {
         message: "documentData missing",
       });
     }
-     const bookingId = await generateBookingId();
+    const bookingId = await generateBookingId();
 
     // CREATE A NEW DOCUMENT BASED ON FRONTEND FIELDS
     const newUpload = new uploadDocument({
@@ -3482,7 +3482,7 @@ const uploadDocumentData = async (req, res) => {
     await newUpload.save();
 
     // SEND EMAIL
-   
+
     return res.status(201).json({
       success: true,
       message: "Document data stored successfully",
@@ -3517,18 +3517,6 @@ const updateUploadedDocumentStatus = async (req, res) => {
     if (!updatedDocument) {
       return res.status(404).json({ message: "Document not found" });
     }
-
-     await sendEmail("draftmakerinfo@gmail.com", "uploadDocuments", {
-      bookingId: updatedDocument.bookingId,
-      agreementName: updatedDocument.documentType,
-      dateTime: updatedDocument.createdAt,
-      userName: updatedDocument.fullName,
-      mobile: updatedDocument.mobileNumber,
-      paymentId: newUpload.payment.paymentId || "N/A",
-      paymentStatus: newUpload.payment.paymentStatus,
-      amount: newUpload.totalAmount,
-    });
-
 
     res.status(200).json({
       success: true,
