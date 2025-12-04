@@ -117,7 +117,7 @@ const BookingTable = () => {
           id: safeDisplay(booking.bookingId),
           name: safeDisplay(booking.userName, "Unknown"),
           phoneNumber: safeDisplay(booking.mobileNumber),
-          status: safeDisplay(booking.doumentStatus),
+          status: safeDisplay(booking.documentStatus),
           paymentId: safeDisplay(booking.paymentDetails?.paymentId),
           paymentStatus: safeDisplay(booking.paymentStatus),
           amount: safeDisplay(booking.paymentDetails?.paidAmount),

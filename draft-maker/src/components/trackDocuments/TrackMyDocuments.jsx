@@ -16,6 +16,7 @@ import {
   Package,
   FileCheck,
   Truck,
+  PauseCircle,
 } from "lucide-react";
 import { trackMyDocumentStatus } from "../../api/service/axiosService";
 
@@ -61,28 +62,30 @@ const TrackMyDocuments = () => {
   };
 
   const normalizeStatus = (status) => {
-    if (!status) return "pending";
+    console.log(status)
+    if (!status) return "processing";
     const statusLower = status.toLowerCase();
-    if (statusLower === "pending") return "pending";
-    if (statusLower === "processing") return "processing";
-    if (statusLower === "processed") return "processed";
-    if (statusLower === "approved") return "approved";
-    if (statusLower === "delivered") return "delivered";
-    if (statusLower === "completed" || statusLower === "success")
-      return "completed";
-    if (
-      statusLower === "cancelled" ||
-      statusLower === "rejected" ||
-      statusLower === "failed"
-    )
+    
+    // Map various status values to the 4 main categories
+    if (statusLower === "processing" || statusLower === "pending" || statusLower === "processed" || statusLower === "approved") 
+      return "processing";
+    
+    if (statusLower === "delivered" || statusLower === "completed" || statusLower === "deliver/completed" || statusLower === "success")
+      return "delivered-completed";
+    
+    if (statusLower === "put on hold" || statusLower === "putonhold" || statusLower === "hold" || statusLower === "on hold")
+      return "put-on-hold";
+    
+    if (statusLower === "cancelled" || statusLower === "rejected" || statusLower === "failed")
       return "cancelled";
-    return "pending";
+    
+    return "processing";
   };
 
   const getStatusConfig = (status) => {
     const normalizedStatus = normalizeStatus(status);
     const configs = {
-      completed: {
+      "delivered-completed": {
         bg: "bg-green-50",
         text: "text-green-700",
         border: "border-green-200",
@@ -90,33 +93,7 @@ const TrackMyDocuments = () => {
         icon: CheckCircle,
         cardBg: "bg-green-50",
         cardBorder: "border-green-200",
-      },
-      delivered: {
-        bg: "bg-emerald-50",
-        text: "text-emerald-700",
-        border: "border-emerald-200",
-        dot: "bg-emerald-500",
-        icon: Truck,
-        cardBg: "bg-emerald-50",
-        cardBorder: "border-emerald-200",
-      },
-      approved: {
-        bg: "bg-teal-50",
-        text: "text-teal-700",
-        border: "border-teal-200",
-        dot: "bg-teal-500",
-        icon: FileCheck,
-        cardBg: "bg-teal-50",
-        cardBorder: "border-teal-200",
-      },
-      processed: {
-        bg: "bg-cyan-50",
-        text: "text-cyan-700",
-        border: "border-cyan-200",
-        dot: "bg-cyan-500",
-        icon: Package,
-        cardBg: "bg-cyan-50",
-        cardBorder: "border-cyan-200",
+        label: "Deliver/Completed",
       },
       processing: {
         bg: "bg-blue-50",
@@ -126,15 +103,17 @@ const TrackMyDocuments = () => {
         icon: Clock,
         cardBg: "bg-blue-50",
         cardBorder: "border-blue-200",
+        label: "Processing",
       },
-      pending: {
+      "put-on-hold": {
         bg: "bg-orange-50",
         text: "text-orange-700",
         border: "border-orange-200",
         dot: "bg-orange-500",
-        icon: AlertCircle,
+        icon: PauseCircle,
         cardBg: "bg-orange-50",
         cardBorder: "border-orange-200",
+        label: "Put on Hold",
       },
       cancelled: {
         bg: "bg-red-100",
@@ -144,16 +123,14 @@ const TrackMyDocuments = () => {
         icon: XCircle,
         cardBg: "bg-red-100",
         cardBorder: "border-red-300",
+        label: "Cancelled",
       },
     };
-    return configs[normalizedStatus] || configs.pending;
+    return configs[normalizedStatus] || configs.processing;
   };
 
   const getStatusBadge = (status) => {
     const config = getStatusConfig(status);
-    const statusText =
-      normalizeStatus(status).charAt(0).toUpperCase() +
-      normalizeStatus(status).slice(1);
     const IconComponent = config.icon;
 
     return (
@@ -161,14 +138,14 @@ const TrackMyDocuments = () => {
         className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-semibold ${config.bg} ${config.text} ${config.border} border-2 shadow-sm`}
       >
         <IconComponent className="w-3 h-3 sm:w-4 sm:h-4" />
-        <span className="hidden sm:inline">{statusText}</span>
-        <span className="sm:hidden">{statusText.substring(0, 4)}</span>
+        <span className="hidden sm:inline">{config.label}</span>
+        <span className="sm:hidden">{config.label.split("/")[0]}</span>
       </span>
     );
   };
 
   const filteredDocuments = documents.filter((doc) => {
-    const normalizedDocStatus = normalizeStatus(doc.doumentStatus);
+    const normalizedDocStatus = normalizeStatus(doc.documentStatus);
     const matchesStatus =
       statusFilter === "all" || normalizedDocStatus === statusFilter;
     const matchesSearch =
@@ -198,26 +175,17 @@ const TrackMyDocuments = () => {
   const getStatusCounts = () => {
     return {
       total: documents.length,
-      completed: documents.filter(
-        (doc) => normalizeStatus(doc.doumentStatus) === "completed"
-      ).length,
-      delivered: documents.filter(
-        (doc) => normalizeStatus(doc.doumentStatus) === "delivered"
-      ).length,
-      approved: documents.filter(
-        (doc) => normalizeStatus(doc.doumentStatus) === "approved"
-      ).length,
-      processed: documents.filter(
-        (doc) => normalizeStatus(doc.doumentStatus) === "processed"
+      "delivered-completed": documents.filter(
+        (doc) => normalizeStatus(doc.documentStatus) === "delivered-completed"
       ).length,
       processing: documents.filter(
-        (doc) => normalizeStatus(doc.doumentStatus) === "processing"
+        (doc) => normalizeStatus(doc.documentStatus) === "processing"
       ).length,
-      pending: documents.filter(
-        (doc) => normalizeStatus(doc.doumentStatus) === "pending"
+      "put-on-hold": documents.filter(
+        (doc) => normalizeStatus(doc.documentStatus) === "put-on-hold"
       ).length,
       cancelled: documents.filter(
-        (doc) => normalizeStatus(doc.doumentStatus) === "cancelled"
+        (doc) => normalizeStatus(doc.documentStatus) === "cancelled"
       ).length,
     };
   };
@@ -296,48 +264,12 @@ const TrackMyDocuments = () => {
         {showResults && (
           <div className="space-y-6 sm:space-y-10">
             {/* Summary Cards - Mobile Optimized */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-4">
               <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-red-100 hover:shadow-2xl transition-all hover:border-red-200 transform hover:-translate-y-1">
                 <div className="text-lg sm:text-2xl font-bold text-red-700 mb-1">
                   {counts.total}
                 </div>
                 <div className="text-xs text-red-600 font-semibold">Total</div>
-              </div>
-              <div className="bg-green-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-green-200 hover:shadow-2xl transition-all hover:border-green-300 transform hover:-translate-y-1">
-                <div className="text-lg sm:text-2xl font-bold text-green-700 mb-1">
-                  {counts.completed}
-                </div>
-                <div className="text-xs text-green-600 font-semibold">
-                  <span className="hidden sm:inline">Completed</span>
-                  <span className="sm:hidden">Done</span>
-                </div>
-              </div>
-              <div className="bg-emerald-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-emerald-200 hover:shadow-2xl transition-all hover:border-emerald-300 transform hover:-translate-y-1">
-                <div className="text-lg sm:text-2xl font-bold text-emerald-700 mb-1">
-                  {counts.delivered}
-                </div>
-                <div className="text-xs text-emerald-600 font-semibold">
-                  <span className="hidden sm:inline">Delivered</span>
-                  <span className="sm:hidden">Deliv</span>
-                </div>
-              </div>
-              <div className="bg-teal-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-teal-200 hover:shadow-2xl transition-all hover:border-teal-300 transform hover:-translate-y-1">
-                <div className="text-lg sm:text-2xl font-bold text-teal-700 mb-1">
-                  {counts.approved}
-                </div>
-                <div className="text-xs text-teal-600 font-semibold">
-                  <span className="hidden sm:inline">Approved</span>
-                  <span className="sm:hidden">Appr</span>
-                </div>
-              </div>
-              <div className="bg-cyan-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-cyan-200 hover:shadow-2xl transition-all hover:border-cyan-300 transform hover:-translate-y-1">
-                <div className="text-lg sm:text-2xl font-bold text-cyan-700 mb-1">
-                  {counts.processed}
-                </div>
-                <div className="text-xs text-cyan-600 font-semibold">
-                  <span className="hidden sm:inline">Processed</span>
-                  <span className="sm:hidden">Proc</span>
-                </div>
               </div>
               <div className="bg-blue-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-blue-200 hover:shadow-2xl transition-all hover:border-blue-300 transform hover:-translate-y-1">
                 <div className="text-lg sm:text-2xl font-bold text-blue-700 mb-1">
@@ -345,16 +277,25 @@ const TrackMyDocuments = () => {
                 </div>
                 <div className="text-xs text-blue-600 font-semibold">
                   <span className="hidden sm:inline">Processing</span>
-                  <span className="sm:hidden">Prog</span>
+                  <span className="sm:hidden">Proc</span>
+                </div>
+              </div>
+              <div className="bg-green-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-green-200 hover:shadow-2xl transition-all hover:border-green-300 transform hover:-translate-y-1">
+                <div className="text-lg sm:text-2xl font-bold text-green-700 mb-1">
+                  {counts["delivered-completed"]}
+                </div>
+                <div className="text-xs text-green-600 font-semibold">
+                  <span className="hidden sm:inline">Deliver/Completed</span>
+                  <span className="sm:hidden">Done</span>
                 </div>
               </div>
               <div className="bg-orange-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-orange-200 hover:shadow-2xl transition-all hover:border-orange-300 transform hover:-translate-y-1">
                 <div className="text-lg sm:text-2xl font-bold text-orange-700 mb-1">
-                  {counts.pending}
+                  {counts["put-on-hold"]}
                 </div>
                 <div className="text-xs text-orange-600 font-semibold">
-                  <span className="hidden sm:inline">Pending</span>
-                  <span className="sm:hidden">Pend</span>
+                  <span className="hidden sm:inline">Put on Hold</span>
+                  <span className="sm:hidden">Hold</span>
                 </div>
               </div>
               <div className="bg-red-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-xl border-2 border-red-300 hover:shadow-2xl transition-all hover:border-red-400 transform hover:-translate-y-1">
@@ -391,13 +332,10 @@ const TrackMyDocuments = () => {
                       onChange={(e) => setStatusFilter(e.target.value)}
                       className="w-full px-4 py-3 sm:py-4 pl-10 sm:pl-12 pr-10 sm:pr-12 border-2 border-red-200 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-200 focus:border-red-500 transition-all appearance-none bg-white font-medium text-sm sm:text-base"
                     >
-                      <option value="all">All Status</option>
-                      <option value="pending">Pending</option>
+                      <option value="all">Select new status</option>
                       <option value="processing">Processing</option>
-                      <option value="processed">Processed</option>
-                      <option value="approved">Approved</option>
-                      <option value="delivered">Delivered</option>
-                      <option value="completed">Completed</option>
+                      <option value="delivered-completed">Deliver/Completed</option>
+                      <option value="put-on-hold">Put on Hold</option>
                       <option value="cancelled">Cancelled</option>
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-400 w-4 h-4 sm:w-5 sm:h-5" />
@@ -448,7 +386,7 @@ const TrackMyDocuments = () => {
                           </p>
                         </div>
                         <div className="flex justify-start sm:justify-end">
-                          {getStatusBadge(doc.doumentStatus)}
+                          {getStatusBadge(doc.documentStatus)}
                         </div>
                       </div>
 

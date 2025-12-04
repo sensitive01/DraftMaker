@@ -169,10 +169,13 @@ export default function PreviewDualNameChange() {
       return false;
     }
 
-    if (!formData.age.trim()) {
+    if (!formData.age || String(formData.age).trim() === '') {
       setValidationError("Please enter your age");
       return false;
-    } else if (isNaN(formData.age) || parseInt(formData.age) <= 0) {
+    }
+
+
+    else if (isNaN(formData.age) || parseInt(formData.age) <= 0) {
       setValidationError("Please enter a valid age");
       return false;
     }

@@ -42,28 +42,44 @@ const DocumentBookingTablePreview = () => {
   const [newStatus, setNewStatus] = useState("");
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
-  const statusOptions = [
-    {
-      value: "Pending",
-      label: "Pending",
-      color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    },
-    {
-      value: "In Progress",
-      label: "In Progress",
-      color: "bg-blue-100 text-blue-800 border-blue-200",
-    },
-    {
-      value: "Completed",
-      label: "Completed",
-      color: "bg-green-100 text-green-800 border-green-200",
-    },
-    {
-      value: "Rejected",
-      label: "Rejected",
-      color: "bg-red-100 text-red-800 border-red-200",
-    },
-  ];
+const statusOptions = [
+  {
+    value: "Pending",
+    label: "Pending",
+    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  },
+  {
+    value: "In Progress",
+    label: "In Progress",
+    color: "bg-blue-100 text-blue-800 border-blue-200",
+  },
+  {
+    value: "Processing",
+    label: "Processing",
+    color: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  },
+  {
+    value: "Hold",
+    label: "Put on Hold",
+    color: "bg-purple-100 text-purple-800 border-purple-200",
+  },
+  {
+    value: "Completed",
+    label: "Deliver / Completed",
+    color: "bg-green-100 text-green-800 border-green-200",
+  },
+  {
+    value: "Rejected",
+    label: "Rejected",
+    color: "bg-red-100 text-red-800 border-red-200",
+  },
+  {
+    value: "Cancelled",
+    label: "Cancelled",
+    color: "bg-rose-100 text-rose-800 border-rose-200",
+  },
+];
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,7 +107,7 @@ const DocumentBookingTablePreview = () => {
   }, [bookingId]);
 
   const handleUpdateStatus = () => {
-    setNewStatus(booking.doumentStatus || "Pending");
+    setNewStatus(booking.documentStatus || "Pending");
     setIsStatusModalOpen(true);
   };
 
@@ -108,7 +124,7 @@ const DocumentBookingTablePreview = () => {
       const response = await updateBookingStatus(booking._id, newStatus);
 
       if (response.status === 200) {
-        setBooking({ ...booking, doumentStatus: newStatus });
+        setBooking({ ...booking, documentStatus: newStatus });
         handleCloseStatusModal();
         alert(`Status updated successfully to ${newStatus}`);
       }
@@ -245,15 +261,15 @@ const DocumentBookingTablePreview = () => {
 
               {/* Right Side - Status and Action */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                {booking.doumentStatus && (
+                {booking.documentStatus && (
                   <div className="flex items-center">
                     <span
                       className={`px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center border ${getStatusBadgeColor(
-                        booking.doumentStatus
+                        booking.documentStatus
                       )}`}
                     >
-                      {getStatusIcon(booking.doumentStatus)}
-                      {booking.doumentStatus}
+                      {getStatusIcon(booking.documentStatus)}
+                      {booking.documentStatus}
                     </span>
                   </div>
                 )}
@@ -787,7 +803,7 @@ const DocumentBookingTablePreview = () => {
           {/* Right Column - Status & Financial Information */}
           <div className="xl:col-span-4 space-y-6">
             {/* Status Overview Card */}
-            {(booking.doumentStatus || booking.paymentStatus) && (
+            {(booking.documentStatus || booking.paymentStatus) && (
               <div className="bg-white rounded-xl shadow-sm border">
                 <div className="px-4 py-3 border-b border-gray-200">
                   <h2 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -796,7 +812,7 @@ const DocumentBookingTablePreview = () => {
                   </h2>
                 </div>
                 <div className="p-4">
-                  {booking.doumentStatus && (
+                  {booking.documentStatus && (
                     <div className="mb-3">
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
                         Document Status
@@ -804,11 +820,11 @@ const DocumentBookingTablePreview = () => {
                       <div className="flex">
                         <span
                           className={`px-3 py-2 rounded-lg text-sm font-semibold flex items-center border ${getStatusBadgeColor(
-                            booking.doumentStatus
+                            booking.documentStatus
                           )}`}
                         >
-                          {getStatusIcon(booking.doumentStatus)}
-                          {booking.doumentStatus}
+                          {getStatusIcon(booking.documentStatus)}
+                          {booking.documentStatus}
                         </span>
                       </div>
                     </div>
@@ -1231,11 +1247,11 @@ const DocumentBookingTablePreview = () => {
                     <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
                       <span
                         className={`px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center w-fit border ${getStatusBadgeColor(
-                          booking.doumentStatus
+                          booking.documentStatus
                         )}`}
                       >
-                        {getStatusIcon(booking.doumentStatus)}
-                        {booking.doumentStatus || "Pending"}
+                        {getStatusIcon(booking.documentStatus)}
+                        {booking.documentStatus || "Pending"}
                       </span>
                     </div>
                   </div>
@@ -1269,7 +1285,7 @@ const DocumentBookingTablePreview = () => {
                   <button
                     onClick={handleStatusSubmit}
                     disabled={
-                      updatingStatus || newStatus === booking.doumentStatus
+                      updatingStatus || newStatus === booking.documentStatus
                     }
                     className="w-full sm:w-auto px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-medium"
                   >
