@@ -826,7 +826,7 @@ const handleUploadResponse = async (req, res) => {
 
 
         try {
-            const updated = await UploadDocumentModel.findOneAndUpdate(
+            const updated = await uploadDocument.findOneAndUpdate(
                 { bookingId: bookingId },
                 {
                     $set: {
