@@ -267,18 +267,19 @@ const EstampBookingTable = () => {
 
       toast.success(
         response?.data?.message ||
-          `Status updated to ${newStatus} successfully!`,
+        `Status updated to ${newStatus} successfully!`,
         {
           duration: 4000,
           position: "top-right",
         }
       );
+ 
     } catch (error) {
       console.error("Error updating status:", error);
       setStatusUpdateLoading(false);
       toast.error(
         error?.response?.data?.message ||
-          "Failed to update status. Please try again.",
+        "Failed to update status. Please try again.",
         {
           duration: 4000,
           position: "top-right",
@@ -327,7 +328,7 @@ const EstampBookingTable = () => {
       setDeleteLoading(false);
       toast.error(
         error?.response?.data?.message ||
-          "Failed to delete e-stamp booking. Please try again.",
+        "Failed to delete e-stamp booking. Please try again.",
         {
           duration: 4000,
           position: "top-right",
@@ -828,11 +829,10 @@ const EstampBookingTable = () => {
               <button
                 onClick={handleStatusUpdate}
                 disabled={!newStatus || statusUpdateLoading}
-                className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center ${
-                  !newStatus || statusUpdateLoading
+                className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center ${!newStatus || statusUpdateLoading
                     ? "opacity-50 cursor-not-allowed"
                     : ""
-                }`}
+                  }`}
               >
                 {statusUpdateLoading ? (
                   <>
@@ -950,11 +950,10 @@ const EstampBookingTable = () => {
                 disabled={
                   deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
                 }
-                className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center ${
-                  deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
+                className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center ${deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
                     ? "opacity-50 cursor-not-allowed"
                     : ""
-                }`}
+                  }`}
               >
                 {deleteLoading ? (
                   <>

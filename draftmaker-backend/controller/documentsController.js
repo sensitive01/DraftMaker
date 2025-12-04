@@ -3537,19 +3537,10 @@ const updateUploadedDocumentStatus = async (req, res) => {
     if (!updatedDocument) {
       return res.status(404).json({ message: "Document not found" });
     }
-        await sendEmail("draftmakerinfo@gmail.com", "uploadDocuments", {
-          bookingId: updatedDocument.bookingId,
-          agreementName: updatedDocument.documentType,
-          dateTime: updatedDocument.createdAt,
-          userName: updatedDocument.requestorName,
-          mobile: updatedDocument.mobileNumber,
-          paymentId: updatedDocument.razorpayPaymentId,
-          paymentStatus: updatedDocument.paymentStatus,
-          amount: updatedDocument.totalAmount,
-        });
+   
 
 
-        console.log(`sending the email ${orderData.documentType}`)
+
 
 
     res.status(200).json({

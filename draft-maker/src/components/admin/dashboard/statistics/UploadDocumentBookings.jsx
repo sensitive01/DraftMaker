@@ -227,18 +227,18 @@ const UploadDocumentBookings = () => {
         statusUpdateBooking._id,
         newStatus
       );
-
+console.log("ststus updated",response)
       if (response.status === 200) {
-        const updatedBookings = bookings.map((booking) => {
-          if (booking._id === statusUpdateBooking._id) {
-            return { ...booking, documentStatus: newStatus };
-          }
-          return booking;
-        });
+        // Update the bookings list with the new status
+        setBookings(prevBookings =>
+          prevBookings.map(booking =>
+            booking._id === statusUpdateBooking._id
+              ? { ...booking, documentStatus: newStatus }
+              : booking
+          )
+        );
 
-        setBookings(updatedBookings);
-        handleCloseStatusModal();
-
+        // Show success message
         toast.success(
           response?.data?.message || `Status updated to ${newStatus} successfully!`,
           {
@@ -246,6 +246,11 @@ const UploadDocumentBookings = () => {
             position: "top-right",
           }
         );
+
+        // Close the modal
+        setIsStatusModalOpen(false);
+        setStatusUpdateBooking(null);
+        setNewStatus("");
       }
     } catch (error) {
       console.error("Error updating status:", error);
