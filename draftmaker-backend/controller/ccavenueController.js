@@ -767,18 +767,18 @@ const handleUploadResponse = async (req, res) => {
             // Fallback: If parsing fails, try to use the order_id, although this is less reliable
             bookingId = `FALLBACK_ERR_${orderId}`;
         }
-        
+
         // **CRITICAL CHECK: Ensure bookingId is available before proceeding**
         if (!bookingId) {
-             console.error("❌ Critical: Booking ID could not be determined from CCAvenue response.");
-             return res.redirect(
+            console.error("❌ Critical: Booking ID could not be determined from CCAvenue response.");
+            return res.redirect(
                 `${process.env.FRONTEND_URL}/payment-failed?` +
                 `error=${encodeURIComponent('Booking ID missing from payment response')}` +
                 `&orderId=${encodeURIComponent(orderId)}`
-             );
+            );
         }
-        
-        console.log("bookingId---->",bookingId)
+
+        console.log("bookingId---->", bookingId)
 
         // BUILD PAYMENT DATA ONLY
         const paymentUpdate = {

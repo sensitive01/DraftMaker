@@ -197,7 +197,7 @@ const getDocumentNames = async (req, res) => {
 
 const getUploadedDocumentData = async (req, res) => {
   try {
-    const uploadedDocuments = await uploadDocument.find({});
+    const uploadedDocuments = await uploadDocument.find({}).sort({createdAt:-1});
 
     if (!uploadedDocuments || uploadedDocuments.length === 0) {
       return res.status(404).json({ message: "No uploaded documents found" });
