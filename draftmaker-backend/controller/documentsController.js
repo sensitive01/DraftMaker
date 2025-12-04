@@ -461,6 +461,7 @@ const trackMyDocumentStatus = async (req, res) => {
         bookingId: 1,
         createdAt: 1,
         documentType: 1,
+        totalAmount:1
       }
     );
 
