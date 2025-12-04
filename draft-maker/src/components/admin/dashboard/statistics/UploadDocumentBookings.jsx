@@ -65,16 +65,25 @@ const UploadDocumentBookings = () => {
       color: "bg-yellow-100 text-yellow-800",
     },
     {
-      value: "In Progress",
-      label: "In Progress",
+      value: "Processing",
+      label: "Processing",
       color: "bg-blue-100 text-blue-800",
     },
     {
-      value: "Completed",
-      label: "Completed",
+      value: "Deliver/Completed",
+      label: "Deliver/Completed",
       color: "bg-green-100 text-green-800",
     },
-    { value: "Rejected", label: "Rejected", color: "bg-red-100 text-red-800" },
+    {
+      value: "Put on Hold",
+      label: "Put on Hold",
+      color: "bg-orange-100 text-orange-800",
+    },
+    {
+      value: "Cancelled",
+      label: "Cancelled",
+      color: "bg-red-100 text-red-800"
+    },
   ];
 
   const formatHumanDate = (dateString) => {
@@ -323,16 +332,45 @@ const UploadDocumentBookings = () => {
       : "bg-gray-100 text-gray-800 border border-gray-200";
   };
 
+  // Separate function for payment status colors
+  const getPaymentStatusBadgeColor = (status) => {
+    const statusLower = status.toLowerCase();
+    switch (statusLower) {
+      case "success":
+      case "completed":
+      case "paid":
+        return "bg-green-100 text-green-800 border border-green-200";
+      case "pending":
+      case "initiated":
+        return "bg-yellow-100 text-yellow-800 border border-yellow-200";
+      case "failed":
+      case "rejected":
+      case "cancelled":
+        return "bg-red-100 text-red-800 border border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border border-gray-200";
+    }
+  };
+
   const getStatusIcon = (status) => {
     switch (status.toLowerCase()) {
       case "pending":
+      case "initiated":
         return <Clock size={12} className="mr-1" />;
       case "in progress":
+      case "processing":
         return <AlertCircle size={12} className="mr-1" />;
       case "completed":
+      case "success":
+      case "paid":
+      case "deliver/completed":
         return <CheckCircle size={12} className="mr-1" />;
       case "rejected":
+      case "failed":
+      case "cancelled":
         return <XCircle size={12} className="mr-1" />;
+      case "put on hold":
+        return <AlertCircle size={12} className="mr-1" />;
       default:
         return <Clock size={12} className="mr-1" />;
     }
@@ -684,7 +722,7 @@ const UploadDocumentBookings = () => {
                     </td>
                     <td className="p-3 whitespace-nowrap">
                       <span
-                        className={`inline-flex px-2 py-1 rounded-full text-xs font-medium items-center ${getStatusBadgeColor(
+                        className={`inline-flex px-2 py-1 rounded-full text-xs font-medium items-center ${getPaymentStatusBadgeColor(
                           booking.paymentStatus
                         )}`}
                       >
@@ -724,7 +762,7 @@ const UploadDocumentBookings = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="p-6 text-center">
+                  <td colSpan="8" className="p-6 text-center">
                     <div className="flex flex-col items-center justify-center space-y-3">
                       <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
                         <Search size={24} className="text-gray-400" />

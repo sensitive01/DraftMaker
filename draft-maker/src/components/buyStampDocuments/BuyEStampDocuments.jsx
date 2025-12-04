@@ -473,9 +473,9 @@ const BuyEStampDocuments = () => {
           const form = document.createElement("form");
           form.method = "POST";
           form.enctype = "application/x-www-form-urlencoded";
-          form.action =
-            "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
-          // form.action = "https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
+          // form.action =
+          //   "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
+          form.action = "https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
 
 
           // Encrypted request
