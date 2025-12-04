@@ -59,7 +59,7 @@ const nameChangeSchema = new mongoose.Schema(
     bookingId: { type: String },
     mobileNumber: { type: String },
     userName: { type: String },
-    doumentStatus: { type: String, default: "Pending" },
+    documentStatus: { type: String, default: "Pending" },
     paymentStatus: { type: String, default: "Pending" },
     paymentDetails: {
       paymentId: { type: String },

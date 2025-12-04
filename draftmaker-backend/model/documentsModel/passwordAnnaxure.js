@@ -101,7 +101,7 @@ const passportAffidavitSchema = new mongoose.Schema(
     },
     bookingId: { type: String },
     mobileNumber: { type: String },
-    doumentStatus: {
+    documentStatus: {
       type: String,
       default: "Pending",
     },

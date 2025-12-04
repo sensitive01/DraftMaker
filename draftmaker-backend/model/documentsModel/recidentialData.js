@@ -120,7 +120,7 @@ const recidentailAgreementSchema = new mongoose.Schema(
     documentType: { type: String },
     formId: { type: String },
     userName: { type: String },
-    doumentStatus: { type: String, default: "Pending" },
+    documentStatus: { type: String, default: "Pending" },
     paymentStatus: { type: String, default: "Pending" },
 
     paymentDetails: {

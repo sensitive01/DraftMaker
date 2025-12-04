@@ -125,7 +125,7 @@ const commercialAgreementSchema = new mongoose.Schema(
     bookingId: { type: String },
     mobileNumber: { type: String },
     documentType: { type: String },
-    doumentStatus: { type: String, default: "Pending" },
+    documentStatus: { type: String, default: "Pending" },
     userName: { type: String },
     paymentStatus: { type: String, default: "Pending" },
 

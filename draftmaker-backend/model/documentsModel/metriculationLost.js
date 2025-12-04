@@ -69,7 +69,7 @@ const documentVerificationSchema = new mongoose.Schema(
     // Meta
     bookingId: { type: String },
     mobileNumber: { type: String },
-    doumentStatus: {
+    documentStatus: {
       type: String,
       default: "Pending",
     },

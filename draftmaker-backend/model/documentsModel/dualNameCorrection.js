@@ -91,7 +91,7 @@ const dualNameCorrection = new mongoose.Schema(
     month: { type: String },
     year: { type: String, default: "2025" },
 
-    doumentStatus: { type: String, default: "Pending" },
+    documentStatus: { type: String, default: "Pending" },
     userName: String,
     paymentStatus: { type: String, default: "Pending" },
     paymentDetails: {

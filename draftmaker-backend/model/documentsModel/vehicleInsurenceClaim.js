@@ -76,7 +76,7 @@ const vehicleAccidentSchema = new mongoose.Schema(
     userName: { type: String },
     documentType: { type: String },
     formId: { type: String },
-    doumentStatus: { type: String, default: "Pending" },
+    documentStatus: { type: String, default: "Pending" },
     paymentStatus: { type: String, default: "Pending" },
 
     paymentDetails: {

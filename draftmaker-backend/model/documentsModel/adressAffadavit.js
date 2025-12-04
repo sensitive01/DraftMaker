@@ -65,7 +65,7 @@ const affidavitSchema = new mongoose.Schema(
     formId: { type: String },
     mobileNumber: { type: String },
     userName: { type: String },
-    doumentStatus: {
+    documentStatus: {
       type: String,
       default: "Pending",
     },

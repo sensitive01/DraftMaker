@@ -118,7 +118,7 @@ const gasFormDataSchema = new mongoose.Schema(
     mobileNumber: {
       type: String,
     },
-    doumentStatus: {
+    documentStatus: {
       type: String,
       default: "Pending",
     },

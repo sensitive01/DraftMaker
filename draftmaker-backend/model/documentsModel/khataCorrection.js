@@ -74,7 +74,7 @@ const dualApplicantSchema = new mongoose.Schema(
     documentType: { type: String },
     formId: { type: String },
 
-    doumentStatus: {
+    documentStatus: {
       type: String,
       default: "Pending",
     },

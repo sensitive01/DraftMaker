@@ -65,7 +65,7 @@ const parentCorrectionFormSchema = new mongoose.Schema(
     year: { type: Number, default: 2025 },
     bookingId: { type: String },
     mobileNumber: { type: String },
-    doumentStatus: { type: String, default: "Pending" },
+    documentStatus: { type: String, default: "Pending" },
     paymentStatus: { type: String, default: "Pending" },
     userName: { type: String },
     documentType: { type: String },
