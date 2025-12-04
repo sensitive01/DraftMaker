@@ -453,6 +453,7 @@ const saveTheEstampData = async (req, res) => {
       paymentStatus: orderData.paymentStatus,
       amount: orderData.totalAmount,
     });
+    console.log(`sending the email ${orderData.documentType}`)
 
     res.status(201).json({
       success: true,

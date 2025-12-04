@@ -1205,6 +1205,8 @@ const updateDualNamePaymentData = async (req, res) => {
       amount: amount,
     });
 
+    console.log(`email is sending....${documentType}`)
+
     res.status(200).json({
       message: "Payment details updated successfully.",
       data: updatedData,
@@ -1385,6 +1387,7 @@ const saveNameCorrectionPaymentData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -1510,6 +1513,7 @@ const saveDobCorrectionPaymentData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -1635,6 +1639,7 @@ const saveGasCorrectionPaymentData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -1760,6 +1765,7 @@ const saveDocumentLostPaymentData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -1883,6 +1889,7 @@ const saveDobParentNameCorrection = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2008,6 +2015,7 @@ const saveBirthCertificateNameCorrection = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2133,6 +2141,7 @@ const saveGstPaymentData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2258,6 +2267,7 @@ const updateMetriculationLostPaymentData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2383,6 +2393,7 @@ const updateKhataCorrectionPaymentData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2508,6 +2519,7 @@ const updateVehicleInsurencePaymentData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2633,6 +2645,7 @@ const updateHufPaymentData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2758,6 +2771,7 @@ const updateGapPeriodData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -2883,6 +2897,7 @@ const updatePasswordAnnaxureData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -3008,6 +3023,7 @@ const updatePassportNameChangePaymentData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -3133,6 +3149,7 @@ const updateAdressAffadavitPaymentData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -3269,6 +3286,7 @@ const updateCommercialPaymentData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -3394,6 +3412,7 @@ const updateRecidentialPaymentData = async (req, res) => {
       paymentStatus: status,
       amount: amount,
     });
+      console.log(`email is sending....${documentType}`)
 
     res.status(200).json({
       message: "Payment details updated successfully.",
@@ -3517,6 +3536,20 @@ const updateUploadedDocumentStatus = async (req, res) => {
     if (!updatedDocument) {
       return res.status(404).json({ message: "Document not found" });
     }
+        await sendEmail("draftmakerinfo@gmail.com", "uploadDocuments", {
+          bookingId: updatedDocument.bookingId,
+          agreementName: updatedDocument.documentType,
+          dateTime: updatedDocument.createdAt,
+          userName: updatedDocument.requestorName,
+          mobile: updatedDocument.mobileNumber,
+          paymentId: updatedDocument.razorpayPaymentId,
+          paymentStatus: updatedDocument.paymentStatus,
+          amount: updatedDocument.totalAmount,
+        });
+
+
+        console.log(`sending the email ${orderData.documentType}`)
+
 
     res.status(200).json({
       success: true,
