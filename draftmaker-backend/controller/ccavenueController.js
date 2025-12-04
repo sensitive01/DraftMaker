@@ -8,7 +8,8 @@ const uploadDocument = require("../model/upload/uploadDocument");
 
 const documentController = require("./documentsController")
 require('dotenv').config();
-const ccAvenueConfig = require("../config/ccAvanueConfig")
+const ccAvenueConfig = require("../config/ccAvanueConfig");
+const sendEmail = require('../utils/sendEmail');
 
 async function generateBookingId() {
     const prefix = "DM";
@@ -298,6 +299,17 @@ const handleResponse = async (req, res) => {
             payment.paymentStatus = 'completed';
             payment.paymentCompletedAt = new Date();
             await payment.save();
+            await sendEmail("draftmakerinfo@gmail.com", "eStamp", {
+                bookingId: bookingId,
+                agreementName: payment.documentType,
+                dateTime: payment.createdAt,
+                userName: payment.requestorName,
+                mobile: payment.mobileNumber,
+                paymentId: payment.razorpayPaymentId,
+                paymentStatus: payment.paymentStatus,
+                amount: payment.totalAmount,
+            });
+            console.log(`sending the email ${payment.documentType}`)
 
             console.log(`✅ Payment successful for order: ${orderId}`);
             return res.redirect(
@@ -812,10 +824,10 @@ const handleUploadResponse = async (req, res) => {
         console.log("🟦 Updating payment details in DB...");
         console.log(paymentUpdate);
 
-     
+
         try {
             const updated = await UploadDocumentModel.findOneAndUpdate(
-                { bookingId: bookingId },     
+                { bookingId: bookingId },
                 {
                     $set: {
                         payment: paymentUpdate,
