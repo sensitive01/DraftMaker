@@ -987,7 +987,7 @@ function App() {
         {/* ................................... */}
 
         <Route
-          path="/documents/preview-page/DM-RFD-18/:bookingId"
+          path="/documents/preview-page/DM-RFD-18/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewRentalAgreement />
@@ -995,7 +995,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-CFD-17/:bookingId"
+          path="/documents/preview-page/DM-CFD-17/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewCommercialAggrement />
@@ -1003,7 +1003,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-AAF-16/:bookingId"
+          path="/documents/preview-page/DM-AAF-16/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewAddressAffadavit />
@@ -1011,7 +1011,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-PNC-15/:bookingId"
+          path="/documents/preview-page/DM-PNC-15/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewPassportNameChange />
@@ -1019,7 +1019,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-PAF-14/:bookingId"
+          path="/documents/preview-page/DM-PAF-14/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewPasswordAnnaxure />
@@ -1027,7 +1027,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-GP-13/:bookingId"
+          path="/documents/preview-page/DM-GP-13/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewGapPeriod />
@@ -1035,7 +1035,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-HUF-12/:bookingId"
+          path="/documents/preview-page/DM-HUF-12/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewHufAgreement />
@@ -1043,7 +1043,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-VIC-11/:bookingId"
+          path="/documents/preview-page/DM-VIC-11/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewVehicleInsuranceClamingPage />
@@ -1051,7 +1051,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-KH-10/:bookingId"
+          path="/documents/preview-page/DM-KH-10/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewJointKhataTransfer />
@@ -1059,7 +1059,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-MAL-9/:bookingId"
+          path="/documents/preview-page/DM-MAL-9/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewMatriculationPage />
@@ -1067,7 +1067,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-GST-8/:bookingId"
+          path="/documents/preview-page/DM-GST-8/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewGstPage />
@@ -1075,7 +1075,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-BC-MNC-7/:bookingId"
+          path="/documents/preview-page/DM-BC-MNC-7/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewBirthCertificatePage />
@@ -1083,7 +1083,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-BCNCP-6/:bookingId"
+          path="/documents/preview-page/DM-BCNCP-6/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewBirthCertificateParentNameCorrectionPage />
@@ -1091,7 +1091,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-DOC-LOST-5/:bookingId"
+          path="/documents/preview-page/DM-DOC-LOST-5/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewDocumentLostPage />
@@ -1099,7 +1099,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-GAS-5/:bookingId"
+          path="/documents/preview-page/DM-GAS-5/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewGasAffidavitForm />
@@ -1107,7 +1107,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-DOBC-3/:bookingId"
+          path="/documents/preview-page/DM-DOBC-3/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewDobCorrectionPage />
@@ -1115,7 +1115,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-NC-2/:bookingId"
+          path="/documents/preview-page/DM-NC-2/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewNameCorrectionChange />
@@ -1123,7 +1123,7 @@ function App() {
           }
         />
         <Route
-          path="/documents/preview-page/DM-DNC-1/:bookingId"
+          path="/documents/preview-page/DM-DNC-1/:bookingId/:orderId"
           element={
             <PaymentLayout>
               <PreviewDualNameChange />

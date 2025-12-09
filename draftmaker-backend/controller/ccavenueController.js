@@ -610,7 +610,7 @@ const handleCCAVENUEResponse = async (req, res) => {
         // Redirect based on payment status
         if (order.paymentStatus === 'SUCCESS' && bookingId && formId) {
             return res.redirect(
-                `https://draftmaker.in/documents/preview-page/${formId}/${bookingId}`
+                `https://draftmaker.in/documents/preview-page/${formId}/${bookingId}/${order.orderId}`
             );
         } else {
             return res.redirect(

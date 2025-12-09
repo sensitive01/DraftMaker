@@ -11,7 +11,7 @@ import {
 } from "../../../../api/service/axiosService";
 
 export default function PreviewDobCorrectionPage() {
-  const { bookingId } = useParams();
+  const { bookingId, orderId } = useParams();
 
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -173,7 +173,9 @@ export default function PreviewDobCorrectionPage() {
         setIsSubmitting(false);
         setShowSuccessNotification(response.data.message);
         setTimeout(() => {
-          navigate("/");
+          navigate(
+            `/documents/home/payment-success?orderId=${orderId}&bookingId=${bookingId}`
+          );
         }, 1500);
       }
     } catch (err) {
@@ -216,12 +218,12 @@ export default function PreviewDobCorrectionPage() {
           <button
             onClick={handleUpdateData}
             disabled={isSubmitting}
-            className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg flex-1 transition duration-300 ease-in-out shadow-md"
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg transform transition duration-300 hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isSubmitting ? (
-              <span className="flex items-center justify-center">
+              <>
                 <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  className="animate-spin -ml-1 h-5 w-5 text-white"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -240,18 +242,11 @@ export default function PreviewDobCorrectionPage() {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                Updating...
-              </span>
+                Processing...
+              </>
             ) : (
-              "Update Application"
+              "Review Completed"
             )}
-          </button>
-
-          <button
-            onClick={() => navigate("/")}
-            className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg flex-1 transition duration-300 ease-in-out shadow-md"
-          >
-            Back To Home
           </button>
         </div>
       </div>

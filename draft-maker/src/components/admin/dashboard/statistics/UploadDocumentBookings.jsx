@@ -82,7 +82,7 @@ const UploadDocumentBookings = () => {
     {
       value: "Cancelled",
       label: "Cancelled",
-      color: "bg-red-100 text-red-800"
+      color: "bg-red-100 text-red-800",
     },
   ];
 
@@ -127,12 +127,21 @@ const UploadDocumentBookings = () => {
         if (response.status === 200) {
           const formattedBookings = response.data.data.map((booking) => ({
             ...booking,
-            username: safeDisplay(booking.userName || booking.fullName, "Unknown"),
+            username: safeDisplay(
+              booking.userName || booking.fullName,
+              "Unknown"
+            ),
             userMobile: safeDisplay(booking.mobileNumber),
             documents: booking.uploadedDocuments || [],
             totalDocuments: (booking.uploadedDocuments || []).length,
-            documentStatus: safeDisplay(booking.documentStatus || "Pending", "Pending"),
-            paymentStatus: safeDisplay(booking.payment?.paymentStatus, "PENDING"),
+            documentStatus: safeDisplay(
+              booking.documentStatus || "Pending",
+              "Pending"
+            ),
+            paymentStatus: safeDisplay(
+              booking.payment?.paymentStatus,
+              "PENDING"
+            ),
             bookingId: safeDisplay(booking.bookingId),
             submittedAt: formatHumanDate(booking.createdAt),
             submittedTime: formatHumanTime(booking.createdAt),
@@ -227,11 +236,11 @@ const UploadDocumentBookings = () => {
         statusUpdateBooking._id,
         newStatus
       );
-console.log("ststus updated",response)
+      console.log("ststus updated", response);
       if (response.status === 200) {
         // Update the bookings list with the new status
-        setBookings(prevBookings =>
-          prevBookings.map(booking =>
+        setBookings((prevBookings) =>
+          prevBookings.map((booking) =>
             booking._id === statusUpdateBooking._id
               ? { ...booking, documentStatus: newStatus }
               : booking
@@ -240,7 +249,8 @@ console.log("ststus updated",response)
 
         // Show success message
         toast.success(
-          response?.data?.message || `Status updated to ${newStatus} successfully!`,
+          response?.data?.message ||
+            `Status updated to ${newStatus} successfully!`,
           {
             duration: 4000,
             position: "top-right",
@@ -255,7 +265,8 @@ console.log("ststus updated",response)
     } catch (error) {
       console.error("Error updating status:", error);
       toast.error(
-        error?.response?.data?.message || "Failed to update status. Please try again.",
+        error?.response?.data?.message ||
+          "Failed to update status. Please try again.",
         {
           duration: 4000,
           position: "top-right",
@@ -306,7 +317,7 @@ console.log("ststus updated",response)
       setDeleteLoading(false);
       toast.error(
         error?.response?.data?.message ||
-        "Failed to delete booking. Please try again.",
+          "Failed to delete booking. Please try again.",
         {
           duration: 4000,
           position: "top-right",
@@ -611,56 +622,32 @@ console.log("ststus updated",response)
       </div>
 
       <div className="hidden lg:block bg-white rounded-lg border border-red-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-[1200px] w-full">
-            <thead className="bg-red-50 border-b border-red-100">
+        <div className="overflow-x-auto max-h-[70vh] overflow-y-auto">
+          <table className="min-w-[1200px] w-full relative">
+            <thead className="bg-red-50 border-b border-red-100 sticky top-0 z-10">
               <tr>
-                <th
-                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
-                  style={{ minWidth: "60px" }}
-                >
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Sl. No.
                 </th>
-                <th
-                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
-                  style={{ minWidth: "150px" }}
-                >
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Booking ID
                 </th>
-                <th
-                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
-                  style={{ minWidth: "200px" }}
-                >
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Date & Time
                 </th>
-                <th
-                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
-                  style={{ minWidth: "180px" }}
-                >
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   User Details
                 </th>
-                <th
-                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
-                  style={{ minWidth: "120px" }}
-                >
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Documents
                 </th>
-                <th
-                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
-                  style={{ minWidth: "160px" }}
-                >
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Document Status
                 </th>
-                <th
-                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
-                  style={{ minWidth: "150px" }}
-                >
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Payment Status
                 </th>
-                <th
-                  className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
-                  style={{ minWidth: "220px" }}
-                >
+                <th className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -736,9 +723,9 @@ console.log("ststus updated",response)
                       </span>
                     </td>
                     <td className="p-3">
-                      <div className="flex items-center gap-2 flex-nowrap">
+                      <div className="flex flex-wrap gap-2">
                         <button
-                          className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors flex items-center space-x-1 text-xs border border-blue-200 whitespace-nowrap"
+                          className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors flex items-center space-x-1 text-xs border border-blue-200"
                           onClick={() => handlePreviewBooking(booking)}
                           title="Preview Details"
                         >
@@ -746,7 +733,7 @@ console.log("ststus updated",response)
                           <span className="font-medium">View</span>
                         </button>
                         <button
-                          className="px-3 py-1.5 bg-orange-50 text-orange-600 rounded-md hover:bg-orange-100 transition-colors flex items-center space-x-1 text-xs border border-orange-200 whitespace-nowrap"
+                          className="px-3 py-1.5 bg-orange-50 text-orange-600 rounded-md hover:bg-orange-100 transition-colors flex items-center space-x-1 text-xs border border-orange-200"
                           onClick={() => handleUpdateStatus(booking)}
                           title="Update Status"
                         >
@@ -754,7 +741,7 @@ console.log("ststus updated",response)
                           <span className="font-medium">Status</span>
                         </button>
                         <button
-                          className="px-3 py-1.5 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors flex items-center space-x-1 text-xs border border-red-200 whitespace-nowrap"
+                          className="px-3 py-1.5 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors flex items-center space-x-1 text-xs border border-red-200"
                           onClick={() => handleOpenDeleteModal(booking)}
                           title="Delete Booking"
                         >
@@ -982,7 +969,8 @@ console.log("ststus updated",response)
                       Documents:
                     </span>
                     <span className="text-sm text-gray-900">
-                      {deleteBookingData.totalDocuments} file{deleteBookingData.totalDocuments !== 1 ? "s" : ""}
+                      {deleteBookingData.totalDocuments} file
+                      {deleteBookingData.totalDocuments !== 1 ? "s" : ""}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -1030,10 +1018,11 @@ console.log("ststus updated",response)
                 disabled={
                   deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
                 }
-                className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center ${deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
-                  ? "opacity-50 cursor-not-allowed"
-                  : ""
-                  }`}
+                className={`px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center ${
+                  deleteConfirmText.toLowerCase() !== "delete" || deleteLoading
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
               >
                 {deleteLoading ? (
                   <>

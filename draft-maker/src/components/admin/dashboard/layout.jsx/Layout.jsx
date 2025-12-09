@@ -153,24 +153,15 @@ const Layout = ({ children }) => {
       },
     ];
 
-    const bottomNavItems = [
-      {
-        icon: HelpCircle,
-        label: "Help",
-        path: "#",
-        isActive: location.pathname === "/help",
-      },
-    ];
-
     const renderNavItems = (items) =>
       items.map((item) => (
-        <li key={item.path} className="mb-2">
+        <li key={item.path} className="mb-1.5">
           {item.hasSubmenu ? (
             <div>
               <div
                 onClick={() => toggleSubmenu(item.submenuKey)}
                 className={`
-                  flex items-center p-3 rounded-lg transition-all duration-300 group cursor-pointer
+                  flex items-center p-2.5 rounded-lg transition-all duration-300 group cursor-pointer
                   ${
                     item.isActive
                       ? "bg-red-600 text-white shadow-md"
@@ -185,7 +176,7 @@ const Layout = ({ children }) => {
               >
                 <div className="flex items-center">
                   <item.icon
-                    size={22}
+                    size={20}
                     className={`
                       ${isSidebarOpen && !isMobile ? "mr-3" : ""}
                       ${item.isActive ? "text-current" : "text-red-600"}
@@ -193,7 +184,7 @@ const Layout = ({ children }) => {
                   />
                   <span
                     className={`
-                      font-medium
+                      text-[15px] font-medium 
                       ${!isSidebarOpen && !isMobile ? "hidden" : ""}
                       ${isMobile && !isSidebarOpen ? "hidden" : ""}
                     `}
@@ -225,13 +216,13 @@ const Layout = ({ children }) => {
               {/* Submenu */}
               {expandedMenus[item.submenuKey] &&
                 (isSidebarOpen || isMobile) && (
-                  <ul className="ml-6 mt-2 space-y-1">
+                  <ul className="ml-6 mt-1.5 space-y-1">
                     {item.submenuItems.map((subItem) => (
                       <li key={subItem.path}>
                         <Link
                           to={subItem.path}
                           className={`
-                          flex items-center p-2 rounded-lg transition-all duration-300 text-sm
+                          flex items-center p-2 rounded-lg transition-all duration-300 text-[13.5px]
                           ${
                             subItem.isActive
                               ? "bg-red-500 text-white shadow-md"
@@ -250,7 +241,7 @@ const Layout = ({ children }) => {
             <Link
               to={item.path}
               className={`
-                flex items-center p-3 rounded-lg transition-all duration-300 group relative
+                flex items-center p-2.5 rounded-lg transition-all duration-300 group relative
                 ${
                   item.isActive
                     ? "bg-red-600 text-white shadow-md"
@@ -266,7 +257,7 @@ const Layout = ({ children }) => {
               <div className="flex items-center">
                 <div className="relative">
                   <item.icon
-                    size={22}
+                    size={20}
                     className={`
                       ${isSidebarOpen && !isMobile ? "mr-3" : ""}
                       ${item.isActive ? "text-current" : "text-red-600"}
@@ -278,8 +269,8 @@ const Layout = ({ children }) => {
                     !isMobile && (
                       <span
                         className={`
-                        absolute -top-2 -right-2 min-w-[20px] h-[20px] px-1
-                        text-xs font-bold rounded-full flex items-center justify-center
+                        absolute -top-2 -right-2 min-w-[18px] h-[18px] px-0.5
+                        text-[11px] font-bold rounded-full flex items-center justify-center
                         border-2 border-white shadow-lg z-10
                         ${
                           item.isActive
@@ -296,7 +287,7 @@ const Layout = ({ children }) => {
                 </div>
                 <span
                   className={`
-                    font-medium
+                    text-[15px] font-medium
                     ${!isSidebarOpen && !isMobile ? "hidden" : ""}
                     ${isMobile && !isSidebarOpen ? "hidden" : ""}
                   `}
@@ -310,8 +301,8 @@ const Layout = ({ children }) => {
                 <div className="ml-auto">
                   <span
                     className={`
-                      min-w-[24px] h-[24px] px-2
-                      text-xs font-bold rounded-full flex items-center justify-center
+                      min-w-[22px] h-[22px] px-1.5
+                      text-[11px] font-bold rounded-full flex items-center justify-center
                       shadow-md
                       ${
                         item.isActive
@@ -335,12 +326,12 @@ const Layout = ({ children }) => {
       <div className="h-full flex flex-col bg-white shadow-xl border-r border-red-100">
         <div className="flex items-center justify-center p-4 border-b border-red-100 bg-red-50">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mr-3">
-              <span className="text-white font-bold text-xl">DM</span>
+            <div className="w-11 h-11 bg-red-600 rounded-full flex items-center justify-center mr-3">
+              <span className="text-white font-bold text-lg">DM</span>
             </div>
             <span
               className={`
-                font-bold text-lg text-red-900 
+                font-bold text-[17px] text-red-900 
                 ${!isSidebarOpen && !isMobile ? "hidden" : ""}
                 ${isMobile && !isSidebarOpen ? "hidden" : ""}
               `}
@@ -350,13 +341,9 @@ const Layout = ({ children }) => {
           </div>
         </div>
 
-        <nav className="flex-1 p-2 bg-white overflow-y-auto">
+        <nav className="flex-1 p-3 bg-white">
           <ul className="space-y-1">{renderNavItems(navItems)}</ul>
         </nav>
-
-        <div className="p-4 border-t border-red-100 bg-red-50">
-          <ul className="space-y-2">{renderNavItems(bottomNavItems)}</ul>
-        </div>
       </div>
     );
   };
@@ -526,6 +513,7 @@ const Layout = ({ children }) => {
 
         <div
           className="p-4 flex-1 overflow-y-auto bg-red-50"
+          style={{ zoom: "80%" }}
           onClick={() => {
             if (isProfileMenuOpen) {
               setIsProfileMenuOpen(false);

@@ -451,9 +451,9 @@ const BookingTable = () => {
 
       {/* Table Container */}
       <div className="bg-white rounded-lg border border-red-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-[1200px] w-full">
-            <thead className="bg-red-50 border-b border-red-100">
+        <div className="overflow-x-auto max-h-[70vh] overflow-y-auto">
+          <table className="min-w-[1200px] w-full relative">
+            <thead className="bg-red-50 border-b border-red-100 sticky top-0 z-10">
               <tr>
                 <th
                   className="p-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider"
