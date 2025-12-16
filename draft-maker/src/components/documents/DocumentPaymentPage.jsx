@@ -847,7 +847,7 @@ const DocumentPaymentPage = () => {
                       htmlFor="includeNotary"
                       className="ml-2 text-sm font-medium text-gray-700 cursor-pointer"
                     >
-                      Include Notary Service
+                      Include Notary Service 
                     </label>
                   </div>
                   <div className="flex-1">
@@ -855,7 +855,7 @@ const DocumentPaymentPage = () => {
                       <div className="flex justify-between items-center">
                         <div>
                           <p className="font-medium text-gray-800 text-sm">
-                            Notary Attestation Service
+                            Notary Attestation Service + Aadhaar digital sign of Deponent
                           </p>
                           <p className="text-xs text-gray-600 mt-0.5">
                             Professional notary attestation for your document

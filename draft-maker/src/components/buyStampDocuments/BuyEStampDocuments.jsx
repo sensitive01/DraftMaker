@@ -242,7 +242,7 @@ const BuyEStampDocuments = () => {
     const stampDescriptions = {
       "684145ffb333b68bfef00580": "(0.5% on AAR, Fine, Premium, Advance)",
       "6841457bb333b68bfef0057c":
-        "(0.5% on average annual rent fine premium subject to maximum of Rs.500)",
+        "(₹20,000 may be given as an alternative consideration amount for the ₹100 stamp or follow the below note)",
       "6841452ab333b68bfef0057a":
         "(Rs.2 for every Rs.100 or part thereof subject to minimum of Rs.100)",
       "6841463db333b68bfef00582":
