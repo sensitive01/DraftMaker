@@ -17,7 +17,7 @@ export default function RefundCancellationPolicyPage() {
   const [businessInfo] = useState({
     businessName: "DRAFT MAKER",
     contactEmail: "draftmakerinfo@gmail.com",
-    contactPhone: "8088774711",
+    contactPhone: "9008774711",
     businessAddress:
       "No 5, 1st floor, Site no 200, Muniraju Complex, Panathur Main Road, Kadubisanahalli, Bengaluru, Karnataka-560103",
     legalEntity: "NAGARAJ AJAY KUMAR",
@@ -72,7 +72,9 @@ export default function RefundCancellationPolicyPage() {
       id: 3,
       icon: <AlertTriangle className="w-6 h-6" />,
       title: "Non-Refundable Services",
-      content: <p className="text-gray-700">All services are non-refundable.</p>,
+      content: (
+        <p className="text-gray-700">All services are non-refundable.</p>
+      ),
     },
     {
       id: 4,

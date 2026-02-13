@@ -166,8 +166,8 @@ const Footer = () => {
                     <div className="text">
                       <p>
                         <span style={{ color: "yellow" }}>Call us </span>
-                        <a href="tel:+91 8088774711">
-                          <span className="mr-1">(+91)</span> 8088774711
+                        <a href="tel:+91 9008774711">
+                          <span className="mr-1">(+91)</span> 9008774711
                         </a>
                       </p>
                     </div>

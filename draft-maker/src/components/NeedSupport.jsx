@@ -17,10 +17,10 @@ const NeedSupport = () => {
             </div>
             <div className="need_action">
               <a href="tel:1234567899" className="btn">
-                <i className="icofont-phone-circle"></i> +91 8088774711
+                <i className="icofont-phone-circle"></i> +91 9008774711
               </a>
-              {/* <a href="tel:+91 8088774711">
-                          <span className="mr-1">(+91)</span> 8088774711
+              {/* <a href="tel:+91 9008774711">
+                          <span className="mr-1">(+91)</span> 9008774711
                         </a> */}
               {/* <a href="#faqBlock" className="faq_btn">Read The FAQ </a> */}
             </div>

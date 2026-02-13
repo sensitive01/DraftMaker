@@ -20,7 +20,7 @@ export default function TermsAndConditionsPage() {
     companyName: "DRAFT MAKER",
     websiteUrl: "https://draftmaker.in",
     contactEmail: "draftmakerinfo@gmail.com",
-    contactPhone: "8088774711",
+    contactPhone: "9008774711",
     businessAddress:
       "No 5, 1st floor, Site no 200, Muniraju Complex, Panathur Main Road, Kadubisanahalli, Bengaluru, Karnataka-560103",
     location: "BENGALURU, KARNATAKA",

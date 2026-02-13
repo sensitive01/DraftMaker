@@ -78,7 +78,7 @@ const ContactMePage = () => {
         formData.name,
         formData.email,
         formData.phone,
-        message
+        message,
       );
 
       if (response.status === 201) {
@@ -92,7 +92,7 @@ const ContactMePage = () => {
     } catch (error) {
       console.error("Error submitting message:", error);
       showErrorMessage(
-        "An error occurred while sending your message. Please try again later."
+        "An error occurred while sending your message. Please try again later.",
       );
     } finally {
       setIsLoading(false);
@@ -188,7 +188,9 @@ const ContactMePage = () => {
                     <div>
                       <p style={{ color: "red" }}>Phone</p>
                       <p style={{ color: "red" }}>
-                        <a href="tel:+91 8088774711" style={{color:"red"}} >(+91) 8088774711</a>
+                        <a href="tel:+91 9008774711" style={{ color: "red" }}>
+                          (+91) 9008774711
+                        </a>
                       </p>
                     </div>
                   </div>
